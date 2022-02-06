@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option go_package = "github.com/essayZW/hpcmanager/proto";
+package publicproto;
+
+// PingResponse ping消息的回复,一般内容为pong
+message PingResponse {
+    string msg = 1;
+}
+
