@@ -4,6 +4,7 @@ import (
 	"flag"
 	"strconv"
 
+	"github.com/essayZW/hpcmanager"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
 	"github.com/essayZW/hpcmanager/logger"
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,7 @@ func main() {
 	var debug bool
 	flag.IntVar(&port, "port", 80, "port to listen")
 	flag.BoolVar(&debug, "debug", true, "debug mode")
+	hpcmanager.LoadCommonArgs()
 	flag.Parse()
 	if debug {
 		gin.SetMode(gin.DebugMode)

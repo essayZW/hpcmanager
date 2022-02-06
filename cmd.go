@@ -1,4 +1,4 @@
-package main
+package hpcmanager
 
 import "flag"
 
@@ -6,8 +6,8 @@ var (
 	etcdAddress string
 )
 
-// loadCommonArgs 注册通用的命令行参数并解析到变量上
-func loadCommonArgs() {
+// LoadCommonArgs 注册通用的命令行参数并解析到变量上
+func LoadCommonArgs() {
 	flag.StringVar(&etcdAddress, "etcdAddress", "172.17.0.2:2379", "etcd service address")
 }
 
