@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+option go_package = "github.com/essayZW/hpcmanager/proto";
+package publicproto;
+
+// 空消息
+message Empty {
+}
