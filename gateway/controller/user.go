@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 
+	"github.com/essayZW/hpcmanager/gateway/response"
 	"github.com/essayZW/hpcmanager/logger"
 	"github.com/essayZW/hpcmanager/proto"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
@@ -16,11 +17,14 @@ type User struct {
 }
 
 func (user *User) ping(ctx *gin.Context) {
-	resp, err := user.userService.Ping(context.TODO(), &proto.Empty{})
+	res, err := user.userService.Ping(context.TODO(), &proto.Empty{})
+	var resp *response.Response
 	if err != nil {
-		ctx.JSON(500, err)
+		resp = response.New(500, err, false, "ping fail!")
+	} else {
+		resp = response.New(200, res, true, "success")
 	}
-	ctx.JSON(200, resp.Msg)
+	resp.Send(ctx)
 }
 
 // Registry 为用户控制器注册相应的处理函数
