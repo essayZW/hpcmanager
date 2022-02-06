@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/essayZW/hpcmanager/logger"
 	publicproto "github.com/essayZW/hpcmanager/proto"
 	user "github.com/essayZW/hpcmanager/user/proto"
 )
@@ -14,6 +15,7 @@ type UserService struct {
 // Ping 测试
 func (s *UserService) Ping(ctx context.Context, _ *publicproto.Empty, req *publicproto.PingResponse) error {
 	req.Msg = "PONG"
+	logger.Info("PING")
 	return nil
 }
 

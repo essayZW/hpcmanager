@@ -4,14 +4,29 @@ import (
 	"flag"
 	"strconv"
 
+	"github.com/asim/go-micro/plugins/registry/etcd/v4"
 	"github.com/essayZW/hpcmanager"
+	"github.com/essayZW/hpcmanager/gateway/controller"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
 	"github.com/essayZW/hpcmanager/logger"
 	"github.com/gin-gonic/gin"
+	"go-micro.dev/v4"
+	"go-micro.dev/v4/client"
+	"go-micro.dev/v4/registry"
 )
 
 func init() {
 	logger.SetName("gateway")
+}
+
+func newServiceClient(etcdAddr string) client.Client {
+	etcdRegistry := etcd.NewRegistry(
+		registry.Addrs(etcdAddr),
+	)
+	srv := micro.NewService(
+		micro.Registry(etcdRegistry),
+	)
+	return srv.Client()
 }
 
 func main() {
@@ -27,13 +42,14 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	serviceClient := newServiceClient(hpcmanager.GetEtcdAddress())
 	server := gin.Default()
 
-	// 注册V1接口的相关方法
-	v1 := server.Group("/v1")
-	// 添加日志中间件
-	v1.Use(middleware.Log)
-	// 添加鉴权中间件
-	v1.Use(middleware.Verify)
+	v1 := server.Group("/api")
+	middleware.Registry(v1)
+
+	userController := controller.NewUser(serviceClient)
+	userController.Registry(v1)
+
 	server.Run(":" + strconv.Itoa(port))
 }
