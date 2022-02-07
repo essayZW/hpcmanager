@@ -9,16 +9,11 @@ import (
 	user "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/user/service"
 	"go-micro.dev/v4"
-	micrologger "go-micro.dev/v4/logger"
 	"go-micro.dev/v4/registry"
 )
 
 func init() {
 	logger.SetName("user")
-	// 替换掉框架默认的logger
-	if log, err := logger.New("user"); err == nil {
-		micrologger.DefaultLogger = log
-	}
 }
 
 func main() {

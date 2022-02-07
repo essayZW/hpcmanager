@@ -12,16 +12,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
-	micrologger "go-micro.dev/v4/logger"
 	"go-micro.dev/v4/registry"
 )
 
 func init() {
 	logger.SetName("gateway")
-	// 替换掉框架默认的logger
-	if log, err := logger.New("user"); err == nil {
-		micrologger.DefaultLogger = log
-	}
 }
 
 func newServiceClient(etcdAddr string) client.Client {
