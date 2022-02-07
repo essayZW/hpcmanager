@@ -37,4 +37,6 @@ require (
 
 replace github.com/essayZW/hpcmanager/gateway => ./gateway
 
+replace github.com/essayZW/hpcmanager => ./
+
 replace github.com/essayZW/hpcmanager/user => ./user
