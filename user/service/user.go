@@ -21,6 +21,16 @@ func (s *UserService) Ping(ctx context.Context, req *publicproto.Empty, resp *pu
 	return nil
 }
 
+// Login 用户登录
+func (s *UserService) Login(ctx context.Context, req *user.LoginRequest, resp *user.CreateSessionResponse) error {
+	return nil
+}
+
+// CreateToken 创建用户的身份认证token
+func (s *UserService) CreateToken(ctx context.Context, req *user.CreateSessionRequest, resp *user.CreateSessionResponse) error {
+	return nil
+}
+
 var _ user.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例

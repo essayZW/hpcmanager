@@ -1,11 +1,28 @@
 syntax = "proto3";
 
-option go_package = "./proto;user";
+option go_package = "github.com/essayZW/hpcmanager/user/proto;user";
 
 import "proto/ping.proto";
 import "proto/common.proto";
+import "proto/public.proto";
 
 service User {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+    rpc Login(LoginRequest) returns (CreateSessionResponse) {}
+    rpc CreateToken(CreateSessionRequest) returns (CreateSessionResponse) {}
 }
 
+message LoginRequest {
+    string username = 1;
+    string md5Password = 2;
+}
+
+message CreateSessionResponse {
+    string token = 1;
+    user.UserInfo userInfo = 2;
+}
+
+
+message CreateSessionRequest {
+    string username = 1;
+}
