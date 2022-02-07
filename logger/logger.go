@@ -7,6 +7,7 @@ import (
 	"time"
 
 	z "github.com/asim/go-micro/plugins/logger/zap/v4"
+	"github.com/essayZW/hpcmanager"
 	"go-micro.dev/v4/logger"
 	"go.uber.org/zap"
 )
@@ -34,8 +35,8 @@ func New(name string) (logger.Logger, error) {
 	}
 	var zapConfig zap.Config
 	var production string
-	if production = os.Getenv("PRODUCTION"); production != "PRODUCTION" {
-		// 如果PRODUCTION环境变量值为PRODUTION则代表为生产环境
+	if production = os.Getenv(hpcmanager.EnvName); production == hpcmanager.ProductionEnvValue {
+		// 如果环境变量值为PRODUTION则代表为生产环境
 		zapConfig = zap.NewProductionConfig()
 	} else {
 		zapConfig = zap.NewDevelopmentConfig()
@@ -53,7 +54,7 @@ func New(name string) (logger.Logger, error) {
 	filename := fmt.Sprintf("/log-%s.txt", today)
 	zapConfig.OutputPaths = append(zapConfig.OutputPaths, logDir+filename)
 	// 需要通过Options设置日志等级
-	if production == "PRODUCTION" {
+	if production == hpcmanager.ProductionEnvValue {
 		cachedLogger, cachedError = z.NewLogger(
 			z.WithConfig(zapConfig),
 		)
