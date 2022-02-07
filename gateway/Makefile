@@ -4,4 +4,6 @@ build:
 .PHONY: clean
 clean:
 	rm -rf ./build
-
+.PHONY: proto
+proto:
+	protoc -I=. -I=../ --go_out=paths=source_relative:. proto/*.proto

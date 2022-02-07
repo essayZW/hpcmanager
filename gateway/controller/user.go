@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 
+	"github.com/essayZW/hpcmanager/gateway/middleware"
+	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
 	"github.com/essayZW/hpcmanager/gateway/response"
 	"github.com/essayZW/hpcmanager/logger"
 	"github.com/essayZW/hpcmanager/proto"
@@ -17,7 +19,10 @@ type User struct {
 }
 
 func (user *User) ping(ctx *gin.Context) {
-	res, err := user.userService.Ping(context.TODO(), &proto.Empty{})
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	res, err := user.userService.Ping(context.TODO(), &proto.Empty{
+		BaseRequest: baseReq.(*gatewaypb.BaseRequest),
+	})
 	var resp *response.Response
 	if err != nil {
 		resp = response.New(500, err, false, "ping fail!")

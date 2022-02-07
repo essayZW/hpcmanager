@@ -43,10 +43,10 @@ func main() {
 	}
 
 	serviceClient := newServiceClient(hpcmanager.GetEtcdAddress())
-	server := gin.Default()
+	server := gin.New()
 
 	v1 := server.Group("/api")
-	middleware.Registry(v1)
+	middleware.Registry(v1, serviceClient)
 
 	userController := controller.NewUser(serviceClient)
 	userController.Registry(v1)
