@@ -12,4 +12,4 @@ mkdir -p /root/.config/hpcmanager
 cp /config-template.yaml /root/.config/hpcmanager/config-$HPCMANAGER_ENV.yaml
 
 # run app
-/main
+/main -etcdAddress=$ETCD_ADDRESS

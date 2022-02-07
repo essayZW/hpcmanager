@@ -14,7 +14,7 @@ cp /config-template.yaml /root/.config/hpcmanager/config-$HPCMANAGER_ENV.yaml
 # run app
 if [ "$HPCMANAGER_ENV" == "production" ]
 then
-    /main -debug=false -port=$PORT
+    /main -debug=false -port=$PORT -etcdAddress=$ETCD_ADDRESS
 else
-    /main -debug=true -port=$PORT
+    /main -debug=true -port=$PORT -etcdAddress=$ETCD_ADDRESS
 fi
