@@ -5,11 +5,14 @@ import (
 
 	"github.com/essayZW/hpcmanager/logger"
 	publicproto "github.com/essayZW/hpcmanager/proto"
+	"github.com/essayZW/hpcmanager/user/db"
 	user "github.com/essayZW/hpcmanager/user/proto"
+	"go-micro.dev/v4/client"
 )
 
 // UserService 服务
 type UserService struct {
+	db *db.UserDB
 }
 
 // Ping 测试
@@ -34,6 +37,8 @@ func (s *UserService) CreateToken(ctx context.Context, req *user.CreateSessionRe
 var _ user.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例
-func NewUser() *UserService {
-	return &UserService{}
+func NewUser(client client.Client, conn *db.UserDB) *UserService {
+	return &UserService{
+		db: conn,
+	}
 }

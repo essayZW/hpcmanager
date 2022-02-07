@@ -5,6 +5,8 @@ go 1.17
 require (
 	github.com/asim/go-micro/plugins/logger/zap/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
+	github.com/go-sql-driver/mysql v1.6.0
+	github.com/jmoiron/sqlx v1.3.4
 	go-micro.dev/v4 v4.5.0
 	go.uber.org/zap v1.20.0
 )
