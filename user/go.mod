@@ -21,6 +21,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.3.1 // indirect
@@ -59,3 +60,7 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
+
+replace github.com/essayZW/hpcmanager/gateway => ../gateway
+
+replace github.com/essayZW/hpcmanager/user => ./

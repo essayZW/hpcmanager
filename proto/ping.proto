@@ -5,6 +5,8 @@ package publicproto;
 
 // PingResponse ping消息的回复,一般内容为pong
 message PingResponse {
-    string msg = 1;
+    string Msg = 1;
+    string Ip = 2;
+    string RequestId = 3;
 }
 

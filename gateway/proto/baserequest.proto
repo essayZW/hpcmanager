@@ -1,0 +1,26 @@
+syntax="proto3";
+
+option go_package="github.com/essayZW/hpcmanager/gateway/proto";
+package request;
+
+message RequestInfo {
+    // Id 此次请求的唯一ID，为一个UUID，用于作为一次调用链路的唯一标识
+    string Id = 1;
+    // RemoteIP 请求者的IP地址
+    string RemoteIP = 2;
+}
+
+
+message UserInfo {
+    // Levels 当前用户的所拥有的权限等级列表
+    repeated int32 Levels = 1;
+    // UserId 当前用户ID
+    int32 UserId = 2;
+    // GroupId 当前用户所属组ID
+    int32 GroupId = 3;
+}
+
+message BaseRequest {
+    RequestInfo requestInfo = 1;
+    UserInfo userInfo = 2;
+}

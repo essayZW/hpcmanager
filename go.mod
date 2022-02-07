@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/asim/go-micro/plugins/logger/zap/v4 v4.0.0-20220118152736-9e0be6c85d75
+	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
 	go-micro.dev/v4 v4.5.0
 	go.uber.org/zap v1.20.0
 )
@@ -23,7 +24,7 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/net v0.0.0-20210510120150-4163338589ed // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
+	golang.org/x/sys v0.0.0-20210603081109-ebe580a85c40 // indirect
 	golang.org/x/text v0.3.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
@@ -33,3 +34,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	google.golang.org/protobuf v1.26.0
 )
+
+replace github.com/essayZW/hpcmanager/gateway => ./gateway
+
+replace github.com/essayZW/hpcmanager/user => ./user

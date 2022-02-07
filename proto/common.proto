@@ -3,6 +3,9 @@ syntax = "proto3";
 option go_package = "github.com/essayZW/hpcmanager/proto";
 package publicproto;
 
+import "gateway/proto/baserequest.proto";
+
 // 空消息
 message Empty {
+    request.BaseRequest baseRequest = 1;
 }
