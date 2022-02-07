@@ -34,8 +34,8 @@ func New(name string) (logger.Logger, error) {
 	}
 	var zapConfig zap.Config
 	var production string
-	if production = os.Getenv("PRODUCTION"); production != "" {
-		// 如果PRODUCTION环境变量存在则代表为生产环境
+	if production = os.Getenv("PRODUCTION"); production != "PRODUCTION" {
+		// 如果PRODUCTION环境变量值为PRODUTION则代表为生产环境
 		zapConfig = zap.NewProductionConfig()
 	} else {
 		zapConfig = zap.NewDevelopmentConfig()
@@ -53,14 +53,14 @@ func New(name string) (logger.Logger, error) {
 	filename := fmt.Sprintf("/log-%s.txt", today)
 	zapConfig.OutputPaths = append(zapConfig.OutputPaths, logDir+filename)
 	// 需要通过Options设置日志等级
-	if production == "" {
+	if production == "PRODUCTION" {
 		cachedLogger, cachedError = z.NewLogger(
 			z.WithConfig(zapConfig),
-			logger.WithLevel(logger.DebugLevel),
 		)
 	} else {
 		cachedLogger, cachedError = z.NewLogger(
 			z.WithConfig(zapConfig),
+			logger.WithLevel(logger.DebugLevel),
 		)
 	}
 	createDate = today
