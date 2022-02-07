@@ -62,7 +62,7 @@ func LoadDatabase() (*Database, error) {
 func getEnvValue() string {
 	value := os.Getenv(hpcmanager.EnvName)
 	if value != hpcmanager.ProductionEnvValue {
-		return hpcmanager.DevelopmentEnvValue
+		return value
 	}
 	return hpcmanager.ProductionEnvValue
 }
