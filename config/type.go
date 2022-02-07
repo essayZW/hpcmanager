@@ -1,5 +1,7 @@
 package config
 
+import "fmt"
+
 // Database Mysql数据库的配置
 type Database struct {
 	// Host 数据库服务地址
@@ -12,4 +14,9 @@ type Database struct {
 	Username string `json:"username"`
 	// Password 数据库服务的连接密码
 	Password string `json:"password"`
+}
+
+// Dsn 返回对应的Dsn
+func (db *Database) Dsn() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=utf8mb4,utf8", db.Username, db.Password, db.Host, db.Port, db.Database)
 }
