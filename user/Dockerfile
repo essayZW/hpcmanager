@@ -1,3 +1,17 @@
 FROM alpine
-ADD build/main /main
-ENTRYPOINT [ "/main" ]
+
+COPY build/main /main
+COPY docker/config-template.yaml /config-template.yaml
+COPY docker/entrypoint.sh /entrypoint.sh
+
+
+ENV MYSQL_HOST=127.0.0.1
+ENV MYSQL_PORT=3306
+ENV MYSQL_DATABASE=hpcmanager
+ENV MYSQL_USERNAME=root
+ENV MYSQL_PASSWORD=password
+
+
+ENV HPCMANAGER_ENV=production
+
+CMD ["sh", "/entrypoint.sh"]
