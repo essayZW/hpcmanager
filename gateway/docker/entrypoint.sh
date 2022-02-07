@@ -12,4 +12,9 @@ mkdir -p /root/.config/hpcmanager
 cp /config-template.yaml /root/.config/hpcmanager/config-$HPCMANAGER_ENV.yaml
 
 # run app
-/main
+if [ "$HPCMANAGER_ENV" == "production" ]
+then
+    /main -debug=false -port=$PORT
+else
+    /main -debug=true -port=$PORT
+fi
