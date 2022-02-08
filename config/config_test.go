@@ -18,3 +18,17 @@ func TestLoadDatabaseConfig(t *testing.T) {
 		t.Errorf("Except: %#v, Get: %#v", excepet, database)
 	}
 }
+
+func TestLoadRedis(t *testing.T) {
+	redis, err := LoadRedis()
+	if err != nil {
+		t.Error(err)
+	}
+	excepet := Redis{
+		Address: "172.17.0.4:6379",
+		DB:      0,
+	}
+	if excepet != *redis {
+		t.Errorf("Except: %#v, Get: %#v", excepet, redis)
+	}
+}
