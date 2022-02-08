@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
+	"sync"
 
 	"github.com/asim/go-micro/plugins/config/source/etcd/v4"
 	"github.com/essayZW/hpcmanager"
@@ -13,7 +14,8 @@ import (
 
 // etcdDynamicConfig etcd为数据源的动态配置监听
 type etcdDynamicConfig struct {
-	conf config.Config
+	conf  config.Config
+	mutex sync.Mutex
 }
 
 // Registry 注册
@@ -71,6 +73,8 @@ func (e *etcdDynamicConfig) Registry(path string, value interface{}, handler Val
 							logger.Error(err)
 						}
 					}()
+					e.mutex.Lock()
+					defer e.mutex.Unlock()
 					reflectValue.Elem().Set(reflect.ValueOf(reallyValue))
 					if handler != nil {
 						handler(reallyValue)
@@ -89,6 +93,17 @@ const EtcdDynamicConfigPrefix = "/hpcmanager/micro/config"
 
 // NewEtcd 创建一个基于etcd的动态配置工具
 func NewEtcd() (DynamicConfig, error) {
+	conf, err := NewEtcdConfig()
+	if err != nil {
+		return nil, err
+	}
+	return &etcdDynamicConfig{
+		conf: conf,
+	}, nil
+}
+
+// NewEtcdConfig 创建新的etcd的配置源
+func NewEtcdConfig() (config.Config, error) {
 	etcdSource := etcd.NewSource(
 		etcd.WithAddress(hpcmanager.GetEtcdAddress()),
 		etcd.WithPrefix(EtcdDynamicConfigPrefix),
@@ -101,7 +116,6 @@ func NewEtcd() (DynamicConfig, error) {
 		logger.Error("New EtcdDynamicConfig error: ", err)
 		return nil, err
 	}
-	return &etcdDynamicConfig{
-		conf: conf,
-	}, nil
+	return conf, nil
+
 }

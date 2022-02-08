@@ -38,8 +38,7 @@ func NewUserEndpoints() []*api.Endpoint {
 
 type UserService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
-	Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*CreateSessionResponse, error)
-	CreateToken(ctx context.Context, in *CreateSessionRequest, opts ...client.CallOption) (*CreateSessionResponse, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error)
 }
 
 type userService struct {
@@ -64,19 +63,9 @@ func (c *userService) Ping(ctx context.Context, in *proto1.Empty, opts ...client
 	return out, nil
 }
 
-func (c *userService) Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*CreateSessionResponse, error) {
+func (c *userService) Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error) {
 	req := c.c.NewRequest(c.name, "User.Login", in)
-	out := new(CreateSessionResponse)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userService) CreateToken(ctx context.Context, in *CreateSessionRequest, opts ...client.CallOption) (*CreateSessionResponse, error) {
-	req := c.c.NewRequest(c.name, "User.CreateToken", in)
-	out := new(CreateSessionResponse)
+	out := new(LoginResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -88,15 +77,13 @@ func (c *userService) CreateToken(ctx context.Context, in *CreateSessionRequest,
 
 type UserHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
-	Login(context.Context, *LoginRequest, *CreateSessionResponse) error
-	CreateToken(context.Context, *CreateSessionRequest, *CreateSessionResponse) error
+	Login(context.Context, *LoginRequest, *LoginResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
 	type user interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
-		Login(ctx context.Context, in *LoginRequest, out *CreateSessionResponse) error
-		CreateToken(ctx context.Context, in *CreateSessionRequest, out *CreateSessionResponse) error
+		Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error
 	}
 	type User struct {
 		user
@@ -113,10 +100,6 @@ func (h *userHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1.Pi
 	return h.UserHandler.Ping(ctx, in, out)
 }
 
-func (h *userHandler) Login(ctx context.Context, in *LoginRequest, out *CreateSessionResponse) error {
+func (h *userHandler) Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error {
 	return h.UserHandler.Login(ctx, in, out)
-}
-
-func (h *userHandler) CreateToken(ctx context.Context, in *CreateSessionRequest, out *CreateSessionResponse) error {
-	return h.UserHandler.CreateToken(ctx, in, out)
 }

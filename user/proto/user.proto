@@ -8,21 +8,15 @@ import "proto/public.proto";
 
 service User {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
-    rpc Login(LoginRequest) returns (CreateSessionResponse) {}
-    rpc CreateToken(CreateSessionRequest) returns (CreateSessionResponse) {}
+    rpc Login(LoginRequest) returns (LoginResponse) {}
 }
 
 message LoginRequest {
     string username = 1;
-    string md5Password = 2;
+    string password = 2;
 }
 
-message CreateSessionResponse {
+message LoginResponse {
     string token = 1;
     user.UserInfo userInfo = 2;
-}
-
-
-message CreateSessionRequest {
-    string username = 1;
 }

@@ -34,17 +34,23 @@ func TestLoginQuery(t *testing.T) {
 	examples := []struct {
 		Username string
 		Password string
-		ExceptID int
+
+		Except bool
 	}{
 		{
 			Username: "121121121",
 			Password: md5Pass,
-			ExceptID: 1,
+			Except:   true,
 		},
 		{
 			Username: "123123123",
 			Password: md5Pass,
-			ExceptID: 2,
+			Except:   true,
+		},
+		{
+			Username: "no",
+			Password: md5Pass,
+			Except:   false,
 		},
 	}
 
@@ -54,9 +60,8 @@ func TestLoginQuery(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			t.Log(res)
-			if res.ID != example.ExceptID {
-				t.Errorf("ExceptId: %v, Get %#v", example.ExceptID, res)
+			if res != example.Except {
+				t.Error(res)
 			}
 		})
 
