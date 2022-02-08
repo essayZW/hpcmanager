@@ -54,7 +54,7 @@ func TestLoginQuery(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			logger.Debug(res)
+			t.Log(res)
 			if res.ID != example.ExceptID {
 				t.Errorf("ExceptId: %v, Get %#v", example.ExceptID, res)
 			}

@@ -18,5 +18,5 @@ type User struct {
 	CollegeName     string    `db:"college_name"`
 	GroupID         string    `db:"group_id"`
 	CreateTime      time.Time `db:"create_time"`
-	ExtraAttributes db.JSON   `db:"extraAttributes"`
+	ExtraAttributes *db.JSON  `db:"extraAttributes"`
 }
