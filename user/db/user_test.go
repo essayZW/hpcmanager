@@ -24,7 +24,7 @@ func init() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	userDb = New(dbConn)
+	userDb = NewUser(dbConn)
 }
 
 func TestLoginQuery(t *testing.T) {

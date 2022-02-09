@@ -25,7 +25,7 @@ const (
 
 // User 用户logic类，主要处理用户相关的逻辑
 type User struct {
-	db          *db.UserDB
+	userDB      *db.UserDB
 	redisClient *redis.Client
 
 	// TokenExpireTime 用户token过期时间
@@ -36,7 +36,7 @@ type User struct {
 func (u *User) LoginCheck(username, password string) (bool, error) {
 	md5Password := fmt.Sprintf("%x", md5.Sum([]byte(password)))
 	md5Password = strings.ToUpper(md5Password)
-	return u.db.LoginQuery(username, md5Password)
+	return u.userDB.LoginQuery(username, md5Password)
 }
 
 // CreateToken 为指定用户名创建token
@@ -51,13 +51,13 @@ func (u *User) CreateToken(username string) string {
 
 // DeleteToken 删除指定用户名的登录token
 func (u *User) DeleteToken(username string) {
-	token := u.QueryToken(username)
+	token := u.GetToken(username)
 	u.redisClient.Do(context.Background(), "del", TokenPrefix+token)
 	u.redisClient.Do(context.Background(), "del", LoginUserTokenPrefix+username)
 }
 
-// QueryToken 查询用户的token
-func (u *User) QueryToken(username string) string {
+// GetToken 查询用户的token
+func (u *User) GetToken(username string) string {
 	token, err := u.redisClient.Get(context.Background(), LoginUserTokenPrefix+username).Result()
 	if err != nil {
 		return ""
@@ -65,15 +65,28 @@ func (u *User) QueryToken(username string) string {
 	return token
 }
 
-// QueryByUsername 通过用户名查询用户信息
-func (u *User) QueryByUsername(username string) (*db.User, error) {
-	return u.db.QueryByUsername(username)
+// GetUserByToken 通过token查询对应者的信息
+func (u *User) GetUserByToken(token string) (*db.User, error) {
+	username, err := u.redisClient.Get(context.Background(), TokenPrefix+token).Result()
+	if err != nil {
+		return nil, err
+	}
+	info, err := u.GetByUsername(username)
+	if err != nil {
+		return nil, err
+	}
+	return info, nil
+}
+
+// GetByUsername 通过用户名查询用户信息
+func (u *User) GetByUsername(username string) (*db.User, error) {
+	return u.userDB.QueryByUsername(username)
 }
 
 // NewUser 创建一个新的userLogic
 func NewUser(db *db.UserDB, configConn config.DynamicConfig, redisConn *redis.Client) *User {
 	user := &User{
-		db:              db,
+		userDB:          db,
 		redisClient:     redisConn,
 		TokenExpireTime: time.Duration(24) * time.Hour,
 	}

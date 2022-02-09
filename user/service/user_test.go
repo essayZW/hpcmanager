@@ -49,9 +49,11 @@ func init() {
 	if ok != "PONG" {
 		logger.Fatal("Redis ping get: ", ok)
 	}
-	userLogic := logic.NewUser(userdb.New(sqlConn), etcdConfig, redisConn)
+	userLogic := logic.NewUser(userdb.NewUser(sqlConn), etcdConfig, redisConn)
+	userpLogic := logic.NewUserPermission(userdb.NewUserPermission(sqlConn))
 	userService = &UserService{
-		userLogic: userLogic,
+		userLogic:  userLogic,
+		userpLogic: userpLogic,
 	}
 }
 
@@ -70,6 +72,17 @@ func TestLogin(t *testing.T) {
 			Except: &user.UserInfo{
 				Username: "123123123",
 				Id:       2,
+				Name:     "测试",
+			},
+			Error: false,
+		},
+		{
+			Name:     "test success2",
+			Username: "121121121",
+			Password: "essay",
+			Except: &user.UserInfo{
+				Username: "121121121",
+				Id:       1,
 				Name:     "测试",
 			},
 			Error: false,
@@ -96,6 +109,54 @@ func TestLogin(t *testing.T) {
 			}
 			if res.UserInfo.GetId() != test.Except.Id {
 				t.Errorf("Except %v, Get %v", test.Except, res.UserInfo)
+			}
+		})
+	}
+}
+
+func TestCheckLogin(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		Token  string
+		Except []int32
+		Error  bool
+	}{
+		// NOTE: token会过期,单元测试之间需要重新生成最新的token
+		{
+			Name:   "test1",
+			Token:  "49b8d8b2691144cf86ef58670229422d",
+			Except: []int32{0, 1},
+		},
+		{
+			Name:   "test2",
+			Token:  "45c6053e75954184a684d6e26b44bdcf",
+			Except: []int32{0},
+		},
+		{
+			Name:   "test3",
+			Token:  "",
+			Except: []int32{},
+			Error:  true,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			res := &user.CheckLoginResponse{}
+			err := userService.CheckLogin(context.Background(), &user.CheckLoginRequest{
+				Token: test.Token,
+			}, res)
+			if err != nil {
+				if !test.Error {
+					t.Error(err)
+				}
+				return
+			}
+			for index, p := range res.PermissionLevel {
+				if p != test.Except[index] {
+					t.Errorf("Except %v Get %v", test.Except, p)
+					break
+				}
 			}
 		})
 	}

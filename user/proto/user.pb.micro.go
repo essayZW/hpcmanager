@@ -39,6 +39,7 @@ func NewUserEndpoints() []*api.Endpoint {
 type UserService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error)
+	CheckLogin(ctx context.Context, in *CheckLoginRequest, opts ...client.CallOption) (*CheckLoginResponse, error)
 }
 
 type userService struct {
@@ -73,17 +74,29 @@ func (c *userService) Login(ctx context.Context, in *LoginRequest, opts ...clien
 	return out, nil
 }
 
+func (c *userService) CheckLogin(ctx context.Context, in *CheckLoginRequest, opts ...client.CallOption) (*CheckLoginResponse, error) {
+	req := c.c.NewRequest(c.name, "User.CheckLogin", in)
+	out := new(CheckLoginResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
 	Login(context.Context, *LoginRequest, *LoginResponse) error
+	CheckLogin(context.Context, *CheckLoginRequest, *CheckLoginResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
 	type user interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
 		Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error
+		CheckLogin(ctx context.Context, in *CheckLoginRequest, out *CheckLoginResponse) error
 	}
 	type User struct {
 		user
@@ -102,4 +115,8 @@ func (h *userHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1.Pi
 
 func (h *userHandler) Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error {
 	return h.UserHandler.Login(ctx, in, out)
+}
+
+func (h *userHandler) CheckLogin(ctx context.Context, in *CheckLoginRequest, out *CheckLoginResponse) error {
+	return h.UserHandler.CheckLogin(ctx, in, out)
 }

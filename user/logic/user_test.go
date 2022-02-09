@@ -47,7 +47,7 @@ func init() {
 	if ok != "PONG" {
 		logger.Fatal("Redis ping get: ", ok)
 	}
-	userLogic = NewUser(userdb.New(sqlConn), etcdConfig, redisConn)
+	userLogic = NewUser(userdb.NewUser(sqlConn), etcdConfig, redisConn)
 }
 
 func TestLoginCheck(t *testing.T) {
@@ -98,12 +98,49 @@ func TestCreateAndQueryToken(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 			token := userLogic.CreateToken(test.Username)
-			if queryed := userLogic.QueryToken(test.Username); queryed != token {
+			if queryed := userLogic.GetToken(test.Username); queryed != token {
 				t.Errorf("Except %s Get %s", queryed, token)
 			}
 			userLogic.DeleteToken(test.Username)
-			if queryed := userLogic.QueryToken(test.Username); queryed != "" {
+			if queryed := userLogic.GetToken(test.Username); queryed != "" {
 				t.Errorf("Except %s Get ", queryed)
+			}
+		})
+	}
+}
+
+func TestQueryByUsername(t *testing.T) {
+	tests := []struct {
+		Name     string
+		Username string
+
+		Except int
+		Error  bool
+	}{
+		{
+			Name:     "test not exists",
+			Username: "1234567890",
+			Error:    true,
+		},
+		{
+			Name:     "test id 2",
+			Username: "123123123",
+			Error:    false,
+			Except:   2,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			info, err := userLogic.GetByUsername(test.Username)
+			if err != nil {
+				if !test.Error {
+					t.Error(err)
+				}
+				return
+			}
+			if info.ID != test.Except {
+				t.Errorf("Except: %d Get %v", test.Except, info)
 			}
 		})
 	}

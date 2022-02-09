@@ -13,7 +13,8 @@ import (
 
 // UserService 服务
 type UserService struct {
-	userLogic *logic.User
+	userLogic  *logic.User
+	userpLogic *logic.UserPermission
 }
 
 // Ping 测试
@@ -37,7 +38,7 @@ func (s *UserService) Login(ctx context.Context, req *user.LoginRequest, resp *u
 		return errors.New("invalid username or password")
 	}
 	// 查询用户信息
-	info, err := s.userLogic.QueryByUsername(req.GetUsername())
+	info, err := s.userLogic.GetByUsername(req.GetUsername())
 	if err != nil {
 		logger.Error("login error ", err)
 		return errors.New("login error")
@@ -57,11 +58,39 @@ func (s *UserService) Login(ctx context.Context, req *user.LoginRequest, resp *u
 	return nil
 }
 
+// CheckLogin 检查用户登录状态，并返回登录用户的信息以及权限信息
+func (s *UserService) CheckLogin(ctx context.Context, req *user.CheckLoginRequest, resp *user.CheckLoginResponse) error {
+	// 通过token查询用户信息
+	info, err := s.userLogic.GetUserByToken(req.GetToken())
+	if err != nil {
+		return err
+	}
+	resp.Login = true
+	resp.UserInfo = &user.UserInfo{
+		Id:       int32(info.ID),
+		Name:     info.Name,
+		Username: info.Username,
+		GroupId:  int32(info.GroupID),
+	}
+	// 查询用户的权限信息
+	permissionInfo, err := s.userpLogic.GetUserPermissionByID(info.ID)
+	if err != nil {
+		logger.Error(err)
+		return errors.New("Permission info query error")
+	}
+	resp.PermissionLevel = make([]int32, len(permissionInfo))
+	for index := range permissionInfo {
+		resp.PermissionLevel[index] = int32(permissionInfo[index].Level)
+	}
+	return nil
+}
+
 var _ user.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例
-func NewUser(client client.Client, userLogic *logic.User) *UserService {
+func NewUser(client client.Client, userLogic *logic.User, userp *logic.UserPermission) *UserService {
 	return &UserService{
-		userLogic: userLogic,
+		userLogic:  userLogic,
+		userpLogic: userp,
 	}
 }

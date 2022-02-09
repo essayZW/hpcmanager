@@ -31,8 +31,8 @@ func (db *UserDB) QueryByUsername(username string) (*User, error) {
 	return &info, nil
 }
 
-// New 创建一个新的操作用户数据库结构体
-func New(conn *sqlx.DB) *UserDB {
+// NewUser 创建一个新的操作用户数据库结构体
+func NewUser(conn *sqlx.DB) *UserDB {
 	return &UserDB{
 		conn: conn,
 	}
