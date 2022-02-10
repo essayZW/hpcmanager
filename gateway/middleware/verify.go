@@ -27,11 +27,13 @@ func (v *verify) HandlerFunc(ctx *gin.Context) {
 		ctx.Next()
 		return
 	}
+	ctx.Abort()
 	// 获取用户的token信息
 	token, err := ctx.Cookie(TokeiCookieName)
 	if err != nil {
 		resp := response.New(403, errors.New("forbidden! need token"), false, "forbidden! need token")
 		resp.Send(ctx)
+		ctx.Abort()
 		return
 	}
 	info, err := v.userService.CheckLogin(context.Background(), &userpb.CheckLoginRequest{
@@ -41,11 +43,13 @@ func (v *verify) HandlerFunc(ctx *gin.Context) {
 		logger.Error(err)
 		resp := response.New(500, err, false, err.Error())
 		resp.Send(ctx)
+		ctx.Abort()
 		return
 	}
 	if !info.Login {
 		resp := response.New(403, errors.New("forbidden! need token"), false, "forbidden! need token")
 		resp.Send(ctx)
+		ctx.Abort()
 		return
 	}
 	value, _ := ctx.Get(BaseRequestKey)
