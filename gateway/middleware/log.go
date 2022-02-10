@@ -17,7 +17,7 @@ func log(ctx *gin.Context) {
 		baseReq.UserInfo.UserId,
 		baseReq.UserInfo.Levels,
 		ctx.Request.Method,
-		ctx.Request.RemoteAddr,
+		ctx.ClientIP(),
 		ctx.Request.RequestURI,
 		ctx.Request.UserAgent())
 	start := time.Now()

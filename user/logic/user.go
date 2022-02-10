@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/essayZW/hpcmanager/config"
@@ -28,6 +29,7 @@ type User struct {
 	userDB      *db.UserDB
 	redisClient *redis.Client
 
+	mutex sync.Mutex
 	// TokenExpireTime 用户token过期时间
 	TokenExpireTime time.Duration
 }
@@ -44,8 +46,10 @@ func (u *User) CreateToken(username string) string {
 	u.DeleteToken(username)
 	token := uuid.New().String()
 	token = strings.Replace(token, "-", "", -1)
+	u.mutex.Lock()
 	u.redisClient.SetEX(context.Background(), TokenPrefix+token, username, u.TokenExpireTime)
 	u.redisClient.SetEX(context.Background(), LoginUserTokenPrefix+username, token, u.TokenExpireTime)
+	u.mutex.Unlock()
 	return token
 }
 
@@ -92,6 +96,8 @@ func NewUser(db *db.UserDB, configConn config.DynamicConfig, redisConn *redis.Cl
 	}
 	var expireTime float64
 	configConn.Registry("user/TokenExpireTime", &expireTime, func(newV interface{}) {
+		user.mutex.Lock()
+		defer user.mutex.Unlock()
 		user.TokenExpireTime = time.Duration(int(expireTime)) * time.Minute
 	})
 	return user

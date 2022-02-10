@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/essayZW/hpcmanager/gateway/proto"
+	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
 	"github.com/essayZW/hpcmanager/gateway/response"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/gin-gonic/gin"
@@ -36,8 +37,10 @@ func (v *verify) HandlerFunc(ctx *gin.Context) {
 		ctx.Abort()
 		return
 	}
+	baseReq, _ := ctx.Get(BaseRequestKey)
 	info, err := v.userService.CheckLogin(context.Background(), &userpb.CheckLoginRequest{
-		Token: token,
+		Token:       token,
+		BaseRequest: baseReq.(*gatewaypb.BaseRequest),
 	})
 	if err != nil {
 		logger.Error(err)

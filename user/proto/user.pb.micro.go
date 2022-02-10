@@ -5,6 +5,7 @@ package user
 
 import (
 	fmt "fmt"
+	_ "github.com/essayZW/hpcmanager/gateway/proto"
 	proto1 "github.com/essayZW/hpcmanager/proto"
 	proto "google.golang.org/protobuf/proto"
 	math "math"

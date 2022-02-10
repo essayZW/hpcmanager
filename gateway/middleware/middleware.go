@@ -12,10 +12,10 @@ func Registry(router *gin.RouterGroup, client client.Client) {
 	router.Use(gin.Recovery())
 	router.Use(baseReq)
 
+	router.Use(log)
+
 	verifyMiddleware = newVerify(client)
 	router.Use(verifyMiddleware.HandlerFunc)
-
-	router.Use(log)
 }
 
 // RegistryExcludeAPIPath 向初步鉴权中间件注册不需要验证的API地址
