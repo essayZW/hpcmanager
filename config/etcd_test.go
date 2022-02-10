@@ -12,9 +12,9 @@ func TestEtcdDynamicConfig(t *testing.T) {
 	hpcmanager.LoadCommonArgs()
 
 	wt := new(sync.WaitGroup)
-	var example3 float64
+	var example3 float64 = 10086
 	var example4 bool
-	var example5 string
+	var example5 string = "initTest"
 
 	examples := []struct {
 		Value   interface{}
