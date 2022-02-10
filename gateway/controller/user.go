@@ -2,8 +2,6 @@ package controller
 
 import (
 	"context"
-	"sync"
-	"time"
 
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
@@ -56,8 +54,6 @@ func (user *User) login(ctx *gin.Context) {
 		rep.Send(ctx)
 		return
 	}
-	// 设置cookie
-	ctx.SetCookie(middleware.TokeiCookieName, res.GetToken(), int(tokenCookieExpireTime), "/", "origin", false, true)
 	rep := response.New(200, res, true, "login success")
 	rep.Send(ctx)
 }
@@ -74,20 +70,8 @@ func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	return userRouter
 }
 
-var (
-	// tokenCookieExpireTime 的过期时间
-	tokenCookieExpireTime time.Duration
-	mutex                 sync.Mutex
-)
-
 // NewUser 创建一个用户控制器
 func NewUser(client client.Client, configConn config.DynamicConfig) *User {
-	var expireTime float64
-	configConn.Registry("user/TokenExpireTime", &expireTime, func(newV interface{}) {
-		mutex.Lock()
-		defer mutex.Unlock()
-		tokenCookieExpireTime = time.Duration(int(expireTime)) * time.Minute / time.Second
-	})
 	return &User{
 		userService: userpb.NewUserService("user", client),
 	}

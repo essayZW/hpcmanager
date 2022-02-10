@@ -13,9 +13,6 @@ import (
 	"go-micro.dev/v4/logger"
 )
 
-// TokeiCookieName  token存储在cookie中的键值
-const TokeiCookieName = "TOKEN"
-
 type verify struct {
 	userService userpb.UserService
 	excludeAPI  []string
@@ -23,15 +20,15 @@ type verify struct {
 
 // HandlerFunc 进行初步的权限信息以及用户信息获取
 func (v *verify) HandlerFunc(ctx *gin.Context) {
-	// TODO 检查当前请求的接口是否需要用户提供token
-	if !v.needVerify(ctx.Request.RequestURI) {
+	// 检查当前请求的接口是否需要用户提供token
+	if !v.needVerify(ctx.Request.URL.Path) {
+		logger.Debug("excludeAPI ", ctx.Request.URL.Path)
 		ctx.Next()
 		return
 	}
-	ctx.Abort()
 	// 获取用户的token信息
-	token, err := ctx.Cookie(TokeiCookieName)
-	if err != nil {
+	token, ok := ctx.GetQuery("access_token")
+	if !ok {
 		resp := response.New(403, errors.New("forbidden! need token"), false, "forbidden! need token")
 		resp.Send(ctx)
 		ctx.Abort()
@@ -43,8 +40,7 @@ func (v *verify) HandlerFunc(ctx *gin.Context) {
 		BaseRequest: baseReq.(*gatewaypb.BaseRequest),
 	})
 	if err != nil {
-		logger.Error(err)
-		resp := response.New(500, err, false, err.Error())
+		resp := response.New(403, err, false, "forbidden! invalid token")
 		resp.Send(ctx)
 		ctx.Abort()
 		return
