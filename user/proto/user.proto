@@ -4,6 +4,7 @@ option go_package = "github.com/essayZW/hpcmanager/user/proto;user";
 
 import "proto/ping.proto";
 import "proto/common.proto";
+import "gateway/proto/baserequest.proto";
 import "proto/public.proto";
 
 service User {
@@ -13,8 +14,9 @@ service User {
 }
 
 message LoginRequest {
-    string username = 1;
-    string password = 2;
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+    string password = 3;
 }
 
 message LoginResponse {
@@ -24,7 +26,8 @@ message LoginResponse {
 
 
 message CheckLoginRequest {
-    string token = 1;
+    request.BaseRequest baseRequest = 1;
+    string token = 2;
 }
 
 

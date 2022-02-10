@@ -28,6 +28,7 @@ func (s *UserService) Ping(ctx context.Context, req *publicproto.Empty, resp *pu
 
 // Login 用户登录
 func (s *UserService) Login(ctx context.Context, req *user.LoginRequest, resp *user.LoginResponse) error {
+	logger.Infof("User login: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	// 检查登录信息
 	success, err := s.userLogic.LoginCheck(req.GetUsername(), req.GetPassword())
 	if err != nil {
@@ -60,10 +61,11 @@ func (s *UserService) Login(ctx context.Context, req *user.LoginRequest, resp *u
 
 // CheckLogin 检查用户登录状态，并返回登录用户的信息以及权限信息
 func (s *UserService) CheckLogin(ctx context.Context, req *user.CheckLoginRequest, resp *user.CheckLoginResponse) error {
+	logger.Infof("User login check: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	// 通过token查询用户信息
 	info, err := s.userLogic.GetUserByToken(req.GetToken())
 	if err != nil {
-		return err
+		return errors.New("token invalid")
 	}
 	resp.Login = true
 	resp.UserInfo = &user.UserInfo{

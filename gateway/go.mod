@@ -8,6 +8,7 @@ require (
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/user v0.0.0-00010101000000-000000000000
+	github.com/go-playground/validator/v10 v10.4.1
 	github.com/google/uuid v1.3.0
 	go-micro.dev/v4 v4.5.0
 	google.golang.org/protobuf v1.26.0
@@ -17,6 +18,8 @@ require (
 	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20210428141323-04723f9f07d7 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
+	github.com/asim/go-micro/plugins/config/encoder/yaml/v4 v4.0.0-20220118152736-9e0be6c85d75 // indirect
+	github.com/asim/go-micro/plugins/config/source/etcd/v4 v4.0.0-20220118152736-9e0be6c85d75 // indirect
 	github.com/asim/go-micro/plugins/logger/zap/v4 v4.0.0-20220118152736-9e0be6c85d75 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
@@ -24,13 +27,13 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.3.1 // indirect
 	github.com/go-git/go-git/v5 v5.4.2 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
-	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
