@@ -28,7 +28,26 @@ func (e *etcdDynamicConfig) Registry(path string, value interface{}, handler Val
 	if reflectValue.IsNil() {
 		return errors.New("value can't be nil ptr")
 	}
+	// 同步数据源最新的值
+	var sourceValue interface{}
+	if err := e.conf.Get(path).Scan(&sourceValue); err == nil {
+		mapSourceValue, ok := sourceValue.(map[string]interface{})
+		if _, hasV := mapSourceValue["v"]; ok && hasV {
+			vValue, ok := mapSourceValue["v"].(map[string]interface{})
+			// 数据源中的值格式有问题
+			if !ok {
+				logger.Debug("Set value to source because invalid source value: ", sourceValue)
+				e.conf.Set(map[string]interface{}{
+					"value": value,
+				}, path+"/v")
 
+			} else {
+				logger.Debug("Get value from source: ", mapSourceValue)
+				go e.setValue(&reflectValue, vValue["value"], handler)
+			}
+
+		}
+	}
 	watcher, err := e.conf.Watch(path)
 	if err != nil {
 		return err
@@ -66,26 +85,28 @@ func (e *etcdDynamicConfig) Registry(path string, value interface{}, handler Val
 			}
 			if reallyValue, ok := changedValue["value"]; ok {
 				// 防止数据类型不匹配导致崩溃从而程序退出以及监听停止
-				go func() {
-					defer func() {
-						err := recover()
-						if err != nil {
-							logger.Error(err)
-						}
-					}()
-					e.mutex.Lock()
-					defer e.mutex.Unlock()
-					reflectValue.Elem().Set(reflect.ValueOf(reallyValue))
-					if handler != nil {
-						handler(reallyValue)
-					}
-				}()
+				go e.setValue(&reflectValue, reallyValue, handler)
 				continue
 			}
 			logger.Debug("EtcdDynamicConfig changed value /path/v must have key value, but is ", changedValue)
 		}
 	}()
 	return nil
+}
+
+func (e *etcdDynamicConfig) setValue(oldValue *reflect.Value, newValue interface{}, handler ValueChange) {
+	defer func() {
+		err := recover()
+		if err != nil {
+			logger.Error(err)
+		}
+	}()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+	oldValue.Elem().Set(reflect.ValueOf(newValue))
+	if handler != nil {
+		handler(newValue)
+	}
 }
 
 // EtcdDynamicConfigPrefix etcd动态配置存储的前缀
