@@ -6,6 +6,7 @@ import (
 
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
 	"github.com/essayZW/hpcmanager"
+	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/gateway/controller"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
 	"github.com/essayZW/hpcmanager/logger"
@@ -45,11 +46,16 @@ func main() {
 	serviceClient := newServiceClient(hpcmanager.GetEtcdAddress())
 	server := gin.New()
 
-	v1 := server.Group("/api")
-	middleware.Registry(v1, serviceClient)
+	api := server.Group("/api")
+	middleware.Registry(api, serviceClient)
 
-	userController := controller.NewUser(serviceClient)
-	userController.Registry(v1)
+	etcdConfig, err := config.NewEtcd()
+	if err != nil {
+		logger.Error("Etcd config create error: ", err)
+	}
+
+	userController := controller.NewUser(serviceClient, etcdConfig)
+	userController.Registry(api)
 
 	server.Run(":" + strconv.Itoa(port))
 }

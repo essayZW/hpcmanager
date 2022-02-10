@@ -30,9 +30,8 @@ func init() {
 	configFileDir = osConfigDir + "/hpcmanager"
 }
 
-// LoadDatabase 加载数据库配置
-func LoadDatabase() (*Database, error) {
-
+// LoadConfigSource 加载配置源
+func LoadConfigSource() (config.Config, error) {
 	enc := yaml.NewEncoder()
 	c, _ := config.NewConfig(
 		config.WithReader(
@@ -50,6 +49,16 @@ func LoadDatabase() (*Database, error) {
 		logger.Error(err)
 		return nil, err
 	}
+	return c, nil
+
+}
+
+// LoadDatabase 加载数据库配置
+func LoadDatabase() (*Database, error) {
+	c, err := LoadConfigSource()
+	if err != nil {
+		return nil, err
+	}
 
 	var database Database
 
@@ -62,7 +71,23 @@ func LoadDatabase() (*Database, error) {
 func getEnvValue() string {
 	value := os.Getenv(hpcmanager.EnvName)
 	if value != hpcmanager.ProductionEnvValue {
-		return hpcmanager.DevelopmentEnvValue
+		if value == "" {
+			return hpcmanager.DevelopmentEnvValue
+		}
+		return value
 	}
 	return hpcmanager.ProductionEnvValue
+}
+
+// LoadRedis 加载redis服务配置
+func LoadRedis() (*Redis, error) {
+	c, err := LoadConfigSource()
+	if err != nil {
+		return nil, err
+	}
+	var redis Redis
+	if err := c.Get("redis").Scan(&redis); err != nil {
+		return nil, err
+	}
+	return &redis, err
 }

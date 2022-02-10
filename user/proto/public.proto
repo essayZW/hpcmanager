@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "github.com/essayZW/hpcmanager/user/proto;user";
+
+package user;
+
+// UserInfo 用户基本信息
+message UserInfo {
+    int32 id = 1;
+    string username = 2;
+    string password = 3;
+    string tel = 4;
+    string email = 5;
+    string name = 6;
+    string pyName = 7;
+    string college = 8;
+    int32 groupId = 9;
+    int32 createTime = 10;
+}

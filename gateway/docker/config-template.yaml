@@ -4,3 +4,7 @@ database:
   database: hpcmanager
   username: mysqlroot
   password: mysqlpass
+redis:
+  address: 172.17.0.4:6379
+  password:
+  db: 0
