@@ -43,6 +43,7 @@ func (u *User) LoginCheck(username, password string) (bool, error) {
 
 // CreateToken 为指定用户名创建token
 func (u *User) CreateToken(username string) string {
+	// 单点登录
 	u.DeleteToken(username)
 	token := uuid.New().String()
 	token = strings.Replace(token, "-", "", -1)
