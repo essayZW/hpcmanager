@@ -11,7 +11,7 @@ func NewBaseRequest(ctx *gin.Context) *proto.BaseRequest {
 	v4 := uuid.New()
 	res := &proto.BaseRequest{
 		RequestInfo: &proto.RequestInfo{
-			RemoteIP: ctx.Request.RemoteAddr,
+			RemoteIP: ctx.ClientIP(),
 			Id:       v4.String(),
 		},
 		UserInfo: &proto.UserInfo{},

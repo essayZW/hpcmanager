@@ -9,6 +9,7 @@ import (
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/gateway/controller"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
+	"github.com/essayZW/hpcmanager/gateway/response"
 	"github.com/essayZW/hpcmanager/logger"
 	"github.com/gin-gonic/gin"
 	"go-micro.dev/v4"
@@ -56,6 +57,11 @@ func main() {
 
 	userController := controller.NewUser(serviceClient, etcdConfig)
 	userController.Registry(api)
+
+	// 注册404处理
+	server.NoRoute(func(c *gin.Context) {
+		response.New(404, "404 not found", false, "404 not found").Send(c)
+	})
 
 	server.Run(":" + strconv.Itoa(port))
 }
