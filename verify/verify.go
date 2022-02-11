@@ -21,8 +21,12 @@ func New() Verify {
 }
 
 // Identify 默认验证器进行操作权限验证
-func Identify(action PermissionAction, permissionLevel []Level) bool {
-	return DefaultVerify.Identify(action, permissionLevel)
+func Identify(action PermissionAction, permissionLevel []int32) bool {
+	levels := make([]Level, len(permissionLevel))
+	for index := range permissionLevel {
+		levels[index] = Level(permissionLevel[index])
+	}
+	return DefaultVerify.Identify(action, levels)
 }
 
 // AllowedActions 默认验证器列出支持的操作
