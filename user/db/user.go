@@ -31,6 +31,20 @@ func (db *UserDB) QueryByUsername(username string) (*User, error) {
 	return &info, nil
 }
 
+// InsertUser 插入新的用户
+func (db *UserDB) InsertUser(userinfo *User) (int, error) {
+	result, err := db.conn.Exec("INSERT INTO `user`"+
+		"(`username`, `password`, `tel`, `email`, `name`, `pinyin_name`, `college_name`, `group_id`, `create_time`, `extraAttributes`)"+
+		"VALUES (?,?,?,?,?,?,?,?,?,?)", userinfo.Username, userinfo.Password, userinfo.Tel, userinfo.Email, userinfo.Name, userinfo.PinyinName, userinfo.CollegeName, userinfo.GroupID, userinfo.CreateTime, userinfo.ExtraAttributes)
+	if err != nil {
+		return 0, err
+	}
+	if res, err := result.RowsAffected(); err == nil {
+		return int(res), nil
+	}
+	return 0, err
+}
+
 // NewUser 创建一个新的操作用户数据库结构体
 func NewUser(conn *sqlx.DB) *UserDB {
 	return &UserDB{

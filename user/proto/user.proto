@@ -12,6 +12,7 @@ service User {
     rpc Login(LoginRequest) returns (LoginResponse) {}
     rpc CheckLogin(CheckLoginRequest) returns (CheckLoginResponse) {}
     rpc ExistUsername(ExistUsernameRequest) returns (ExistUsernameResponse) {}
+    rpc AddUser(AddUserRequest) returns (AddUserResponse) {}
 }
 
 message LoginRequest {
@@ -46,4 +47,13 @@ message ExistUsernameRequest {
 
 message ExistUsernameResponse {
     bool exist = 1;
+}
+
+message AddUserRequest {
+    request.BaseRequest baseRequest = 1;
+    user.UserInfo userInfo = 2;
+}
+
+message AddUserResponse {
+    int32 userid = 1;
 }

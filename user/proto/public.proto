@@ -15,5 +15,6 @@ message UserInfo {
     string pyName = 7;
     string college = 8;
     int32 groupId = 9;
-    int32 createTime = 10;
+    int64 createTime = 10;
+    string extraAttributes = 11;
 }

@@ -97,7 +97,7 @@ message ExistUsernameRequest {
 }
 ```
 
-相应参数：
+响应参数：
 
 ```protobuf
 message ExistUsernameResponse {
@@ -105,7 +105,30 @@ message ExistUsernameResponse {
 }
 ```
 
+## AddUser
 
+描述：添加一个新的用户，返回新添加用户的用户id
+
+需求权限：`SuperAdmin`,`CommonAdmin`
+
+原型定义：`rpc AddUser(AddUserRequest) returns (AddUserResponse) {}`
+
+请求参数：
+
+```protobuf
+message AddUserRequest {
+    request.BaseRequest baseRequest = 1;
+    user.UserInfo userInfo = 2;
+}
+```
+
+响应参数：
+
+```protobuf
+message AddUserResponse {
+    int32 userid = 1;
+}
+```
 
 # 附录
 

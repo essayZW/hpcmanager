@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -12,6 +13,7 @@ import (
 	"github.com/essayZW/hpcmanager/user/db"
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
+	"github.com/mozillazg/go-pinyin"
 )
 
 // 对于已经登录的用户来说，会在redis中存储两个值
@@ -86,6 +88,34 @@ func (u *User) GetUserByToken(token string) (*db.User, error) {
 // GetByUsername 通过用户名查询用户信息
 func (u *User) GetByUsername(username string) (*db.User, error) {
 	return u.userDB.QueryByUsername(username)
+}
+
+// AddUser 添加新的用户
+func (u *User) AddUser(userInfo *db.User) (int, error) {
+	if userInfo.Username == "" {
+		return 0, errors.New("username can't be empty")
+	}
+	if userInfo.Name == "" {
+		return 0, errors.New("name can't be empty")
+	}
+	if userInfo.Password == "" {
+		return 0, errors.New("password can't be empty")
+	}
+	if userInfo.PinyinName == "" {
+		pinyinDict := pinyin.LazyPinyin(userInfo.Name, pinyin.NewArgs())
+		userInfo.PinyinName = strings.Join(pinyinDict, "")
+	}
+	if userInfo.CreateTime.IsZero() {
+		userInfo.CreateTime = time.Now()
+	}
+	// password进行MD5加密
+	md5Password := fmt.Sprintf("%x", md5.Sum([]byte(userInfo.Password)))
+	userInfo.Password = strings.ToUpper(md5Password)
+	id, err := u.userDB.InsertUser(userInfo)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }
 
 // NewUser 创建一个新的userLogic

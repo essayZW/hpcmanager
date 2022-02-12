@@ -13,6 +13,7 @@ import (
 	userdb "github.com/essayZW/hpcmanager/user/db"
 	"github.com/essayZW/hpcmanager/user/logic"
 	user "github.com/essayZW/hpcmanager/user/proto"
+	"github.com/essayZW/hpcmanager/verify"
 	"github.com/go-redis/redis/v8"
 )
 
@@ -63,6 +64,13 @@ func init() {
 		},
 		UserInfo: &gateway.UserInfo{
 			UserId: 0,
+			Levels: []int32{
+				int32(verify.SuperAdmin),
+				int32(verify.CommonAdmin),
+				int32(verify.Tutor),
+				int32(verify.Common),
+				int32(verify.Guest),
+			},
 		},
 	}
 }
@@ -200,6 +208,63 @@ func TestExistUsername(t *testing.T) {
 			}, &res)
 			if err != nil || res.Exist != test.Except {
 				t.Errorf("Error %v Except %v Get %v", err, test.Except, res.Exist)
+			}
+		})
+	}
+}
+
+func TestAddUser(t *testing.T) {
+	tests := []struct {
+		Name  string
+		Data  *user.UserInfo
+		Error bool
+	}{
+		{
+			Name: "test add success",
+			Data: &user.UserInfo{
+				Username: "777777777",
+				Password: "testing",
+				Name:     "大佬",
+			},
+			Error: false,
+		},
+		{
+			Name: "test add success2",
+			Data: &user.UserInfo{
+				Username:        "666666666",
+				Password:        "testing",
+				Name:            "大佬",
+				ExtraAttributes: "{}",
+			},
+			Error: false,
+		},
+		{
+			Name: "test add fail",
+			Data: &user.UserInfo{
+				Username: "123123123",
+				Password: "testing",
+				Name:     "大佬",
+			},
+			Error: true,
+		},
+		{
+			Name: "test add fail2",
+			Data: &user.UserInfo{
+				Username: "888888888",
+				Password: "testing",
+			},
+			Error: true,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			var resp user.AddUserResponse
+			err := userService.AddUser(context.Background(), &user.AddUserRequest{
+				BaseRequest: baseRequest,
+				UserInfo:    test.Data,
+			}, &resp)
+			if (err != nil) != test.Error {
+				t.Errorf("Except: %v Get %v", test.Error, err)
 			}
 		})
 	}

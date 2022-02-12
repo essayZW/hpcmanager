@@ -42,6 +42,7 @@ type UserService interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error)
 	CheckLogin(ctx context.Context, in *CheckLoginRequest, opts ...client.CallOption) (*CheckLoginResponse, error)
 	ExistUsername(ctx context.Context, in *ExistUsernameRequest, opts ...client.CallOption) (*ExistUsernameResponse, error)
+	AddUser(ctx context.Context, in *AddUserRequest, opts ...client.CallOption) (*AddUserResponse, error)
 }
 
 type userService struct {
@@ -96,6 +97,16 @@ func (c *userService) ExistUsername(ctx context.Context, in *ExistUsernameReques
 	return out, nil
 }
 
+func (c *userService) AddUser(ctx context.Context, in *AddUserRequest, opts ...client.CallOption) (*AddUserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.AddUser", in)
+	out := new(AddUserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
@@ -103,6 +114,7 @@ type UserHandler interface {
 	Login(context.Context, *LoginRequest, *LoginResponse) error
 	CheckLogin(context.Context, *CheckLoginRequest, *CheckLoginResponse) error
 	ExistUsername(context.Context, *ExistUsernameRequest, *ExistUsernameResponse) error
+	AddUser(context.Context, *AddUserRequest, *AddUserResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
@@ -111,6 +123,7 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error
 		CheckLogin(ctx context.Context, in *CheckLoginRequest, out *CheckLoginResponse) error
 		ExistUsername(ctx context.Context, in *ExistUsernameRequest, out *ExistUsernameResponse) error
+		AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error
 	}
 	type User struct {
 		user
@@ -137,4 +150,8 @@ func (h *userHandler) CheckLogin(ctx context.Context, in *CheckLoginRequest, out
 
 func (h *userHandler) ExistUsername(ctx context.Context, in *ExistUsernameRequest, out *ExistUsernameResponse) error {
 	return h.UserHandler.ExistUsername(ctx, in, out)
+}
+
+func (h *userHandler) AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error {
+	return h.UserHandler.AddUser(ctx, in, out)
 }
