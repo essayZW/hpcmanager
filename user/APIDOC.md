@@ -80,6 +80,33 @@ message CheckLoginResponse {
 }
 ```
 
+## ExistUsername
+
+描述：查询某个用户名的用户是否存在
+
+需求权限：无
+
+原型定义：`rpc ExistUsername(ExistUsernameRequest) returns (ExistUsernameResponse) {}`
+
+请求参数：
+
+```protobuf
+message ExistUsernameRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+```
+
+相应参数：
+
+```protobuf
+message ExistUsernameResponse {
+    bool exist = 1;
+}
+```
+
+
+
 # 附录
 
 ## UserInfo

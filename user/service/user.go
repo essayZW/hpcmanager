@@ -87,6 +87,17 @@ func (s *UserService) CheckLogin(ctx context.Context, req *user.CheckLoginReques
 	return nil
 }
 
+// ExistUsername 检查是否存在某个用户名的用户
+func (s *UserService) ExistUsername(ctx context.Context, req *user.ExistUsernameRequest, resp *user.ExistUsernameResponse) error {
+	logger.Infof("ExistUsername: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	// 直接通过用户名查询用户信息
+	resp.Exist = true
+	if _, err := s.userLogic.GetByUsername(req.GetUsername()); err != nil {
+		resp.Exist = false
+	}
+	return nil
+}
+
 var _ user.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例

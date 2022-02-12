@@ -11,6 +11,7 @@ service User {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc Login(LoginRequest) returns (LoginResponse) {}
     rpc CheckLogin(CheckLoginRequest) returns (CheckLoginResponse) {}
+    rpc ExistUsername(ExistUsernameRequest) returns (ExistUsernameResponse) {}
 }
 
 message LoginRequest {
@@ -35,4 +36,14 @@ message CheckLoginResponse {
     bool login = 1;
     user.UserInfo userInfo = 2;
     repeated int32 permissionLevel = 3;
+}
+
+message ExistUsernameRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+
+
+message ExistUsernameResponse {
+    bool exist = 1;
 }
