@@ -2,7 +2,9 @@
 
 目前所有HTTP接口都以`/api`为前缀
 
-## /user/ping
+## user控制器
+
+### /user/ping
 
 Method: GET
 
@@ -12,7 +14,7 @@ Method: GET
 
 响应：请求ID、PONG
 
-## /user/token
+### /user/token
 
 Method: POST
 
@@ -30,3 +32,15 @@ Method: POST
 响应：
 
 生成的Token以及登录的用户的基础信息
+
+# hpc控制器
+
+### /hpc/ping
+
+Method: GET
+
+描述：进行hpc服务的ping测试
+
+参数：无
+
+响应：请求ID、PONG
