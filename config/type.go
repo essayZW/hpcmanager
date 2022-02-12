@@ -27,3 +27,10 @@ type Redis struct {
 	Password string
 	DB       int
 }
+
+// Registry 配置
+type Registry struct {
+	Etcd struct {
+		Address string
+	}
+}

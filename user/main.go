@@ -2,10 +2,8 @@ package main
 
 import (
 	"context"
-	"flag"
 
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
-	"github.com/essayZW/hpcmanager"
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
@@ -23,11 +21,12 @@ func init() {
 }
 
 func main() {
-	hpcmanager.LoadCommonArgs()
-	flag.Parse()
-
+	registryConf, err := config.LoadRegistry()
+	if err != nil {
+		logger.Fatal("load etcd config error: ", nil)
+	}
 	etcdRegistry := etcd.NewRegistry(
-		registry.Addrs(hpcmanager.GetEtcdAddress()),
+		registry.Addrs(registryConf.Etcd.Address),
 	)
 
 	srv := micro.NewService(

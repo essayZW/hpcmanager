@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
-	"github.com/essayZW/hpcmanager"
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/gateway/controller"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
@@ -36,7 +35,6 @@ func main() {
 	var debug bool
 	flag.IntVar(&port, "port", 80, "port to listen")
 	flag.BoolVar(&debug, "debug", true, "debug mode")
-	hpcmanager.LoadCommonArgs()
 	flag.Parse()
 	if debug {
 		gin.SetMode(gin.DebugMode)
@@ -44,7 +42,12 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	serviceClient := newServiceClient(hpcmanager.GetEtcdAddress())
+	registryConf, err := config.LoadRegistry()
+	if err != nil {
+		logger.Fatal("etcd config load error: ", err)
+	}
+
+	serviceClient := newServiceClient(registryConf.Etcd.Address)
 	server := gin.New()
 
 	api := server.Group("/api")

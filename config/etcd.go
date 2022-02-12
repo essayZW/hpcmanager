@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/asim/go-micro/plugins/config/source/etcd/v4"
-	"github.com/essayZW/hpcmanager"
 	"github.com/essayZW/hpcmanager/logger"
 	"go-micro.dev/v4/config"
 )
@@ -125,8 +124,12 @@ func NewEtcd() (DynamicConfig, error) {
 
 // NewEtcdConfig 创建新的etcd的配置源
 func NewEtcdConfig() (config.Config, error) {
+	registryConf, err := LoadRegistry()
+	if err != nil {
+		return nil, err
+	}
 	etcdSource := etcd.NewSource(
-		etcd.WithAddress(hpcmanager.GetEtcdAddress()),
+		etcd.WithAddress(registryConf.Etcd.Address),
 		etcd.WithPrefix(EtcdDynamicConfigPrefix),
 		etcd.StripPrefix(true),
 	)
