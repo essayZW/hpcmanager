@@ -23,7 +23,14 @@ func (verify *hardcodeVerify) AllowedActions(permissionLevel []Level) []Permissi
 }
 
 func newDefault() *hardcodeVerify {
-	return &hardcodeVerify{}
+	return &hardcodeVerify{
+		actionsLevel: map[PermissionAction]*actionVerify{
+			AddUserAction: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+		},
+	}
 }
 
 // actionVerify PermissionAction的加强版本，包含了对于单个操作的具体权限要求的定义及其权限验证函数

@@ -3,6 +3,11 @@ package verify
 // PermissionAction 需要权限的操作
 type PermissionAction string
 
+const (
+	// AddUserAction 添加用户操作
+	AddUserAction = "__ADD_USER__"
+)
+
 // Verify 进行操作的权限验证
 type Verify interface {
 	// Identify 权限鉴定, action 为需要鉴定的操作名称, permissionLevel 为鉴定者拥有的权限等级列表
