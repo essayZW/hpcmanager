@@ -72,7 +72,9 @@ CREATE TABLE `permission` (
   `description` varchar(512) NOT NULL,
   `create_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `level_UNIQUE` (`level`),
+  UNIQUE KEY `name_UNIQUE` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -127,4 +129,4 @@ CREATE TABLE `user_permission` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-12 15:46:37
+-- Dump completed on 2022-02-12 17:31:29
