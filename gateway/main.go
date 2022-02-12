@@ -60,6 +60,8 @@ func main() {
 
 	userController := controller.NewUser(serviceClient, etcdConfig)
 	userController.Registry(api)
+	hpcController := controller.NewHpc(serviceClient, etcdConfig)
+	hpcController.Registry(api)
 
 	// 注册404处理
 	server.NoRoute(func(c *gin.Context) {
