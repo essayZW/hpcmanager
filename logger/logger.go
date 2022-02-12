@@ -68,6 +68,7 @@ func New(name string) (logger.Logger, error) {
 		cachedLogger, cachedError = z.NewLogger(
 			z.WithConfig(zapConfig),
 			logger.WithLevel(logger.DebugLevel),
+			logger.WithCallerSkipCount(3),
 		)
 	}
 	createDate = today
