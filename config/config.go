@@ -91,3 +91,16 @@ func LoadRedis() (*Redis, error) {
 	}
 	return &redis, err
 }
+
+// LoadRegistry 加载etcd注册中心配置
+func LoadRegistry() (*Registry, error) {
+	c, err := LoadConfigSource()
+	if err != nil {
+		return nil, err
+	}
+	var registry Registry
+	if err := c.Get("registry").Scan(&registry); err != nil {
+		return nil, err
+	}
+	return &registry, err
+}

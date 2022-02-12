@@ -5,10 +5,10 @@ import (
 	"strconv"
 
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
-	"github.com/essayZW/hpcmanager"
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/gateway/controller"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
+	"github.com/essayZW/hpcmanager/gateway/response"
 	"github.com/essayZW/hpcmanager/logger"
 	"github.com/gin-gonic/gin"
 	"go-micro.dev/v4"
@@ -35,7 +35,6 @@ func main() {
 	var debug bool
 	flag.IntVar(&port, "port", 80, "port to listen")
 	flag.BoolVar(&debug, "debug", true, "debug mode")
-	hpcmanager.LoadCommonArgs()
 	flag.Parse()
 	if debug {
 		gin.SetMode(gin.DebugMode)
@@ -43,7 +42,12 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	serviceClient := newServiceClient(hpcmanager.GetEtcdAddress())
+	registryConf, err := config.LoadRegistry()
+	if err != nil {
+		logger.Fatal("etcd config load error: ", err)
+	}
+
+	serviceClient := newServiceClient(registryConf.Etcd.Address)
 	server := gin.New()
 
 	api := server.Group("/api")
@@ -56,6 +60,13 @@ func main() {
 
 	userController := controller.NewUser(serviceClient, etcdConfig)
 	userController.Registry(api)
+	hpcController := controller.NewHpc(serviceClient, etcdConfig)
+	hpcController.Registry(api)
+
+	// 注册404处理
+	server.NoRoute(func(c *gin.Context) {
+		response.New(404, "404 not found", false, "404 not found").Send(c)
+	})
 
 	server.Run(":" + strconv.Itoa(port))
 }

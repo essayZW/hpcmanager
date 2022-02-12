@@ -1,10 +1,16 @@
 package logic
 
-import "github.com/essayZW/hpcmanager/user/db"
+import (
+	"time"
+
+	"github.com/essayZW/hpcmanager/user/db"
+	"github.com/essayZW/hpcmanager/verify"
+)
 
 // UserPermission 用户权限相关的主要逻辑操作
 type UserPermission struct {
-	db *db.UserPermissionDB
+	db  *db.UserPermissionDB
+	pdb *db.PermissionDB
 }
 
 // GetUserPermissionByID 通过用户ID查询用户拥有的权限信息
@@ -12,9 +18,28 @@ func (u *UserPermission) GetUserPermissionByID(id int) ([]*db.FullUserPermission
 	return u.db.QueryUserPermissionLevel(id)
 }
 
+// AddUserPermission 添加用户权限
+func (u *UserPermission) AddUserPermission(info *db.UserPermission, level verify.Level) error {
+	// 查询权限level对应的权限ID
+	id, err := u.pdb.QueryIDByLevel(int32(level))
+	if err != nil {
+		return err
+	}
+	if info.CreateTime.IsZero() {
+		info.CreateTime = time.Now()
+	}
+	info.PermissionID = id
+	err = u.db.Insert(info)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // NewUserPermission 创建UserPermission结构体指针
-func NewUserPermission(db *db.UserPermissionDB) *UserPermission {
+func NewUserPermission(db *db.UserPermissionDB, pdb *db.PermissionDB) *UserPermission {
 	return &UserPermission{
-		db: db,
+		db:  db,
+		pdb: pdb,
 	}
 }

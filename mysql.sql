@@ -40,15 +40,6 @@ CREATE TABLE `group` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `group`
---
-
-LOCK TABLES `group` WRITE;
-/*!40000 ALTER TABLE `group` DISABLE KEYS */;
-/*!40000 ALTER TABLE `group` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `hpc_user`
 --
 
@@ -68,15 +59,6 @@ CREATE TABLE `hpc_user` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `hpc_user`
---
-
-LOCK TABLES `hpc_user` WRITE;
-/*!40000 ALTER TABLE `hpc_user` DISABLE KEYS */;
-/*!40000 ALTER TABLE `hpc_user` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `permission`
 --
 
@@ -90,18 +72,11 @@ CREATE TABLE `permission` (
   `description` varchar(512) NOT NULL,
   `create_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `level_UNIQUE` (`level`),
+  UNIQUE KEY `name_UNIQUE` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `permission`
---
-
-LOCK TABLES `permission` WRITE;
-/*!40000 ALTER TABLE `permission` DISABLE KEYS */;
-/*!40000 ALTER TABLE `permission` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `user`
@@ -118,7 +93,7 @@ CREATE TABLE `user` (
   `email` varchar(128) DEFAULT NULL,
   `name` varchar(32) NOT NULL,
   `pinyin_name` varchar(64) NOT NULL,
-  `college_name` varchar(64) NOT NULL,
+  `college_name` varchar(64) DEFAULT NULL,
   `group_id` int NOT NULL,
   `create_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
@@ -126,15 +101,6 @@ CREATE TABLE `user` (
   UNIQUE KEY `username_UNIQUE` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user`
---
-
-LOCK TABLES `user` WRITE;
-/*!40000 ALTER TABLE `user` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `user_permission`
@@ -153,15 +119,6 @@ CREATE TABLE `user_permission` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user_permission`
---
-
-LOCK TABLES `user_permission` WRITE;
-/*!40000 ALTER TABLE `user_permission` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_permission` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -172,4 +129,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-06 22:34:25
+-- Dump completed on 2022-02-12 17:31:29

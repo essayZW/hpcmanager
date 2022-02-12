@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/essayZW/hpcmanager"
 	"github.com/essayZW/hpcmanager/config"
@@ -144,4 +145,55 @@ func TestQueryByUsername(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestAddUser(t *testing.T) {
+	tests := []struct {
+		Name  string
+		Data  *userdb.User
+		Error bool
+	}{
+		{
+			Name: "test add success",
+			Data: &userdb.User{
+				Username:   "999999999",
+				Password:   "testing",
+				Name:       "大佬",
+				CreateTime: time.Now(),
+				ExtraAttributes: &db.JSON{
+					"testing": true,
+				},
+			},
+			Error: false,
+		},
+		{
+			Name: "test add fail",
+			Data: &userdb.User{
+				Username:   "123123123",
+				Password:   "testing",
+				Name:       "大佬",
+				CreateTime: time.Now(),
+			},
+			Error: true,
+		},
+		{
+			Name: "test add fail2",
+			Data: &userdb.User{
+				Username:   "888888888",
+				Password:   "testing",
+				CreateTime: time.Now(),
+			},
+			Error: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			_, err := userLogic.AddUser(test.Data)
+			if (err != nil) != test.Error {
+				t.Errorf("Except: %v Get %v", test.Error, err)
+			}
+		})
+	}
+
 }

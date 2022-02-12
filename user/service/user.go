@@ -3,11 +3,16 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
+	"time"
 
+	hpcDB "github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
 	publicproto "github.com/essayZW/hpcmanager/proto"
+	"github.com/essayZW/hpcmanager/user/db"
 	"github.com/essayZW/hpcmanager/user/logic"
 	user "github.com/essayZW/hpcmanager/user/proto"
+	"github.com/essayZW/hpcmanager/verify"
 	"go-micro.dev/v4/client"
 )
 
@@ -83,6 +88,57 @@ func (s *UserService) CheckLogin(ctx context.Context, req *user.CheckLoginReques
 	resp.PermissionLevel = make([]int32, len(permissionInfo))
 	for index := range permissionInfo {
 		resp.PermissionLevel[index] = int32(permissionInfo[index].Level)
+	}
+	return nil
+}
+
+// ExistUsername 检查是否存在某个用户名的用户
+func (s *UserService) ExistUsername(ctx context.Context, req *user.ExistUsernameRequest, resp *user.ExistUsernameResponse) error {
+	logger.Infof("ExistUsername: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	// 直接通过用户名查询用户信息
+	resp.Exist = true
+	if _, err := s.userLogic.GetByUsername(req.GetUsername()); err != nil {
+		resp.Exist = false
+	}
+	return nil
+}
+
+// AddUser 添加一个新的用户,返回新用户的用户ID信息
+func (s *UserService) AddUser(ctx context.Context, req *user.AddUserRequest, resp *user.AddUserResponse) error {
+	logger.Infof("AddUser: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	if !verify.Identify(verify.AddUserAction, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("Adduser permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("Adduser permission forbidden")
+	}
+	extraAttributes, err := hpcDB.NewJSON(req.UserInfo.GetExtraAttributes())
+	if err != nil {
+		return fmt.Errorf("Parse extraAttributes error: %v", err)
+	}
+	addedUserInfo := &db.User{
+		Username:        req.UserInfo.GetUsername(),
+		Password:        req.UserInfo.GetPassword(),
+		Tel:             req.UserInfo.GetTel(),
+		Email:           req.UserInfo.GetEmail(),
+		Name:            req.UserInfo.GetName(),
+		PinyinName:      req.UserInfo.GetPyName(),
+		CollegeName:     req.UserInfo.GetCollege(),
+		GroupID:         int(req.UserInfo.GetGroupId()),
+		CreateTime:      time.Now(),
+		ExtraAttributes: extraAttributes,
+	}
+	id, err := s.userLogic.AddUser(addedUserInfo)
+	if err != nil {
+		return fmt.Errorf("Adduser error: %v", err)
+	}
+	resp.Userid = int32(id)
+	// TODO 调用命令调度系统添加计算节点上的用户
+	// 添加新用户默认权限信息
+	err = s.userpLogic.AddUserPermission(&db.UserPermission{
+		UserID:      id,
+		UserGroupID: int(req.UserInfo.GetGroupId()),
+	}, verify.Common)
+	if err != nil {
+		return fmt.Errorf("Init user permission info error: %v", err)
 	}
 	return nil
 }

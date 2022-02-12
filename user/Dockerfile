@@ -1,5 +1,7 @@
 FROM alpine
 
+RUN apk update && apk add tzdata
+
 COPY build/main /main
 COPY docker/config-template.yaml /config-template.yaml
 COPY docker/entrypoint.sh /entrypoint.sh
