@@ -131,6 +131,15 @@ func (s *UserService) AddUser(ctx context.Context, req *user.AddUserRequest, res
 		return fmt.Errorf("Adduser error: %v", err)
 	}
 	resp.Userid = int32(id)
+	// TODO 调用命令调度系统添加计算节点上的用户
+	// 添加新用户默认权限信息
+	err = s.userpLogic.AddUserPermission(&db.UserPermission{
+		UserID:      id,
+		UserGroupID: int(req.UserInfo.GetGroupId()),
+	}, verify.Common)
+	if err != nil {
+		return fmt.Errorf("Init user permission info error: %v", err)
+	}
 	return nil
 }
 

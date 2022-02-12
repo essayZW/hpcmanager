@@ -1,6 +1,8 @@
 package db
 
 import (
+	"errors"
+
 	"github.com/jmoiron/sqlx"
 )
 
@@ -25,6 +27,24 @@ func (up *UserPermissionDB) QueryUserPermissionLevel(userid int) ([]*FullUserPer
 		res = append(res, &row)
 	}
 	return res, nil
+}
+
+// Insert 插入一条新的用户权限记录
+func (up *UserPermissionDB) Insert(info *UserPermission) error {
+	res, err := up.conn.Exec("INSERT INTO `user_permission`"+
+		"(`user_id`, `user_group_id`, `permissionid`, `create_time`, `extraAttributes`)"+
+		"VALUES (?,?,?,?,?)", info.UserID, info.UserGroupID, info.PermissionID, info.CreateTime, info.ExtraAttributes)
+	if err != nil {
+		return err
+	}
+	ar, err := res.RowsAffected()
+	if err != nil {
+		return nil
+	}
+	if ar == 0 {
+		return errors.New("insert has no affected rows")
+	}
+	return nil
 }
 
 // NewUserPermission 创建新的用户权限操作结构体
