@@ -1,0 +1,11 @@
+syntax="proto3";
+
+option go_package="github.com/essayZW/hpcmanager/permission/proto;permission";
+
+import "proto/common.proto";
+import "proto/ping.proto";
+
+service Permission {
+    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+}
+
