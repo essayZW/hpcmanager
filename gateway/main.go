@@ -62,6 +62,8 @@ func main() {
 	userController.Registry(api)
 	hpcController := controller.NewHpc(serviceClient, etcdConfig)
 	hpcController.Registry(api)
+	permissionController := controller.NewPermission(serviceClient, etcdConfig)
+	permissionController.Registry(api)
 
 	// 注册404处理
 	server.NoRoute(func(c *gin.Context) {

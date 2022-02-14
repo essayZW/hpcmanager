@@ -27,7 +27,7 @@ func main() {
 	)
 
 	srv := micro.NewService(
-		micro.Name("user"),
+		micro.Name("permission"),
 		micro.Registry(etcdRegistry),
 	)
 
