@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"os"
 	"testing"
 
@@ -48,7 +49,7 @@ func TestQueryUserPermissionLevel(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			res, err := userPermissionDB.QueryUserPermissionLevel(test.ID)
+			res, err := userPermissionDB.QueryUserPermissionLevel(context.Background(), test.ID)
 			if err != nil {
 				t.Error(err)
 				return

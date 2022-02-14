@@ -37,7 +37,7 @@ func main() {
 	serviceClient := srv.Client()
 
 	// 创建数据库连接
-	sqlConn, err := db.NewDB()
+	sqldb, err := db.NewDB()
 	if err != nil {
 		logger.Fatal("MySQL conn error: ", err)
 	}
@@ -64,8 +64,8 @@ func main() {
 	if ok != "PONG" {
 		logger.Fatal("Redis ping get: ", ok)
 	}
-	userLogic := logic.NewUser(userdb.NewUser(sqlConn), etcdConfig, redisConn)
-	userPermissionLogic := logic.NewUserPermission(userdb.NewUserPermission(sqlConn), userdb.NewPermission(sqlConn))
+	userLogic := logic.NewUser(userdb.NewUser(sqldb), etcdConfig, redisConn)
+	userPermissionLogic := logic.NewUserPermission(userdb.NewUserPermission(sqldb), userdb.NewPermission(sqldb))
 
 	userService := service.NewUser(serviceClient, userLogic, userPermissionLogic)
 	user.RegisterUserHandler(srv.Server(), userService)

@@ -35,7 +35,7 @@ func (s *UserService) Ping(ctx context.Context, req *publicproto.Empty, resp *pu
 func (s *UserService) Login(ctx context.Context, req *user.LoginRequest, resp *user.LoginResponse) error {
 	logger.Infof("User login: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	// 检查登录信息
-	success, err := s.userLogic.LoginCheck(req.GetUsername(), req.GetPassword())
+	success, err := s.userLogic.LoginCheck(ctx, req.GetUsername(), req.GetPassword())
 	if err != nil {
 		logger.Error("login error:", err)
 		return errors.New("login error")
@@ -44,7 +44,7 @@ func (s *UserService) Login(ctx context.Context, req *user.LoginRequest, resp *u
 		return errors.New("invalid username or password")
 	}
 	// 查询用户信息
-	info, err := s.userLogic.GetByUsername(req.GetUsername())
+	info, err := s.userLogic.GetByUsername(ctx, req.GetUsername())
 	if err != nil {
 		logger.Error("login error ", err)
 		return errors.New("login error")
@@ -55,7 +55,7 @@ func (s *UserService) Login(ctx context.Context, req *user.LoginRequest, resp *u
 		Name:     info.Name,
 	}
 	// 创建登录token
-	token := s.userLogic.CreateToken(req.GetUsername())
+	token := s.userLogic.CreateToken(ctx, req.GetUsername())
 	if token == "" {
 		return errors.New("login error")
 	}
@@ -68,7 +68,7 @@ func (s *UserService) Login(ctx context.Context, req *user.LoginRequest, resp *u
 func (s *UserService) CheckLogin(ctx context.Context, req *user.CheckLoginRequest, resp *user.CheckLoginResponse) error {
 	logger.Infof("User login check: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	// 通过token查询用户信息
-	info, err := s.userLogic.GetUserByToken(req.GetToken())
+	info, err := s.userLogic.GetUserByToken(ctx, req.GetToken())
 	if err != nil {
 		return errors.New("token invalid")
 	}
@@ -80,7 +80,7 @@ func (s *UserService) CheckLogin(ctx context.Context, req *user.CheckLoginReques
 		GroupId:  int32(info.GroupID),
 	}
 	// 查询用户的权限信息
-	permissionInfo, err := s.userpLogic.GetUserPermissionByID(info.ID)
+	permissionInfo, err := s.userpLogic.GetUserPermissionByID(ctx, info.ID)
 	if err != nil {
 		logger.Error(err)
 		return errors.New("Permission info query error")
@@ -95,9 +95,10 @@ func (s *UserService) CheckLogin(ctx context.Context, req *user.CheckLoginReques
 // ExistUsername 检查是否存在某个用户名的用户
 func (s *UserService) ExistUsername(ctx context.Context, req *user.ExistUsernameRequest, resp *user.ExistUsernameResponse) error {
 	logger.Infof("ExistUsername: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	thisCtx := context.Background()
 	// 直接通过用户名查询用户信息
 	resp.Exist = true
-	if _, err := s.userLogic.GetByUsername(req.GetUsername()); err != nil {
+	if _, err := s.userLogic.GetByUsername(thisCtx, req.GetUsername()); err != nil {
 		resp.Exist = false
 	}
 	return nil
@@ -126,21 +127,24 @@ func (s *UserService) AddUser(ctx context.Context, req *user.AddUserRequest, res
 		CreateTime:      time.Now(),
 		ExtraAttributes: extraAttributes,
 	}
-	id, err := s.userLogic.AddUser(addedUserInfo)
-	if err != nil {
-		return fmt.Errorf("Adduser error: %v", err)
-	}
-	resp.Userid = int32(id)
-	// TODO 调用命令调度系统添加计算节点上的用户
-	// 添加新用户默认权限信息
-	err = s.userpLogic.AddUserPermission(&db.UserPermission{
-		UserID:      id,
-		UserGroupID: int(req.UserInfo.GetGroupId()),
-	}, verify.Common)
-	if err != nil {
-		return fmt.Errorf("Init user permission info error: %v", err)
-	}
-	return nil
+	_, err = hpcDB.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		id, err := s.userLogic.AddUser(c, addedUserInfo)
+		if err != nil {
+			return nil, fmt.Errorf("Adduser error: %v", err)
+		}
+		resp.Userid = int32(id)
+		// TODO 调用命令调度系统添加计算节点上的用户
+		// 添加新用户默认权限信息
+		err = s.userpLogic.AddUserPermission(c, &db.UserPermission{
+			UserID:      id,
+			UserGroupID: int(req.UserInfo.GetGroupId()),
+		}, verify.Common)
+		if err != nil {
+			return nil, fmt.Errorf("Init user permission info error: %v", err)
+		}
+		return nil, nil
+	})
+	return err
 }
 
 var _ user.UserHandler = (*UserService)(nil)
