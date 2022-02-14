@@ -1,19 +1,20 @@
 package db
 
 import (
+	"context"
 	"errors"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/essayZW/hpcmanager/db"
 )
 
 // UserPermissionDB 用户权限表操作
 type UserPermissionDB struct {
-	conn *sqlx.DB
+	conn *db.DB
 }
 
 // QueryUserPermissionLevel 通过用户ID查询用户的权限所拥有的权限级别信息
-func (up *UserPermissionDB) QueryUserPermissionLevel(userid int) ([]*FullUserPermission, error) {
-	rows, err := up.conn.Queryx("SELECT `user_permission`.*, `permission`.level "+
+func (up *UserPermissionDB) QueryUserPermissionLevel(ctx context.Context, userid int) ([]*FullUserPermission, error) {
+	rows, err := up.conn.Query(ctx, "SELECT `user_permission`.*, `permission`.level "+
 		"FROM `user_permission`, `permission` "+
 		"WHERE `user_id`=? AND `user_permission`.permission_id=`permission`.id", userid)
 	defer rows.Close()
@@ -30,9 +31,9 @@ func (up *UserPermissionDB) QueryUserPermissionLevel(userid int) ([]*FullUserPer
 }
 
 // Insert 插入一条新的用户权限记录
-func (up *UserPermissionDB) Insert(info *UserPermission) error {
-	res, err := up.conn.Exec("INSERT INTO `user_permission`"+
-		"(`user_id`, `user_group_id`, `permissionid`, `create_time`, `extraAttributes`)"+
+func (up *UserPermissionDB) Insert(ctx context.Context, info *UserPermission) error {
+	res, err := up.conn.Exec(ctx, "INSERT INTO `user_permission`"+
+		"(`user_id`, `user_group_id`, `permission_id`, `create_time`, `extraAttributes`)"+
 		"VALUES (?,?,?,?,?)", info.UserID, info.UserGroupID, info.PermissionID, info.CreateTime, info.ExtraAttributes)
 	if err != nil {
 		return err
@@ -48,7 +49,7 @@ func (up *UserPermissionDB) Insert(info *UserPermission) error {
 }
 
 // NewUserPermission 创建新的用户权限操作结构体
-func NewUserPermission(conn *sqlx.DB) *UserPermissionDB {
+func NewUserPermission(conn *db.DB) *UserPermissionDB {
 	return &UserPermissionDB{
 		conn: conn,
 	}

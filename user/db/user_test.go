@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"crypto/md5"
 	"fmt"
 	"os"
@@ -56,7 +57,7 @@ func TestLoginQuery(t *testing.T) {
 
 	for index, example := range examples {
 		t.Run("LoginQuery"+strconv.Itoa(index), func(t *testing.T) {
-			res, err := userDb.LoginQuery(example.Username, example.Password)
+			res, err := userDb.LoginQuery(context.Background(), example.Username, example.Password)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"context"
 	"time"
 
 	"github.com/essayZW/hpcmanager/user/db"
@@ -14,14 +15,14 @@ type UserPermission struct {
 }
 
 // GetUserPermissionByID 通过用户ID查询用户拥有的权限信息
-func (u *UserPermission) GetUserPermissionByID(id int) ([]*db.FullUserPermission, error) {
-	return u.db.QueryUserPermissionLevel(id)
+func (u *UserPermission) GetUserPermissionByID(ctx context.Context, id int) ([]*db.FullUserPermission, error) {
+	return u.db.QueryUserPermissionLevel(ctx, id)
 }
 
 // AddUserPermission 添加用户权限
-func (u *UserPermission) AddUserPermission(info *db.UserPermission, level verify.Level) error {
+func (u *UserPermission) AddUserPermission(ctx context.Context, info *db.UserPermission, level verify.Level) error {
 	// 查询权限level对应的权限ID
-	id, err := u.pdb.QueryIDByLevel(int32(level))
+	id, err := u.pdb.QueryIDByLevel(ctx, int32(level))
 	if err != nil {
 		return err
 	}
@@ -29,7 +30,7 @@ func (u *UserPermission) AddUserPermission(info *db.UserPermission, level verify
 		info.CreateTime = time.Now()
 	}
 	info.PermissionID = id
-	err = u.db.Insert(info)
+	err = u.db.Insert(ctx, info)
 	if err != nil {
 		return err
 	}
