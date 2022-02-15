@@ -21,8 +21,8 @@ type verify struct {
 // HandlerFunc 进行初步的权限信息以及用户信息获取
 func (v *verify) HandlerFunc(ctx *gin.Context) {
 	// 检查当前请求的接口是否需要用户提供token
-	if !v.needVerify(ctx.Request.URL.Path) {
-		logger.Debug("excludeAPI ", ctx.Request.URL.Path)
+	if !v.needVerify(ctx.Request.URL.Path, ctx.Request.Method) {
+		logger.Debug("excludeAPI ", ctx.Request.Method, ":", ctx.Request.URL.Path)
 		ctx.Next()
 		return
 	}
@@ -65,9 +65,10 @@ func (v *verify) registryExcludeAPIPath(path string) {
 	v.excludeAPI = append(v.excludeAPI, path)
 }
 
-func (v *verify) needVerify(path string) bool {
+func (v *verify) needVerify(path string, method string) bool {
+	target := method + ":" + path
 	for index := range v.excludeAPI {
-		if v.excludeAPI[index] == path {
+		if v.excludeAPI[index] == target {
 			return false
 		}
 	}
