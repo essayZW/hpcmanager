@@ -2,6 +2,8 @@
 
 目前所有HTTP接口都以`/api`为前缀
 
+**所有的API请求必须附加access_token=token进行身份验证**
+
 ## user控制器
 
 ### /user/ping
@@ -32,6 +34,20 @@ Method: POST
 响应：
 
 生成的Token以及登录的用户的基础信息
+
+### /user/token
+
+Method: GET
+
+描述：通过用户的token查询对应的用户信息
+
+参数：
+
+无
+
+响应：
+
+用户的基本信息
 
 # hpc控制器
 
