@@ -45,6 +45,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: SuperAdmin,
 			},
+			// 普通成员权限及以上
+			GetUserInfo: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
 		},
 	}
 }

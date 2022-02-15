@@ -12,6 +12,8 @@ const (
 	RemoveUserPermissionAction = "__REMOVE_USER_PERMISSION__"
 	// AddPermission 添加权限等级
 	AddPermission = "__ADD_PERMISSION__"
+	// GetUserInfo 查询用户信息
+	GetUserInfo = "__GET_USER_INFO__"
 )
 
 // Verify 进行操作的权限验证
@@ -43,6 +45,26 @@ func Identify(action PermissionAction, permissionLevel []int32) bool {
 // AllowedActions 默认验证器列出支持的操作
 func AllowedActions(permissionLevel []Level) []PermissionAction {
 	return DefaultVerify.AllowedActions(permissionLevel)
+}
+
+// IsAdmin 是否是管理员
+func IsAdmin(permissionLevel []Level) bool {
+	for _, level := range permissionLevel {
+		if level == CommonAdmin || level == SuperAdmin {
+			return true
+		}
+	}
+	return false
+}
+
+// IsTutor 是否是导师
+func IsTutor(permissionLevel []Level) bool {
+	for _, level := range permissionLevel {
+		if level == Tutor {
+			return true
+		}
+	}
+	return false
 }
 
 // Level 权限等级
