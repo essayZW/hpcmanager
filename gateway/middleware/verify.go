@@ -54,9 +54,11 @@ func (v *verify) HandlerFunc(ctx *gin.Context) {
 	value, _ := ctx.Get(BaseRequestKey)
 	breq := value.(*proto.BaseRequest)
 	breq.UserInfo = &proto.UserInfo{
-		Levels:  info.GetPermissionLevel(),
-		UserId:  info.GetUserInfo().GetId(),
-		GroupId: info.GetUserInfo().GetGroupId(),
+		Levels:   info.GetPermissionLevel(),
+		UserId:   info.GetUserInfo().GetId(),
+		GroupId:  info.GetUserInfo().GetGroupId(),
+		Name:     info.GetUserInfo().GetName(),
+		Username: info.GetUserInfo().GetUsername(),
 	}
 	ctx.Next()
 }

@@ -155,7 +155,9 @@ var _ userpb.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例
 func NewUser(client client.Client, userLogic *logic.User) *UserService {
+	permissionService := permissionpb.NewPermissionService("permission", client)
 	return &UserService{
-		userLogic: userLogic,
+		userLogic:         userLogic,
+		permissionService: permissionService,
 	}
 }

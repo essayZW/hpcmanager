@@ -18,6 +18,10 @@ message UserInfo {
     int32 UserId = 2;
     // GroupId 当前用户所属组ID
     int32 GroupId = 3;
+    // Name 用户姓名
+    string Name = 4;
+    // Username 用户用户名
+    string Username = 5;
 }
 
 message BaseRequest {

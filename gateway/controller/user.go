@@ -39,7 +39,7 @@ func (user *User) ping(ctx *gin.Context) {
 func (user *User) login(ctx *gin.Context) {
 	var params jsonparam.Login
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		rep := response.New(200, err, false, "username or password validate error")
+		rep := response.New(500, err, false, "username or password validate error")
 		rep.Send(ctx)
 		return
 	}
@@ -50,11 +50,19 @@ func (user *User) login(ctx *gin.Context) {
 		BaseRequest: baseReq.(*gatewaypb.BaseRequest),
 	})
 	if err != nil {
-		rep := response.New(200, err, false, "login fail")
+		rep := response.New(500, err, false, "login fail")
 		rep.Send(ctx)
 		return
 	}
 	rep := response.New(200, res, true, "login success")
+	rep.Send(ctx)
+}
+
+// loginValid /api/user/token GET query token info of user
+func (user *User) loginValid(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	// 暂时直接返回中间件处理的信息
+	rep := response.New(200, baseReq.(*gatewaypb.BaseRequest).UserInfo, true, "success")
 	rep.Send(ctx)
 }
 
@@ -63,10 +71,12 @@ func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller User")
 	userRouter := router.Group("/user")
 	userRouter.GET("/ping", user.ping)
-	middleware.RegistryExcludeAPIPath("/api/user/ping")
+	middleware.RegistryExcludeAPIPath("GET:/api/user/ping")
 
 	userRouter.POST("/token", user.login)
-	middleware.RegistryExcludeAPIPath("/api/user/token")
+	middleware.RegistryExcludeAPIPath("POST:/api/user/token")
+
+	userRouter.GET("/token", user.loginValid)
 	return userRouter
 }
 
