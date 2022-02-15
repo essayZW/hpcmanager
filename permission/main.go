@@ -65,7 +65,10 @@ func main() {
 		logger.Fatal("Redis ping get: ", ok)
 	}
 
-	permissionService := service.NewPermission(serviceClient, logic.NewUserPermission(permissiondb.NewUserPermission(sqldb), permissiondb.NewPermission(sqldb)))
+	permissionLogic := logic.NewPermission(permissiondb.NewPermission(sqldb))
+	userPermissionLogic := logic.NewUserPermission(permissiondb.NewUserPermission(sqldb), permissionLogic)
+
+	permissionService := service.NewPermission(serviceClient, userPermissionLogic)
 	permissionpb.RegisterPermissionHandler(srv.Server(), permissionService)
 
 	srv.Init()
