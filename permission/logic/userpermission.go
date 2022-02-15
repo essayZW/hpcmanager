@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/essayZW/hpcmanager/user/db"
+	"github.com/essayZW/hpcmanager/permission/db"
 	"github.com/essayZW/hpcmanager/verify"
 )
 
@@ -15,7 +15,7 @@ type UserPermission struct {
 }
 
 // GetUserPermissionByID 通过用户ID查询用户拥有的权限信息
-func (u *UserPermission) GetUserPermissionByID(ctx context.Context, id int) ([]*db.FullUserPermission, error) {
+func (u *UserPermission) GetUserPermissionByID(ctx context.Context, id int) ([]*db.Permission, error) {
 	return u.db.QueryUserPermissionLevel(ctx, id)
 }
 

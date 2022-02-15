@@ -6,6 +6,8 @@ type PermissionAction string
 const (
 	// AddUserAction 添加用户操作
 	AddUserAction = "__ADD_USER__"
+	// AddUserPermissionAction 添加用户权限操作
+	AddUserPermissionAction = "__ADD_USER_PERMISSION__"
 )
 
 // Verify 进行操作的权限验证

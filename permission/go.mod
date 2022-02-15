@@ -1,17 +1,16 @@
-module github.com/essayZW/hpcmanager/user
+module github.com/essayZW/hpcmanager/permission
 
 go 1.17
 
 replace github.com/essayZW/hpcmanager => ../
 
+replace github.com/essayZW/hpcmanager/gateway => ../gateway
+
 require (
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
-	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
-	github.com/essayZW/hpcmanager/permission v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/user v0.0.0-00010101000000-000000000000
 	github.com/go-redis/redis/v8 v8.11.4
-	github.com/google/uuid v1.3.0
-	github.com/mozillazg/go-pinyin v0.19.0
 	go-micro.dev/v4 v4.6.0
 	google.golang.org/protobuf v1.26.0
 )
@@ -30,6 +29,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
@@ -38,6 +38,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/jmoiron/sqlx v1.3.4 // indirect
@@ -72,10 +73,8 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
-replace github.com/essayZW/hpcmanager/gateway => ../gateway
-
-replace github.com/essayZW/hpcmanager/user => ./
-
 replace github.com/essayZW/hpcmanager/hpc => ../hpc
 
-replace github.com/essayZW/hpcmanager/permission => ../permission
+replace github.com/essayZW/hpcmanager/user => ../user
+
+replace github.com/essayZW/hpcmanager/permission => ./

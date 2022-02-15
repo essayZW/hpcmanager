@@ -7,17 +7,17 @@ import (
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
-	userdb "github.com/essayZW/hpcmanager/user/db"
-	"github.com/essayZW/hpcmanager/user/logic"
-	user "github.com/essayZW/hpcmanager/user/proto"
-	"github.com/essayZW/hpcmanager/user/service"
+	permissiondb "github.com/essayZW/hpcmanager/permission/db"
+	"github.com/essayZW/hpcmanager/permission/logic"
+	permissionpb "github.com/essayZW/hpcmanager/permission/proto"
+	"github.com/essayZW/hpcmanager/permission/service"
 	"github.com/go-redis/redis/v8"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/registry"
 )
 
 func init() {
-	logger.SetName("user")
+	logger.SetName("permission")
 }
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 	)
 
 	srv := micro.NewService(
-		micro.Name("user"),
+		micro.Name("permission"),
 		micro.Registry(etcdRegistry),
 	)
 
@@ -42,7 +42,7 @@ func main() {
 		logger.Fatal("MySQL conn error: ", err)
 	}
 	// 创建动态配置源
-	etcdConfig, err := config.NewEtcd()
+	//etcdConfig, err := config.NewEtcd()
 	if err != nil {
 		logger.Fatal("Etcd config create error: ", err)
 	}
@@ -64,10 +64,9 @@ func main() {
 	if ok != "PONG" {
 		logger.Fatal("Redis ping get: ", ok)
 	}
-	userLogic := logic.NewUser(userdb.NewUser(sqldb), etcdConfig, redisConn)
 
-	userService := service.NewUser(serviceClient, userLogic)
-	user.RegisterUserHandler(srv.Server(), userService)
+	permissionService := service.NewPermission(serviceClient, logic.NewUserPermission(permissiondb.NewUserPermission(sqldb), permissiondb.NewPermission(sqldb)))
+	permissionpb.RegisterPermissionHandler(srv.Server(), permissionService)
 
 	srv.Init()
 	if err := srv.Run(); err != nil {

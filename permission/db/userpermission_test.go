@@ -34,7 +34,7 @@ func TestQueryUserPermissionLevel(t *testing.T) {
 		{
 			Name:   "test1",
 			ID:     1,
-			Except: []int{0, 1},
+			Except: []int{0, 1, 2},
 		},
 		{
 			Name:   "test2",

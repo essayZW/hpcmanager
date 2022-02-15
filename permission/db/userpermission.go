@@ -13,17 +13,17 @@ type UserPermissionDB struct {
 }
 
 // QueryUserPermissionLevel 通过用户ID查询用户的权限所拥有的权限级别信息
-func (up *UserPermissionDB) QueryUserPermissionLevel(ctx context.Context, userid int) ([]*FullUserPermission, error) {
-	rows, err := up.conn.Query(ctx, "SELECT `user_permission`.*, `permission`.level "+
+func (up *UserPermissionDB) QueryUserPermissionLevel(ctx context.Context, userid int) ([]*Permission, error) {
+	rows, err := up.conn.Query(ctx, "SELECT `permission`.* "+
 		"FROM `user_permission`, `permission` "+
 		"WHERE `user_id`=? AND `user_permission`.permission_id=`permission`.id", userid)
 	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
-	res := make([]*FullUserPermission, 0)
+	res := make([]*Permission, 0)
 	for rows.Next() {
-		var row FullUserPermission
+		var row Permission
 		rows.StructScan(&row)
 		res = append(res, &row)
 	}
