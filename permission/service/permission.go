@@ -24,10 +24,10 @@ type PermissionService struct {
 
 // Ping ping测试
 func (permission *PermissionService) Ping(ctx context.Context, req *publicpb.Empty, resp *publicpb.PingResponse) error {
+	logger.Infof("Ping %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	resp.Msg = "PONG"
 	resp.Ip = req.BaseRequest.RequestInfo.RemoteIP
 	resp.RequestId = req.BaseRequest.RequestInfo.Id
-	logger.Info("PING ", resp)
 	return nil
 }
 
@@ -41,12 +41,14 @@ func (permission *PermissionService) GetUserPermission(ctx context.Context, req 
 	resp.Info = make([]*permissionpb.PermissionInfo, len(permissionInfo))
 	for index, singleInfo := range permissionInfo {
 		resp.Info[index] = &permissionpb.PermissionInfo{
-			Id:              int32(singleInfo.ID),
-			Name:            singleInfo.Name,
-			Description:     singleInfo.Description,
-			Level:           int32(singleInfo.Level),
-			CreateTime:      singleInfo.CreateTime.Unix(),
-			ExtraAttributes: singleInfo.ExtraAttributes.String(),
+			Id:          int32(singleInfo.ID),
+			Name:        singleInfo.Name,
+			Description: singleInfo.Description,
+			Level:       int32(singleInfo.Level),
+			CreateTime:  singleInfo.CreateTime.Unix(),
+		}
+		if singleInfo.ExtraAttributes != nil {
+			resp.Info[index].ExtraAttributes = singleInfo.ExtraAttributes.String()
 		}
 	}
 	return nil
