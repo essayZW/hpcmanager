@@ -11,6 +11,7 @@ service Permission {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc GetUserPermission(GetUserPermissionRequest) returns (GetUserPermissionResponse) {}
     rpc AddUserPermission(AddUserPermissionRequest) returns (AddUserPermissionResponse) {}
+    rpc RemoveUserPermission(RemoveUserPermissionRequest) returns (RemoveUserPermissionResponse) {}
 }
 
 
@@ -32,5 +33,15 @@ message AddUserPermissionRequest {
 }
 
 message AddUserPermissionResponse {
+    bool success = 1;
+}
+
+message RemoveUserPermissionRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userid = 2;
+    int32 level = 3;
+}
+
+message RemoveUserPermissionResponse {
     bool success = 1;
 }

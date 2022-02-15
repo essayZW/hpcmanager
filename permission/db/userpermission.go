@@ -48,6 +48,22 @@ func (up *UserPermissionDB) Insert(ctx context.Context, info *UserPermission) er
 	return nil
 }
 
+// Delete 删除某条用户权限记录
+func (up *UserPermissionDB) Delete(ctx context.Context, deleted *UserPermission) error {
+	res, err := up.conn.Exec(ctx, "DELETE FROM `user_permission` WHERE `user_id`=? AND `permission_id`=?", deleted.UserID, deleted.PermissionID)
+	if err != nil {
+		return err
+	}
+	ar, err := res.RowsAffected()
+	if err != nil {
+		return nil
+	}
+	if ar == 0 {
+		return errors.New("delete has no affected rows")
+	}
+	return nil
+}
+
 // NewUserPermission 创建新的用户权限操作结构体
 func NewUserPermission(conn *db.DB) *UserPermissionDB {
 	return &UserPermissionDB{

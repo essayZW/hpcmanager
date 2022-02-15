@@ -33,6 +33,10 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			RemoveUserPermissionAction: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
 		},
 	}
 }

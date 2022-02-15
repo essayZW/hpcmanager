@@ -74,6 +74,30 @@ message AddUserPermissionResponse {
 }
 ```
 
+## RemoveUserPermission
+
+描述：删除用户的某一个权限，返回操作是否成功的状态
+
+原型定义：`rpc RemoveUserPermission(RemoveUserPermissionRequest) returns (RemoveUserPermissionResponse) {}`
+
+请求参数：
+
+```protobuf
+message RemoveUserPermissionRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userid = 2;
+    int32 level = 3;
+}
+```
+
+响应参数：
+
+```protobuf
+message RemoveUserPermissionResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## PermissionInfo

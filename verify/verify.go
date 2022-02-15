@@ -8,6 +8,8 @@ const (
 	AddUserAction = "__ADD_USER__"
 	// AddUserPermissionAction 添加用户权限操作
 	AddUserPermissionAction = "__ADD_USER_PERMISSION__"
+	// RemoveUserPermissionAction 删除用户权限操作
+	RemoveUserPermissionAction = "__REMOVE_USER_PERMISSION__"
 )
 
 // Verify 进行操作的权限验证

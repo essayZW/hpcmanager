@@ -69,6 +69,22 @@ func (permission *PermissionService) AddUserPermission(ctx context.Context, req 
 	return nil
 }
 
+// RemoveUserPermission 删除用户的某个权限
+func (permission *PermissionService) RemoveUserPermission(ctx context.Context, req *permissionpb.RemoveUserPermissionRequest, resp *permissionpb.RemoveUserPermissionResponse) error {
+	logger.Infof("RemoveUserPermission %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	// 鉴权，只有管理员才可以进行此项操作
+	if !verify.Identify(verify.RemoveUserPermissionAction, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("RemoveUserPermission permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("RemoveUserPermission permission forbidden")
+	}
+	err := permission.userpLogic.RemoveUserPermission(ctx, int(req.GetUserid()), verify.Level(req.GetLevel()))
+	if err != nil {
+		return errors.New("Remove user permission error")
+	}
+	resp.Success = true
+	return nil
+}
+
 var _ permissionpb.PermissionHandler = (*PermissionService)(nil)
 
 // NewPermission 创建一个新的Permission服务
