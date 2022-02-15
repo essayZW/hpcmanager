@@ -352,7 +352,8 @@ CREATE TABLE `user_permission` (
   `permission_id` int NOT NULL,
   `create_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `id_level` (`user_id`,`permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -390,4 +391,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-14 17:44:05
+-- Dump completed on 2022-02-15 16:49:00
