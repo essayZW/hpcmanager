@@ -48,9 +48,9 @@ func AllowedActions(permissionLevel []Level) []PermissionAction {
 }
 
 // IsAdmin 是否是管理员
-func IsAdmin(permissionLevel []Level) bool {
+func IsAdmin(permissionLevel []int32) bool {
 	for _, level := range permissionLevel {
-		if level == CommonAdmin || level == SuperAdmin {
+		if level == int32(CommonAdmin) || level == int32(SuperAdmin) {
 			return true
 		}
 	}
@@ -58,9 +58,9 @@ func IsAdmin(permissionLevel []Level) bool {
 }
 
 // IsTutor 是否是导师
-func IsTutor(permissionLevel []Level) bool {
+func IsTutor(permissionLevel []int32) bool {
 	for _, level := range permissionLevel {
-		if level == Tutor {
+		if level == int32(Tutor) {
 			return true
 		}
 	}
