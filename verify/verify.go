@@ -48,7 +48,7 @@ const (
 	// MinLevel 权限值的下界
 	MinLevel Level = -128
 	// Guest 游客级别的权限，基本没有什么权限
-	Guest Level = iota
+	Guest Level = iota - 1
 	// Common 普通用户的权限
 	Common
 	// Tutor 导师用户的权限
