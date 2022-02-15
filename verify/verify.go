@@ -10,6 +10,8 @@ const (
 	AddUserPermissionAction = "__ADD_USER_PERMISSION__"
 	// RemoveUserPermissionAction 删除用户权限操作
 	RemoveUserPermissionAction = "__REMOVE_USER_PERMISSION__"
+	// AddPermission 添加权限等级
+	AddPermission = "__ADD_PERMISSION__"
 )
 
 // Verify 进行操作的权限验证

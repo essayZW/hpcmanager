@@ -98,6 +98,29 @@ message RemoveUserPermissionResponse {
 }
 ```
 
+## AddPermission
+
+描述：添加一个新的权限等级描述，返回新添加的权限等级的ID
+
+原型定义：`rpc AddPermission(AddPermissionRequest) returns (AddPermissionResponse) {}`
+
+请求参数：
+
+ ```protobuf
+ message AddPermissionRequest {
+     request.BaseRequest baseRequest = 1;
+     permission.PermissionInfo info = 2;
+ }
+ ```
+
+响应参数：
+
+```protobuf
+message AddPermissionResponse {
+    int32 permissionID = 1;
+}
+```
+
 # 附录
 
 ## PermissionInfo

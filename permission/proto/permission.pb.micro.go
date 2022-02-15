@@ -42,6 +42,7 @@ type PermissionService interface {
 	GetUserPermission(ctx context.Context, in *GetUserPermissionRequest, opts ...client.CallOption) (*GetUserPermissionResponse, error)
 	AddUserPermission(ctx context.Context, in *AddUserPermissionRequest, opts ...client.CallOption) (*AddUserPermissionResponse, error)
 	RemoveUserPermission(ctx context.Context, in *RemoveUserPermissionRequest, opts ...client.CallOption) (*RemoveUserPermissionResponse, error)
+	AddPermission(ctx context.Context, in *AddPermissionRequest, opts ...client.CallOption) (*AddPermissionResponse, error)
 }
 
 type permissionService struct {
@@ -96,6 +97,16 @@ func (c *permissionService) RemoveUserPermission(ctx context.Context, in *Remove
 	return out, nil
 }
 
+func (c *permissionService) AddPermission(ctx context.Context, in *AddPermissionRequest, opts ...client.CallOption) (*AddPermissionResponse, error) {
+	req := c.c.NewRequest(c.name, "Permission.AddPermission", in)
+	out := new(AddPermissionResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Permission service
 
 type PermissionHandler interface {
@@ -103,6 +114,7 @@ type PermissionHandler interface {
 	GetUserPermission(context.Context, *GetUserPermissionRequest, *GetUserPermissionResponse) error
 	AddUserPermission(context.Context, *AddUserPermissionRequest, *AddUserPermissionResponse) error
 	RemoveUserPermission(context.Context, *RemoveUserPermissionRequest, *RemoveUserPermissionResponse) error
+	AddPermission(context.Context, *AddPermissionRequest, *AddPermissionResponse) error
 }
 
 func RegisterPermissionHandler(s server.Server, hdlr PermissionHandler, opts ...server.HandlerOption) error {
@@ -111,6 +123,7 @@ func RegisterPermissionHandler(s server.Server, hdlr PermissionHandler, opts ...
 		GetUserPermission(ctx context.Context, in *GetUserPermissionRequest, out *GetUserPermissionResponse) error
 		AddUserPermission(ctx context.Context, in *AddUserPermissionRequest, out *AddUserPermissionResponse) error
 		RemoveUserPermission(ctx context.Context, in *RemoveUserPermissionRequest, out *RemoveUserPermissionResponse) error
+		AddPermission(ctx context.Context, in *AddPermissionRequest, out *AddPermissionResponse) error
 	}
 	type Permission struct {
 		permission
@@ -137,4 +150,8 @@ func (h *permissionHandler) AddUserPermission(ctx context.Context, in *AddUserPe
 
 func (h *permissionHandler) RemoveUserPermission(ctx context.Context, in *RemoveUserPermissionRequest, out *RemoveUserPermissionResponse) error {
 	return h.PermissionHandler.RemoveUserPermission(ctx, in, out)
+}
+
+func (h *permissionHandler) AddPermission(ctx context.Context, in *AddPermissionRequest, out *AddPermissionResponse) error {
+	return h.PermissionHandler.AddPermission(ctx, in, out)
 }

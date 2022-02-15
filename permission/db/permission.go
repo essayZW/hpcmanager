@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/essayZW/hpcmanager/db"
+	"go-micro.dev/v4/logger"
 )
 
 // PermissionDB 权限表的相关操作
@@ -23,6 +24,22 @@ func (p *PermissionDB) QueryIDByLevel(ctx context.Context, level int32) (int, er
 		return 0, err
 	}
 	return id, nil
+}
+
+// Insert 插入一条新的权限记录
+func (p *PermissionDB) Insert(ctx context.Context, info *Permission) (int, error) {
+	res, err := p.conn.Exec(ctx, "INSERT INTO `permission` (`name`, `level`, `description`, `create_time`, `extraAttributes`) VALUES (?,?,?,?,?)", info.Name,
+		info.Level, info.Description, info.CreateTime, info.ExtraAttributes)
+	if err != nil {
+		logger.Warn("insert into permission error: %v", err, " with data: ", info)
+		return 0, err
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		logger.Warn("insert into permission error: %v", err, " with data: ", info)
+		return 0, err
+	}
+	return int(id), nil
 }
 
 // NewPermission 新建一个权限表操作结构体

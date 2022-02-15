@@ -25,17 +25,25 @@ func (verify *hardcodeVerify) AllowedActions(permissionLevel []Level) []Permissi
 func newDefault() *hardcodeVerify {
 	return &hardcodeVerify{
 		actionsLevel: map[PermissionAction]*actionVerify{
+			// 普通管理员及以上
 			AddUserAction: {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			// 普通管理员及以上
 			AddUserPermissionAction: {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			// 普通管理员及以上
 			RemoveUserPermissionAction: {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
+			},
+			// 超级管理员及以上
+			AddPermission: {
+				maxLevel: MaxLevel,
+				minLevel: SuperAdmin,
 			},
 		},
 	}

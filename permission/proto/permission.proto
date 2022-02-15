@@ -12,6 +12,7 @@ service Permission {
     rpc GetUserPermission(GetUserPermissionRequest) returns (GetUserPermissionResponse) {}
     rpc AddUserPermission(AddUserPermissionRequest) returns (AddUserPermissionResponse) {}
     rpc RemoveUserPermission(RemoveUserPermissionRequest) returns (RemoveUserPermissionResponse) {}
+    rpc AddPermission(AddPermissionRequest) returns (AddPermissionResponse) {}
 }
 
 
@@ -44,4 +45,13 @@ message RemoveUserPermissionRequest {
 
 message RemoveUserPermissionResponse {
     bool success = 1;
+}
+
+message AddPermissionRequest {
+    request.BaseRequest baseRequest = 1;
+    permission.PermissionInfo info = 2;
+}
+
+message AddPermissionResponse {
+    int32 permissionID = 1;
 }
