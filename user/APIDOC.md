@@ -130,6 +130,32 @@ message AddUserResponse {
 }
 ```
 
+## CreateToken
+
+描述：传入用户名，为其创建登录token
+
+需求权限：无
+
+原型定义：`rpc createtoken(createtokenrequest) returns (createtokenresponse) {}`
+
+请求参数：
+
+```protobuf
+message CreateTokenRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+```
+
+响应参数：
+
+```protobuf
+message CreateTokenResponse {
+    string token = 1;
+    user.UserInfo userInfo = 2;
+}
+```
+
 # 附录
 
 ## UserInfo

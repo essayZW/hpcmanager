@@ -267,3 +267,36 @@ func TestAddUser(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateToken(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		Username string
+		Error    bool
+	}{
+		{
+			Name:     "test createToken success",
+			Username: "121121121",
+			Error:    false,
+		},
+		{
+			Name:     "test createToken fail",
+			Username: "nouser",
+			Error:    true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			var resp user.CreateTokenResponse
+			err := userService.CreateToken(context.Background(), &user.CreateTokenRequest{
+				BaseRequest: baseRequest,
+				Username:    test.Username,
+			}, &resp)
+			if (err != nil) != test.Error {
+				t.Errorf("Except %v Get %v UserInfo %v Token %v", test.Error, err, resp.UserInfo, resp.Token)
+			}
+		})
+	}
+}

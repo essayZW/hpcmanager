@@ -15,6 +15,7 @@ service User {
     rpc CheckLogin(CheckLoginRequest) returns (CheckLoginResponse) {}
     rpc ExistUsername(ExistUsernameRequest) returns (ExistUsernameResponse) {}
     rpc AddUser(AddUserRequest) returns (AddUserResponse) {}
+    rpc CreateToken(CreateTokenRequest) returns (CreateTokenResponse) {}
 }
 
 message LoginRequest {
@@ -58,4 +59,14 @@ message AddUserRequest {
 
 message AddUserResponse {
     int32 userid = 1;
+}
+
+message CreateTokenRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+
+message CreateTokenResponse {
+    string token = 1;
+    user.UserInfo userInfo = 2;
 }

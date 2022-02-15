@@ -54,6 +54,7 @@ func (s *UserService) Login(ctx context.Context, req *userpb.LoginRequest, resp 
 		Id:       int32(info.ID),
 		Username: info.Username,
 		Name:     info.Name,
+		GroupId:  int32(info.GroupID),
 	}
 	// 创建登录token
 	token := s.userLogic.CreateToken(ctx, req.GetUsername())
@@ -149,6 +150,25 @@ func (s *UserService) AddUser(ctx context.Context, req *userpb.AddUserRequest, r
 		return nil, nil
 	})
 	return err
+}
+
+// CreateToken 创建用户token接口
+func (s *UserService) CreateToken(ctx context.Context, req *userpb.CreateTokenRequest, resp *userpb.CreateTokenResponse) error {
+	logger.Infof("CreateToken: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	// 根据用户名查询用户信息，确保用户存在
+	userInfo, err := s.userLogic.GetByUsername(ctx, req.GetUsername())
+	if err != nil {
+		return errors.New("user don't exists")
+	}
+	token := s.userLogic.CreateToken(ctx, req.GetUsername())
+	resp.Token = token
+	resp.UserInfo = &userpb.UserInfo{
+		Id:       int32(userInfo.ID),
+		Username: userInfo.Username,
+		Name:     userInfo.Name,
+		GroupId:  int32(userInfo.GroupID),
+	}
+	return nil
 }
 
 var _ userpb.UserHandler = (*UserService)(nil)

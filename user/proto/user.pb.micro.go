@@ -43,6 +43,7 @@ type UserService interface {
 	CheckLogin(ctx context.Context, in *CheckLoginRequest, opts ...client.CallOption) (*CheckLoginResponse, error)
 	ExistUsername(ctx context.Context, in *ExistUsernameRequest, opts ...client.CallOption) (*ExistUsernameResponse, error)
 	AddUser(ctx context.Context, in *AddUserRequest, opts ...client.CallOption) (*AddUserResponse, error)
+	CreateToken(ctx context.Context, in *CreateTokenRequest, opts ...client.CallOption) (*CreateTokenResponse, error)
 }
 
 type userService struct {
@@ -107,6 +108,16 @@ func (c *userService) AddUser(ctx context.Context, in *AddUserRequest, opts ...c
 	return out, nil
 }
 
+func (c *userService) CreateToken(ctx context.Context, in *CreateTokenRequest, opts ...client.CallOption) (*CreateTokenResponse, error) {
+	req := c.c.NewRequest(c.name, "User.CreateToken", in)
+	out := new(CreateTokenResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
@@ -115,6 +126,7 @@ type UserHandler interface {
 	CheckLogin(context.Context, *CheckLoginRequest, *CheckLoginResponse) error
 	ExistUsername(context.Context, *ExistUsernameRequest, *ExistUsernameResponse) error
 	AddUser(context.Context, *AddUserRequest, *AddUserResponse) error
+	CreateToken(context.Context, *CreateTokenRequest, *CreateTokenResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
@@ -124,6 +136,7 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		CheckLogin(ctx context.Context, in *CheckLoginRequest, out *CheckLoginResponse) error
 		ExistUsername(ctx context.Context, in *ExistUsernameRequest, out *ExistUsernameResponse) error
 		AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error
+		CreateToken(ctx context.Context, in *CreateTokenRequest, out *CreateTokenResponse) error
 	}
 	type User struct {
 		user
@@ -154,4 +167,8 @@ func (h *userHandler) ExistUsername(ctx context.Context, in *ExistUsernameReques
 
 func (h *userHandler) AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error {
 	return h.UserHandler.AddUser(ctx, in, out)
+}
+
+func (h *userHandler) CreateToken(ctx context.Context, in *CreateTokenRequest, out *CreateTokenResponse) error {
+	return h.UserHandler.CreateToken(ctx, in, out)
 }
