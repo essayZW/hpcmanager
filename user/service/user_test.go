@@ -22,7 +22,6 @@ var baseRequest *gateway.BaseRequest
 
 func init() {
 	os.Setenv(hpcmanager.EnvName, "testing")
-	hpcmanager.LoadCommonArgs()
 
 	// 创建数据库连接
 	sqlConn, err := db.NewDB()
@@ -53,10 +52,8 @@ func init() {
 		logger.Fatal("Redis ping get: ", ok)
 	}
 	userLogic := logic.NewUser(userdb.NewUser(sqlConn), etcdConfig, redisConn)
-	userpLogic := logic.NewUserPermission(userdb.NewUserPermission(sqlConn), userdb.NewPermission(sqlConn))
 	userService = &UserService{
-		userLogic:  userLogic,
-		userpLogic: userpLogic,
+		userLogic: userLogic,
 	}
 	baseRequest = &gateway.BaseRequest{
 		RequestInfo: &gateway.RequestInfo{
@@ -118,8 +115,9 @@ func TestLogin(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			var res user.LoginResponse
 			err := userService.Login(context.Background(), &user.LoginRequest{
-				Username: test.Username,
-				Password: test.Password,
+				BaseRequest: baseRequest,
+				Username:    test.Username,
+				Password:    test.Password,
 			}, &res)
 			if err != nil && !test.Error {
 				t.Error(err)

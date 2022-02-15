@@ -29,6 +29,10 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			AddUserPermissionAction: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
 		},
 	}
 }

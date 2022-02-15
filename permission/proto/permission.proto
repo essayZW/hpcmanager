@@ -4,8 +4,33 @@ option go_package="github.com/essayZW/hpcmanager/permission/proto;permission";
 
 import "proto/common.proto";
 import "proto/ping.proto";
+import "gateway/proto/baserequest.proto";
+import "proto/permissionpublic.proto";
 
 service Permission {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+    rpc GetUserPermission(GetUserPermissionRequest) returns (GetUserPermissionResponse) {}
+    rpc AddUserPermission(AddUserPermissionRequest) returns (AddUserPermissionResponse) {}
 }
 
+
+message GetUserPermissionRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 id = 2;
+}
+
+message GetUserPermissionResponse {
+    repeated permission.PermissionInfo info = 1;
+}
+
+
+message AddUserPermissionRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userid = 2;
+    int32 userGroupID = 3;
+    int32 level = 4;
+}
+
+message AddUserPermissionResponse {
+    bool success = 1;
+}

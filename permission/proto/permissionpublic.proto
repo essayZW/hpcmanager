@@ -1,0 +1,14 @@
+syntax="proto3";
+
+option go_package="github.com/essayZW/hpcmanager/permission/proto;permission";
+
+package permission;
+
+message PermissionInfo {
+    int32 id = 1;
+    string name = 2;
+    int32 level = 3;
+    string description = 4;
+    int64 createTime = 5;
+    string extraAttributes = 6;
+}

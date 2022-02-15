@@ -65,9 +65,8 @@ func main() {
 		logger.Fatal("Redis ping get: ", ok)
 	}
 	userLogic := logic.NewUser(userdb.NewUser(sqldb), etcdConfig, redisConn)
-	userPermissionLogic := logic.NewUserPermission(userdb.NewUserPermission(sqldb), userdb.NewPermission(sqldb))
 
-	userService := service.NewUser(serviceClient, userLogic, userPermissionLogic)
+	userService := service.NewUser(serviceClient, userLogic)
 	user.RegisterUserHandler(srv.Server(), userService)
 
 	srv.Init()

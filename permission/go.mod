@@ -9,6 +9,7 @@ replace github.com/essayZW/hpcmanager/gateway => ../gateway
 require (
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/user v0.0.0-00010101000000-000000000000
 	github.com/go-redis/redis/v8 v8.11.4
 	go-micro.dev/v4 v4.6.0
 	google.golang.org/protobuf v1.26.0
@@ -75,3 +76,5 @@ require (
 replace github.com/essayZW/hpcmanager/hpc => ../hpc
 
 replace github.com/essayZW/hpcmanager/user => ../user
+
+replace github.com/essayZW/hpcmanager/permission => ./

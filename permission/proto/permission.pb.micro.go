@@ -5,6 +5,7 @@ package permission
 
 import (
 	fmt "fmt"
+	_ "github.com/essayZW/hpcmanager/gateway/proto"
 	proto1 "github.com/essayZW/hpcmanager/proto"
 	proto "google.golang.org/protobuf/proto"
 	math "math"
@@ -38,6 +39,8 @@ func NewPermissionEndpoints() []*api.Endpoint {
 
 type PermissionService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
+	GetUserPermission(ctx context.Context, in *GetUserPermissionRequest, opts ...client.CallOption) (*GetUserPermissionResponse, error)
+	AddUserPermission(ctx context.Context, in *AddUserPermissionRequest, opts ...client.CallOption) (*AddUserPermissionResponse, error)
 }
 
 type permissionService struct {
@@ -62,15 +65,39 @@ func (c *permissionService) Ping(ctx context.Context, in *proto1.Empty, opts ...
 	return out, nil
 }
 
+func (c *permissionService) GetUserPermission(ctx context.Context, in *GetUserPermissionRequest, opts ...client.CallOption) (*GetUserPermissionResponse, error) {
+	req := c.c.NewRequest(c.name, "Permission.GetUserPermission", in)
+	out := new(GetUserPermissionResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *permissionService) AddUserPermission(ctx context.Context, in *AddUserPermissionRequest, opts ...client.CallOption) (*AddUserPermissionResponse, error) {
+	req := c.c.NewRequest(c.name, "Permission.AddUserPermission", in)
+	out := new(AddUserPermissionResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Permission service
 
 type PermissionHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
+	GetUserPermission(context.Context, *GetUserPermissionRequest, *GetUserPermissionResponse) error
+	AddUserPermission(context.Context, *AddUserPermissionRequest, *AddUserPermissionResponse) error
 }
 
 func RegisterPermissionHandler(s server.Server, hdlr PermissionHandler, opts ...server.HandlerOption) error {
 	type permission interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
+		GetUserPermission(ctx context.Context, in *GetUserPermissionRequest, out *GetUserPermissionResponse) error
+		AddUserPermission(ctx context.Context, in *AddUserPermissionRequest, out *AddUserPermissionResponse) error
 	}
 	type Permission struct {
 		permission
@@ -85,4 +112,12 @@ type permissionHandler struct {
 
 func (h *permissionHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error {
 	return h.PermissionHandler.Ping(ctx, in, out)
+}
+
+func (h *permissionHandler) GetUserPermission(ctx context.Context, in *GetUserPermissionRequest, out *GetUserPermissionResponse) error {
+	return h.PermissionHandler.GetUserPermission(ctx, in, out)
+}
+
+func (h *permissionHandler) AddUserPermission(ctx context.Context, in *AddUserPermissionRequest, out *AddUserPermissionResponse) error {
+	return h.PermissionHandler.AddUserPermission(ctx, in, out)
 }

@@ -5,7 +5,10 @@ import (
 
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
 	"github.com/essayZW/hpcmanager/config"
+	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
+	permissiondb "github.com/essayZW/hpcmanager/permission/db"
+	"github.com/essayZW/hpcmanager/permission/logic"
 	permissionpb "github.com/essayZW/hpcmanager/permission/proto"
 	"github.com/essayZW/hpcmanager/permission/service"
 	"github.com/go-redis/redis/v8"
@@ -34,7 +37,7 @@ func main() {
 	serviceClient := srv.Client()
 
 	// 创建数据库连接
-	//sqldb, err := db.NewDB()
+	sqldb, err := db.NewDB()
 	if err != nil {
 		logger.Fatal("MySQL conn error: ", err)
 	}
@@ -62,7 +65,7 @@ func main() {
 		logger.Fatal("Redis ping get: ", ok)
 	}
 
-	permissionService := service.NewPermission(serviceClient)
+	permissionService := service.NewPermission(serviceClient, logic.NewUserPermission(permissiondb.NewUserPermission(sqldb), permissiondb.NewPermission(sqldb)))
 	permissionpb.RegisterPermissionHandler(srv.Server(), permissionService)
 
 	srv.Init()
