@@ -60,6 +60,7 @@ func (v *verify) HandlerFunc(ctx *gin.Context) {
 		Name:     info.GetUserInfo().GetName(),
 		Username: info.GetUserInfo().GetUsername(),
 	}
+	logger.Info("Userinfo: ", breq.UserInfo)
 	ctx.Next()
 }
 
