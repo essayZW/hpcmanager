@@ -156,6 +156,29 @@ message CreateTokenResponse {
 }
 ```
 
+## GetUserInfo
+
+描述：传入目标用户ID，查询用户的详细个人信息，对于不同权限的查询者其能查询的范围不同
+
+需求权限：`Common`及以上
+
+请求参数：
+
+```protobuf
+message GetUserInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userid = 2;
+}
+```
+
+响应参数：
+
+```protobuf
+message GetUserInfoResponse {
+    user.UserInfo userInfo = 1;
+}
+```
+
 # 附录
 
 ## UserInfo

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/essayZW/hpcmanager/db"
+	"go-micro.dev/v4/logger"
 )
 
 // UserDB 用户数据库操作
@@ -51,6 +52,21 @@ func (db *UserDB) InsertUser(ctx context.Context, userinfo *User) (int, error) {
 		return int(res), nil
 	}
 	return 0, err
+}
+
+// QueryByID 通过ID查询用户表的记录
+func (db *UserDB) QueryByID(ctx context.Context, userid int) (*User, error) {
+	row, err := db.conn.QueryRow(ctx, "SELECT * FROM `user` WHERE `id`=?", userid)
+	if err != nil {
+		return nil, err
+	}
+	var userInfo User
+	err = row.StructScan(&userInfo)
+	if err != nil {
+		logger.Warn("struct scan User error: ", err)
+		return nil, err
+	}
+	return &userInfo, nil
 }
 
 // NewUser 创建一个新的操作用户数据库结构体

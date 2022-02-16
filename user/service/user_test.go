@@ -300,3 +300,89 @@ func TestCreateToken(t *testing.T) {
 		})
 	}
 }
+
+func TestGetUserInfo(t *testing.T) {
+	tests := []struct {
+		Name        string
+		UserID      int
+		GroupID     int
+		QueryUserID int
+		Levels      []int32
+
+		Error bool
+	}{
+		{
+			Name:        "Query self success",
+			UserID:      2,
+			QueryUserID: 2,
+			Levels: []int32{
+				int32(verify.Common),
+			},
+			Error: false,
+		},
+		{
+			Name:        "Query other user forbidden",
+			UserID:      43,
+			QueryUserID: 2,
+			Levels: []int32{
+				int32(verify.Common),
+			},
+			Error: true,
+		},
+		{
+			Name:        "Tutor Query other user",
+			UserID:      1,
+			QueryUserID: 2,
+			GroupID:     1,
+			Levels: []int32{
+				int32(verify.Tutor),
+			},
+			Error: false,
+		},
+		{
+			Name:        "Tutor query other group user",
+			UserID:      1,
+			QueryUserID: 43,
+			GroupID:     3,
+			Levels: []int32{
+				int32(verify.Tutor),
+			},
+			Error: true,
+		},
+		{
+			Name:        "Admin query other user",
+			UserID:      1,
+			QueryUserID: 2,
+			Levels: []int32{
+				int32(verify.CommonAdmin),
+			},
+			Error: false,
+		},
+		{
+			Name:        "Admin query other user2",
+			UserID:      43,
+			QueryUserID: 2,
+			Levels: []int32{
+				int32(verify.CommonAdmin),
+			},
+			Error: false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			req := &user.GetUserInfoRequest{
+				BaseRequest: baseRequest,
+				Userid:      int32(test.QueryUserID),
+			}
+			req.BaseRequest.UserInfo.Levels = test.Levels
+			req.BaseRequest.UserInfo.UserId = int32(test.UserID)
+			req.BaseRequest.UserInfo.GroupId = int32(test.GroupID)
+			var resp user.GetUserInfoResponse
+			err := userService.GetUserInfo(context.Background(), req, &resp)
+			if (err != nil) != test.Error {
+				t.Errorf("Except: %v Get: %v Resp: %v", test.Error, err, resp.UserInfo)
+			}
+		})
+	}
+}

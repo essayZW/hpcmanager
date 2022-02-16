@@ -171,6 +171,48 @@ func (s *UserService) CreateToken(ctx context.Context, req *userpb.CreateTokenRe
 	return nil
 }
 
+// GetUserInfo 查询用户详细信息
+func (s *UserService) GetUserInfo(ctx context.Context, req *userpb.GetUserInfoRequest, resp *userpb.GetUserInfoResponse) error {
+	logger.Infof("GetUserInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	if !verify.Identify(verify.GetUserInfo, req.GetBaseRequest().GetUserInfo().GetLevels()) {
+		logger.Info("GetUserInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("GetUserInfo permission forbidden")
+	}
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	if !isAdmin && !isTutor {
+		// 普通用户，判断是否是本人
+		if req.BaseRequest.UserInfo.UserId != req.Userid {
+			return errors.New("you can only query your own user information")
+		}
+	}
+	userInfo, err := s.userLogic.GetUserInfoByID(ctx, int(req.Userid))
+	if err != nil {
+		return errors.New("User information query error")
+	}
+	if isTutor && !isAdmin {
+		// 是导师且不是管理员，判断其是否属于对应的组
+		if req.BaseRequest.UserInfo.GroupId != int32(userInfo.GroupID) {
+			return errors.New("Cannot query user information of other groups")
+		}
+	}
+	resp.UserInfo = &userpb.UserInfo{
+		Id:         int32(userInfo.ID),
+		GroupId:    int32(userInfo.GroupID),
+		Username:   userInfo.Username,
+		Name:       userInfo.Name,
+		Tel:        userInfo.Tel,
+		Email:      userInfo.Email,
+		PyName:     userInfo.PinyinName,
+		College:    userInfo.CollegeName,
+		CreateTime: userInfo.CreateTime.Unix(),
+	}
+	if userInfo.ExtraAttributes != nil {
+		resp.UserInfo.ExtraAttributes = userInfo.ExtraAttributes.String()
+	}
+	return nil
+}
+
 var _ userpb.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例

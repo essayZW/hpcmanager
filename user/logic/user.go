@@ -118,6 +118,11 @@ func (u *User) AddUser(ctx context.Context, userInfo *db.User) (int, error) {
 	return id, nil
 }
 
+// GetUserInfoByID 通过ID查询用户信息
+func (u *User) GetUserInfoByID(ctx context.Context, userid int) (*db.User, error) {
+	return u.userDB.QueryByID(ctx, userid)
+}
+
 // NewUser 创建一个新的userLogic
 func NewUser(db *db.UserDB, configConn config.DynamicConfig, redisConn *redis.Client) *User {
 	user := &User{
