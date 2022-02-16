@@ -66,8 +66,13 @@ func main() {
 	}
 	userLogic := logic.NewUser(userdb.NewUser(sqldb), etcdConfig, redisConn)
 
+	serviceServer := srv.Server()
+
 	userService := service.NewUser(serviceClient, userLogic)
-	user.RegisterUserHandler(srv.Server(), userService)
+	user.RegisterUserHandler(serviceServer, userService)
+
+	userGroupService := service.NewGroup(serviceClient)
+	user.RegisterGroupServiceHandler(serviceServer, userGroupService)
 
 	srv.Init()
 	if err := srv.Run(); err != nil {

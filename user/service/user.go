@@ -25,10 +25,10 @@ type UserService struct {
 
 // Ping 测试
 func (s *UserService) Ping(ctx context.Context, req *publicproto.Empty, resp *publicproto.PingResponse) error {
+	logger.Info("User PING ", req)
 	resp.Msg = "PONG"
 	resp.Ip = req.BaseRequest.RequestInfo.RemoteIP
 	resp.RequestId = req.BaseRequest.RequestInfo.Id
-	logger.Info("PING ", resp)
 	return nil
 }
 

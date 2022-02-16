@@ -1,0 +1,12 @@
+syntax="proto3";
+
+option go_package="github.com/essayZW/hpcmanager/user/proto;user";
+
+package user;
+
+import "proto/ping.proto";
+import "proto/common.proto";
+
+service GroupService {
+    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+}
