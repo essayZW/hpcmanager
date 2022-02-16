@@ -81,7 +81,7 @@ func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 }
 
 // NewUser 创建一个用户控制器
-func NewUser(client client.Client, configConn config.DynamicConfig) *User {
+func NewUser(client client.Client, configConn config.DynamicConfig) Controller {
 	return &User{
 		userService: userpb.NewUserService("user", client),
 	}

@@ -44,7 +44,7 @@ func (permission *Permission) Registry(router *gin.RouterGroup) *gin.RouterGroup
 }
 
 // NewPermission 创建新的permission控制器
-func NewPermission(client client.Client, configConn config.DynamicConfig) *Permission {
+func NewPermission(client client.Client, configConn config.DynamicConfig) Controller {
 	return &Permission{
 		permissionService: permissionpb.NewPermissionService("permission", client),
 	}
