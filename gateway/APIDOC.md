@@ -49,13 +49,37 @@ Method: GET
 
 用户的基本信息
 
-# hpc控制器
+## hpc控制器
 
 ### /hpc/ping
 
 Method: GET
 
 描述：进行hpc服务的ping测试
+
+参数：无
+
+响应：请求ID、PONG
+
+## permission控制器
+
+### /permission/ping
+
+Method: GET
+
+描述：进行permission服务的ping测试
+
+参数：无
+
+响应：请求ID、PONG
+
+## group控制器
+
+### /group/ping
+
+Method: GET
+
+描述：进行group服务的ping测试
 
 参数：无
 
