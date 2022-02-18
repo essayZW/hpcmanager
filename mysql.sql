@@ -334,6 +334,7 @@ CREATE TABLE `user_group_apply` (
   `tutor_check_time` timestamp NULL DEFAULT NULL,
   `manager_chack_time` timestamp NULL DEFAULT NULL,
   `manaher_checker_id` int DEFAULT NULL,
+  `manager_checker_username` varchar(32) DEFAULT NULL,
   `manager_checker_name` varchar(32) DEFAULT NULL,
   `create_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
@@ -394,4 +395,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-18 13:55:10
+-- Dump completed on 2022-02-18 21:54:56
