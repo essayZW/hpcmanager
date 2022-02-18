@@ -45,6 +45,7 @@ type UserService interface {
 	AddUser(ctx context.Context, in *AddUserRequest, opts ...client.CallOption) (*AddUserResponse, error)
 	CreateToken(ctx context.Context, in *CreateTokenRequest, opts ...client.CallOption) (*CreateTokenResponse, error)
 	GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...client.CallOption) (*GetUserInfoResponse, error)
+	PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, opts ...client.CallOption) (*PaginationGetUserInfoResponse, error)
 }
 
 type userService struct {
@@ -129,6 +130,16 @@ func (c *userService) GetUserInfo(ctx context.Context, in *GetUserInfoRequest, o
 	return out, nil
 }
 
+func (c *userService) PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, opts ...client.CallOption) (*PaginationGetUserInfoResponse, error) {
+	req := c.c.NewRequest(c.name, "User.PaginationGetUserInfo", in)
+	out := new(PaginationGetUserInfoResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
@@ -139,6 +150,7 @@ type UserHandler interface {
 	AddUser(context.Context, *AddUserRequest, *AddUserResponse) error
 	CreateToken(context.Context, *CreateTokenRequest, *CreateTokenResponse) error
 	GetUserInfo(context.Context, *GetUserInfoRequest, *GetUserInfoResponse) error
+	PaginationGetUserInfo(context.Context, *PaginationGetUserInfoRequest, *PaginationGetUserInfoResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
@@ -150,6 +162,7 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error
 		CreateToken(ctx context.Context, in *CreateTokenRequest, out *CreateTokenResponse) error
 		GetUserInfo(ctx context.Context, in *GetUserInfoRequest, out *GetUserInfoResponse) error
+		PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, out *PaginationGetUserInfoResponse) error
 	}
 	type User struct {
 		user
@@ -188,4 +201,8 @@ func (h *userHandler) CreateToken(ctx context.Context, in *CreateTokenRequest, o
 
 func (h *userHandler) GetUserInfo(ctx context.Context, in *GetUserInfoRequest, out *GetUserInfoResponse) error {
 	return h.UserHandler.GetUserInfo(ctx, in, out)
+}
+
+func (h *userHandler) PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, out *PaginationGetUserInfoResponse) error {
+	return h.UserHandler.PaginationGetUserInfo(ctx, in, out)
 }

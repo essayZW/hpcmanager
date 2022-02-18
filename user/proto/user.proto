@@ -17,6 +17,7 @@ service User {
     rpc AddUser(AddUserRequest) returns (AddUserResponse) {}
     rpc CreateToken(CreateTokenRequest) returns (CreateTokenResponse) {}
     rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse) {}
+    rpc PaginationGetUserInfo(PaginationGetUserInfoRequest) returns (PaginationGetUserInfoResponse) {}
 }
 
 message LoginRequest {
@@ -79,4 +80,15 @@ message GetUserInfoRequest {
 
 message GetUserInfoResponse {
     user.UserInfo userInfo = 1;
+}
+
+message PaginationGetUserInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageSize = 2;
+    int32 pageIndex = 3;
+}
+
+message PaginationGetUserInfoResponse {
+    repeated user.UserInfo userInfos = 1;
+    int32 count = 2;
 }

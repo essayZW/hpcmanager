@@ -123,6 +123,43 @@ func (u *User) GetUserInfoByID(ctx context.Context, userid int) (*db.User, error
 	return u.userDB.QueryByID(ctx, userid)
 }
 
+// PaginationUserResult 分页查询用户信息的结果
+type PaginationUserResult struct {
+	Infos []*db.User
+	Count int
+}
+
+// PaginationGetUserInfo 分页查询用户信息
+func (u *User) PaginationGetUserInfo(ctx context.Context, pageIndex, pageSize, groupID int) (*PaginationUserResult, error) {
+	if pageIndex < 1 {
+		return nil, errors.New("pageIndex must large than 0")
+	}
+	if pageSize <= 0 || pageSize > 200 {
+		return nil, errors.New("pageSize must large than 0 and less than 200")
+	}
+	// 先查询总数
+	count, err := u.userDB.QueryAllUserCount(ctx, groupID)
+	if err != nil {
+		return nil, err
+	}
+	if count == 0 {
+		return &PaginationUserResult{
+			Infos: make([]*db.User, 0),
+			Count: 0,
+		}, nil
+	}
+	offset := pageSize * (pageIndex - 1)
+	infos, err := u.userDB.PaginationQuery(ctx, offset, pageSize, groupID)
+	if err != nil {
+		return nil, err
+	}
+	return &PaginationUserResult{
+		Infos: infos,
+		Count: count,
+	}, nil
+
+}
+
 // NewUser 创建一个新的userLogic
 func NewUser(db *db.UserDB, configConn config.DynamicConfig, redisConn *redis.Client) *User {
 	user := &User{

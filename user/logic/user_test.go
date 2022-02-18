@@ -197,3 +197,60 @@ func TestAddUser(t *testing.T) {
 	}
 
 }
+
+func TestPaginationGetUserInfo(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		PageSize  int
+		PageIndex int
+
+		ExceptLen   int
+		ExceptCount int
+		Error       bool
+	}{
+		{
+			Name:        "error pageSize",
+			PageSize:    0,
+			PageIndex:   1,
+			ExceptCount: 0,
+			Error:       true,
+		},
+		{
+			Name:        "error pageIndex",
+			PageSize:    1,
+			PageIndex:   0,
+			ExceptCount: 0,
+			Error:       true,
+		},
+		{
+			Name:        "success",
+			PageSize:    1,
+			PageIndex:   2,
+			ExceptLen:   1,
+			ExceptCount: 2,
+			Error:       false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			infos, err := userLogic.PaginationGetUserInfo(context.Background(), test.PageIndex, test.PageSize)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error && err == nil {
+				t.Errorf("Get: %v Except: %v", err, test.Error)
+			}
+			if test.ExceptLen != len(infos.Infos) {
+				t.Errorf("Get: %v Except: %v", infos, test.ExceptCount)
+			}
+			if test.ExceptCount != infos.Count {
+				t.Errorf("Get: %v Except: %v", infos, test.ExceptCount)
+			}
+		})
+	}
+}

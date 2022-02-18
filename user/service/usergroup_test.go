@@ -206,10 +206,10 @@ func TestPaginationGetGroupInfo(t *testing.T) {
 				return
 			}
 			if len(resp.GroupInfos) != test.ExceptLen {
-				t.Errorf("Get:%v ExceptCount: %v", resp.GroupInfos, test.ExceptCount)
+				t.Errorf("Get:%v ExceptCount: %v", resp.GroupInfos, test.ExceptLen)
 			}
 			if resp.Count != int32(test.ExceptCount) {
-				t.Errorf("Get:%v ExceptCount: %v", resp.GroupInfos, test.ExceptCount)
+				t.Errorf("Get:%v ExceptCount: %v", resp.Count, test.ExceptCount)
 			}
 		})
 	}

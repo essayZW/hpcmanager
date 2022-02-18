@@ -118,7 +118,7 @@ func TestPaginationGetGroupInfo(t *testing.T) {
 				t.Errorf("Except: %v Get: %v", test.Error, err)
 			}
 			if len(infos.Infos) != test.ExceptLen {
-				t.Errorf("Get: %v Except: %v", infos, test.ExceptCount)
+				t.Errorf("Get: %v Except: %v", infos, test.ExceptLen)
 			}
 			if infos.Count != test.ExceptCount {
 				t.Errorf("Get: %v Except: %v", infos, test.ExceptCount)

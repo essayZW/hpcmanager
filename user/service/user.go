@@ -68,7 +68,7 @@ func (s *UserService) Login(ctx context.Context, req *userpb.LoginRequest, resp 
 
 // CheckLogin 检查用户登录状态，并返回登录用户的信息以及权限信息
 func (s *UserService) CheckLogin(ctx context.Context, req *userpb.CheckLoginRequest, resp *userpb.CheckLoginResponse) error {
-	logger.Infof("User login check: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	logger.Infof("CheckLodin: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	// 通过token查询用户信息
 	info, err := s.userLogic.GetUserByToken(ctx, req.GetToken())
 	if err != nil {
@@ -211,6 +211,52 @@ func (s *UserService) GetUserInfo(ctx context.Context, req *userpb.GetUserInfoRe
 	}
 	if userInfo.ExtraAttributes != nil {
 		resp.UserInfo.ExtraAttributes = userInfo.ExtraAttributes.String()
+	}
+	return nil
+}
+
+// PaginationGetUserInfo 分页查询用户信息
+func (s *UserService) PaginationGetUserInfo(ctx context.Context, req *userpb.PaginationGetUserInfoRequest, resp *userpb.PaginationGetUserInfoResponse) error {
+	logger.Infof("PaginationGetUserInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	if !verify.Identify(verify.GetUserInfo, req.GetBaseRequest().GetUserInfo().GetLevels()) {
+		logger.Info("PaginationGetUserInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("PaginationGetUserInfo permission forbidden")
+	}
+	// 只能导师和管理员有查询多个用户的权限
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	if !isAdmin && !isTutor {
+		logger.Info("PaginationGetUserInfo permission forbidden: must be tutor or admin, baseRequest: ", req.BaseRequest)
+		return errors.New("PaginationGetUserInfo permission forbidden: must be tutor or admin")
+	}
+	var infos *logic.PaginationUserResult
+	var err error
+	if isAdmin {
+		infos, err = s.userLogic.PaginationGetUserInfo(ctx, int(req.PageIndex), int(req.PageSize), 0)
+	} else {
+		// 导师只可以查看自己组的用户信息
+		infos, err = s.userLogic.PaginationGetUserInfo(ctx, int(req.PageIndex), int(req.PageSize), int(req.BaseRequest.UserInfo.GroupId))
+	}
+	if err != nil {
+		return errors.New("User infos query error")
+	}
+	resp.Count = int32(infos.Count)
+	resp.UserInfos = make([]*userpb.UserInfo, len(infos.Infos))
+	for index, userInfo := range infos.Infos {
+		resp.UserInfos[index] = &userpb.UserInfo{
+			Id:         int32(userInfo.ID),
+			GroupId:    int32(userInfo.GroupID),
+			Username:   userInfo.Username,
+			Name:       userInfo.Name,
+			Tel:        userInfo.Tel,
+			Email:      userInfo.Email,
+			PyName:     userInfo.PinyinName,
+			College:    userInfo.CollegeName,
+			CreateTime: userInfo.CreateTime.Unix(),
+		}
+		if userInfo.ExtraAttributes != nil {
+			resp.UserInfos[index].ExtraAttributes = userInfo.ExtraAttributes.String()
+		}
 	}
 	return nil
 }

@@ -2,8 +2,10 @@ package db
 
 import (
 	"context"
+	"errors"
 
 	"github.com/essayZW/hpcmanager/db"
+	"github.com/jmoiron/sqlx"
 	"go-micro.dev/v4/logger"
 )
 
@@ -67,6 +69,53 @@ func (db *UserDB) QueryByID(ctx context.Context, userid int) (*User, error) {
 		return nil, err
 	}
 	return &userInfo, nil
+}
+
+// PaginationQuery 分页查询用户信息记录,若groupID为0则查询所有用户
+func (db *UserDB) PaginationQuery(ctx context.Context, offset, size, groupID int) ([]*User, error) {
+	var rows *sqlx.Rows
+	var err error
+	if groupID == 0 {
+		rows, err = db.conn.Query(ctx, "SELECT * FROM `user` LIMIT ?, ?", offset, size)
+	} else {
+		rows, err = db.conn.Query(ctx, "SELECT * FROM `user` WHERE `group_id`=? LIMIT ?, ?", groupID, offset, size)
+	}
+	if err != nil {
+		return nil, errors.New("user infos query error")
+	}
+	infos := make([]*User, 0)
+	for rows.Next() {
+		var info User
+		err := rows.StructScan(&info)
+		if err != nil {
+			logger.Warn("StructScan User error: ", err)
+			return nil, errors.New("struct scan user info error")
+		}
+		infos = append(infos, &info)
+	}
+	return infos, nil
+}
+
+// QueryAllUserCount 查询所有用户的数量,若groupID为0则查询所有用户
+func (db *UserDB) QueryAllUserCount(ctx context.Context, groupID int) (int, error) {
+	var row *sqlx.Row
+	var err error
+	if groupID == 0 {
+		row, err = db.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `user`")
+	} else {
+		row, err = db.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `user` WHERE `group_id`=?", groupID)
+	}
+	if err != nil {
+		logger.Warn("QueryAllUserCount error: ", err)
+		return 0, errors.New("Get user count error")
+	}
+	var count int
+	err = row.Scan(&count)
+	if err != nil {
+		logger.Warn("QueryAllUserCount error: ", err)
+		return 0, errors.New("Get user count error")
+	}
+	return count, nil
 }
 
 // NewUser 创建一个新的操作用户数据库结构体

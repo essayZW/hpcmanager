@@ -13,6 +13,7 @@ import (
 	userdb "github.com/essayZW/hpcmanager/user/db"
 	"github.com/essayZW/hpcmanager/user/logic"
 	user "github.com/essayZW/hpcmanager/user/proto"
+	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
 	"github.com/go-redis/redis/v8"
 )
@@ -382,6 +383,104 @@ func TestGetUserInfo(t *testing.T) {
 			err := userService.GetUserInfo(context.Background(), req, &resp)
 			if (err != nil) != test.Error {
 				t.Errorf("Except: %v Get: %v Resp: %v", test.Error, err, resp.UserInfo)
+			}
+		})
+	}
+}
+
+func TestPaginationGetUserInfo(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		PageIndex int
+		PageSize  int
+
+		UserGroupID int
+		UserLevels  []int32
+
+		ExceptCount int
+		ExceptLen   int
+		Error       bool
+	}{
+		{
+			Name: "permission forbidden",
+			UserLevels: []int32{
+				int32(verify.Common),
+			},
+			Error: true,
+		},
+		{
+			Name:        "tutor success",
+			PageIndex:   1,
+			PageSize:    1,
+			UserGroupID: 1,
+			UserLevels: []int32{
+				int32(verify.Tutor),
+			},
+			ExceptCount: 1,
+			ExceptLen:   1,
+		},
+		{
+			Name:        "tutor success2",
+			PageIndex:   2,
+			PageSize:    1,
+			UserGroupID: 1,
+			UserLevels: []int32{
+				int32(verify.Tutor),
+			},
+			ExceptCount: 1,
+			ExceptLen:   0,
+			Error:       false,
+		},
+		{
+			Name:        "admin success",
+			PageIndex:   1,
+			PageSize:    1,
+			UserGroupID: 1,
+			UserLevels: []int32{
+				int32(verify.CommonAdmin),
+			},
+			ExceptCount: 2,
+			ExceptLen:   1,
+			Error:       false,
+		},
+		{
+			Name:        "admin success2",
+			PageIndex:   1,
+			PageSize:    2,
+			UserGroupID: 1,
+			UserLevels: []int32{
+				int32(verify.CommonAdmin),
+			},
+			ExceptCount: 2,
+			ExceptLen:   2,
+			Error:       false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			var req userpb.PaginationGetUserInfoRequest
+			req.BaseRequest.UserInfo.Levels = test.UserLevels
+			req.BaseRequest.UserInfo.GroupId = int32(test.UserGroupID)
+			req.PageIndex = int32(test.PageIndex)
+			req.PageSize = int32(test.PageSize)
+			var resp userpb.PaginationGetUserInfoResponse
+			err := userService.PaginationGetUserInfo(context.Background(), &req, &resp)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v, Except: %v", err, test.Error)
+				}
+			}
+			if test.Error && err == nil {
+				t.Errorf("Except: %v Get: %v", test.Error, err)
+				return
+			}
+			if len(resp.UserInfos) != test.ExceptLen {
+				t.Errorf("Get: %v Except: %v", resp.UserInfos, test.ExceptLen)
+			}
+			if resp.Count != int32(test.ExceptCount) {
+				t.Errorf("Get:%v ExceptCount: %v", resp.Count, test.ExceptCount)
 			}
 		})
 	}
