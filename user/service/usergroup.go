@@ -80,8 +80,9 @@ func (group *UserGroupService) PaginationGetGroupInfo(ctx context.Context, req *
 	if err != nil {
 		return errors.New("Pagination query group info error")
 	}
-	resp.GroupInfos = make([]*userpb.GroupInfo, len(infos))
-	for index, info := range infos {
+	resp.Count = int32(infos.Count)
+	resp.GroupInfos = make([]*userpb.GroupInfo, len(infos.Infos))
+	for index, info := range infos.Infos {
 		resp.GroupInfos[index] = &userpb.GroupInfo{
 			Id:              int32(info.ID),
 			Name:            info.Name,

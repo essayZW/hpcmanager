@@ -33,4 +33,5 @@ message PaginationGetGroupInfoRequest {
 
 message PaginationGetGroupInfoResponse {
     repeated user.GroupInfo groupInfos = 1;
+    int32 count = 2;
 }

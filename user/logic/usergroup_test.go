@@ -77,6 +77,7 @@ func TestPaginationGetGroupInfo(t *testing.T) {
 		PageSize  int
 		PageIndex int
 
+		ExceptLen   int
 		ExceptCount int
 		Error       bool
 	}{
@@ -98,7 +99,8 @@ func TestPaginationGetGroupInfo(t *testing.T) {
 			Name:        "test success",
 			PageSize:    1,
 			PageIndex:   1,
-			ExceptCount: 1,
+			ExceptLen:   1,
+			ExceptCount: 2,
 			Error:       false,
 		},
 	}
@@ -115,7 +117,10 @@ func TestPaginationGetGroupInfo(t *testing.T) {
 			if test.Error && err == nil {
 				t.Errorf("Except: %v Get: %v", test.Error, err)
 			}
-			if len(infos) != test.ExceptCount {
+			if len(infos.Infos) != test.ExceptLen {
+				t.Errorf("Get: %v Except: %v", infos, test.ExceptCount)
+			}
+			if infos.Count != test.ExceptCount {
 				t.Errorf("Get: %v Except: %v", infos, test.ExceptCount)
 			}
 		})

@@ -139,6 +139,7 @@ func TestPaginationGetGroupInfo(t *testing.T) {
 		PageIndex  int
 		UserLevels []int32
 
+		ExceptLen   int
 		ExceptCount int
 		Error       bool
 	}{
@@ -166,7 +167,8 @@ func TestPaginationGetGroupInfo(t *testing.T) {
 			Name:        "test success",
 			PageSize:    1,
 			PageIndex:   1,
-			ExceptCount: 1,
+			ExceptLen:   1,
+			ExceptCount: 2,
 			UserLevels: []int32{
 				int32(verify.CommonAdmin),
 			},
@@ -203,7 +205,10 @@ func TestPaginationGetGroupInfo(t *testing.T) {
 				t.Errorf("Except: %v Get: %v", test.Error, err)
 				return
 			}
-			if len(resp.GroupInfos) != test.ExceptCount {
+			if len(resp.GroupInfos) != test.ExceptLen {
+				t.Errorf("Get:%v ExceptCount: %v", resp.GroupInfos, test.ExceptCount)
+			}
+			if resp.Count != int32(test.ExceptCount) {
 				t.Errorf("Get:%v ExceptCount: %v", resp.GroupInfos, test.ExceptCount)
 			}
 		})
