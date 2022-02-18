@@ -162,6 +162,8 @@ message CreateTokenResponse {
 
 需求权限：`Common`及以上
 
+原型定义：`rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse) {}`
+
 请求参数：
 
 ```protobuf
@@ -176,6 +178,31 @@ message GetUserInfoRequest {
 ```protobuf
 message GetUserInfoResponse {
     user.UserInfo userInfo = 1;
+}
+```
+
+## GetGroupInfoByID
+
+描述：传入目标组的ID，查询组的基本信息，对于不同权限的查询者其能查询的范围不同
+
+需求权限：`Tutor`及以上
+
+原型定义：`rpc GetGroupInfoByID(GetGroupInfoByIDRequest) returns (GetGroupInfoByIDResponse) {}`
+
+请求参数：
+
+```protobuf
+message GetGroupInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+}
+```
+
+响应参数：
+
+```protobuf
+message GetGroupInfoByIDResponse {
+    user.GroupInfo groupInfo = 1;
 }
 ```
 
@@ -198,6 +225,29 @@ message UserInfo {
     string college = 8;
     int32 groupId = 9;
     int32 createTime = 10;
+}
+```
+
+## GroupInfo
+
+描述：Group相关的信息
+
+```protobuf
+// GroupInfo 用户组基本信息
+message GroupInfo {
+    int32 id = 1;
+    string name = 2;
+    string queueName = 3;
+    string nodeGroupName = 4;
+    int64 createTime = 5;
+    int32 createrID = 6;
+    string createrName = 7;
+    string createrUsername = 8;
+    int32 tutorID = 9;
+    string tutorName = 10;
+    string tutorUsername = 11;
+    double balance = 12;
+    string extraAttributes = 13;
 }
 ```
 
