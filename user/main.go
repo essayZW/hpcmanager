@@ -71,7 +71,9 @@ func main() {
 	userService := service.NewUser(serviceClient, userLogic)
 	user.RegisterUserHandler(serviceServer, userService)
 
-	userGroupService := service.NewGroup(serviceClient)
+	userGroupLogic := logic.NewUserGroup(userdb.NewUserGroup(sqldb))
+
+	userGroupService := service.NewGroup(serviceClient, userGroupLogic)
 	user.RegisterGroupServiceHandler(serviceServer, userGroupService)
 
 	srv.Init()

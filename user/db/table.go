@@ -20,3 +20,20 @@ type User struct {
 	CreateTime      time.Time `db:"create_time"`
 	ExtraAttributes *db.JSON  `db:"extraAttributes"`
 }
+
+// Group 数据库中的Group表的结构体
+type Group struct {
+	ID                int       `db:"id"`
+	Name              string    `db:"name"`
+	QueueName         string    `db:"queue_name"`
+	NodeUserGroupName string    `db:"node_usergroup"`
+	CreateTime        time.Time `db:"create_time"`
+	CreaterID         int       `db:"creater_id"`
+	CreaterUsername   string    `db:"creater_username"`
+	CreaterName       string    `db:"creater_name"`
+	TutorID           int       `db:"tutor_id"`
+	TutorUsername     string    `db:"tutor_username"`
+	TutorName         string    `db:"tutor_name"`
+	Balance           float64   `db:"balance"`
+	ExtraAttributes   *db.JSON  `db:"extraAttributes"`
+}

@@ -6,7 +6,20 @@ package user;
 
 import "proto/ping.proto";
 import "proto/common.proto";
+import "gateway/proto/baserequest.proto";
+import "proto/userpublic.proto";
 
 service GroupService {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+    rpc GetGroupInfoByID(GetGroupInfoByIDRequest) returns (GetGroupInfoByIDResponse) {}
+}
+
+
+message GetGroupInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+}
+
+message GetGroupInfoByIDResponse {
+    user.GroupInfo groupInfo = 1;
 }

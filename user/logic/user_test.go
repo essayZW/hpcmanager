@@ -74,7 +74,7 @@ func TestLoginCheck(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			status, err := userLogic.LoginCheck(test.Username, test.Password)
+			status, err := userLogic.LoginCheck(context.Background(), test.Username, test.Password)
 			if err != nil && test.Except {
 				t.Error(err)
 			}
@@ -98,12 +98,12 @@ func TestCreateAndQueryToken(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			token := userLogic.CreateToken(test.Username)
-			if queryed := userLogic.GetToken(test.Username); queryed != token {
+			token := userLogic.CreateToken(context.Background(), test.Username)
+			if queryed := userLogic.GetToken(context.Background(), test.Username); queryed != token {
 				t.Errorf("Except %s Get %s", queryed, token)
 			}
-			userLogic.DeleteToken(test.Username)
-			if queryed := userLogic.GetToken(test.Username); queryed != "" {
+			userLogic.DeleteToken(context.Background(), test.Username)
+			if queryed := userLogic.GetToken(context.Background(), test.Username); queryed != "" {
 				t.Errorf("Except %s Get ", queryed)
 			}
 		})
@@ -133,7 +133,7 @@ func TestQueryByUsername(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			info, err := userLogic.GetByUsername(test.Username)
+			info, err := userLogic.GetByUsername(context.Background(), test.Username)
 			if err != nil {
 				if !test.Error {
 					t.Error(err)
@@ -189,7 +189,7 @@ func TestAddUser(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			_, err := userLogic.AddUser(test.Data)
+			_, err := userLogic.AddUser(context.Background(), test.Data)
 			if (err != nil) != test.Error {
 				t.Errorf("Except: %v Get %v", test.Error, err)
 			}

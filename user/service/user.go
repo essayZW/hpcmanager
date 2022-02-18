@@ -138,6 +138,8 @@ func (s *UserService) AddUser(ctx context.Context, req *userpb.AddUserRequest, r
 			return nil, fmt.Errorf("Adduser error: %v", err)
 		}
 		resp.Userid = int32(id)
+		// TODO 调用hpc服务添加机器上的节点用户
+		// TODO 同步添加hpc_user表信息
 		// 添加新用户默认权限信息
 		addResp, err := s.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
 			Userid:      int32(id),

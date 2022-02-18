@@ -50,6 +50,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: Common,
 			},
+			// 导师权限及以上
+			GetGroupInfo: {
+				maxLevel: MaxLevel,
+				minLevel: Tutor,
+			},
 		},
 	}
 }

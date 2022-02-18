@@ -14,6 +14,8 @@ const (
 	AddPermission = "__ADD_PERMISSION__"
 	// GetUserInfo 查询用户信息
 	GetUserInfo = "__GET_USER_INFO__"
+	// GetGroupInfo 查询用户组信息
+	GetGroupInfo = "__GET_GROUP_INFO__"
 )
 
 // Verify 进行操作的权限验证

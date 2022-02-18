@@ -18,3 +18,20 @@ message UserInfo {
     int64 createTime = 10;
     string extraAttributes = 11;
 }
+
+// GroupInfo 用户组基本信息
+message GroupInfo {
+    int32 id = 1;
+    string name = 2;
+    string queueName = 3;
+    string nodeGroupName = 4;
+    int64 createTime = 5;
+    int32 createrID = 6;
+    string createrName = 7;
+    string createrUsername = 8;
+    int32 tutorID = 9;
+    string tutorName = 10;
+    string tutorUsername = 11;
+    double balance = 12;
+    string extraAttributes = 13;
+}
