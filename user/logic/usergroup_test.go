@@ -61,8 +61,62 @@ func TestGetGroupByID(t *testing.T) {
 				}
 				return
 			}
+			if test.Error && err == nil {
+				t.Errorf("Except: %v Get: %v", test.Error, err)
+			}
 			if res.Name != test.ExceptName {
 				t.Errorf("Get: %v, Except: %v", res, test.ExceptName)
+			}
+		})
+	}
+}
+
+func TestPaginationGetGroupInfo(t *testing.T) {
+	tests := []struct {
+		Name      string
+		PageSize  int
+		PageIndex int
+
+		ExceptCount int
+		Error       bool
+	}{
+		{
+			Name:        "test error pageSize",
+			PageSize:    -1,
+			PageIndex:   10,
+			ExceptCount: 0,
+			Error:       true,
+		},
+		{
+			Name:        "test error pageIndex",
+			PageSize:    1,
+			PageIndex:   0,
+			ExceptCount: 0,
+			Error:       true,
+		},
+		{
+			Name:        "test success",
+			PageSize:    1,
+			PageIndex:   1,
+			ExceptCount: 1,
+			Error:       false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			infos, err := userGroupLogic.PaginationGetGroupInfo(context.Background(), test.PageIndex, test.PageSize)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get:%v Exceot: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error && err == nil {
+				t.Errorf("Except: %v Get: %v", test.Error, err)
+			}
+			if len(infos) != test.ExceptCount {
+				t.Errorf("Get: %v Except: %v", infos, test.ExceptCount)
 			}
 		})
 	}

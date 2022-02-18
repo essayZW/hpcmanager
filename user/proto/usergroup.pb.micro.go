@@ -40,6 +40,7 @@ func NewGroupServiceEndpoints() []*api.Endpoint {
 type GroupService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
 	GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, opts ...client.CallOption) (*GetGroupInfoByIDResponse, error)
+	PaginationGetGroupInfo(ctx context.Context, in *PaginationGetGroupInfoRequest, opts ...client.CallOption) (*PaginationGetGroupInfoResponse, error)
 }
 
 type groupService struct {
@@ -74,17 +75,29 @@ func (c *groupService) GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByI
 	return out, nil
 }
 
+func (c *groupService) PaginationGetGroupInfo(ctx context.Context, in *PaginationGetGroupInfoRequest, opts ...client.CallOption) (*PaginationGetGroupInfoResponse, error) {
+	req := c.c.NewRequest(c.name, "GroupService.PaginationGetGroupInfo", in)
+	out := new(PaginationGetGroupInfoResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for GroupService service
 
 type GroupServiceHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
 	GetGroupInfoByID(context.Context, *GetGroupInfoByIDRequest, *GetGroupInfoByIDResponse) error
+	PaginationGetGroupInfo(context.Context, *PaginationGetGroupInfoRequest, *PaginationGetGroupInfoResponse) error
 }
 
 func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts ...server.HandlerOption) error {
 	type groupService interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
 		GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, out *GetGroupInfoByIDResponse) error
+		PaginationGetGroupInfo(ctx context.Context, in *PaginationGetGroupInfoRequest, out *PaginationGetGroupInfoResponse) error
 	}
 	type GroupService struct {
 		groupService
@@ -103,4 +116,8 @@ func (h *groupServiceHandler) Ping(ctx context.Context, in *proto1.Empty, out *p
 
 func (h *groupServiceHandler) GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, out *GetGroupInfoByIDResponse) error {
 	return h.GroupServiceHandler.GetGroupInfoByID(ctx, in, out)
+}
+
+func (h *groupServiceHandler) PaginationGetGroupInfo(ctx context.Context, in *PaginationGetGroupInfoRequest, out *PaginationGetGroupInfoResponse) error {
+	return h.GroupServiceHandler.PaginationGetGroupInfo(ctx, in, out)
 }

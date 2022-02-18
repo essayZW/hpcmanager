@@ -12,6 +12,7 @@ import "proto/userpublic.proto";
 service GroupService {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc GetGroupInfoByID(GetGroupInfoByIDRequest) returns (GetGroupInfoByIDResponse) {}
+    rpc PaginationGetGroupInfo(PaginationGetGroupInfoRequest) returns (PaginationGetGroupInfoResponse) {}
 }
 
 
@@ -22,4 +23,14 @@ message GetGroupInfoByIDRequest {
 
 message GetGroupInfoByIDResponse {
     user.GroupInfo groupInfo = 1;
+}
+
+message PaginationGetGroupInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageSize = 2;
+    int32 pageIndex = 3;
+}
+
+message PaginationGetGroupInfoResponse {
+    repeated user.GroupInfo groupInfos = 1;
 }

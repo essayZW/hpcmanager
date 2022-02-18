@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/essayZW/hpcmanager/db"
 	"go-micro.dev/v4/logger"
@@ -26,6 +27,25 @@ func (group *UserGroupDB) QueryGroupByID(ctx context.Context, groupID int) (*Gro
 		return nil, errors.New("group info query error")
 	}
 	return &groupInfo, nil
+}
+
+// PaginationQuery 分页查询用户组信息记录
+func (group *UserGroupDB) PaginationQuery(ctx context.Context, offset int, size int) ([]*Group, error) {
+	rows, err := group.db.Query(ctx, "SELECT * FROM `group` LIMIT ?, ?", offset, size)
+	if err != nil {
+		return nil, errors.New("group infos query error")
+	}
+	infos := make([]*Group, 0)
+	for rows.Next() {
+		var groupInfo Group
+		err := rows.StructScan(&groupInfo)
+		if err != nil {
+			logger.Warn("Group info StructScan error: ", err)
+			return nil, fmt.Errorf("query info StructScan error: %v", err)
+		}
+		infos = append(infos, &groupInfo)
+	}
+	return infos, nil
 }
 
 // NewUserGroup 创建一个新的用户数据库操作实例

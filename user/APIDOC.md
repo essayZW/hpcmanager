@@ -206,6 +206,32 @@ message GetGroupInfoByIDResponse {
 }
 ```
 
+## PaginationGetGroupInfo
+
+描述：传入分页大小以及页码，查询一系列组的基本信息，只支持管理员进行查询
+
+需求权限：`CommonAdmin`及以上
+
+原型定义：`rpc PaginationGetGroupInfo(PaginationGetGroupInfoRequest) returns (PaginationGetGroupInfoResponse) {}`
+
+请求参数：
+
+```protobuf
+message PaginationGetGroupInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageSize = 2;
+    int32 pageIndex = 3;
+}
+```
+
+响应参数：
+
+```protobuf
+message PaginationGetGroupInfoResponse {
+    repeated user.GroupInfo groupInfos = 1;
+}
+```
+
 # 附录
 
 ## UserInfo

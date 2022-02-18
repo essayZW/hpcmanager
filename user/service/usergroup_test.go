@@ -121,8 +121,90 @@ func TestGetGroupInfoByID(t *testing.T) {
 				}
 				return
 			}
+			if test.Error && err == nil {
+				t.Errorf("Except: %v Get: %v", test.Error, err)
+				return
+			}
 			if resp.GroupInfo.Name != test.ExceptName {
 				t.Errorf("Except: %v Get: %v", test.Error, resp.GroupInfo)
+			}
+		})
+	}
+}
+
+func TestPaginationGetGroupInfo(t *testing.T) {
+	tests := []struct {
+		Name       string
+		PageSize   int
+		PageIndex  int
+		UserLevels []int32
+
+		ExceptCount int
+		Error       bool
+	}{
+		{
+			Name:      "test error pageSize",
+			PageSize:  -1,
+			PageIndex: 10,
+			UserLevels: []int32{
+				int32(verify.CommonAdmin),
+			},
+			ExceptCount: 0,
+			Error:       true,
+		},
+		{
+			Name:        "test error pageIndex",
+			PageSize:    1,
+			PageIndex:   0,
+			ExceptCount: 0,
+			UserLevels: []int32{
+				int32(verify.CommonAdmin),
+			},
+			Error: true,
+		},
+		{
+			Name:        "test success",
+			PageSize:    1,
+			PageIndex:   1,
+			ExceptCount: 1,
+			UserLevels: []int32{
+				int32(verify.CommonAdmin),
+			},
+			Error: false,
+		},
+		{
+			Name:        "test permission forbidden",
+			PageSize:    1,
+			PageIndex:   1,
+			ExceptCount: 0,
+			UserLevels: []int32{
+				int32(verify.Common),
+			},
+			Error: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			var request userpb.PaginationGetGroupInfoRequest
+			request.BaseRequest = baseRequest
+			request.BaseRequest.UserInfo.Levels = test.UserLevels
+			request.PageIndex = int32(test.PageIndex)
+			request.PageSize = int32(test.PageSize)
+			var resp userpb.PaginationGetGroupInfoResponse
+
+			err := userGroupService.PaginationGetGroupInfo(context.Background(), &request, &resp)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v, Except: %v", err, test.Error)
+				}
+			}
+			if test.Error && err == nil {
+				t.Errorf("Except: %v Get: %v", test.Error, err)
+				return
+			}
+			if len(resp.GroupInfos) != test.ExceptCount {
+				t.Errorf("Get:%v ExceptCount: %v", resp.GroupInfos, test.ExceptCount)
 			}
 		})
 	}

@@ -63,6 +63,46 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 	return nil
 }
 
+// PaginationGetGroupInfo 分页查询用户组基本信息
+func (group *UserGroupService) PaginationGetGroupInfo(ctx context.Context, req *userpb.PaginationGetGroupInfoRequest, resp *userpb.PaginationGetGroupInfoResponse) error {
+	logger.Infof("PaginationGetGroupInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("PaginationGetGroupInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("PaginationGetGroupInfo permission forbidden")
+	}
+	// 只有管理员才可以分页查询组信息
+	if !verify.IsAdmin(req.BaseRequest.UserInfo.Levels) {
+		logger.Info("PaginationGetGroupInfo permission forbidden: not admin BaseRequest: ", req.BaseRequest)
+		return errors.New("Only admin can query all group's info")
+	}
+
+	infos, err := group.userGroupLogic.PaginationGetGroupInfo(ctx, int(req.PageIndex), int(req.PageSize))
+	if err != nil {
+		return errors.New("Pagination query group info error")
+	}
+	resp.GroupInfos = make([]*userpb.GroupInfo, len(infos))
+	for index, info := range infos {
+		resp.GroupInfos[index] = &userpb.GroupInfo{
+			Id:              int32(info.ID),
+			Name:            info.Name,
+			QueueName:       info.QueueName,
+			NodeGroupName:   info.NodeUserGroupName,
+			CreateTime:      info.CreateTime.Unix(),
+			CreaterID:       int32(info.CreaterID),
+			CreaterUsername: info.CreaterUsername,
+			CreaterName:     info.CreaterName,
+			TutorID:         int32(info.TutorID),
+			TutorUsername:   info.TutorUsername,
+			TutorName:       info.TutorName,
+			Balance:         info.Balance,
+		}
+		if info.ExtraAttributes != nil {
+			resp.GroupInfos[index].ExtraAttributes = info.ExtraAttributes.String()
+		}
+	}
+	return nil
+}
+
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务
