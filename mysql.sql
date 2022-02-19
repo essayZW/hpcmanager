@@ -352,7 +352,6 @@ DROP TABLE IF EXISTS `user_permission`;
 CREATE TABLE `user_permission` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
-  `user_group_id` int NOT NULL,
   `permission_id` int NOT NULL,
   `create_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
@@ -395,4 +394,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-18 21:54:56
+-- Dump completed on 2022-02-19 15:01:09
