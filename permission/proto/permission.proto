@@ -29,8 +29,7 @@ message GetUserPermissionResponse {
 message AddUserPermissionRequest {
     request.BaseRequest baseRequest = 1;
     int32 userid = 2;
-    int32 userGroupID = 3;
-    int32 level = 4;
+    int32 level = 3;
 }
 
 message AddUserPermissionResponse {

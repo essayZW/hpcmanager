@@ -54,10 +54,9 @@ func TestQueryUserPermissionLevel(t *testing.T) {
 				t.Error(err)
 				return
 			}
-			logger.Debug(res)
-			for index, p := range res {
-				if int(p.Level) != test.Except[index] {
-					t.Errorf("Except %v Get %v", test.Except, p.Level)
+			for index := range test.Except {
+				if int(res[index].Level) != test.Except[index] {
+					t.Errorf("Except %v Get %v", test.Except, res[index].Level)
 					break
 				}
 			}

@@ -33,8 +33,8 @@ func (up *UserPermissionDB) QueryUserPermissionLevel(ctx context.Context, userid
 // Insert 插入一条新的用户权限记录
 func (up *UserPermissionDB) Insert(ctx context.Context, info *UserPermission) error {
 	res, err := up.conn.Exec(ctx, "INSERT INTO `user_permission`"+
-		"(`user_id`, `user_group_id`, `permission_id`, `create_time`, `extraAttributes`)"+
-		"VALUES (?,?,?,?,?)", info.UserID, info.UserGroupID, info.PermissionID, info.CreateTime, info.ExtraAttributes)
+		"(`user_id`, `permission_id`, `create_time`, `extraAttributes`)"+
+		"VALUES (?,?,?,?)", info.UserID, info.PermissionID, info.CreateTime, info.ExtraAttributes)
 	if err != nil {
 		return err
 	}

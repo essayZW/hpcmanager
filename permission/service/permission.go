@@ -63,8 +63,7 @@ func (permission *PermissionService) AddUserPermission(ctx context.Context, req 
 		return errors.New("AdduserPermission permission forbidden")
 	}
 	err := permission.userpLogic.AddUserPermission(ctx, &db.UserPermission{
-		UserID:      int(req.GetUserid()),
-		UserGroupID: int(req.GetUserGroupID()),
+		UserID: int(req.GetUserid()),
 	}, verify.Level(req.Level))
 	if err != nil {
 		resp.Success = false

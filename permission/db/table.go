@@ -10,7 +10,6 @@ import (
 type UserPermission struct {
 	ID              int       `db:"id"`
 	UserID          int       `db:"user_id"`
-	UserGroupID     int       `db:"user_group_id"`
 	PermissionID    int       `db:"permission_id"`
 	CreateTime      time.Time `db:"create_time"`
 	ExtraAttributes *db.JSON  `db:"extraAttributes"`
