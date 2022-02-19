@@ -35,3 +35,27 @@ message GroupInfo {
     double balance = 12;
     string extraAttributes = 13;
 }
+
+// UserGroupApply 用户加入组申请记录信息
+message UserGroupApply {
+    int32 id = 1;
+    int32 userID = 2;
+    string userUsername = 3;
+    string userName = 4;
+    int32 applyGroupID = 5;
+    int32 tutorID = 6;
+    string tutorUsername = 7;
+    string tutorName = 8;
+    int32 tutorCheckStatus = 9;
+    int32 managerCheckStatus = 10;
+    int32 status = 11;
+    string messageTutor = 12;
+    string messageManager = 13;
+    int64 tutorCheckTime = 14;
+    int64 managerCheckTime = 15;
+    int32 managerCheckerID = 16;
+    string managerCheckerUsername = 17;
+    string managerCheckerName = 18;
+    int64 createTime = 19;
+    string extraAttributes = 20;
+}

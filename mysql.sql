@@ -332,8 +332,8 @@ CREATE TABLE `user_group_apply` (
   `message_tutor` varchar(300) DEFAULT NULL,
   `message_manager` varchar(300) DEFAULT NULL,
   `tutor_check_time` timestamp NULL DEFAULT NULL,
-  `manager_chack_time` timestamp NULL DEFAULT NULL,
-  `manaher_checker_id` int DEFAULT NULL,
+  `manager_check_time` timestamp NULL DEFAULT NULL,
+  `manager_checker_id` int DEFAULT NULL,
   `manager_checker_username` varchar(32) DEFAULT NULL,
   `manager_checker_name` varchar(32) DEFAULT NULL,
   `create_time` timestamp NOT NULL,
@@ -394,4 +394,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-19 15:01:09
+-- Dump completed on 2022-02-19 20:02:51

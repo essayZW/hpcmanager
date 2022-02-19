@@ -142,9 +142,8 @@ func (s *UserService) AddUser(ctx context.Context, req *userpb.AddUserRequest, r
 		// TODO 同步添加hpc_user表信息
 		// 添加新用户默认权限信息
 		addResp, err := s.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
-			Userid:      int32(id),
-			UserGroupID: req.UserInfo.GroupId,
-			Level:       int32(verify.Common),
+			Userid: int32(id),
+			Level:  int32(verify.Common),
 		})
 		if err != nil || !addResp.Success {
 			return nil, fmt.Errorf("Init user permission info error: %v", err)

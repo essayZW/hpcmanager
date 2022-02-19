@@ -11,9 +11,11 @@ require (
 	github.com/essayZW/hpcmanager/permission v0.0.0-00010101000000-000000000000
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/google/uuid v1.3.0
+	github.com/jmoiron/sqlx v1.3.4
 	github.com/mozillazg/go-pinyin v0.19.0
 	go-micro.dev/v4 v4.6.0
 	google.golang.org/protobuf v1.26.0
+	gopkg.in/guregu/null.v4 v4.0.0
 )
 
 require (
@@ -40,7 +42,6 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
-	github.com/jmoiron/sqlx v1.3.4 // indirect
 	github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351 // indirect
 	github.com/miekg/dns v1.1.43 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect

@@ -153,6 +153,58 @@ func (group *UserGroupService) SearchTutorInfo(ctx context.Context, req *userpb.
 	return nil
 }
 
+// PageGetApplyGroupInfo 分页查询用户加入组申请记录,对于不同的权限的角色，所查询的范围不同,根据用户的最高权限来进行查询范围判断
+func (group *UserGroupService) PageGetApplyGroupInfo(ctx context.Context, req *userpb.PageGetApplyGroupInfoRequest, resp *userpb.PageGetApplyGroupInfoResponse) error {
+	logger.Infof("PageGetApplyGroupInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+
+	var result *logic.PaginationApplyResult
+	var err error
+	if isAdmin {
+		// 管理员只可以查看已经经过导师审核的所有的申请信息
+		result, err = group.userGroupLogic.AdminPageGetApplyInfo(ctx, int(req.PageIndex), int(req.PageSize))
+	} else if isTutor {
+		// 导师可以查看自己组的所有申请信息
+		result, err = group.userGroupLogic.TutorPageGetApplyInfo(ctx, int(req.PageIndex), int(req.PageSize), int(req.BaseRequest.UserInfo.GroupId))
+	} else {
+		// 普通用户只可以查看自己发起的申请信息
+		result, err = group.userGroupLogic.CommonPageGetApplyInfo(ctx, int(req.PageIndex), int(req.PageSize), int(req.BaseRequest.UserInfo.UserId))
+	}
+	if err != nil {
+		return err
+	}
+	resp.Applies = make([]*userpb.UserGroupApply, len(result.Applies))
+	for index := range result.Applies {
+		resp.Applies[index] = &userpb.UserGroupApply{
+			Id:                     int32(result.Applies[index].ID),
+			UserID:                 int32(result.Applies[index].ApplyGroupID),
+			UserUsername:           result.Applies[index].UserUsername,
+			UserName:               result.Applies[index].UserName,
+			ApplyGroupID:           int32(result.Applies[index].ApplyGroupID),
+			TutorID:                int32(result.Applies[index].TutorID),
+			TutorUsername:          result.Applies[index].TutorUsername,
+			TutorName:              result.Applies[index].TutorName,
+			TutorCheckStatus:       int32(result.Applies[index].TutorCheckStatus),
+			ManagerCheckStatus:     int32(result.Applies[index].ManagerCheckStatus),
+			Status:                 int32(result.Applies[index].Status),
+			MessageTutor:           result.Applies[index].MessageTutor.String,
+			MessageManager:         result.Applies[index].MessageManager.String,
+			TutorCheckTime:         result.Applies[index].TutorCheckTime.Time.Unix(),
+			ManagerCheckTime:       result.Applies[index].ManagerCheckTime.Time.Unix(),
+			ManagerCheckerID:       int32(result.Applies[index].ManagerCheckerID.Int64),
+			ManagerCheckerUsername: result.Applies[index].ManagerCheckerUsername.String,
+			ManagerCheckerName:     result.Applies[index].ManegerCheckerName.String,
+			CreateTime:             result.Applies[index].CreateTime.Time.Unix(),
+		}
+		if result.Applies[index].ExtraAttributes != nil {
+			resp.Applies[index].ExtraAttributes = result.Applies[index].ExtraAttributes.String()
+		}
+	}
+	resp.Count = int32(result.Count)
+	return nil
+}
+
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务

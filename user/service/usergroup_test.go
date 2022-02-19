@@ -313,3 +313,99 @@ func TestCreateJoinGroupApply(t *testing.T) {
 		})
 	}
 }
+
+func TestPageGetApplyGroupInfo(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		PageIndex int
+		PageSize  int
+
+		UserID      int
+		UserLevels  []int32
+		UserGroupID int
+
+		Error       bool
+		ExceptCount int
+		ExceptLen   int
+	}{
+		{
+			Name:      "admin query",
+			PageIndex: 1,
+			PageSize:  2,
+			UserLevels: []int32{
+				int32(verify.SuperAdmin),
+			},
+			Error:       false,
+			ExceptCount: 1,
+			ExceptLen:   1,
+		},
+		{
+			Name:      "admin query2",
+			PageIndex: 2,
+			PageSize:  2,
+			UserLevels: []int32{
+				int32(verify.SuperAdmin),
+				int32(verify.Tutor),
+			},
+			Error:       false,
+			ExceptCount: 1,
+			ExceptLen:   0,
+		},
+		{
+			Name:        "tutor query success",
+			PageIndex:   1,
+			PageSize:    2,
+			UserGroupID: 2,
+			UserLevels: []int32{
+				int32(verify.Tutor),
+			},
+			Error:       false,
+			ExceptCount: 2,
+			ExceptLen:   2,
+		},
+		{
+			Name:      "common query success",
+			PageIndex: 1,
+			PageSize:  2,
+			UserID:    21,
+			UserLevels: []int32{
+				int32(verify.Common),
+			},
+			Error:       false,
+			ExceptCount: 2,
+			ExceptLen:   2,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			var req userpb.PageGetApplyGroupInfoRequest
+			req.BaseRequest = baseRequest
+			req.BaseRequest.UserInfo.UserId = int32(test.UserID)
+			req.BaseRequest.UserInfo.GroupId = int32(test.UserGroupID)
+			req.BaseRequest.UserInfo.Levels = test.UserLevels
+			req.PageIndex = int32(test.PageIndex)
+			req.PageSize = int32(test.PageSize)
+			var resp userpb.PageGetApplyGroupInfoResponse
+			err := userGroupService.PageGetApplyGroupInfo(context.Background(), &req, &resp)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Except: %v Get: %v", test.Error, err)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Except: %v Get: %v", test.Error, err)
+				return
+			}
+			if test.ExceptCount != int(resp.Count) {
+				t.Errorf("Get: %v, ExceptCount: %v", resp.Count, test.ExceptCount)
+				return
+			}
+			if test.ExceptLen != len(resp.Applies) {
+				t.Errorf("Get: %v ExceptLen: %v", resp.Applies, test.ExceptLen)
+			}
+		})
+	}
+}

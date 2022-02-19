@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/essayZW/hpcmanager/user/db"
+	"gopkg.in/guregu/null.v4"
 )
 
 // UserGroup 用户组相关的操作逻辑
@@ -78,13 +79,107 @@ func (group *UserGroup) CreateUserJoinGroupApply(ctx context.Context, userInfo *
 		TutorID:       groupInfo.TutorID,
 		TutorUsername: groupInfo.TutorUsername,
 		TutorName:     groupInfo.TutorName,
-		CreateTime:    time.Now(),
+		CreateTime:    null.NewTime(time.Now(), true),
 	})
 }
 
 // GetByTutorUsername 通过导师用户名查询导师的其他信息
 func (group *UserGroup) GetByTutorUsername(ctx context.Context, username string) (*db.Group, error) {
 	return group.userGroupDB.QueryByTutorUsername(ctx, username)
+}
+
+// PaginationApplyResult 分页查询申请信息的结果
+type PaginationApplyResult struct {
+	Applies []*db.UserGroupApply
+	Count   int
+}
+
+// AdminPageGetApplyInfo 管理员分页查询所有的申请信息
+func (group *UserGroup) AdminPageGetApplyInfo(ctx context.Context, pageIndex, pageSize int) (*PaginationApplyResult, error) {
+	if pageIndex < 1 {
+		return nil, errors.New("pageIndex must large than 0")
+	}
+	if pageSize <= 0 || pageSize > 200 {
+		return nil, errors.New("pageSize must large than 0 and less than 200")
+	}
+	// 先查询总数
+	count, err := group.userGroupApplyDB.AdminLimitQueryApplyCount(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if count == 0 {
+		return &PaginationApplyResult{
+			Applies: make([]*db.UserGroupApply, 0),
+			Count:   0,
+		}, nil
+	}
+	offset := pageSize * (pageIndex - 1)
+	applis, err := group.userGroupApplyDB.AdminLimitQueryApplyInfo(ctx, offset, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	return &PaginationApplyResult{
+		Applies: applis,
+		Count:   count,
+	}, nil
+}
+
+// TutorPageGetApplyInfo 导师分页查看申请本组的所有申请信息
+func (group *UserGroup) TutorPageGetApplyInfo(ctx context.Context, pageIndex, pageSize, groupID int) (*PaginationApplyResult, error) {
+	if pageIndex < 1 {
+		return nil, errors.New("pageIndex must large than 0")
+	}
+	if pageSize <= 0 || pageSize > 200 {
+		return nil, errors.New("pageSize must large than 0 and less than 200")
+	}
+	count, err := group.userGroupApplyDB.TutorLimitQueryApplyCount(ctx, groupID)
+	if err != nil {
+		return nil, err
+	}
+	if count == 0 {
+		return &PaginationApplyResult{
+			Applies: make([]*db.UserGroupApply, 0),
+			Count:   0,
+		}, nil
+	}
+	offset := pageSize * (pageIndex - 1)
+	applis, err := group.userGroupApplyDB.TutorLimitQueryApplyInfo(ctx, offset, pageSize, groupID)
+	if err != nil {
+		return nil, err
+	}
+	return &PaginationApplyResult{
+		Applies: applis,
+		Count:   count,
+	}, nil
+}
+
+// CommonPageGetApplyInfo 普通用户分页查询自己创建的所有申请信息
+func (group *UserGroup) CommonPageGetApplyInfo(ctx context.Context, pageIndex, pageSize, userID int) (*PaginationApplyResult, error) {
+	if pageIndex < 1 {
+		return nil, errors.New("pageIndex must large than 0")
+	}
+	if pageSize <= 0 || pageSize > 200 {
+		return nil, errors.New("pageSize must large than 0 and less than 200")
+	}
+	count, err := group.userGroupApplyDB.CommonLimitQueryApplyCount(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if count == 0 {
+		return &PaginationApplyResult{
+			Applies: make([]*db.UserGroupApply, 0),
+			Count:   0,
+		}, nil
+	}
+	offset := pageSize * (pageIndex - 1)
+	applis, err := group.userGroupApplyDB.CommonLimitQueryApplyInfo(ctx, offset, pageSize, userID)
+	if err != nil {
+		return nil, err
+	}
+	return &PaginationApplyResult{
+		Applies: applis,
+		Count:   count,
+	}, nil
 }
 
 // NewUserGroup 创建一个新的用户组的操作逻辑

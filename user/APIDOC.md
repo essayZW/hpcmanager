@@ -314,6 +314,33 @@ message SearchTutorInfoResponse {
 }
 ```
 
+## PageGetApplyGroupInfo
+
+描述：分页查询申请记录，对于不同权限的用户所能查找的范围不同
+
+需求权限：无
+
+原型定义：`rpc PageGetApplyGroupInfo(PageGetApplyGroupInfoRequest) returns (PageGetApplyGroupInfoResponse) {}`
+
+请求参数：
+
+```protobuf
+message PageGetApplyGroupInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+```
+
+响应参数：
+
+```protobuf
+message PageGetApplyGroupInfoResponse {
+    repeated user.UserGroupApply applies = 1;
+    int32 count = 2;
+}
+```
+
 # 附录
 
 ## UserInfo

@@ -15,6 +15,7 @@ service GroupService {
     rpc PaginationGetGroupInfo(PaginationGetGroupInfoRequest) returns (PaginationGetGroupInfoResponse) {}
     rpc CreateJoinGroupApply(CreateJoinGroupApplyRequest) returns (CreateJoinGroupApplyResponse) {}
     rpc SearchTutorInfo(SearchTutorInfoRequest) returns (SearchTutorInfoResponse) {}
+    rpc PageGetApplyGroupInfo(PageGetApplyGroupInfoRequest) returns (PageGetApplyGroupInfoResponse) {}
 }
 
 
@@ -59,4 +60,15 @@ message SearchTutorInfoResponse {
     string tutorName = 3;
     int32 groupID = 4;
     string groupName = 5;
+}
+
+message PageGetApplyGroupInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+
+message PageGetApplyGroupInfoResponse {
+    repeated user.UserGroupApply applies = 1;
+    int32 count = 2;
 }
