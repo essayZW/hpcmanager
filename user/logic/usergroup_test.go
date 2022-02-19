@@ -22,7 +22,7 @@ func init() {
 	if err != nil {
 		logger.Fatal("MySQL conn error: ", err)
 	}
-	userGroupLogic = NewUserGroup(userdb.NewUserGroup(sqlConn))
+	userGroupLogic = NewUserGroup(userdb.NewUserGroup(sqlConn), userdb.NewUserGroupApply(sqlConn))
 }
 
 func TestGetGroupByID(t *testing.T) {
@@ -122,6 +122,75 @@ func TestPaginationGetGroupInfo(t *testing.T) {
 			}
 			if infos.Count != test.ExceptCount {
 				t.Errorf("Get: %v Except: %v", infos, test.ExceptCount)
+			}
+		})
+	}
+}
+
+func TestCreateUserJoinGroupApply(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		ApplyGroupID int
+		UserInfo     *userdb.User
+		Error        bool
+	}{
+		{
+			Name:         "error user groupID",
+			ApplyGroupID: 1,
+			UserInfo: &userdb.User{
+				ID:       1,
+				Username: "121121121",
+				Name:     "大佬",
+				GroupID:  2,
+			},
+			Error: true,
+		},
+		{
+			Name:         "success",
+			ApplyGroupID: 1,
+			UserInfo: &userdb.User{
+				ID:       20,
+				Username: "456456456",
+				Name:     "申请组",
+			},
+			Error: false,
+		},
+		{
+			Name:         "not exists groupid",
+			ApplyGroupID: 5,
+			UserInfo: &userdb.User{
+				ID:       20,
+				Username: "456456456",
+				Name:     "申请组",
+			},
+			Error: true,
+		},
+		{
+			Name:         "repeated apply",
+			ApplyGroupID: 1,
+			UserInfo: &userdb.User{
+				ID:       20,
+				Username: "456456456",
+				Name:     "申请组",
+			},
+			Error: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			_, err := userGroupLogic.CreateUserJoinGroupApply(context.Background(), test.UserInfo, test.ApplyGroupID)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v Except: %v", err, test.Error)
+				return
+
 			}
 		})
 	}

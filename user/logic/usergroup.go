@@ -3,13 +3,15 @@ package logic
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/essayZW/hpcmanager/user/db"
 )
 
 // UserGroup 用户组相关的操作逻辑
 type UserGroup struct {
-	userGroupDB *db.UserGroupDB
+	userGroupDB      *db.UserGroupDB
+	userGroupApplyDB *db.UserGroupApplyDB
 }
 
 // GetGroupInfoByID 通过ID查询组信息
@@ -53,9 +55,37 @@ func (group *UserGroup) PaginationGetGroupInfo(ctx context.Context, pageIndex in
 	}, nil
 }
 
+// CreateUserJoinGroupApply 创建用户申请加入组的申请记录
+func (group *UserGroup) CreateUserJoinGroupApply(ctx context.Context, userInfo *db.User, applyGroupID int) (int64, error) {
+	if userInfo.GroupID != 0 {
+		return 0, errors.New("user has a group, can't apply new group")
+	}
+	// 判断申请的组是否存在
+	groupInfo, err := group.GetGroupInfoByID(ctx, applyGroupID)
+	if err != nil {
+		return 0, errors.New("error applyGroupID")
+	}
+	// 判断是否已经存在申请记录
+	exists := group.userGroupApplyDB.ExistsApply(ctx, userInfo.ID, applyGroupID)
+	if exists {
+		return 0, errors.New("apply has created, can't create a new application")
+	}
+	return group.userGroupApplyDB.Insert(ctx, &db.UserGroupApply{
+		UserID:        userInfo.ID,
+		UserUsername:  userInfo.Username,
+		UserName:      userInfo.Name,
+		ApplyGroupID:  applyGroupID,
+		TutorID:       groupInfo.TutorID,
+		TutorUsername: groupInfo.TutorUsername,
+		TutorName:     groupInfo.TutorName,
+		CreateTime:    time.Now(),
+	})
+}
+
 // NewUserGroup 创建一个新的用户组的操作逻辑
-func NewUserGroup(userGroupDB *db.UserGroupDB) *UserGroup {
+func NewUserGroup(userGroupDB *db.UserGroupDB, userGroupApplyDB *db.UserGroupApplyDB) *UserGroup {
 	return &UserGroup{
-		userGroupDB: userGroupDB,
+		userGroupDB:      userGroupDB,
+		userGroupApplyDB: userGroupApplyDB,
 	}
 }

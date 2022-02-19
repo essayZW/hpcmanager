@@ -37,3 +37,27 @@ type Group struct {
 	Balance           float64   `db:"balance"`
 	ExtraAttributes   *db.JSON  `db:"extraAttributes"`
 }
+
+// UserGroupApply 数据库中的新用户申请表结构体
+type UserGroupApply struct {
+	ID                     int       `db:"id"`
+	UserID                 int       `db:"user_id"`
+	UserUsername           string    `db:"user_username"`
+	UserName               string    `db:"user_name"`
+	ApplyGroupID           int       `db:"apply_group_id"`
+	TutorID                int       `db:"tutor_id"`
+	TutorUsername          string    `db:"tutor_username"`
+	TutorName              string    `db:"tutor_name"`
+	TutorCheckStatus       int8      `db:"tutor_check_status"`
+	ManagerCheckStatus     int8      `db:"manager_check_status"`
+	Status                 int8      `db:"status"`
+	MessageTutor           string    `db:"message_tutor"`
+	MessageManager         string    `db:"message_manager"`
+	TutorCheckTime         time.Time `db:"tutor_check_time"`
+	ManagerCheckTime       time.Time `db:"manager_check_time"`
+	ManagerCheckerID       int       `db:"manager_checker_id"`
+	ManagerCheckerUsername string    `db:"manager_checker_username"`
+	ManegerCheckerName     string    `db:"manager_checker_name"`
+	CreateTime             time.Time `db:"create_time"`
+	ExtraAttributes        *db.JSON  `db:"extraAttributes"`
+}

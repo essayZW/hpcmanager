@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
 	publicpb "github.com/essayZW/hpcmanager/proto"
 	"github.com/essayZW/hpcmanager/user/logic"
@@ -15,6 +16,7 @@ import (
 // UserGroupService 提供关于用户组方面的接口
 type UserGroupService struct {
 	userGroupLogic *logic.UserGroup
+	userLogic      *logic.User
 }
 
 // Ping 用户组服务ping测试
@@ -104,11 +106,40 @@ func (group *UserGroupService) PaginationGetGroupInfo(ctx context.Context, req *
 	return nil
 }
 
+// CreateJoinGroupApply 创建用户加入组申请单
+func (group *UserGroupService) CreateJoinGroupApply(ctx context.Context, req *userpb.CreateJoinGroupApplyRequest, resp *userpb.CreateJoinGroupApplyResponse) error {
+	logger.Infof("CreateJoinGroupApply: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	if !verify.Identify(verify.ApplyJoinGroup, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("CreateJoinGroupApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("CreateJoinGroupApply permission forbidden")
+	}
+	// 查询申请人的信息
+	userInfo, err := group.userLogic.GetUserInfoByID(ctx, int(req.BaseRequest.UserInfo.UserId))
+	if err != nil {
+		return errors.New("apply fail: error userid")
+	}
+	if userInfo.GroupID != 0 {
+		return errors.New("apply fail: user have a group")
+	}
+	id, err := db.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		return group.userGroupLogic.CreateUserJoinGroupApply(c, userInfo, int(req.ApplyGroupID))
+	})
+	if err != nil {
+		return err
+	}
+	resp.ApplyID = int32(id.(int64))
+	logger.Info("Create new user join group apply: ", id)
+	resp.Success = true
+	// TODO 发送异步消息，表明申请已经创建
+	return nil
+}
+
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务
-func NewGroup(client client.Client, userGroupLogic *logic.UserGroup) *UserGroupService {
+func NewGroup(client client.Client, userGroupLogic *logic.UserGroup, userLogic *logic.User) *UserGroupService {
 	return &UserGroupService{
 		userGroupLogic: userGroupLogic,
+		userLogic:      userLogic,
 	}
 }

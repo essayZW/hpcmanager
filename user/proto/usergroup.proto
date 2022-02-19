@@ -13,6 +13,7 @@ service GroupService {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc GetGroupInfoByID(GetGroupInfoByIDRequest) returns (GetGroupInfoByIDResponse) {}
     rpc PaginationGetGroupInfo(PaginationGetGroupInfoRequest) returns (PaginationGetGroupInfoResponse) {}
+    rpc CreateJoinGroupApply(CreateJoinGroupApplyRequest) returns (CreateJoinGroupApplyResponse) {}
 }
 
 
@@ -34,4 +35,14 @@ message PaginationGetGroupInfoRequest {
 message PaginationGetGroupInfoResponse {
     repeated user.GroupInfo groupInfos = 1;
     int32 count = 2;
+}
+
+message CreateJoinGroupApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyGroupID = 2;
+}
+
+message CreateJoinGroupApplyResponse {
+    bool success = 1;
+    int32 applyID = 2;
 }

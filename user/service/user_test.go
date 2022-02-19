@@ -323,7 +323,7 @@ func TestGetUserInfo(t *testing.T) {
 		},
 		{
 			Name:        "Query other user forbidden",
-			UserID:      43,
+			UserID:      21,
 			QueryUserID: 2,
 			Levels: []int32{
 				int32(verify.Common),
@@ -334,7 +334,7 @@ func TestGetUserInfo(t *testing.T) {
 			Name:        "Tutor Query other user",
 			UserID:      1,
 			QueryUserID: 2,
-			GroupID:     1,
+			GroupID:     2,
 			Levels: []int32{
 				int32(verify.Tutor),
 			},
@@ -343,7 +343,7 @@ func TestGetUserInfo(t *testing.T) {
 		{
 			Name:        "Tutor query other group user",
 			UserID:      1,
-			QueryUserID: 43,
+			QueryUserID: 21,
 			GroupID:     3,
 			Levels: []int32{
 				int32(verify.Tutor),
@@ -361,7 +361,7 @@ func TestGetUserInfo(t *testing.T) {
 		},
 		{
 			Name:        "Admin query other user2",
-			UserID:      43,
+			UserID:      21,
 			QueryUserID: 2,
 			Levels: []int32{
 				int32(verify.CommonAdmin),
@@ -381,8 +381,15 @@ func TestGetUserInfo(t *testing.T) {
 			req.BaseRequest.UserInfo.GroupId = int32(test.GroupID)
 			var resp user.GetUserInfoResponse
 			err := userService.GetUserInfo(context.Background(), req, &resp)
-			if (err != nil) != test.Error {
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Except: %v Get: %v Resp: %v", test.Error, err, resp.UserInfo)
+				}
+				return
+			}
+			if test.Error {
 				t.Errorf("Except: %v Get: %v Resp: %v", test.Error, err, resp.UserInfo)
+				return
 			}
 		})
 	}

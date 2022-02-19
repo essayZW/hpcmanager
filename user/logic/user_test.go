@@ -235,7 +235,7 @@ func TestPaginationGetUserInfo(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			infos, err := userLogic.PaginationGetUserInfo(context.Background(), test.PageIndex, test.PageSize)
+			infos, err := userLogic.PaginationGetUserInfo(context.Background(), test.PageIndex, test.PageSize, 0)
 			if err != nil {
 				if !test.Error {
 					t.Errorf("Get: %v Except: %v", err, test.Error)

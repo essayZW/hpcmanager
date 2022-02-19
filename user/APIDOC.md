@@ -259,6 +259,32 @@ message PaginationGetUserInfoResponse {
 }
 ```
 
+## CreateJoinGroupApply
+
+描述：传入申请的组的ID信息，创建一个当前用户申请加入组的新的申请
+
+需求权限：仅`Guest`权限
+
+原型定义：`rpc CreateJoinGroupApply(CreateJoinGroupApplyRequest) returns (CreateJoinGroupApplyResponse) {}`
+
+请求参数：
+
+```protobuf
+message CreateJoinGroupApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyGroupID = 2;
+}
+```
+
+响应参数：
+
+```protobuf
+message CreateJoinGroupApplyResponse {
+    bool success = 1;
+    int32 applyID = 2;
+}
+```
+
 # 附录
 
 ## UserInfo

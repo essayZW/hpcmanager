@@ -55,6 +55,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: Tutor,
 			},
+			// 游客权限
+			ApplyJoinGroup: {
+				maxLevel: Guest,
+				minLevel: Guest,
+			},
 		},
 	}
 }
