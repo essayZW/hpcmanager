@@ -104,3 +104,16 @@ func LoadRegistry() (*Registry, error) {
 	}
 	return &registry, err
 }
+
+// LoadRabbitmq 加载rabbitmq消息队列配置
+func LoadRabbitmq() (*Rabbitmq, error) {
+	c, err := LoadConfigSource()
+	if err != nil {
+		return nil, err
+	}
+	var rabbitmq Rabbitmq
+	if err := c.Get("rabbitmq").Scan(&rabbitmq); err != nil {
+		return nil, err
+	}
+	return &rabbitmq, nil
+}
