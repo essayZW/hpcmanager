@@ -195,3 +195,45 @@ func TestCreateUserJoinGroupApply(t *testing.T) {
 		})
 	}
 }
+
+func TestGetByTutorUsername(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		Username string
+
+		Error         bool
+		ExceptGroupID int
+	}{
+		{
+			Name:          "success",
+			Username:      "123123123",
+			ExceptGroupID: 1,
+			Error:         false,
+		},
+		{
+			Name:     "does not exists",
+			Username: "no",
+			Error:    true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			group, err := userGroupLogic.GetByTutorUsername(context.Background(), test.Username)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v Except: %v", err, test.Error)
+				return
+			}
+			if test.ExceptGroupID != group.ID {
+				t.Errorf("Get: %v, Except: %v", group, test.ExceptGroupID)
+			}
+		})
+	}
+}

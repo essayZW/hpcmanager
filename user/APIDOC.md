@@ -285,6 +285,35 @@ message CreateJoinGroupApplyResponse {
 }
 ```
 
+## SearchTutorInfo
+
+描述：传入导师的用户名，搜索其对应组的信息以及导师的其他基本信息
+
+需求权限：仅`Guest`权限
+
+原型定义：`rpc SearchTutorInfo(SearchTutorInfoRequest) returns (SearchTutorInfoResponse) {}`
+
+请求参数：
+
+```protobuf
+message SearchTutorInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+```
+
+响应参数：
+
+```protobuf
+message SearchTutorInfoResponse {
+    int32 tutorID = 1;
+    string tutorUsername = 2;
+    string tutorName = 3;
+    int32 groupID = 4;
+    string groupName = 5;
+}
+```
+
 # 附录
 
 ## UserInfo

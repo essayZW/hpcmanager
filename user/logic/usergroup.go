@@ -82,6 +82,11 @@ func (group *UserGroup) CreateUserJoinGroupApply(ctx context.Context, userInfo *
 	})
 }
 
+// GetByTutorUsername 通过导师用户名查询导师的其他信息
+func (group *UserGroup) GetByTutorUsername(ctx context.Context, username string) (*db.Group, error) {
+	return group.userGroupDB.QueryByTutorUsername(ctx, username)
+}
+
 // NewUserGroup 创建一个新的用户组的操作逻辑
 func NewUserGroup(userGroupDB *db.UserGroupDB, userGroupApplyDB *db.UserGroupApplyDB) *UserGroup {
 	return &UserGroup{

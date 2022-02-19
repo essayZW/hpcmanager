@@ -42,6 +42,7 @@ type GroupService interface {
 	GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, opts ...client.CallOption) (*GetGroupInfoByIDResponse, error)
 	PaginationGetGroupInfo(ctx context.Context, in *PaginationGetGroupInfoRequest, opts ...client.CallOption) (*PaginationGetGroupInfoResponse, error)
 	CreateJoinGroupApply(ctx context.Context, in *CreateJoinGroupApplyRequest, opts ...client.CallOption) (*CreateJoinGroupApplyResponse, error)
+	SearchTutorInfo(ctx context.Context, in *SearchTutorInfoRequest, opts ...client.CallOption) (*SearchTutorInfoResponse, error)
 }
 
 type groupService struct {
@@ -96,6 +97,16 @@ func (c *groupService) CreateJoinGroupApply(ctx context.Context, in *CreateJoinG
 	return out, nil
 }
 
+func (c *groupService) SearchTutorInfo(ctx context.Context, in *SearchTutorInfoRequest, opts ...client.CallOption) (*SearchTutorInfoResponse, error) {
+	req := c.c.NewRequest(c.name, "GroupService.SearchTutorInfo", in)
+	out := new(SearchTutorInfoResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for GroupService service
 
 type GroupServiceHandler interface {
@@ -103,6 +114,7 @@ type GroupServiceHandler interface {
 	GetGroupInfoByID(context.Context, *GetGroupInfoByIDRequest, *GetGroupInfoByIDResponse) error
 	PaginationGetGroupInfo(context.Context, *PaginationGetGroupInfoRequest, *PaginationGetGroupInfoResponse) error
 	CreateJoinGroupApply(context.Context, *CreateJoinGroupApplyRequest, *CreateJoinGroupApplyResponse) error
+	SearchTutorInfo(context.Context, *SearchTutorInfoRequest, *SearchTutorInfoResponse) error
 }
 
 func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts ...server.HandlerOption) error {
@@ -111,6 +123,7 @@ func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts
 		GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, out *GetGroupInfoByIDResponse) error
 		PaginationGetGroupInfo(ctx context.Context, in *PaginationGetGroupInfoRequest, out *PaginationGetGroupInfoResponse) error
 		CreateJoinGroupApply(ctx context.Context, in *CreateJoinGroupApplyRequest, out *CreateJoinGroupApplyResponse) error
+		SearchTutorInfo(ctx context.Context, in *SearchTutorInfoRequest, out *SearchTutorInfoResponse) error
 	}
 	type GroupService struct {
 		groupService
@@ -137,4 +150,8 @@ func (h *groupServiceHandler) PaginationGetGroupInfo(ctx context.Context, in *Pa
 
 func (h *groupServiceHandler) CreateJoinGroupApply(ctx context.Context, in *CreateJoinGroupApplyRequest, out *CreateJoinGroupApplyResponse) error {
 	return h.GroupServiceHandler.CreateJoinGroupApply(ctx, in, out)
+}
+
+func (h *groupServiceHandler) SearchTutorInfo(ctx context.Context, in *SearchTutorInfoRequest, out *SearchTutorInfoResponse) error {
+	return h.GroupServiceHandler.SearchTutorInfo(ctx, in, out)
 }

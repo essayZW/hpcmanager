@@ -134,6 +134,25 @@ func (group *UserGroupService) CreateJoinGroupApply(ctx context.Context, req *us
 	return nil
 }
 
+// SearchTutorInfo 通过用户名查询导师信息
+func (group *UserGroupService) SearchTutorInfo(ctx context.Context, req *userpb.SearchTutorInfoRequest, resp *userpb.SearchTutorInfoResponse) error {
+	logger.Infof("SearchTutorInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	if !verify.Identify(verify.SearchTutorInfo, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("SearchTutorInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("SearchTutorInfo permission forbidden")
+	}
+	info, err := group.userGroupLogic.GetByTutorUsername(ctx, req.Username)
+	if err != nil {
+		return errors.New("tutor dones not exists")
+	}
+	resp.GroupID = int32(info.ID)
+	resp.TutorID = int32(info.TutorID)
+	resp.TutorUsername = info.TutorUsername
+	resp.TutorName = info.TutorName
+	resp.GroupName = info.Name
+	return nil
+}
+
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务

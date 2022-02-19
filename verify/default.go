@@ -60,6 +60,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: Guest,
 				minLevel: Guest,
 			},
+			// 游客权限
+			SearchTutorInfo: {
+				maxLevel: Guest,
+				minLevel: Guest,
+			},
 		},
 	}
 }

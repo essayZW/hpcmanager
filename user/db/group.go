@@ -64,6 +64,21 @@ func (group *UserGroupDB) GetGroupCount(ctx context.Context) (int, error) {
 	return count, nil
 }
 
+// QueryByTutorUsername 通过导师用户名精准查询信息
+func (group *UserGroupDB) QueryByTutorUsername(ctx context.Context, username string) (*Group, error) {
+	row, err := group.db.QueryRow(ctx, "SELECT * FROM `group` WHERE `tutor_username`=?", username)
+	if err != nil {
+		logger.Warn("QueryByTutorUsername error: ", err)
+		return nil, errors.New("QueryByTutorUsername fail")
+	}
+	var info Group
+	err = row.StructScan(&info)
+	if err != nil {
+		return nil, errors.New("QueryByTutorUsername fail")
+	}
+	return &info, nil
+}
+
 // NewUserGroup 创建一个新的用户数据库操作实例
 func NewUserGroup(conn *db.DB) *UserGroupDB {
 	return &UserGroupDB{
