@@ -156,6 +156,53 @@ func (ugadb *UserGroupApplyDB) CommonLimitQueryApplyCount(ctx context.Context, u
 	return count, nil
 }
 
+// QueryByID 通过ID查询记录
+func (ugadb *UserGroupApplyDB) QueryByID(ctx context.Context, applyID int) (*UserGroupApply, error) {
+	row, err := ugadb.db.QueryRow(ctx, "SELECT * FROM `user_group_apply` WHERE `id`=?", applyID)
+	if err != nil {
+		logger.Warn("QueryByID query error: ", err)
+		return nil, errors.New("QueryByID error")
+	}
+	var apply UserGroupApply
+	err = row.StructScan(&apply)
+	if err != nil {
+		return nil, errors.New("QueryByID error")
+	}
+	return &apply, nil
+}
+
+// UpdateTutorCheckStatus 更新导师审核状态
+func (ugadb *UserGroupApplyDB) UpdateTutorCheckStatus(ctx context.Context, newStatus *UserGroupApply) (bool, error) {
+	res, err := ugadb.db.Exec(ctx, "UPDATE `user_group_apply` SET `tutor_check_status`=?, `message_tutor`=?,`tutor_check_time`=? WHERE `id`=?",
+		newStatus.TutorCheckStatus, newStatus.MessageTutor, newStatus.TutorCheckTime, newStatus.ID)
+	if err != nil {
+		logger.Warn("UpdateTutorCheckStatus error: ", err)
+		return false, errors.New("tutor check error")
+	}
+	affectedRows, err := res.RowsAffected()
+	if err != nil {
+		return false, errors.New("tutor check error")
+	}
+	return affectedRows > 0, nil
+}
+
+// UpdateAdminCheckStatus 更新管理员审核状态
+func (ugadb *UserGroupApplyDB) UpdateAdminCheckStatus(ctx context.Context, newStatus *UserGroupApply) (bool, error) {
+	res, err := ugadb.db.Exec(ctx, "UPDATE `user_group_apply` SET `manager_check_status`=?, `message_manager`=?, `manager_check_time`=?,"+
+		"`manager_checker_id`=?, `manager_checker_username`=?, `manager_checker_name`=? WHERE `id`=? AND `tutor_check_status`!=-1",
+		newStatus.ManagerCheckStatus, newStatus.MessageManager, newStatus.ManagerCheckTime, newStatus.ManagerCheckerID, newStatus.ManagerCheckerUsername,
+		newStatus.ManagerCheckerName, newStatus.ID)
+	if err != nil {
+		logger.Warn("UpdateAdminCheckStatus error: ", err)
+		return false, errors.New("admin check error")
+	}
+	affectedRows, err := res.RowsAffected()
+	if err != nil {
+		return false, errors.New("tutor check error")
+	}
+	return affectedRows > 0, nil
+}
+
 // NewUserGroupApply 创建新用户申请表数据库操作结构体
 func NewUserGroupApply(db *db.DB) *UserGroupApplyDB {
 	return &UserGroupApplyDB{

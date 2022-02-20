@@ -341,6 +341,33 @@ message PageGetApplyGroupInfoResponse {
 }
 ```
 
+## CheckApply
+
+描述：审核用户加入组申请
+
+需求权限：`Tutor`及以上
+
+原型定义：`rpc CheckApply(CheckApplyRequest) returns (CheckApplyResponse) {}`
+
+请求参数：
+
+```protobuf
+message CheckApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    bool checkStatus = 3;
+    string checkMessage = 4;
+}
+```
+
+响应参数： 
+
+```protobuf
+message CheckApplyResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## UserInfo

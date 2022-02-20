@@ -65,6 +65,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: Guest,
 				minLevel: Guest,
 			},
+			// 需要导师及以上权限
+			CheckJoinGroupApply: {
+				maxLevel: MaxLevel,
+				minLevel: Tutor,
+			},
 		},
 	}
 }

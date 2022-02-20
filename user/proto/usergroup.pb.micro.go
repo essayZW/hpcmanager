@@ -44,6 +44,7 @@ type GroupService interface {
 	CreateJoinGroupApply(ctx context.Context, in *CreateJoinGroupApplyRequest, opts ...client.CallOption) (*CreateJoinGroupApplyResponse, error)
 	SearchTutorInfo(ctx context.Context, in *SearchTutorInfoRequest, opts ...client.CallOption) (*SearchTutorInfoResponse, error)
 	PageGetApplyGroupInfo(ctx context.Context, in *PageGetApplyGroupInfoRequest, opts ...client.CallOption) (*PageGetApplyGroupInfoResponse, error)
+	CheckApply(ctx context.Context, in *CheckApplyRequest, opts ...client.CallOption) (*CheckApplyResponse, error)
 }
 
 type groupService struct {
@@ -118,6 +119,16 @@ func (c *groupService) PageGetApplyGroupInfo(ctx context.Context, in *PageGetApp
 	return out, nil
 }
 
+func (c *groupService) CheckApply(ctx context.Context, in *CheckApplyRequest, opts ...client.CallOption) (*CheckApplyResponse, error) {
+	req := c.c.NewRequest(c.name, "GroupService.CheckApply", in)
+	out := new(CheckApplyResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for GroupService service
 
 type GroupServiceHandler interface {
@@ -127,6 +138,7 @@ type GroupServiceHandler interface {
 	CreateJoinGroupApply(context.Context, *CreateJoinGroupApplyRequest, *CreateJoinGroupApplyResponse) error
 	SearchTutorInfo(context.Context, *SearchTutorInfoRequest, *SearchTutorInfoResponse) error
 	PageGetApplyGroupInfo(context.Context, *PageGetApplyGroupInfoRequest, *PageGetApplyGroupInfoResponse) error
+	CheckApply(context.Context, *CheckApplyRequest, *CheckApplyResponse) error
 }
 
 func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts ...server.HandlerOption) error {
@@ -137,6 +149,7 @@ func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts
 		CreateJoinGroupApply(ctx context.Context, in *CreateJoinGroupApplyRequest, out *CreateJoinGroupApplyResponse) error
 		SearchTutorInfo(ctx context.Context, in *SearchTutorInfoRequest, out *SearchTutorInfoResponse) error
 		PageGetApplyGroupInfo(ctx context.Context, in *PageGetApplyGroupInfoRequest, out *PageGetApplyGroupInfoResponse) error
+		CheckApply(ctx context.Context, in *CheckApplyRequest, out *CheckApplyResponse) error
 	}
 	type GroupService struct {
 		groupService
@@ -171,4 +184,8 @@ func (h *groupServiceHandler) SearchTutorInfo(ctx context.Context, in *SearchTut
 
 func (h *groupServiceHandler) PageGetApplyGroupInfo(ctx context.Context, in *PageGetApplyGroupInfoRequest, out *PageGetApplyGroupInfoResponse) error {
 	return h.GroupServiceHandler.PageGetApplyGroupInfo(ctx, in, out)
+}
+
+func (h *groupServiceHandler) CheckApply(ctx context.Context, in *CheckApplyRequest, out *CheckApplyResponse) error {
+	return h.GroupServiceHandler.CheckApply(ctx, in, out)
 }

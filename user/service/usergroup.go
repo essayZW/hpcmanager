@@ -194,7 +194,7 @@ func (group *UserGroupService) PageGetApplyGroupInfo(ctx context.Context, req *u
 			ManagerCheckTime:       result.Applies[index].ManagerCheckTime.Time.Unix(),
 			ManagerCheckerID:       int32(result.Applies[index].ManagerCheckerID.Int64),
 			ManagerCheckerUsername: result.Applies[index].ManagerCheckerUsername.String,
-			ManagerCheckerName:     result.Applies[index].ManegerCheckerName.String,
+			ManagerCheckerName:     result.Applies[index].ManagerCheckerName.String,
 			CreateTime:             result.Applies[index].CreateTime.Time.Unix(),
 		}
 		if result.Applies[index].ExtraAttributes != nil {
@@ -202,6 +202,30 @@ func (group *UserGroupService) PageGetApplyGroupInfo(ctx context.Context, req *u
 		}
 	}
 	resp.Count = int32(result.Count)
+	return nil
+}
+
+// CheckApply 审核用户加入组申请
+func (group *UserGroupService) CheckApply(ctx context.Context, req *userpb.CheckApplyRequest, resp *userpb.CheckApplyResponse) error {
+	logger.Infof("CheckApply: %v||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	if !verify.Identify(verify.CheckJoinGroupApply, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("CheckJoinGroupApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("CheckJoinGroupApply permission forbidden")
+	}
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	var status bool
+	var err error
+	if isAdmin {
+		status, err = group.userGroupLogic.AdminCheckApply(ctx, int(req.ApplyID), int(req.BaseRequest.UserInfo.UserId),
+			req.BaseRequest.UserInfo.Username, req.BaseRequest.UserInfo.Name, req.CheckStatus, req.CheckMessage)
+	} else if isTutor {
+		status, err = group.userGroupLogic.TutorCheckApply(ctx, int(req.BaseRequest.UserInfo.UserId), int(req.ApplyID), req.CheckStatus, req.CheckMessage)
+	}
+	if err != nil {
+		return err
+	}
+	resp.Success = status
 	return nil
 }
 

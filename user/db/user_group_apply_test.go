@@ -56,3 +56,14 @@ func TestCommonLimitQueryApplyCount(t *testing.T) {
 		t.Errorf("Get: %v, Except: 1", count)
 	}
 }
+
+func TestQueryByID(t *testing.T) {
+	apply, err := userGroupApplyDB.QueryByID(context.Background(), 6)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if apply.UserID != 20 {
+		t.Errorf("Except userID 20, Get %v", apply)
+	}
+}

@@ -182,6 +182,78 @@ func (group *UserGroup) CommonPageGetApplyInfo(ctx context.Context, pageIndex, p
 	}, nil
 }
 
+// GetApplyInfoByID 通过申请ID查询申请记录信息
+func (group *UserGroup) GetApplyInfoByID(ctx context.Context, applyID int) (*db.UserGroupApply, error) {
+	return group.userGroupApplyDB.QueryByID(ctx, applyID)
+}
+
+// TutorCheckApply 导师审核申请记录
+func (group *UserGroup) TutorCheckApply(ctx context.Context, tutorID int, applyID int, checkAccept bool, checkMessage string) (bool, error) {
+	applyInfo, err := group.GetApplyInfoByID(ctx, applyID)
+	if err != nil {
+		return false, errors.New("Invalid applyid: Get apply info error")
+	}
+	if applyInfo.Status != 1 {
+		// 当前的申请记录状态不是正常状态，可能已经被撤销
+		return false, errors.New("invalid apply status")
+	}
+	if applyInfo.TutorCheckStatus != -1 {
+		// 已经被导师审核
+		return false, errors.New("tutor has reviewed this application")
+	}
+	if applyInfo.TutorID != tutorID {
+		// 不是这条记录的导师
+		return false, errors.New("must be group tutor")
+	}
+	var checkStatus int8
+	if checkAccept {
+		checkStatus = 1
+	} else {
+		checkStatus = 0
+	}
+	return group.userGroupApplyDB.UpdateTutorCheckStatus(ctx, &db.UserGroupApply{
+		TutorCheckStatus: checkStatus,
+		MessageTutor:     null.NewString(checkMessage, true),
+		TutorCheckTime:   null.NewTime(time.Now(), true),
+		ID:               applyID,
+	})
+}
+
+// AdminCheckApply 管理员审核申请记录
+func (group *UserGroup) AdminCheckApply(ctx context.Context, applyID int, checkerID int, checkerUsername, checkerName string, checkAccept bool, checkMessage string) (bool, error) {
+	applyInfo, err := group.GetApplyInfoByID(ctx, applyID)
+	if err != nil {
+		return false, errors.New("Invalid applyid: Get apply info error")
+	}
+	if applyInfo.Status != 1 {
+		// 当前的申请记录状态不是正常状态，可能已经被撤销
+		return false, errors.New("invalid apply status")
+	}
+	if applyInfo.TutorCheckStatus != 1 {
+		// 导师未审核或者审核失败
+		return false, errors.New("tutor has not reviewed or the review has not passed")
+	}
+	if applyInfo.ManagerCheckStatus != -1 {
+		// 已经被管理员进行了审核
+		return false, errors.New("manager has reviewed this application")
+	}
+	var checkStatus int8
+	if checkAccept {
+		checkStatus = 1
+	} else {
+		checkStatus = 0
+	}
+	return group.userGroupApplyDB.UpdateAdminCheckStatus(ctx, &db.UserGroupApply{
+		ID:                     applyID,
+		ManagerCheckStatus:     checkStatus,
+		MessageManager:         null.NewString(checkMessage, true),
+		ManagerCheckTime:       null.NewTime(time.Now(), true),
+		ManagerCheckerID:       null.NewInt(int64(checkerID), true),
+		ManagerCheckerUsername: null.NewString(checkerUsername, true),
+		ManagerCheckerName:     null.NewString(checkerName, true),
+	})
+}
+
 // NewUserGroup 创建一个新的用户组的操作逻辑
 func NewUserGroup(userGroupDB *db.UserGroupDB, userGroupApplyDB *db.UserGroupApplyDB) *UserGroup {
 	return &UserGroup{

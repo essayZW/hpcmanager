@@ -58,7 +58,7 @@ type UserGroupApply struct {
 	ManagerCheckTime       null.Time   `db:"manager_check_time"`
 	ManagerCheckerID       null.Int    `db:"manager_checker_id"`
 	ManagerCheckerUsername null.String `db:"manager_checker_username"`
-	ManegerCheckerName     null.String `db:"manager_checker_name"`
+	ManagerCheckerName     null.String `db:"manager_checker_name"`
 	CreateTime             null.Time   `db:"create_time"`
 	ExtraAttributes        *db.JSON    `db:"extraAttributes"`
 }

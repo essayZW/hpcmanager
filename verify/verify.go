@@ -20,6 +20,8 @@ const (
 	ApplyJoinGroup = "__ADD_APPLY_GROUP__"
 	// SearchTutorInfo 搜索导师以及组基本信息
 	SearchTutorInfo = "__SEARCH_TUTOR_INFO__"
+	// CheckJoinGroupApply 审核加入组申请
+	CheckJoinGroupApply = "__CHECK_JOIN_GROUP_APPLY__"
 )
 
 // Verify 进行操作的权限验证

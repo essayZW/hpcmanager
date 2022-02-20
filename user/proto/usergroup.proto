@@ -16,6 +16,7 @@ service GroupService {
     rpc CreateJoinGroupApply(CreateJoinGroupApplyRequest) returns (CreateJoinGroupApplyResponse) {}
     rpc SearchTutorInfo(SearchTutorInfoRequest) returns (SearchTutorInfoResponse) {}
     rpc PageGetApplyGroupInfo(PageGetApplyGroupInfoRequest) returns (PageGetApplyGroupInfoResponse) {}
+    rpc CheckApply(CheckApplyRequest) returns (CheckApplyResponse) {}
 }
 
 
@@ -71,4 +72,15 @@ message PageGetApplyGroupInfoRequest {
 message PageGetApplyGroupInfoResponse {
     repeated user.UserGroupApply applies = 1;
     int32 count = 2;
+}
+
+message CheckApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    bool checkStatus = 3;
+    string checkMessage = 4;
+}
+
+message CheckApplyResponse {
+    bool success = 1;
 }

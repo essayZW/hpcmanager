@@ -237,3 +237,146 @@ func TestGetByTutorUsername(t *testing.T) {
 		})
 	}
 }
+
+func TestTutorCheckApply(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		ApplyID      int
+		CheckStatus  bool
+		TutorID      int
+		CheckMessage string
+
+		Error bool
+	}{
+		{
+			Name:         "test success",
+			ApplyID:      9,
+			CheckStatus:  true,
+			TutorID:      2,
+			CheckMessage: "测试审核通过",
+			Error:        false,
+		},
+		{
+			Name:         "test success2",
+			ApplyID:      10,
+			CheckStatus:  false,
+			TutorID:      2,
+			CheckMessage: "测试审核不通过",
+			Error:        false,
+		},
+		{
+			Name:         "test fail",
+			ApplyID:      11,
+			CheckStatus:  true,
+			TutorID:      2,
+			CheckMessage: "审核通过",
+			Error:        true,
+		},
+		{
+			Name:         "test repeated check",
+			ApplyID:      1,
+			CheckStatus:  true,
+			TutorID:      2,
+			CheckMessage: "审核通过",
+			Error:        true,
+		},
+		{
+			Name:         "test other group apply",
+			ApplyID:      12,
+			CheckStatus:  false,
+			CheckMessage: "测试消息",
+			Error:        true,
+		},
+		{
+			Name:    "test invalid apply id",
+			ApplyID: 99,
+			Error:   true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			_, err := userGroupLogic.TutorCheckApply(context.Background(), test.TutorID, test.ApplyID, test.CheckStatus, test.CheckMessage)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v, Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v, Except: %v", err, test.Error)
+			}
+		})
+	}
+}
+
+func TestAdminCheckApply(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		ApplyID         int
+		CheckStatus     bool
+		CheckMessage    string
+		CheckerID       int
+		CheckerUsername string
+		CheckerName     string
+
+		Error bool
+	}{
+		{
+			Name:            "test check success",
+			ApplyID:         9,
+			CheckStatus:     true,
+			CheckMessage:    "管理员审核通过",
+			CheckerID:       1,
+			CheckerUsername: "121121121",
+			CheckerName:     "管理员",
+			Error:           false,
+		},
+		{
+			Name:            "check tutor check not accept",
+			ApplyID:         10,
+			CheckStatus:     true,
+			CheckMessage:    "管理员审核通过",
+			CheckerID:       1,
+			CheckerUsername: "121121121",
+			CheckerName:     "管理员",
+			Error:           true,
+		},
+		{
+			Name:            "check tutor not check",
+			ApplyID:         1,
+			CheckStatus:     true,
+			CheckMessage:    "管理员审核通过",
+			CheckerID:       1,
+			CheckerUsername: "121121121",
+			Error:           true,
+			CheckerName:     "管理员",
+		},
+		{
+			Name:            "repeated check",
+			ApplyID:         9,
+			CheckStatus:     true,
+			CheckMessage:    "管理员审核通过",
+			CheckerID:       1,
+			CheckerUsername: "121121121",
+			CheckerName:     "管理员",
+			Error:           true,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			_, err := userGroupLogic.AdminCheckApply(context.Background(), test.ApplyID, test.CheckerID, test.CheckerUsername, test.CheckerName, test.CheckStatus, test.CheckMessage)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v, Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v, Except: %v", err, test.Error)
+			}
+		})
+	}
+}
