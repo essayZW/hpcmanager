@@ -6,7 +6,9 @@ import (
 
 	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
+	permissionpb "github.com/essayZW/hpcmanager/permission/proto"
 	publicpb "github.com/essayZW/hpcmanager/proto"
+	userdb "github.com/essayZW/hpcmanager/user/db"
 	"github.com/essayZW/hpcmanager/user/logic"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
@@ -17,6 +19,8 @@ import (
 type UserGroupService struct {
 	userGroupLogic *logic.UserGroup
 	userLogic      *logic.User
+
+	permissionService permissionpb.PermissionService
 }
 
 // Ping 用户组服务ping测试
@@ -229,12 +233,71 @@ func (group *UserGroupService) CheckApply(ctx context.Context, req *userpb.Check
 	return nil
 }
 
+// CreateGroup 创建新的用户组
+func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.CreateGroupRequest, resp *userpb.CreateGroupResponse) error {
+	logger.Infof("CreateGroup: %v||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	if !verify.Identify(verify.CreateGroup, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("CreateGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("CreateGroup permission forbidden")
+	}
+	// 验证该导师用户不能是其他组的导师
+	if verify.IsTutor(req.BaseRequest.UserInfo.Levels) {
+		return errors.New("this user already is other group's tutor")
+	}
+	idInterface, err := db.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		// 查询分配的导师信息
+		tutorInfo, err := group.userLogic.GetUserInfoByID(c, int(req.TutorID))
+		if err != nil {
+			return nil, err
+		}
+		// TODO 调用hpc服务添加对应的计算节点组
+		var nodeUserGroupName string
+		// 创建组信息
+		id, err := group.userGroupLogic.CreateGroup(c, &userdb.User{
+			ID:       int(req.BaseRequest.UserInfo.UserId),
+			Username: req.BaseRequest.UserInfo.Username,
+			Name:     req.BaseRequest.UserInfo.Name,
+		}, tutorInfo, req.Name, req.QueueName, nodeUserGroupName)
+		if err != nil {
+			return nil, err
+		}
+		// 修改导师所属的组ID
+		err = group.userLogic.ChangeUserGroup(c, tutorInfo.ID, int(id))
+		if err != nil {
+			return nil, err
+		}
+		// 添加权限记录
+		resp, err := group.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
+			Userid: int32(tutorInfo.ID),
+			Level:  int32(verify.Tutor),
+		})
+		if err != nil {
+			return nil, err
+		}
+		if !resp.Success {
+			return nil, errors.New("user permission create error")
+		}
+		return id, nil
+	})
+	if err != nil {
+		return err
+	}
+	id, ok := idInterface.(int64)
+	if !ok {
+		return errors.New("error result for create group")
+	}
+	resp.GroupID = int32(id)
+	resp.Success = true
+	return nil
+}
+
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务
 func NewGroup(client client.Client, userGroupLogic *logic.UserGroup, userLogic *logic.User) *UserGroupService {
 	return &UserGroupService{
-		userGroupLogic: userGroupLogic,
-		userLogic:      userLogic,
+		userGroupLogic:    userGroupLogic,
+		userLogic:         userLogic,
+		permissionService: permissionpb.NewPermissionService("permission", client),
 	}
 }

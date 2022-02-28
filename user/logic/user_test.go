@@ -254,3 +254,42 @@ func TestPaginationGetUserInfo(t *testing.T) {
 		})
 	}
 }
+
+func TestChangeUserGroup(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		UserID  int
+		GroupID int
+
+		Error bool
+	}{
+		{
+			Name:    "success1",
+			UserID:  22,
+			GroupID: 2,
+			Error:   false,
+		},
+		{
+			Name:    "success2",
+			UserID:  22,
+			GroupID: 0,
+			Error:   false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			err := userLogic.ChangeUserGroup(context.Background(), test.UserID, test.GroupID)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v, Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v, Except: %v", err, test.Error)
+			}
+		})
+	}
+}

@@ -368,6 +368,34 @@ message CheckApplyResponse {
 }
 ```
 
+## CreateGroup
+
+描述：创建新的用户组
+
+需求权限：`CommonAdmin`及以上
+
+原型定义：`rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {}`
+
+请求参数：
+
+```protobuf
+message CreateGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 tutorID = 2;
+    string name = 3;
+    string queueName = 4;
+}
+```
+
+响应参数：
+
+```protobuf
+message CreateGroupResponse {
+    bool success = 1;
+    int32 groupID = 2;
+}
+```
+
 # 附录
 
 ## UserInfo

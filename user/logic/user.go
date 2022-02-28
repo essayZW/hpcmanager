@@ -160,6 +160,11 @@ func (u *User) PaginationGetUserInfo(ctx context.Context, pageIndex, pageSize, g
 
 }
 
+// ChangeUserGroup 修改用户的组信息
+func (u *User) ChangeUserGroup(ctx context.Context, userID int, groupID int) error {
+	return u.userDB.UpdateUserGroup(ctx, userID, groupID)
+}
+
 // NewUser 创建一个新的userLogic
 func NewUser(db *db.UserDB, configConn config.DynamicConfig, redisConn *redis.Client) *User {
 	user := &User{

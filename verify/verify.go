@@ -22,6 +22,8 @@ const (
 	SearchTutorInfo = "__SEARCH_TUTOR_INFO__"
 	// CheckJoinGroupApply 审核加入组申请
 	CheckJoinGroupApply = "__CHECK_JOIN_GROUP_APPLY__"
+	// CreateGroup 创建组
+	CreateGroup = "__CREATE_GROUP__"
 )
 
 // Verify 进行操作的权限验证

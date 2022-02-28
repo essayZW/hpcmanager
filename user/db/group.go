@@ -79,6 +79,24 @@ func (group *UserGroupDB) QueryByTutorUsername(ctx context.Context, username str
 	return &info, nil
 }
 
+// Insert 插入新的用户组记录
+func (group *UserGroupDB) Insert(ctx context.Context, groupInfo *Group) (int64, error) {
+	res, err := group.db.Exec(ctx, "INSERT INTO `group`"+
+		"(`name`, `queue_name`, `node_usergroup`, `create_time`, `creater_id`, `creater_username`, `creater_name`, `tutor_id`, `tutor_username`, `tutor_name`, `extraAttributes`)"+
+		"VALUES (?,?,?,?,?,?,?,?,?,?,?)", groupInfo.Name, groupInfo.QueueName, groupInfo.NodeUserGroupName,
+		groupInfo.CreateTime, groupInfo.CreaterID, groupInfo.CreaterUsername, groupInfo.CreaterName,
+		groupInfo.TutorID, groupInfo.TutorUsername, groupInfo.TutorName, groupInfo.ExtraAttributes)
+	if err != nil {
+		logger.Warn("Insert group error: ", err)
+		return 0, errors.New("insert new group row error")
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, errors.New("insert new group row error")
+	}
+	return id, nil
+}
+
 // NewUserGroup 创建一个新的用户数据库操作实例
 func NewUserGroup(conn *db.DB) *UserGroupDB {
 	return &UserGroupDB{

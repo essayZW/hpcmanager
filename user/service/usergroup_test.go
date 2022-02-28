@@ -10,14 +10,44 @@ import (
 	"github.com/essayZW/hpcmanager/db"
 	gateway "github.com/essayZW/hpcmanager/gateway/proto"
 	"github.com/essayZW/hpcmanager/logger"
+	permissionpb "github.com/essayZW/hpcmanager/permission/proto"
+	publicpb "github.com/essayZW/hpcmanager/proto"
 	userdb "github.com/essayZW/hpcmanager/user/db"
 	"github.com/essayZW/hpcmanager/user/logic"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
 	"github.com/go-redis/redis/v8"
+	"go-micro.dev/v4/client"
 )
 
 var userGroupService *UserGroupService
+
+type PermissionServiceMock struct {
+}
+
+func (pm *PermissionServiceMock) Ping(ctx context.Context, req *publicpb.Empty, options ...client.CallOption) (*publicpb.PingResponse, error) {
+	return nil, nil
+}
+
+func (pm *PermissionServiceMock) GetUserPermission(ctx context.Context, req *permissionpb.GetUserPermissionRequest, options ...client.CallOption) (*permissionpb.GetUserPermissionResponse, error) {
+	return nil, nil
+}
+
+func (pm *PermissionServiceMock) AddUserPermission(ctx context.Context, req *permissionpb.AddUserPermissionRequest, options ...client.CallOption) (*permissionpb.AddUserPermissionResponse, error) {
+	return &permissionpb.AddUserPermissionResponse{
+		Success: true,
+	}, nil
+}
+
+func (pm *PermissionServiceMock) RemoveUserPermission(ctx context.Context, req *permissionpb.RemoveUserPermissionRequest, options ...client.CallOption) (*permissionpb.RemoveUserPermissionResponse, error) {
+	return nil, nil
+}
+
+func (pm *PermissionServiceMock) AddPermission(ctx context.Context, req *permissionpb.AddPermissionRequest, options ...client.CallOption) (*permissionpb.AddPermissionResponse, error) {
+	return nil, nil
+}
+
+var _ permissionpb.PermissionService = (*PermissionServiceMock)(nil)
 
 func init() {
 	os.Setenv(hpcmanager.EnvName, "testing")
@@ -53,8 +83,9 @@ func init() {
 	userLogic := logic.NewUser(userdb.NewUser(sqlConn), etcdConfig, redisConn)
 	userGroupLogic := logic.NewUserGroup(userdb.NewUserGroup(sqlConn), userdb.NewUserGroupApply(sqlConn))
 	userGroupService = &UserGroupService{
-		userGroupLogic: userGroupLogic,
-		userLogic:      userLogic,
+		userGroupLogic:    userGroupLogic,
+		userLogic:         userLogic,
+		permissionService: &PermissionServiceMock{},
 	}
 	baseRequest = &gateway.BaseRequest{
 		RequestInfo: &gateway.RequestInfo{
@@ -281,7 +312,7 @@ func TestCreateJoinGroupApply(t *testing.T) {
 			Error:        false,
 		},
 		{
-			Name:   "test repeaded apply",
+			Name:   "test repeated apply",
 			UserID: 21,
 			UserLevels: []int32{
 				int32(verify.Guest),
@@ -405,6 +436,80 @@ func TestPageGetApplyGroupInfo(t *testing.T) {
 			}
 			if test.ExceptLen != len(resp.Applies) {
 				t.Errorf("Get: %v ExceptLen: %v", resp.Applies, test.ExceptLen)
+			}
+		})
+	}
+}
+
+func TestCreateGroup(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		TutorID   int
+		GroupName string
+		QueueName string
+
+		UserLevels []int32
+
+		Error bool
+	}{
+		{
+			Name: "forbidden",
+			UserLevels: []int32{
+				int32(verify.Common),
+			},
+			Error: true,
+		},
+		{
+			Name: "test success1",
+			UserLevels: []int32{
+				int32(verify.SuperAdmin),
+			},
+			TutorID:   23,
+			GroupName: "test1Group",
+			QueueName: "queue_test1Group",
+			Error:     false,
+		},
+		{
+			Name: "test success2",
+			UserLevels: []int32{
+				int32(verify.SuperAdmin),
+			},
+			TutorID:   24,
+			GroupName: "test2Group",
+			QueueName: "queue_test2Group",
+			Error:     false,
+		},
+		{
+			Name: "test repeated name",
+			UserLevels: []int32{
+				int32(verify.SuperAdmin),
+			},
+			TutorID:   24,
+			GroupName: "test2Group",
+			QueueName: "queue_test2Group",
+			Error:     true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			var req userpb.CreateGroupRequest
+			req.BaseRequest = baseRequest
+			req.BaseRequest.UserInfo.Levels = test.UserLevels
+			req.TutorID = int32(test.TutorID)
+			req.Name = test.GroupName
+			req.QueueName = test.QueueName
+			var resp userpb.CreateGroupResponse
+			err := userGroupService.CreateGroup(context.Background(), &req, &resp)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Except: %v Get: %v", test.Error, err)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Except: %v Get: %v", test.Error, err)
 			}
 		})
 	}

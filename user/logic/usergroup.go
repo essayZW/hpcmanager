@@ -254,6 +254,23 @@ func (group *UserGroup) AdminCheckApply(ctx context.Context, applyID int, checke
 	})
 }
 
+// CreateGroup 创建一个新的用户组
+func (group *UserGroup) CreateGroup(ctx context.Context, createrInfo, tutorInfo *db.User, name, queueName, nodeUserGroupName string) (int64, error) {
+	return group.userGroupDB.Insert(ctx, &db.Group{
+		Name:              name,
+		QueueName:         queueName,
+		NodeUserGroupName: nodeUserGroupName,
+		CreateTime:        time.Now(),
+		CreaterID:         createrInfo.ID,
+		CreaterUsername:   createrInfo.Username,
+		CreaterName:       createrInfo.Name,
+		TutorID:           tutorInfo.ID,
+		TutorUsername:     tutorInfo.Username,
+		TutorName:         tutorInfo.Name,
+	})
+
+}
+
 // NewUserGroup 创建一个新的用户组的操作逻辑
 func NewUserGroup(userGroupDB *db.UserGroupDB, userGroupApplyDB *db.UserGroupApplyDB) *UserGroup {
 	return &UserGroup{

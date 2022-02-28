@@ -70,6 +70,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: Tutor,
 			},
+			// 需要普通管理员及以上权限
+			CreateGroup: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
 		},
 	}
 }

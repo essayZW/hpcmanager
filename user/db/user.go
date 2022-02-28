@@ -118,6 +118,20 @@ func (db *UserDB) QueryAllUserCount(ctx context.Context, groupID int) (int, erro
 	return count, nil
 }
 
+// UpdateUserGroup 更新用户所属的组信息
+func (db *UserDB) UpdateUserGroup(ctx context.Context, userID, groupID int) error {
+	res, err := db.conn.Exec(ctx, "UPDATE `user` SET `group_id`=? WHERE `id`=?", groupID, userID)
+	if err != nil {
+		logger.Warn("UpdateUserGroup error: ", err)
+		return errors.New("UpdateUserGroup: update error")
+	}
+	_, err = res.RowsAffected()
+	if err != nil {
+		return errors.New("UpdateUserGroup: update error")
+	}
+	return nil
+}
+
 // NewUser 创建一个新的操作用户数据库结构体
 func NewUser(db *db.DB) *UserDB {
 	return &UserDB{

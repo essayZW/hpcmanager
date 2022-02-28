@@ -45,6 +45,7 @@ type GroupService interface {
 	SearchTutorInfo(ctx context.Context, in *SearchTutorInfoRequest, opts ...client.CallOption) (*SearchTutorInfoResponse, error)
 	PageGetApplyGroupInfo(ctx context.Context, in *PageGetApplyGroupInfoRequest, opts ...client.CallOption) (*PageGetApplyGroupInfoResponse, error)
 	CheckApply(ctx context.Context, in *CheckApplyRequest, opts ...client.CallOption) (*CheckApplyResponse, error)
+	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*CreateGroupResponse, error)
 }
 
 type groupService struct {
@@ -129,6 +130,16 @@ func (c *groupService) CheckApply(ctx context.Context, in *CheckApplyRequest, op
 	return out, nil
 }
 
+func (c *groupService) CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*CreateGroupResponse, error) {
+	req := c.c.NewRequest(c.name, "GroupService.CreateGroup", in)
+	out := new(CreateGroupResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for GroupService service
 
 type GroupServiceHandler interface {
@@ -139,6 +150,7 @@ type GroupServiceHandler interface {
 	SearchTutorInfo(context.Context, *SearchTutorInfoRequest, *SearchTutorInfoResponse) error
 	PageGetApplyGroupInfo(context.Context, *PageGetApplyGroupInfoRequest, *PageGetApplyGroupInfoResponse) error
 	CheckApply(context.Context, *CheckApplyRequest, *CheckApplyResponse) error
+	CreateGroup(context.Context, *CreateGroupRequest, *CreateGroupResponse) error
 }
 
 func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts ...server.HandlerOption) error {
@@ -150,6 +162,7 @@ func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts
 		SearchTutorInfo(ctx context.Context, in *SearchTutorInfoRequest, out *SearchTutorInfoResponse) error
 		PageGetApplyGroupInfo(ctx context.Context, in *PageGetApplyGroupInfoRequest, out *PageGetApplyGroupInfoResponse) error
 		CheckApply(ctx context.Context, in *CheckApplyRequest, out *CheckApplyResponse) error
+		CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error
 	}
 	type GroupService struct {
 		groupService
@@ -188,4 +201,8 @@ func (h *groupServiceHandler) PageGetApplyGroupInfo(ctx context.Context, in *Pag
 
 func (h *groupServiceHandler) CheckApply(ctx context.Context, in *CheckApplyRequest, out *CheckApplyResponse) error {
 	return h.GroupServiceHandler.CheckApply(ctx, in, out)
+}
+
+func (h *groupServiceHandler) CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error {
+	return h.GroupServiceHandler.CreateGroup(ctx, in, out)
 }

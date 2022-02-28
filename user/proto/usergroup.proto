@@ -17,6 +17,7 @@ service GroupService {
     rpc SearchTutorInfo(SearchTutorInfoRequest) returns (SearchTutorInfoResponse) {}
     rpc PageGetApplyGroupInfo(PageGetApplyGroupInfoRequest) returns (PageGetApplyGroupInfoResponse) {}
     rpc CheckApply(CheckApplyRequest) returns (CheckApplyResponse) {}
+    rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {}
 }
 
 
@@ -83,4 +84,16 @@ message CheckApplyRequest {
 
 message CheckApplyResponse {
     bool success = 1;
+}
+
+message CreateGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 tutorID = 2;
+    string name = 3;
+    string queueName = 4;
+}
+
+message CreateGroupResponse {
+    bool success = 1;
+    int32 groupID = 2;
 }
