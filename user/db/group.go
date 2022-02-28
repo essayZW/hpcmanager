@@ -50,7 +50,7 @@ func (group *UserGroupDB) PaginationQuery(ctx context.Context, offset int, size 
 
 // GetGroupCount 查询所有组的数量
 func (group *UserGroupDB) GetGroupCount(ctx context.Context) (int, error) {
-	row, err := group.db.QueryRow(ctx, "SELECT COUNT(*) FROM `user`")
+	row, err := group.db.QueryRow(ctx, "SELECT COUNT(*) FROM `group`")
 	if err != nil {
 		logger.Warn("Query Group count error: ", err)
 		return 0, errors.New("Query group count error")
