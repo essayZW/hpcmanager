@@ -5,6 +5,7 @@ package hpc
 
 import (
 	fmt "fmt"
+	_ "github.com/essayZW/hpcmanager/gateway/proto"
 	proto1 "github.com/essayZW/hpcmanager/proto"
 	proto "google.golang.org/protobuf/proto"
 	math "math"
@@ -38,6 +39,7 @@ func NewHpcEndpoints() []*api.Endpoint {
 
 type HpcService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
+	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*CreateGroupResponse, error)
 }
 
 type hpcService struct {
@@ -62,15 +64,27 @@ func (c *hpcService) Ping(ctx context.Context, in *proto1.Empty, opts ...client.
 	return out, nil
 }
 
+func (c *hpcService) CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*CreateGroupResponse, error) {
+	req := c.c.NewRequest(c.name, "Hpc.CreateGroup", in)
+	out := new(CreateGroupResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Hpc service
 
 type HpcHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
+	CreateGroup(context.Context, *CreateGroupRequest, *CreateGroupResponse) error
 }
 
 func RegisterHpcHandler(s server.Server, hdlr HpcHandler, opts ...server.HandlerOption) error {
 	type hpc interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
+		CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error
 	}
 	type Hpc struct {
 		hpc
@@ -85,4 +99,8 @@ type hpcHandler struct {
 
 func (h *hpcHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error {
 	return h.HpcHandler.Ping(ctx, in, out)
+}
+
+func (h *hpcHandler) CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error {
+	return h.HpcHandler.CreateGroup(ctx, in, out)
 }
