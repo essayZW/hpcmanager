@@ -38,7 +38,10 @@ CREATE TABLE `group` (
   `tutor_name` varchar(32) DEFAULT NULL,
   `balance` decimal(18,2) DEFAULT '0.00',
   `extraAttributes` varchar(2048) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name_UNIQUE` (`name`),
+  UNIQUE KEY `queue_name_UNIQUE` (`queue_name`),
+  UNIQUE KEY `node_usergroup_UNIQUE` (`node_usergroup`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -394,4 +397,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-19 20:02:51
+-- Dump completed on 2022-02-28 16:46:03
