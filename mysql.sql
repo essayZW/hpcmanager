@@ -27,8 +27,7 @@ DROP TABLE IF EXISTS `group`;
 CREATE TABLE `group` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
-  `queue_name` varchar(64) NOT NULL,
-  `node_usergroup` varchar(64) NOT NULL,
+  `hpc_group_id` int NOT NULL DEFAULT '0',
   `create_time` timestamp NOT NULL,
   `creater_id` int NOT NULL,
   `creater_username` varchar(32) NOT NULL,
@@ -39,9 +38,27 @@ CREATE TABLE `group` (
   `balance` decimal(18,2) DEFAULT '0.00',
   `extraAttributes` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `name_UNIQUE` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `hpc_group`
+--
+
+DROP TABLE IF EXISTS `hpc_group`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `hpc_group` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `queue_name` varchar(64) NOT NULL,
+  `gid` int NOT NULL,
+  `extraAttributes` varchar(2048) DEFAULT NULL,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`),
   UNIQUE KEY `queue_name_UNIQUE` (`queue_name`),
-  UNIQUE KEY `node_usergroup_UNIQUE` (`node_usergroup`)
+  UNIQUE KEY `gid_UNIQUE` (`gid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -306,6 +323,7 @@ CREATE TABLE `user` (
   `pinyin_name` varchar(64) NOT NULL,
   `college_name` varchar(64) DEFAULT NULL,
   `group_id` int NOT NULL,
+  `hpc_user_id` int NOT NULL DEFAULT '0',
   `create_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -397,4 +415,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-28 16:46:03
+-- Dump completed on 2022-02-28 21:21:39
