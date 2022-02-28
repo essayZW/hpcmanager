@@ -23,17 +23,15 @@ message UserInfo {
 message GroupInfo {
     int32 id = 1;
     string name = 2;
-    string queueName = 3;
-    string nodeGroupName = 4;
-    int64 createTime = 5;
-    int32 createrID = 6;
-    string createrName = 7;
-    string createrUsername = 8;
-    int32 tutorID = 9;
-    string tutorName = 10;
-    string tutorUsername = 11;
-    double balance = 12;
-    string extraAttributes = 13;
+    int64 createTime = 3;
+    int32 createrID = 4;
+    string createrName = 5;
+    string createrUsername = 6;
+    int32 tutorID = 7;
+    string tutorName = 8;
+    string tutorUsername = 9;
+    double balance = 10;
+    string extraAttributes = 11;
 }
 
 // UserGroupApply 用户加入组申请记录信息

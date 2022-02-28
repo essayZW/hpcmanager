@@ -82,9 +82,9 @@ func (group *UserGroupDB) QueryByTutorUsername(ctx context.Context, username str
 // Insert 插入新的用户组记录
 func (group *UserGroupDB) Insert(ctx context.Context, groupInfo *Group) (int64, error) {
 	res, err := group.db.Exec(ctx, "INSERT INTO `group`"+
-		"(`name`, `queue_name`, `node_usergroup`, `create_time`, `creater_id`, `creater_username`, `creater_name`, `tutor_id`, `tutor_username`, `tutor_name`, `extraAttributes`)"+
-		"VALUES (?,?,?,?,?,?,?,?,?,?,?)", groupInfo.Name, groupInfo.QueueName, groupInfo.NodeUserGroupName,
-		groupInfo.CreateTime, groupInfo.CreaterID, groupInfo.CreaterUsername, groupInfo.CreaterName,
+		"(`hpc_group_id`, `name`, `create_time`, `creater_id`, `creater_username`, `creater_name`, `tutor_id`, `tutor_username`, `tutor_name`, `extraAttributes`)"+
+		"VALUES (?,?,?,?,?,?,?,?,?,?)", groupInfo.HpcGroupID, groupInfo.Name, groupInfo.CreateTime, groupInfo.CreaterID,
+		groupInfo.CreaterUsername, groupInfo.CreaterName,
 		groupInfo.TutorID, groupInfo.TutorUsername, groupInfo.TutorName, groupInfo.ExtraAttributes)
 	if err != nil {
 		logger.Warn("Insert group error: ", err)

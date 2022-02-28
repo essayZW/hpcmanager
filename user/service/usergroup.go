@@ -34,6 +34,7 @@ func (group *UserGroupService) Ping(ctx context.Context, req *publicpb.Empty, re
 
 // GetGroupInfoByID 查询用户组信息
 func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb.GetGroupInfoByIDRequest, resp *userpb.GetGroupInfoByIDResponse) error {
+	// TODO 添加对应的计算节点上的组信息
 	logger.Infof("GetGrouoInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
 		logger.Info("GetGroupInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
@@ -52,8 +53,6 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 	resp.GroupInfo = &userpb.GroupInfo{
 		Id:              int32(info.ID),
 		Name:            info.Name,
-		QueueName:       info.QueueName,
-		NodeGroupName:   info.NodeUserGroupName,
 		CreateTime:      info.CreateTime.Unix(),
 		CreaterID:       int32(info.CreaterID),
 		CreaterUsername: info.CreaterUsername,
@@ -71,6 +70,7 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 
 // PaginationGetGroupInfo 分页查询用户组基本信息
 func (group *UserGroupService) PaginationGetGroupInfo(ctx context.Context, req *userpb.PaginationGetGroupInfoRequest, resp *userpb.PaginationGetGroupInfoResponse) error {
+	// TODO 添加对应的计算节点上的组信息
 	logger.Infof("PaginationGetGroupInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
 		logger.Info("PaginationGetGroupInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
@@ -92,8 +92,6 @@ func (group *UserGroupService) PaginationGetGroupInfo(ctx context.Context, req *
 		resp.GroupInfos[index] = &userpb.GroupInfo{
 			Id:              int32(info.ID),
 			Name:            info.Name,
-			QueueName:       info.QueueName,
-			NodeGroupName:   info.NodeUserGroupName,
 			CreateTime:      info.CreateTime.Unix(),
 			CreaterID:       int32(info.CreaterID),
 			CreaterUsername: info.CreaterUsername,
@@ -251,13 +249,14 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 			return nil, err
 		}
 		// TODO 调用hpc服务添加对应的计算节点组
-		var nodeUserGroupName string
+		var hpcGroupID int
+
 		// 创建组信息
 		id, err := group.userGroupLogic.CreateGroup(c, &userdb.User{
 			ID:       int(req.BaseRequest.UserInfo.UserId),
 			Username: req.BaseRequest.UserInfo.Username,
 			Name:     req.BaseRequest.UserInfo.Name,
-		}, tutorInfo, req.Name, req.QueueName, nodeUserGroupName)
+		}, tutorInfo, req.Name, hpcGroupID)
 		if err != nil {
 			return nil, err
 		}
