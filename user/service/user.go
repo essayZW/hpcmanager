@@ -68,7 +68,7 @@ func (s *UserService) Login(ctx context.Context, req *userpb.LoginRequest, resp 
 
 // CheckLogin 检查用户登录状态，并返回登录用户的信息以及权限信息
 func (s *UserService) CheckLogin(ctx context.Context, req *userpb.CheckLoginRequest, resp *userpb.CheckLoginResponse) error {
-	logger.Infof("CheckLodin: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	logger.Infof("CheckLogin: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	// 通过token查询用户信息
 	info, err := s.userLogic.GetUserByToken(ctx, req.GetToken())
 	if err != nil {
