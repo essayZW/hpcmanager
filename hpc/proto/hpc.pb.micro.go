@@ -39,7 +39,7 @@ func NewHpcEndpoints() []*api.Endpoint {
 
 type HpcService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
-	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*CreateGroupResponse, error)
+	AddUserWithGroup(ctx context.Context, in *AddUserWithGroupRequest, opts ...client.CallOption) (*AddUserWithGroupResponse, error)
 }
 
 type hpcService struct {
@@ -64,9 +64,9 @@ func (c *hpcService) Ping(ctx context.Context, in *proto1.Empty, opts ...client.
 	return out, nil
 }
 
-func (c *hpcService) CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*CreateGroupResponse, error) {
-	req := c.c.NewRequest(c.name, "Hpc.CreateGroup", in)
-	out := new(CreateGroupResponse)
+func (c *hpcService) AddUserWithGroup(ctx context.Context, in *AddUserWithGroupRequest, opts ...client.CallOption) (*AddUserWithGroupResponse, error) {
+	req := c.c.NewRequest(c.name, "Hpc.AddUserWithGroup", in)
+	out := new(AddUserWithGroupResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -78,13 +78,13 @@ func (c *hpcService) CreateGroup(ctx context.Context, in *CreateGroupRequest, op
 
 type HpcHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
-	CreateGroup(context.Context, *CreateGroupRequest, *CreateGroupResponse) error
+	AddUserWithGroup(context.Context, *AddUserWithGroupRequest, *AddUserWithGroupResponse) error
 }
 
 func RegisterHpcHandler(s server.Server, hdlr HpcHandler, opts ...server.HandlerOption) error {
 	type hpc interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
-		CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error
+		AddUserWithGroup(ctx context.Context, in *AddUserWithGroupRequest, out *AddUserWithGroupResponse) error
 	}
 	type Hpc struct {
 		hpc
@@ -101,6 +101,6 @@ func (h *hpcHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1.Pin
 	return h.HpcHandler.Ping(ctx, in, out)
 }
 
-func (h *hpcHandler) CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error {
-	return h.HpcHandler.CreateGroup(ctx, in, out)
+func (h *hpcHandler) AddUserWithGroup(ctx context.Context, in *AddUserWithGroupRequest, out *AddUserWithGroupResponse) error {
+	return h.HpcHandler.AddUserWithGroup(ctx, in, out)
 }

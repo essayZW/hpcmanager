@@ -1,11 +1,16 @@
 package main
 
 import (
+	"flag"
+
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
 	"github.com/essayZW/hpcmanager/config"
+	"github.com/essayZW/hpcmanager/db"
+	hpcdb "github.com/essayZW/hpcmanager/hpc/db"
 	"github.com/essayZW/hpcmanager/hpc/logic"
 	hpcpb "github.com/essayZW/hpcmanager/hpc/proto"
 	"github.com/essayZW/hpcmanager/hpc/service"
+	"github.com/essayZW/hpcmanager/hpc/source"
 	"github.com/essayZW/hpcmanager/logger"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/registry"
@@ -16,6 +21,10 @@ func init() {
 }
 
 func main() {
+	var hpcCmdBaseDir string
+	flag.StringVar(&hpcCmdBaseDir, "cmdBaseDir", "", "used to found cmd file")
+	flag.Parse()
+
 	registryConf, err := config.LoadRegistry()
 	if err != nil {
 		logger.Fatal("load etcd config error: ", nil)
@@ -32,10 +41,10 @@ func main() {
 	serviceClient := srv.Client()
 
 	// 创建数据库连接
-	//sqlConn, err := db.NewDB()
-	//if err != nil {
-	//logger.Fatal("MySQL conn error: ", err)
-	//}
+	sqlConn, err := db.NewDB()
+	if err != nil {
+		logger.Fatal("MySQL conn error: ", err)
+	}
 	// 创建动态配置源
 	//etcdConfig, err := config.NewEtcd()
 	//if err != nil {
@@ -60,7 +69,11 @@ func main() {
 	//logger.Fatal("Redis ping get: ", ok)
 	//}
 
-	hpcLogic := logic.NewHpc()
+	hpcSource := source.New(
+		source.WithCmdBaseDir(hpcCmdBaseDir),
+	)
+
+	hpcLogic := logic.NewHpc(hpcSource, hpcdb.NewHpcUser(sqlConn), hpcdb.NewHpcGroup(sqlConn))
 
 	hpcService := service.NewHpc(serviceClient, hpcLogic)
 	hpcpb.RegisterHpcHandler(srv.Server(), hpcService)

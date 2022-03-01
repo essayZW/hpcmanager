@@ -8,15 +8,21 @@ import "gateway/proto/baserequest.proto";
 
 service Hpc {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
-    rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {}
+    rpc AddUserWithGroup(AddUserWithGroupRequest) returns (AddUserWithGroupResponse) {}
 }
 
-message CreateGroupRequest {
+message AddUserWithGroupRequest {
     request.BaseRequest baseRequest = 1;
-    string name = 2;
+    string tutorUsername = 2;
+    string groupName = 3;
+    string queueName = 4;
 }
 
-message CreateGroupResponse {
+message AddUserWithGroupResponse {
     string groupName = 1;
     int32 gid = 2;
+    string userName = 3;
+    int32 uid = 4;
+    int32 hpcGroupID = 5;
+    int32 hpcUserID = 6;
 }
