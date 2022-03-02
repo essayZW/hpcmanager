@@ -396,6 +396,32 @@ message CreateGroupResponse {
 }
 ```
 
+## JoinGroup
+
+描述：添加现有的没有i组的用户到一个组中
+
+需求权限：`CommonAdmin`及以上
+
+原型定义：`rpc JoinGroup(JoinGroupRequest) returns (JoinGroupResponse) {}`
+
+请求参数：
+
+```protobuf
+message JoinGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userID = 2;
+    int32 groupID = 3;
+}
+```
+
+响应参数：
+
+```protobuf
+message JoinGroupResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## UserInfo

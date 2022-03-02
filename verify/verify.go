@@ -24,6 +24,8 @@ const (
 	CheckJoinGroupApply = "__CHECK_JOIN_GROUP_APPLY__"
 	// CreateGroup 创建组
 	CreateGroup = "__CREATE_GROUP__"
+	// JoinGroup 用户加入某个组
+	JoinGroup = "__JOIN_GROUP__"
 )
 
 // Verify 进行操作的权限验证

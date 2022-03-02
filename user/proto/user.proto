@@ -96,8 +96,8 @@ message PaginationGetUserInfoResponse {
 
 message JoinGroupRequest {
     request.BaseRequest baseRequest = 1;
-    int32 userID = 1;
-    int32 groupID = 2;
+    int32 userID = 2;
+    int32 groupID = 3;
 }
 
 message JoinGroupResponse {

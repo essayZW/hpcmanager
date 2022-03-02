@@ -75,6 +75,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			// 需要普通管理员及以上权限
+			JoinGroup: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
 		},
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	hpcDB "github.com/essayZW/hpcmanager/db"
+	hpcpb "github.com/essayZW/hpcmanager/hpc/proto"
 	"github.com/essayZW/hpcmanager/logger"
 	permissionpb "github.com/essayZW/hpcmanager/permission/proto"
 	publicproto "github.com/essayZW/hpcmanager/proto"
@@ -20,7 +21,9 @@ import (
 // UserService 服务
 type UserService struct {
 	userLogic         *logic.User
+	groupLogic        *logic.UserGroup
 	permissionService permissionpb.PermissionService
+	hpcService        hpcpb.HpcService
 }
 
 // Ping 测试
@@ -263,13 +266,75 @@ func (s *UserService) PaginationGetUserInfo(ctx context.Context, req *userpb.Pag
 	return nil
 }
 
+// JoinGroup 将一个没有组的用户加入到一个已经存在的组中,并提升其权限为Common
+func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupRequest, resp *userpb.JoinGroupResponse) error {
+	logger.Infof("JoinGroup: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	if !verify.Identify(verify.GetUserInfo, req.GetBaseRequest().GetUserInfo().GetLevels()) {
+		logger.Info("JoinGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("JoinGroup permission forbidden")
+	}
+	_, err := hpcDB.Transication(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
+		// 验证用户不属于任何一个组
+		userInfo, err := s.userLogic.GetUserInfoByID(ctx, int(req.UserID))
+		if err != nil {
+			return nil, errors.New("user not exists")
+		}
+		if userInfo.GroupID != 0 {
+			return nil, errors.New("user already has a group")
+		}
+		// 查询组信息
+		groupInfo, err := s.groupLogic.GetGroupInfoByID(ctx, int(req.GroupID))
+		if err != nil {
+			return nil, errors.New("group not exists")
+		}
+
+		hpcResp, err := s.hpcService.AddUserToGroup(ctx, &hpcpb.AddUserToGroupRequest{
+			UserName:   userInfo.Username,
+			HpcGroupID: int32(groupInfo.HpcGroupID),
+		})
+		if err != nil {
+			return nil, err
+		}
+		err = s.userLogic.SetHpcUserID(ctx, userInfo.ID, int(hpcResp.HpcUserID))
+		if err != nil {
+			return nil, err
+		}
+		err = s.userLogic.ChangeUserGroup(ctx, userInfo.ID, groupInfo.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		// 删除原来的Guest权限
+		s.permissionService.RemoveUserPermission(ctx, &permissionpb.RemoveUserPermissionRequest{
+			Userid: int32(userInfo.ID),
+			Level:  int32(verify.Guest),
+		})
+		// 添加Common权限
+		addResp, err := s.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
+			Userid: int32(userInfo.ID),
+			Level:  int32(verify.Common),
+		})
+		if err != nil {
+			return nil, err
+		}
+		if !addResp.Success {
+			return nil, errors.New("add user permission error")
+		}
+		resp.Success = true
+		return nil, nil
+	})
+	return err
+}
+
 var _ userpb.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例
-func NewUser(client client.Client, userLogic *logic.User) *UserService {
+func NewUser(client client.Client, userLogic *logic.User, groupLogic *logic.UserGroup) *UserService {
 	permissionService := permissionpb.NewPermissionService("permission", client)
+	hpcService := hpcpb.NewHpcService("hpc", client)
 	return &UserService{
 		userLogic:         userLogic,
 		permissionService: permissionService,
+		hpcService:        hpcService,
 	}
 }
