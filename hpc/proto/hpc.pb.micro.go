@@ -40,6 +40,7 @@ func NewHpcEndpoints() []*api.Endpoint {
 type HpcService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
 	AddUserWithGroup(ctx context.Context, in *AddUserWithGroupRequest, opts ...client.CallOption) (*AddUserWithGroupResponse, error)
+	AddUserToGroup(ctx context.Context, in *AddUserToGroupRequest, opts ...client.CallOption) (*AddUserToGroupResponse, error)
 }
 
 type hpcService struct {
@@ -74,17 +75,29 @@ func (c *hpcService) AddUserWithGroup(ctx context.Context, in *AddUserWithGroupR
 	return out, nil
 }
 
+func (c *hpcService) AddUserToGroup(ctx context.Context, in *AddUserToGroupRequest, opts ...client.CallOption) (*AddUserToGroupResponse, error) {
+	req := c.c.NewRequest(c.name, "Hpc.AddUserToGroup", in)
+	out := new(AddUserToGroupResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Hpc service
 
 type HpcHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
 	AddUserWithGroup(context.Context, *AddUserWithGroupRequest, *AddUserWithGroupResponse) error
+	AddUserToGroup(context.Context, *AddUserToGroupRequest, *AddUserToGroupResponse) error
 }
 
 func RegisterHpcHandler(s server.Server, hdlr HpcHandler, opts ...server.HandlerOption) error {
 	type hpc interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
 		AddUserWithGroup(ctx context.Context, in *AddUserWithGroupRequest, out *AddUserWithGroupResponse) error
+		AddUserToGroup(ctx context.Context, in *AddUserToGroupRequest, out *AddUserToGroupResponse) error
 	}
 	type Hpc struct {
 		hpc
@@ -103,4 +116,8 @@ func (h *hpcHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1.Pin
 
 func (h *hpcHandler) AddUserWithGroup(ctx context.Context, in *AddUserWithGroupRequest, out *AddUserWithGroupResponse) error {
 	return h.HpcHandler.AddUserWithGroup(ctx, in, out)
+}
+
+func (h *hpcHandler) AddUserToGroup(ctx context.Context, in *AddUserToGroupRequest, out *AddUserToGroupResponse) error {
+	return h.HpcHandler.AddUserToGroup(ctx, in, out)
 }

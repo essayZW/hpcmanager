@@ -57,6 +57,9 @@ func (h *HpcService) AddUserWithGroup(ctx context.Context, req *hpcproto.AddUser
 			// NOTE 数据库数据更新失败,但是执行的脚本命令不可以恢复,需要联系管理员手动同步数据
 			return nil, err
 		}
+		resp.HpcGroupID = int32(hpcGroupID)
+		resp.GroupName = groupname
+		resp.Gid = int32(gid)
 		halfFlag := false
 		username, ok := data["uname"].(string)
 		if !ok {
@@ -78,12 +81,44 @@ func (h *HpcService) AddUserWithGroup(ctx context.Context, req *hpcproto.AddUser
 			// NOTE 数据库数据更新失败,但是执行的脚本命令不可以恢复,需要联系管理员手动同步数据
 			return nil, err
 		}
-		resp.HpcGroupID = int32(hpcGroupID)
 		resp.HpcUserID = int32(hpcUserID)
-		resp.GroupName = groupname
-		resp.Gid = int32(gid)
 		resp.UserName = username
 		resp.Uid = int32(uid)
+		return nil, nil
+	})
+	return err
+}
+
+// AddUserToGroup 添加用户到用户组
+func (h *HpcService) AddUserToGroup(ctx context.Context, req *hpcproto.AddUserToGroupRequest, resp *hpcproto.AddUserToGroupResponse) error {
+	logger.Infof("AddUserToGroup : %v", req.BaseRequest)
+	// 鉴权
+	if !verify.Identify(verify.AddUserAction, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("AddUserToGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("AddUserToGroup permission forbidden")
+	}
+	_, err := db.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		data, err := h.hpcLogic.AddUserToGroup(c, req.UserName, req.GroupName, int(req.Gid))
+		if err != nil {
+			return nil, err
+		}
+		username, ok := data["uname"].(string)
+		if !ok {
+			logger.Warn("AddUserToGroup error: error response data: ", err)
+			return nil, errors.New("error response data from source")
+		}
+		uid, ok := data["uid"].(int)
+		if !ok {
+			logger.Warn("AddUserToGroup error: error response data: ", err)
+			return nil, errors.New("error response data from source")
+		}
+		userID, err := h.hpcLogic.CreateUser(c, username, uid)
+		if err != nil {
+			return nil, err
+		}
+		resp.HpcUserID = int32(userID)
+		resp.Uid = int32(uid)
+		resp.UserName = username
 		return nil, nil
 	})
 	return err

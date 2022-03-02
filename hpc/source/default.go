@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os/exec"
 	"path"
+	"strconv"
 	"time"
 )
 
@@ -15,7 +16,7 @@ type defaultSource struct {
 }
 
 func (source *defaultSource) AddUserToGroup(userName, groupName string, gid int) (map[string]interface{}, error) {
-	return nil, nil
+	return source.timeoutExec("php", "useradd.php", "--user", userName, "--group", groupName, "--gid", strconv.Itoa(gid))
 }
 
 func (source *defaultSource) AddUserWithGroup(userName, groupName string) (map[string]interface{}, error) {

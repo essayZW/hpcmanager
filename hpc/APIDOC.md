@@ -54,3 +54,30 @@ message AddUserWithGroupResponse {
     int32 hpcUserID = 6;
 }
 ```
+
+## AddUserToGroup
+
+描述：创建一个新用户并添加到一个已经存在的用户组中
+
+原型定义：`rpc AddUserToGroup(AddUserToGroupRequest) returns (AddUserToGroupResponse) {}`
+
+请求参数：
+
+```protobuf
+message AddUserToGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    string userName = 2;
+    string groupName = 3;
+    int32 gid = 4;
+}
+```
+
+响应参数：
+
+```protobuf
+message AddUserToGroupResponse {
+    int32 hpcUserID = 1;
+    string userName = 2;
+    int32 uid = 3;
+}
+```

@@ -20,6 +20,9 @@ type HpcLogic struct {
 // AddUserWithGroup 创建组并添加用户到组
 func (hpc *HpcLogic) AddUserWithGroup(ctx context.Context, username, groupname string) (map[string]interface{}, error) {
 	res, err := hpc.hpcSource.AddUserWithGroup(username, groupname)
+	if err != nil {
+		return nil, err
+	}
 	success := res["success"]
 	var status string
 	status, ok := success.(string)
@@ -46,6 +49,38 @@ func (hpc *HpcLogic) AddUserWithGroup(ctx context.Context, username, groupname s
 	default:
 		logger.Warn("AddUserWithGroup error: ", err)
 		return nil, fmt.Errorf("AddUserWithGroup error with error %s", err.Error())
+	}
+}
+
+// AddUserToGroup 添加用户到现有的用户组中
+func (hpc *HpcLogic) AddUserToGroup(ctx context.Context, username, groupname string, gid int) (map[string]interface{}, error) {
+	res, err := hpc.hpcSource.AddUserToGroup(username, groupname, gid)
+	if err != nil {
+		return nil, err
+	}
+	success := res["success"]
+	var status string
+	status, ok := success.(string)
+	if !ok {
+		logger.Warn("AddUserToGroup error: ", err)
+		return nil, fmt.Errorf("AddUserToGroup error with error %s", err.Error())
+	}
+	switch status {
+	case "true":
+		data, ok := res["data"]
+		if !ok {
+			logger.Warn("AddUserToGroup error: ", err)
+			return nil, fmt.Errorf("AddUserToGroup error with error %s", err.Error())
+		}
+		mapData, ok := data.(map[string]interface{})
+		if !ok {
+			logger.Warn("AddUserToGroup error: ", err)
+			return nil, fmt.Errorf("AddUserToGroup error with error %s", err.Error())
+		}
+		return mapData, nil
+	default:
+		logger.Warn("AddUserToGroup error: ", err)
+		return nil, fmt.Errorf("AddUserToGroup error with error %s", err.Error())
 	}
 }
 
