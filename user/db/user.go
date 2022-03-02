@@ -45,8 +45,10 @@ func (db *UserDB) QueryByUsername(ctx context.Context, username string) (*User, 
 // InsertUser 插入新的用户
 func (db *UserDB) InsertUser(ctx context.Context, userinfo *User) (int, error) {
 	result, err := db.conn.Exec(ctx, "INSERT INTO `user`"+
-		"(`username`, `password`, `tel`, `email`, `name`, `pinyin_name`, `college_name`, `group_id`, `create_time`, `extraAttributes`)"+
-		"VALUES (?,?,?,?,?,?,?,?,?,?)", userinfo.Username, userinfo.Password, userinfo.Tel, userinfo.Email, userinfo.Name, userinfo.PinyinName, userinfo.CollegeName, userinfo.GroupID, userinfo.CreateTime, userinfo.ExtraAttributes)
+		"(`username`, `password`, `tel`, `email`, `name`, `pinyin_name`, `college_name`, `group_id`, `hpc_user_id`, `create_time`, `extraAttributes`)"+
+		"VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+		userinfo.Username, userinfo.Password, userinfo.Tel, userinfo.Email, userinfo.Name, userinfo.PinyinName,
+		userinfo.CollegeName, userinfo.GroupID, userinfo.HpcUserID, userinfo.CreateTime, userinfo.ExtraAttributes)
 	if err != nil {
 		return 0, err
 	}

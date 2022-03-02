@@ -116,30 +116,32 @@ func (s *UserService) AddUser(ctx context.Context, req *userpb.AddUserRequest, r
 		logger.Info("Adduser permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("Adduser permission forbidden")
 	}
-	extraAttributes, err := hpcDB.NewJSON(req.UserInfo.GetExtraAttributes())
-	if err != nil {
-		return fmt.Errorf("Parse extraAttributes error: %v", err)
-	}
-	addedUserInfo := &db.User{
-		Username:        req.UserInfo.GetUsername(),
-		Password:        req.UserInfo.GetPassword(),
-		Tel:             req.UserInfo.GetTel(),
-		Email:           req.UserInfo.GetEmail(),
-		Name:            req.UserInfo.GetName(),
-		PinyinName:      req.UserInfo.GetPyName(),
-		CollegeName:     req.UserInfo.GetCollege(),
-		GroupID:         int(req.UserInfo.GetGroupId()),
-		CreateTime:      time.Now(),
-		ExtraAttributes: extraAttributes,
-	}
-	_, err = hpcDB.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+	_, err := hpcDB.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		// TODO 调用hpc服务添加机器上的节点用户
+		var hpcUserID int
+
+		extraAttributes, err := hpcDB.NewJSON(req.UserInfo.GetExtraAttributes())
+		if err != nil {
+			return nil, fmt.Errorf("Parse extraAttributes error: %v", err)
+		}
+		addedUserInfo := &db.User{
+			Username:        req.UserInfo.GetUsername(),
+			Password:        req.UserInfo.GetPassword(),
+			Tel:             req.UserInfo.GetTel(),
+			Email:           req.UserInfo.GetEmail(),
+			Name:            req.UserInfo.GetName(),
+			PinyinName:      req.UserInfo.GetPyName(),
+			CollegeName:     req.UserInfo.GetCollege(),
+			GroupID:         int(req.UserInfo.GetGroupId()),
+			HpcUserID:       hpcUserID,
+			CreateTime:      time.Now(),
+			ExtraAttributes: extraAttributes,
+		}
 		id, err := s.userLogic.AddUser(c, addedUserInfo)
 		if err != nil {
 			return nil, fmt.Errorf("Adduser error: %v", err)
 		}
 		resp.Userid = int32(id)
-		// TODO 调用hpc服务添加机器上的节点用户
-		// TODO 同步添加hpc_user表信息
 		// 添加新用户默认权限信息
 		addResp, err := s.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
 			Userid: int32(id),
@@ -207,6 +209,7 @@ func (s *UserService) GetUserInfo(ctx context.Context, req *userpb.GetUserInfoRe
 		PyName:     userInfo.PinyinName,
 		College:    userInfo.CollegeName,
 		CreateTime: userInfo.CreateTime.Unix(),
+		HpcUserID:  int32(userInfo.HpcUserID),
 	}
 	if userInfo.ExtraAttributes != nil {
 		resp.UserInfo.ExtraAttributes = userInfo.ExtraAttributes.String()
@@ -252,6 +255,7 @@ func (s *UserService) PaginationGetUserInfo(ctx context.Context, req *userpb.Pag
 			PyName:     userInfo.PinyinName,
 			College:    userInfo.CollegeName,
 			CreateTime: userInfo.CreateTime.Unix(),
+			HpcUserID:  int32(userInfo.HpcUserID),
 		}
 		if userInfo.ExtraAttributes != nil {
 			resp.UserInfos[index].ExtraAttributes = userInfo.ExtraAttributes.String()

@@ -52,8 +52,6 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 	resp.GroupInfo = &userpb.GroupInfo{
 		Id:              int32(info.ID),
 		Name:            info.Name,
-		QueueName:       info.QueueName,
-		NodeGroupName:   info.NodeUserGroupName,
 		CreateTime:      info.CreateTime.Unix(),
 		CreaterID:       int32(info.CreaterID),
 		CreaterUsername: info.CreaterUsername,
@@ -62,6 +60,7 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 		TutorUsername:   info.TutorUsername,
 		TutorName:       info.TutorName,
 		Balance:         info.Balance,
+		HpcGroupID:      int32(info.HpcGroupID),
 	}
 	if info.ExtraAttributes != nil {
 		resp.GroupInfo.ExtraAttributes = info.ExtraAttributes.String()
@@ -92,8 +91,6 @@ func (group *UserGroupService) PaginationGetGroupInfo(ctx context.Context, req *
 		resp.GroupInfos[index] = &userpb.GroupInfo{
 			Id:              int32(info.ID),
 			Name:            info.Name,
-			QueueName:       info.QueueName,
-			NodeGroupName:   info.NodeUserGroupName,
 			CreateTime:      info.CreateTime.Unix(),
 			CreaterID:       int32(info.CreaterID),
 			CreaterUsername: info.CreaterUsername,
@@ -102,6 +99,7 @@ func (group *UserGroupService) PaginationGetGroupInfo(ctx context.Context, req *
 			TutorUsername:   info.TutorUsername,
 			TutorName:       info.TutorName,
 			Balance:         info.Balance,
+			HpcGroupID:      int32(info.HpcGroupID),
 		}
 		if info.ExtraAttributes != nil {
 			resp.GroupInfos[index].ExtraAttributes = info.ExtraAttributes.String()
@@ -251,13 +249,14 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 			return nil, err
 		}
 		// TODO 调用hpc服务添加对应的计算节点组
-		var nodeUserGroupName string
+		var hpcGroupID int
+
 		// 创建组信息
 		id, err := group.userGroupLogic.CreateGroup(c, &userdb.User{
 			ID:       int(req.BaseRequest.UserInfo.UserId),
 			Username: req.BaseRequest.UserInfo.Username,
 			Name:     req.BaseRequest.UserInfo.Name,
-		}, tutorInfo, req.Name, req.QueueName, nodeUserGroupName)
+		}, tutorInfo, req.Name, hpcGroupID)
 		if err != nil {
 			return nil, err
 		}
