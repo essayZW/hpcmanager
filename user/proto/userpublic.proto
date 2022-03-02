@@ -17,6 +17,7 @@ message UserInfo {
     int32 groupId = 9;
     int64 createTime = 10;
     string extraAttributes = 11;
+    int32 hpcUserID = 12;
 }
 
 // GroupInfo 用户组基本信息
@@ -32,6 +33,7 @@ message GroupInfo {
     string tutorUsername = 9;
     double balance = 10;
     string extraAttributes = 11;
+    int32 hpcGroupID = 12;
 }
 
 // UserGroupApply 用户加入组申请记录信息

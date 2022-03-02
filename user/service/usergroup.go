@@ -34,7 +34,6 @@ func (group *UserGroupService) Ping(ctx context.Context, req *publicpb.Empty, re
 
 // GetGroupInfoByID 查询用户组信息
 func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb.GetGroupInfoByIDRequest, resp *userpb.GetGroupInfoByIDResponse) error {
-	// TODO 添加对应的计算节点上的组信息
 	logger.Infof("GetGrouoInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
 		logger.Info("GetGroupInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
@@ -61,6 +60,7 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 		TutorUsername:   info.TutorUsername,
 		TutorName:       info.TutorName,
 		Balance:         info.Balance,
+		HpcGroupID:      int32(info.HpcGroupID),
 	}
 	if info.ExtraAttributes != nil {
 		resp.GroupInfo.ExtraAttributes = info.ExtraAttributes.String()
@@ -70,7 +70,6 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 
 // PaginationGetGroupInfo 分页查询用户组基本信息
 func (group *UserGroupService) PaginationGetGroupInfo(ctx context.Context, req *userpb.PaginationGetGroupInfoRequest, resp *userpb.PaginationGetGroupInfoResponse) error {
-	// TODO 添加对应的计算节点上的组信息
 	logger.Infof("PaginationGetGroupInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
 		logger.Info("PaginationGetGroupInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
@@ -100,6 +99,7 @@ func (group *UserGroupService) PaginationGetGroupInfo(ctx context.Context, req *
 			TutorUsername:   info.TutorUsername,
 			TutorName:       info.TutorName,
 			Balance:         info.Balance,
+			HpcGroupID:      int32(info.HpcGroupID),
 		}
 		if info.ExtraAttributes != nil {
 			resp.GroupInfos[index].ExtraAttributes = info.ExtraAttributes.String()

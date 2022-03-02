@@ -176,7 +176,6 @@ func (s *UserService) CreateToken(ctx context.Context, req *userpb.CreateTokenRe
 
 // GetUserInfo 查询用户详细信息
 func (s *UserService) GetUserInfo(ctx context.Context, req *userpb.GetUserInfoRequest, resp *userpb.GetUserInfoResponse) error {
-	// TODO 添加对应的计算节点上的用户信息
 	logger.Infof("GetUserInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	if !verify.Identify(verify.GetUserInfo, req.GetBaseRequest().GetUserInfo().GetLevels()) {
 		logger.Info("GetUserInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
@@ -210,6 +209,7 @@ func (s *UserService) GetUserInfo(ctx context.Context, req *userpb.GetUserInfoRe
 		PyName:     userInfo.PinyinName,
 		College:    userInfo.CollegeName,
 		CreateTime: userInfo.CreateTime.Unix(),
+		HpcUserID:  int32(userInfo.HpcUserID),
 	}
 	if userInfo.ExtraAttributes != nil {
 		resp.UserInfo.ExtraAttributes = userInfo.ExtraAttributes.String()
@@ -219,7 +219,6 @@ func (s *UserService) GetUserInfo(ctx context.Context, req *userpb.GetUserInfoRe
 
 // PaginationGetUserInfo 分页查询用户信息
 func (s *UserService) PaginationGetUserInfo(ctx context.Context, req *userpb.PaginationGetUserInfoRequest, resp *userpb.PaginationGetUserInfoResponse) error {
-	// TODO 添加对应的计算节点上的用户信息
 	logger.Infof("PaginationGetUserInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	if !verify.Identify(verify.GetUserInfo, req.GetBaseRequest().GetUserInfo().GetLevels()) {
 		logger.Info("PaginationGetUserInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
@@ -256,6 +255,7 @@ func (s *UserService) PaginationGetUserInfo(ctx context.Context, req *userpb.Pag
 			PyName:     userInfo.PinyinName,
 			College:    userInfo.CollegeName,
 			CreateTime: userInfo.CreateTime.Unix(),
+			HpcUserID:  int32(userInfo.HpcUserID),
 		}
 		if userInfo.ExtraAttributes != nil {
 			resp.UserInfos[index].ExtraAttributes = userInfo.ExtraAttributes.String()
