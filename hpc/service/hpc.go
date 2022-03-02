@@ -98,7 +98,11 @@ func (h *HpcService) AddUserToGroup(ctx context.Context, req *hpcproto.AddUserTo
 		return errors.New("AddUserToGroup permission forbidden")
 	}
 	_, err := db.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
-		data, err := h.hpcLogic.AddUserToGroup(c, req.UserName, req.GroupName, int(req.Gid))
+		groupInfo, err := h.hpcLogic.GetGroupInfoByID(c, int(req.HpcGroupID))
+		if err != nil {
+			return nil, errors.New("invalid hpc group id")
+		}
+		data, err := h.hpcLogic.AddUserToGroup(c, req.UserName, groupInfo.Name, groupInfo.GID)
 		if err != nil {
 			return nil, err
 		}

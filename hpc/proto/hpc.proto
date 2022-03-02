@@ -31,8 +31,7 @@ message AddUserWithGroupResponse {
 message AddUserToGroupRequest {
     request.BaseRequest baseRequest = 1;
     string userName = 2;
-    string groupName = 3;
-    int32 gid = 4;
+    int32 hpcGroupID = 3;
 }
 
 message AddUserToGroupResponse {

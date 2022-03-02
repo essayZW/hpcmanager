@@ -30,6 +30,22 @@ func (hpc *HpcGroupDB) Insert(ctx context.Context, data *HpcGroup) (int64, error
 	return id, nil
 }
 
+// QueryByID 通过ID查询记录
+func (hpc *HpcGroupDB) QueryByID(ctx context.Context, id int) (*HpcGroup, error) {
+	res, err := hpc.conn.QueryRow(ctx, "SELECT * FROM `hpc_group` WHERE `id`=?", id)
+	if err != nil {
+		logger.Warn("QueryByID error: ", err)
+		return nil, errors.New("QueryByID error")
+	}
+	var info HpcGroup
+	err = res.StructScan(&info)
+	if err != nil {
+		logger.Warn("QueryByID structScan error: ", err)
+		return nil, errors.New("QueryByID structScan error")
+	}
+	return &info, nil
+}
+
 // NewHpcGroup 创建新的NewHpcGroup结构体并返回指针
 func NewHpcGroup(db *db.DB) *HpcGroupDB {
 	return &HpcGroupDB{
