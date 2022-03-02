@@ -165,6 +165,11 @@ func (u *User) ChangeUserGroup(ctx context.Context, userID int, groupID int) err
 	return u.userDB.UpdateUserGroup(ctx, userID, groupID)
 }
 
+// SetHpcUserID 设置用户对应的计算节点上的用户信息表的ID
+func (u *User) SetHpcUserID(ctx context.Context, userID, hpcUserID int) error {
+	return u.userDB.UpdateHpcUserID(ctx, userID, hpcUserID)
+}
+
 // NewUser 创建一个新的userLogic
 func NewUser(db *db.UserDB, configConn config.DynamicConfig, redisConn *redis.Client) *User {
 	user := &User{

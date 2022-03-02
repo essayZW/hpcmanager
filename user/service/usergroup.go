@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/essayZW/hpcmanager/db"
+	hpcpb "github.com/essayZW/hpcmanager/hpc/proto"
 	"github.com/essayZW/hpcmanager/logger"
 	permissionpb "github.com/essayZW/hpcmanager/permission/proto"
 	publicpb "github.com/essayZW/hpcmanager/proto"
@@ -21,6 +22,7 @@ type UserGroupService struct {
 	userLogic      *logic.User
 
 	permissionService permissionpb.PermissionService
+	hpcService        hpcpb.HpcService
 }
 
 // Ping 用户组服务ping测试
@@ -231,7 +233,7 @@ func (group *UserGroupService) CheckApply(ctx context.Context, req *userpb.Check
 	return nil
 }
 
-// CreateGroup 创建新的用户组
+// CreateGroup 创建新的用户组并将用户设置为新组的导师
 func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.CreateGroupRequest, resp *userpb.CreateGroupResponse) error {
 	logger.Infof("CreateGroup: %v||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	if !verify.Identify(verify.CreateGroup, req.BaseRequest.UserInfo.Levels) {
@@ -242,21 +244,35 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 	if verify.IsTutor(req.BaseRequest.UserInfo.Levels) {
 		return errors.New("this user already is other group's tutor")
 	}
-	idInterface, err := db.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+	idInterface, err := db.Transication(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
 		// 查询分配的导师信息
 		tutorInfo, err := group.userLogic.GetUserInfoByID(c, int(req.TutorID))
 		if err != nil {
 			return nil, err
 		}
-		// TODO 调用hpc服务添加对应的计算节点组
-		var hpcGroupID int
+		// 调用hpc服务添加对应的计算节点组
+		hpcResp, err := group.hpcService.AddUserWithGroup(c, &hpcpb.AddUserWithGroupRequest{
+			TutorUsername: tutorInfo.Username,
+			GroupName:     tutorInfo.Username,
+			// TODO 私有队列名字待定
+			QueueName:   "QUEUE_" + tutorInfo.Username,
+			BaseRequest: req.BaseRequest,
+		})
+		if err != nil {
+			return nil, err
+		}
 
 		// 创建组信息
 		id, err := group.userGroupLogic.CreateGroup(c, &userdb.User{
 			ID:       int(req.BaseRequest.UserInfo.UserId),
 			Username: req.BaseRequest.UserInfo.Username,
 			Name:     req.BaseRequest.UserInfo.Name,
-		}, tutorInfo, req.Name, hpcGroupID)
+		}, tutorInfo, req.Name, int(hpcResp.HpcGroupID))
+		if err != nil {
+			return nil, err
+		}
+		// 修改导师用户关联的hpc_user表ID
+		err = group.userLogic.SetHpcUserID(c, tutorInfo.ID, int(hpcResp.HpcUserID))
 		if err != nil {
 			return nil, err
 		}
@@ -265,15 +281,23 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 		if err != nil {
 			return nil, err
 		}
+		// 删除该用户原来的Guest权限
+		// NOTE 删除不管是否删除成功,若存在则会删除成功,不存在则忽略删除失败的错误消息
+		group.permissionService.RemoveUserPermission(ctx, &permissionpb.RemoveUserPermissionRequest{
+			Userid:      int32(tutorInfo.ID),
+			Level:       int32(verify.Guest),
+			BaseRequest: req.BaseRequest,
+		})
 		// 添加权限记录
-		resp, err := group.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
-			Userid: int32(tutorInfo.ID),
-			Level:  int32(verify.Tutor),
+		addresp, err := group.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
+			Userid:      int32(tutorInfo.ID),
+			Level:       int32(verify.Tutor),
+			BaseRequest: req.BaseRequest,
 		})
 		if err != nil {
 			return nil, err
 		}
-		if !resp.Success {
+		if !addresp.Success {
 			return nil, errors.New("user permission create error")
 		}
 		return id, nil
@@ -298,5 +322,6 @@ func NewGroup(client client.Client, userGroupLogic *logic.UserGroup, userLogic *
 		userGroupLogic:    userGroupLogic,
 		userLogic:         userLogic,
 		permissionService: permissionpb.NewPermissionService("permission", client),
+		hpcService:        hpcpb.NewHpcService("hpc", client),
 	}
 }

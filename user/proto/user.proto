@@ -18,6 +18,7 @@ service User {
     rpc CreateToken(CreateTokenRequest) returns (CreateTokenResponse) {}
     rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse) {}
     rpc PaginationGetUserInfo(PaginationGetUserInfoRequest) returns (PaginationGetUserInfoResponse) {}
+    rpc JoinGroup(JoinGroupRequest) returns (JoinGroupResponse) {}
 }
 
 message LoginRequest {
@@ -91,4 +92,14 @@ message PaginationGetUserInfoRequest {
 message PaginationGetUserInfoResponse {
     repeated user.UserInfo userInfos = 1;
     int32 count = 2;
+}
+
+message JoinGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userID = 1;
+    int32 groupID = 2;
+}
+
+message JoinGroupResponse {
+    bool success = 1;
 }

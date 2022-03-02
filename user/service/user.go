@@ -117,9 +117,6 @@ func (s *UserService) AddUser(ctx context.Context, req *userpb.AddUserRequest, r
 		return errors.New("Adduser permission forbidden")
 	}
 	_, err := hpcDB.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
-		// TODO 调用hpc服务添加机器上的节点用户
-		var hpcUserID int
-
 		extraAttributes, err := hpcDB.NewJSON(req.UserInfo.GetExtraAttributes())
 		if err != nil {
 			return nil, fmt.Errorf("Parse extraAttributes error: %v", err)
@@ -133,7 +130,7 @@ func (s *UserService) AddUser(ctx context.Context, req *userpb.AddUserRequest, r
 			PinyinName:      req.UserInfo.GetPyName(),
 			CollegeName:     req.UserInfo.GetCollege(),
 			GroupID:         int(req.UserInfo.GetGroupId()),
-			HpcUserID:       hpcUserID,
+			HpcUserID:       0,
 			CreateTime:      time.Now(),
 			ExtraAttributes: extraAttributes,
 		}
@@ -143,9 +140,11 @@ func (s *UserService) AddUser(ctx context.Context, req *userpb.AddUserRequest, r
 		}
 		resp.Userid = int32(id)
 		// 添加新用户默认权限信息
+		// 新建立的用户默认没有组因此只有Guest权限
 		addResp, err := s.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
-			Userid: int32(id),
-			Level:  int32(verify.Common),
+			Userid:      int32(id),
+			Level:       int32(verify.Guest),
+			BaseRequest: req.BaseRequest,
 		})
 		if err != nil || !addResp.Success {
 			return nil, fmt.Errorf("Init user permission info error: %v", err)

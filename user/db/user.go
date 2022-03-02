@@ -134,6 +134,20 @@ func (db *UserDB) UpdateUserGroup(ctx context.Context, userID, groupID int) erro
 	return nil
 }
 
+// UpdateHpcUserID 更新用户关联的hpc_user的ID
+func (db *UserDB) UpdateHpcUserID(ctx context.Context, userID, hpcUserID int) error {
+	res, err := db.conn.Exec(ctx, "UPDATE `user` SET `hpc_user_id`=? WHERE `id`=?", hpcUserID, userID)
+	if err != nil {
+		logger.Warn("UpdateHpcUserID error: ", err)
+		return errors.New("UpdateHpcUserID: update error")
+	}
+	_, err = res.RowsAffected()
+	if err != nil {
+		return errors.New("UpdateHpcUserID: update error")
+	}
+	return nil
+}
+
 // NewUser 创建一个新的操作用户数据库结构体
 func NewUser(db *db.DB) *UserDB {
 	return &UserDB{
