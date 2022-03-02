@@ -414,7 +414,9 @@ message UserInfo {
     string pyName = 7;
     string college = 8;
     int32 groupId = 9;
-    int32 createTime = 10;
+    int64 createTime = 10;
+    string extraAttributes = 11;
+    int32 hpcUserID = 12;
 }
 ```
 
@@ -427,17 +429,46 @@ message UserInfo {
 message GroupInfo {
     int32 id = 1;
     string name = 2;
-    string queueName = 3;
-    string nodeGroupName = 4;
-    int64 createTime = 5;
-    int32 createrID = 6;
-    string createrName = 7;
-    string createrUsername = 8;
-    int32 tutorID = 9;
-    string tutorName = 10;
-    string tutorUsername = 11;
-    double balance = 12;
-    string extraAttributes = 13;
+    int64 createTime = 3;
+    int32 createrID = 4;
+    string createrName = 5;
+    string createrUsername = 6;
+    int32 tutorID = 7;
+    string tutorName = 8;
+    string tutorUsername = 9;
+    double balance = 10;
+    string extraAttributes = 11;
+    int32 hpcGroupID = 12;
+}
+```
+
+## UserGroupApply
+
+描述：group申请相关的信息
+
+```protobuf
+// UserGroupApply 用户加入组申请记录信息
+message UserGroupApply {
+    int32 id = 1;
+    int32 userID = 2;
+    string userUsername = 3;
+    string userName = 4;
+    int32 applyGroupID = 5;
+    int32 tutorID = 6;
+    string tutorUsername = 7;
+    string tutorName = 8;
+    int32 tutorCheckStatus = 9;
+    int32 managerCheckStatus = 10;
+    int32 status = 11;
+    string messageTutor = 12;
+    string messageManager = 13;
+    int64 tutorCheckTime = 14;
+    int64 managerCheckTime = 15;
+    int32 managerCheckerID = 16;
+    string managerCheckerUsername = 17;
+    string managerCheckerName = 18;
+    int64 createTime = 19;
+    string extraAttributes = 20;
 }
 ```
 
