@@ -240,28 +240,26 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 		logger.Info("CreateGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("CreateGroup permission forbidden")
 	}
-	// 验证该导师用户不能是其他组的导师
-	if verify.IsTutor(req.BaseRequest.UserInfo.Levels) {
-		return errors.New("this user already is other group's tutor")
-	}
 	idInterface, err := db.Transication(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
-		// 查询分配的导师信息
+		// 查询新组的新导师的信息
 		tutorInfo, err := group.userLogic.GetUserInfoByID(c, int(req.TutorID))
 		if err != nil {
 			return nil, err
 		}
+		// 新的导师必须是不属于任何组的一个新用户
+		if tutorInfo.GroupID != 0 {
+			return nil, errors.New("this user has in a group")
+		}
 		// 调用hpc服务添加对应的计算节点组
 		hpcResp, err := group.hpcService.AddUserWithGroup(c, &hpcpb.AddUserWithGroupRequest{
 			TutorUsername: tutorInfo.Username,
-			GroupName:     tutorInfo.Username,
-			// TODO 私有队列名字待定
-			QueueName:   "QUEUE_" + tutorInfo.Username,
-			BaseRequest: req.BaseRequest,
+			GroupName:     req.Name,
+			QueueName:     req.QueueName,
+			BaseRequest:   req.BaseRequest,
 		})
 		if err != nil {
 			return nil, err
 		}
-
 		// 创建组信息
 		id, err := group.userGroupLogic.CreateGroup(c, &userdb.User{
 			ID:       int(req.BaseRequest.UserInfo.UserId),
