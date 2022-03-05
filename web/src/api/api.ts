@@ -19,12 +19,12 @@ export const ApiBaseURL = '/api';
 export const accessTokenKey = 'ACCESS_TOKEN';
 
 export class ApiRequest {
-  static async request(
+  static async request<T>(
     url: string,
     method: Method,
     param: Record<string, unknown>,
     body: Record<string, unknown>
-  ): Promise<HTTPResponse<unknown>> {
+  ): Promise<HTTPResponse<T>> {
     try {
       // 获取access_token
       const accessToken = localStorage.getItem(accessTokenKey);
@@ -43,7 +43,7 @@ export class ApiRequest {
           ...body,
         },
       });
-      const responseData = data as HTTPResponse<unknown>;
+      const responseData = data as HTTPResponse<T>;
       if (responseData.code < 200 || responseData.code > 300) {
         // http code 错误
         throw new Error(`response code ${responseData.code} error`);
