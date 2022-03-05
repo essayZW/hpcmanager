@@ -16,10 +16,6 @@ export default defineConfig({
     }),
   ],
   build: {
-    rollupOptions: {
-      output: {
-        dir: '../proxy/build/web',
-      },
-    },
+    outDir: '../proxy/build/web',
   },
 });

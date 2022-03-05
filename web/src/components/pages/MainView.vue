@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import LogoImageSrc from '../assets/logo.png';
+import LogoImageSrc from '../../assets/logo.png';
 </script>
 <template>
   <el-container>
