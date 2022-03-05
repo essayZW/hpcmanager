@@ -22,8 +22,8 @@ export class ApiRequest {
   static async request<T>(
     url: string,
     method: Method,
-    param: Record<string, unknown>,
-    body: Record<string, unknown>
+    param: Record<string, unknown> = {},
+    body: Record<string, unknown> = {}
   ): Promise<HTTPResponse<T>> {
     try {
       // 获取access_token

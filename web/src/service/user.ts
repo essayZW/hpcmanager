@@ -22,12 +22,7 @@ export interface LoginUserInfo {
 // 判断用户是否已经登录,如果已经登录,返回登录的用户的信息
 export async function IsLogin(): Promise<LoginUserInfo | null> {
   try {
-    const { status, data } = await ApiRequest.request(
-      '/user/token',
-      'GET',
-      {},
-      {}
-    );
+    const { status, data } = await ApiRequest.request('/user/token', 'GET');
     if (!status) {
       return null;
     }
