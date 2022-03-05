@@ -107,3 +107,13 @@ interface CreateUserParam {
 ```
 
 响应：无
+
+### /sys/install
+
+Method: GET
+
+描述：查询系统是否已经初始化
+
+参数：无
+
+响应：states表明是否已经初始化

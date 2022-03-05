@@ -119,6 +119,12 @@ func (sys *System) initPermision(ctx context.Context, baseReq *gatewaypb.BaseReq
 	return true
 }
 
+func (sys *System) isInstall(ctx *gin.Context) {
+	status := utils.IsInstall(sys.redisConn)
+	resp := response.New(200, nil, status, "query success")
+	resp.Send(ctx)
+}
+
 // Registry 注册system控制器的相关函数
 func (sys *System) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller System")
@@ -126,6 +132,8 @@ func (sys *System) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	sysRouter.POST("/install", sys.install)
 	middleware.RegistryExcludeAPIPath("POST:/api/sys/install")
+	sysRouter.GET("/install", sys.isInstall)
+	middleware.RegistryExcludeAPIPath("GET:/api/sys/install")
 	return sysRouter
 }
 
