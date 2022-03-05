@@ -48,12 +48,6 @@ export class ApiRequest {
         // http code 错误
         throw new Error(`response code ${responseData.code} error`);
       }
-      if (!responseData.status) {
-        // 接口操作失败
-        throw new Error(
-          `response status is false, message: ${responseData.message}`
-        );
-      }
       return responseData;
     } catch (error) {
       console.error(`http request fail: ${error}`);
