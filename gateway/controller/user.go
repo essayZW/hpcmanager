@@ -39,7 +39,7 @@ func (user *User) ping(ctx *gin.Context) {
 func (user *User) login(ctx *gin.Context) {
 	var params jsonparam.Login
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		rep := response.New(500, err, false, "username or password validate error")
+		rep := response.New(500, err.Error(), false, "username or password validate error")
 		rep.Send(ctx)
 		return
 	}

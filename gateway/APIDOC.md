@@ -24,10 +24,10 @@ Method: POST
 
 参数：
 
-```json
-{
-    "username": "",
-    "password": ""
+```typescript
+interface Login {
+    "username": string,
+    "password": string
 }
 ```
 
@@ -84,3 +84,26 @@ Method: GET
 参数：无
 
 响应：请求ID、PONG
+
+## system控制器
+
+### /sys/install
+
+Method: POST
+
+描述：进行系统的初始化
+
+参数：
+
+```typescript
+interface CreateUserParam {
+    "username": string;
+    "password": string;
+    "tel"?: string;
+    "email"?: string;
+    "name": string;
+    "collegeName": string;
+}
+```
+
+响应：无
