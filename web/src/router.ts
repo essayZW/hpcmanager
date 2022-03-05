@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { isInstall } from './service/sys';
 
 import MainView from './pages/MainView.vue';
 import NotFound from './pages/NotFound.vue';
@@ -14,6 +15,16 @@ const Router: RouteRecordRaw[] = [
     path: '/install',
     name: 'Install',
     component: InstallView,
+    beforeEnter: async () => {
+      // 验证是否已经安装
+      const status = await isInstall();
+      if (status) {
+        ElMessage({
+          message: '已经安装,跳转到登录界面',
+        });
+        return '/login';
+      }
+    },
   },
   {
     path: '/:pathMatch(.*)',

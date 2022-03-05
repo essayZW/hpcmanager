@@ -7,8 +7,6 @@ import { requiredWithLength, FormInstance } from '../utils/validateRule';
 
 const router = useRouter();
 
-// TODO 验证是否已经安装
-
 const formElem = ref<FormInstance>();
 // 提交登录表单
 let adminFormData = reactive<CreateUserParam>({

@@ -23,3 +23,18 @@ export async function install(param: CreateUserParam): Promise<{
     };
   }
 }
+
+// 判断系统是否已经被安装
+export async function isInstall(): Promise<boolean> {
+  try {
+    const { status } = await ApiRequest.request<null>(
+      '/sys/install',
+      'GET',
+      {},
+      {}
+    );
+    return status;
+  } catch (error) {
+    return false;
+  }
+}
