@@ -66,6 +66,26 @@ func (user *User) loginValid(ctx *gin.Context) {
 	rep.Send(ctx)
 }
 
+// logout /api/user/token DELETE 删除用户token,退出登录
+func (user *User) logout(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	_, err := user.userService.Logout(context.Background(), &userpb.LogoutRequest{
+		BaseRequest: baseRequest,
+		Username:    baseRequest.UserInfo.Username,
+	})
+	if err != nil {
+		res := response.New(500, nil, false, err.Error())
+		res.Send(ctx)
+		return
+	}
+	res := response.New(200, nil, true, "推出登录成功")
+	res.Send(ctx)
+	return
+
+}
+
 // Registry 为用户控制器注册相应的处理函数
 func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller User")
@@ -77,6 +97,8 @@ func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	middleware.RegistryExcludeAPIPath("POST:/api/user/token")
 
 	userRouter.GET("/token", user.loginValid)
+
+	userRouter.DELETE("/token", user.logout)
 	return userRouter
 }
 

@@ -1,20 +1,20 @@
-# gateway服务接口文档
+# gateway 服务接口文档
 
-目前所有HTTP接口都以`/api`为前缀
+目前所有 HTTP 接口都以`/api`为前缀
 
-**所有的API请求必须附加access_token=token进行身份验证**
+**所有的 API 请求必须附加 access_token=token 进行身份验证**
 
-## user控制器
+## user 控制器
 
 ### /user/ping
 
 Method: GET
 
-描述：进行user服务的ping测试
+描述：进行 user 服务的 ping 测试
 
 参数：无
 
-响应：请求ID、PONG
+响应：请求 ID、PONG
 
 ### /user/token
 
@@ -26,20 +26,20 @@ Method: POST
 
 ```typescript
 interface Login {
-    "username": string,
-    "password": string
+  username: string;
+  password: string;
 }
 ```
 
 响应：
 
-生成的Token以及登录的用户的基础信息
+生成的 Token 以及登录的用户的基础信息
 
 ### /user/token
 
 Method: GET
 
-描述：通过用户的token查询对应的用户信息
+描述：通过用户的 token 查询对应的用户信息
 
 参数：
 
@@ -49,43 +49,57 @@ Method: GET
 
 用户的基本信息
 
-## hpc控制器
+### /user/token
+
+Method: DELETE
+
+描述: 删除用户的登录 token,使用户退出登录
+
+参数:
+
+无
+
+响应:
+
+无
+
+## hpc 控制器
 
 ### /hpc/ping
 
 Method: GET
 
-描述：进行hpc服务的ping测试
+描述：进行 hpc 服务的 ping 测试
 
 参数：无
 
-响应：请求ID、PONG
+响应：请求 ID、PONG
 
-## permission控制器
+## permission 控制器
 
 ### /permission/ping
 
 Method: GET
 
-描述：进行permission服务的ping测试
+描述：进行 permission 服务的 ping 测试
 
 参数：无
 
-响应：请求ID、PONG
+响应：请求 ID、PONG
 
-## group控制器
+## group 控制器
 
 ### /group/ping
 
 Method: GET
 
-描述：进行group服务的ping测试
+描述：进行 group 服务的 ping 测试
 
 参数：无
 
-响应：请求ID、PONG
+响应：请求 ID、PONG
 
-## system控制器
+## system 控制器
 
 ### /sys/install
 
@@ -97,12 +111,12 @@ Method: POST
 
 ```typescript
 interface CreateUserParam {
-    "username": string;
-    "password": string;
-    "tel"?: string;
-    "email"?: string;
-    "name": string;
-    "collegeName": string;
+  username: string;
+  password: string;
+  tel?: string;
+  email?: string;
+  name: string;
+  collegeName: string;
 }
 ```
 
@@ -116,4 +130,5 @@ Method: GET
 
 参数：无
 
-响应：states表明是否已经初始化
+响应：states 表明是否已经初始化
+
