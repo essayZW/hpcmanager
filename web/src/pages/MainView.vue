@@ -40,7 +40,22 @@ onBeforeMount(async () => {
         <el-image :src="LogoImageSrc" class="logo"></el-image>
         <h1>计算平台管理系统</h1>
       </div>
-      <div class="login-user">{{ loginInfo.userInfo.Name }}</div>
+      <div class="login-user">
+        <el-dropdown trigger="hover">
+          <span>
+            <el-icon class="el-icon--right"> <i-ep-avatar /> </el-icon>
+            {{ loginInfo.userInfo.Username }}
+            <el-icon class="el-icon--right">
+              <i-ep-arrow-down />
+            </el-icon>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
     </el-header>
     <el-container>
       <el-aside class="aside"> Aside </el-aside>
@@ -79,6 +94,10 @@ onBeforeMount(async () => {
 
   .login-user {
     cursor: pointer;
+    span {
+      height: @headerheight;
+      line-height: @headerheight;
+    }
   }
 }
 .aside {

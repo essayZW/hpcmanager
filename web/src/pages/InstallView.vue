@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { CreateUserParam } from '../service/user';
 import { install } from '../service/sys';
 import { useRouter } from 'vue-router';
 import { requiredWithLength, FormInstance } from '../utils/validateRule';
+import { installRequest } from '../api/sys';
 
 const router = useRouter();
 
 const formElem = ref<FormInstance>();
 // 提交登录表单
-let adminFormData = reactive<CreateUserParam>({
+let adminFormData = reactive<installRequest>({
   username: '',
   password: '',
   name: '',
@@ -30,7 +30,7 @@ function submit(elem: FormInstance | undefined) {
   }
   elem.validate(async (valid) => {
     if (valid) {
-      let { status, message } = await install(adminFormData as CreateUserParam);
+      let { status, message } = await install(adminFormData as installRequest);
       if (!status) {
         ElMessage({
           type: 'error',
