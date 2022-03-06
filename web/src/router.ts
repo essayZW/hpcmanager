@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { isInstall } from './service/sys';
-import { IsLogin } from './service/user';
+import { isLogin } from './service/user';
 
 import MainView from './pages/MainView.vue';
 import NotFound from './pages/NotFound.vue';
@@ -34,7 +34,7 @@ const Router: RouteRecordRaw[] = [
     component: LoginView,
     beforeEnter: async () => {
       // 判断是否登录
-      const userInfo = await IsLogin();
+      const userInfo = await isLogin();
       if (userInfo != null) {
         ElMessage({
           message: '已经登录,跳转到主页面',

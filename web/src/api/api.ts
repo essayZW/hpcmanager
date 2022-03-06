@@ -8,7 +8,7 @@ export interface HTTPResponse<T> {
   message: string;
 }
 
-export interface Ping {
+export interface pingResponse {
   Msg: string;
   Ip: string;
   RequestId: string;
@@ -44,10 +44,6 @@ export class ApiRequest {
         },
       });
       const responseData = data as HTTPResponse<T>;
-      if (responseData.code < 200 || responseData.code > 300) {
-        // http code 错误
-        throw new Error(`response code ${responseData.code} error`);
-      }
       return responseData;
     } catch (error) {
       console.error(`http request fail: ${error}`);

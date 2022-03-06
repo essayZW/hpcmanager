@@ -1,4 +1,5 @@
 import { ApiRequest } from '../api/api';
+import { createToken, loginResponse } from '../api/user';
 
 // 创建用户参数
 export interface CreateUserParam {
@@ -20,7 +21,7 @@ export interface LoginUserInfo {
 }
 
 // 判断用户是否已经登录,如果已经登录,返回登录的用户的信息
-export async function IsLogin(): Promise<LoginUserInfo | null> {
+export async function isLogin(): Promise<LoginUserInfo | null> {
   try {
     const { status, data } = await ApiRequest.request('/user/token', 'GET');
     if (!status) {
@@ -29,5 +30,21 @@ export async function IsLogin(): Promise<LoginUserInfo | null> {
     return data as LoginUserInfo;
   } catch (error) {
     return null;
+  }
+}
+
+// 进行用户登录,登录成功返回用户信息,登录失败返回登录失败消息
+export async function login(
+  username: string,
+  password: string
+): Promise<loginResponse | string> {
+  try {
+    const data = await createToken({
+      username,
+      password,
+    });
+    return data;
+  } catch (error) {
+    return `登录失败:${error}`;
   }
 }
