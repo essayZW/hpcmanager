@@ -74,6 +74,12 @@ func (sys *System) install(ctx *gin.Context) {
 		Level:       int32(verify.SuperAdmin),
 		BaseRequest: baseRequest,
 	})
+	// 移除原先的guest权限
+	sys.permissionService.RemoveUserPermission(c, &permissionpb.RemoveUserPermissionRequest{
+		Userid:      userResp.Userid,
+		Level:       int32(verify.Guest),
+		BaseRequest: baseRequest,
+	})
 	if err != nil || !resp.Success {
 		logger.Warn("add super admin permission error: ", err)
 		resp := response.New(500, nil, false, "用户权限初始化失败")

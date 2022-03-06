@@ -71,7 +71,7 @@ func main() {
 	server := gin.New()
 
 	api := server.Group("/api")
-	middleware.Registry(api, serviceClient)
+	middleware.Registry(api, serviceClient, redisConn)
 
 	etcdConfig, err := config.NewEtcd()
 	if err != nil {
