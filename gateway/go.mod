@@ -8,10 +8,12 @@ require (
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/hpc v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/permission v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/user v0.0.0-00010101000000-000000000000
 	github.com/go-playground/validator/v10 v10.4.1
+	github.com/go-redis/redis/v8 v8.11.4
 	github.com/google/uuid v1.3.0
-	go-micro.dev/v4 v4.5.0
+	go-micro.dev/v4 v4.6.0
 	google.golang.org/protobuf v1.26.0
 )
 
@@ -23,9 +25,11 @@ require (
 	github.com/asim/go-micro/plugins/config/source/etcd/v4 v4.0.0-20220118152736-9e0be6c85d75 // indirect
 	github.com/asim/go-micro/plugins/logger/zap/v4 v4.0.0-20220118152736-9e0be6c85d75 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -83,3 +87,5 @@ replace github.com/essayZW/hpcmanager/user => ../user
 replace github.com/essayZW/hpcmanager/gateway => ./
 
 replace github.com/essayZW/hpcmanager/hpc => ../hpc
+
+replace github.com/essayZW/hpcmanager/permission => ../permission

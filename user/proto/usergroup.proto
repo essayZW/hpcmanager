@@ -1,0 +1,99 @@
+syntax="proto3";
+
+option go_package="github.com/essayZW/hpcmanager/user/proto;user";
+
+package user;
+
+import "proto/ping.proto";
+import "proto/common.proto";
+import "gateway/proto/baserequest.proto";
+import "proto/userpublic.proto";
+
+service GroupService {
+    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+    rpc GetGroupInfoByID(GetGroupInfoByIDRequest) returns (GetGroupInfoByIDResponse) {}
+    rpc PaginationGetGroupInfo(PaginationGetGroupInfoRequest) returns (PaginationGetGroupInfoResponse) {}
+    rpc CreateJoinGroupApply(CreateJoinGroupApplyRequest) returns (CreateJoinGroupApplyResponse) {}
+    rpc SearchTutorInfo(SearchTutorInfoRequest) returns (SearchTutorInfoResponse) {}
+    rpc PageGetApplyGroupInfo(PageGetApplyGroupInfoRequest) returns (PageGetApplyGroupInfoResponse) {}
+    rpc CheckApply(CheckApplyRequest) returns (CheckApplyResponse) {}
+    rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {}
+}
+
+
+message GetGroupInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+}
+
+message GetGroupInfoByIDResponse {
+    user.GroupInfo groupInfo = 1;
+}
+
+message PaginationGetGroupInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageSize = 2;
+    int32 pageIndex = 3;
+}
+
+message PaginationGetGroupInfoResponse {
+    repeated user.GroupInfo groupInfos = 1;
+    int32 count = 2;
+}
+
+message CreateJoinGroupApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyGroupID = 2;
+}
+
+message CreateJoinGroupApplyResponse {
+    bool success = 1;
+    int32 applyID = 2;
+}
+
+message SearchTutorInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+
+message SearchTutorInfoResponse {
+    int32 tutorID = 1;
+    string tutorUsername = 2;
+    string tutorName = 3;
+    int32 groupID = 4;
+    string groupName = 5;
+}
+
+message PageGetApplyGroupInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+
+message PageGetApplyGroupInfoResponse {
+    repeated user.UserGroupApply applies = 1;
+    int32 count = 2;
+}
+
+message CheckApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    bool checkStatus = 3;
+    string checkMessage = 4;
+}
+
+message CheckApplyResponse {
+    bool success = 1;
+}
+
+message CreateGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 tutorID = 2;
+    string name = 3;
+    string queueName = 4;
+}
+
+message CreateGroupResponse {
+    bool success = 1;
+    int32 groupID = 2;
+}

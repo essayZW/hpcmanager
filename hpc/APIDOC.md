@@ -25,4 +25,58 @@ message PingResponse {
     string RequestId = 3;
 }
 ```
+## AddUserWithGroup
 
+描述：创建用户组并添加用户到这个组中,一般用于新建用户组的时候顺便添加导师用户到组中
+
+原型定义：`rpc AddUserWithGroup(AddUserWithGroupRequest) returns (AddUserWithGroupResponse) {}`
+
+请求参数：
+
+```protobuf
+message AddUserWithGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    string tutorUsername = 2;
+    string groupName = 3;
+    string queueName = 4;
+}
+```
+
+响应参数：
+
+```protobuf
+message AddUserWithGroupResponse {
+    string groupName = 1;
+    int32 gid = 2;
+    string userName = 3;
+    int32 uid = 4;
+    int32 hpcGroupID = 5;
+    int32 hpcUserID = 6;
+}
+```
+
+## AddUserToGroup
+
+描述：创建一个新用户并添加到一个已经存在的用户组中
+
+原型定义：`rpc AddUserToGroup(AddUserToGroupRequest) returns (AddUserToGroupResponse) {}`
+
+请求参数：
+
+```protobuf
+message AddUserToGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    string userName = 2;
+    int32 hpcGroupID = 3;
+}
+```
+
+响应参数：
+
+```protobuf
+message AddUserToGroupResponse {
+    int32 hpcUserID = 1;
+    string userName = 2;
+    int32 uid = 3;
+}
+```

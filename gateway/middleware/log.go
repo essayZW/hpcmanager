@@ -12,10 +12,7 @@ import (
 func log(ctx *gin.Context) {
 	value, _ := ctx.Get(BaseRequestKey)
 	baseReq := value.(*proto.BaseRequest)
-	logger.Infof("%v||%v||%v||%v||%s||%v||%v||%v", baseReq.RequestInfo.Id,
-		baseReq.UserInfo.UserId,
-		baseReq.UserInfo.UserId,
-		baseReq.UserInfo.Levels,
+	logger.Infof("%v||%s||%v||%v||%v", baseReq.RequestInfo.Id,
 		ctx.Request.Method,
 		ctx.ClientIP(),
 		ctx.Request.URL.Path,

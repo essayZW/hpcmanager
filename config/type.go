@@ -34,3 +34,8 @@ type Registry struct {
 		Address string
 	}
 }
+
+// Rabbitmq 配置
+type Rabbitmq struct {
+	Address string
+}

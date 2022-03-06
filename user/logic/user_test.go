@@ -74,7 +74,7 @@ func TestLoginCheck(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			status, err := userLogic.LoginCheck(test.Username, test.Password)
+			status, err := userLogic.LoginCheck(context.Background(), test.Username, test.Password)
 			if err != nil && test.Except {
 				t.Error(err)
 			}
@@ -98,12 +98,12 @@ func TestCreateAndQueryToken(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			token := userLogic.CreateToken(test.Username)
-			if queryed := userLogic.GetToken(test.Username); queryed != token {
+			token := userLogic.CreateToken(context.Background(), test.Username)
+			if queryed := userLogic.GetToken(context.Background(), test.Username); queryed != token {
 				t.Errorf("Except %s Get %s", queryed, token)
 			}
-			userLogic.DeleteToken(test.Username)
-			if queryed := userLogic.GetToken(test.Username); queryed != "" {
+			userLogic.DeleteToken(context.Background(), test.Username)
+			if queryed := userLogic.GetToken(context.Background(), test.Username); queryed != "" {
 				t.Errorf("Except %s Get ", queryed)
 			}
 		})
@@ -133,7 +133,7 @@ func TestQueryByUsername(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			info, err := userLogic.GetByUsername(test.Username)
+			info, err := userLogic.GetByUsername(context.Background(), test.Username)
 			if err != nil {
 				if !test.Error {
 					t.Error(err)
@@ -189,11 +189,107 @@ func TestAddUser(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			_, err := userLogic.AddUser(test.Data)
+			_, err := userLogic.AddUser(context.Background(), test.Data)
 			if (err != nil) != test.Error {
 				t.Errorf("Except: %v Get %v", test.Error, err)
 			}
 		})
 	}
 
+}
+
+func TestPaginationGetUserInfo(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		PageSize  int
+		PageIndex int
+
+		ExceptLen   int
+		ExceptCount int
+		Error       bool
+	}{
+		{
+			Name:        "error pageSize",
+			PageSize:    0,
+			PageIndex:   1,
+			ExceptCount: 0,
+			Error:       true,
+		},
+		{
+			Name:        "error pageIndex",
+			PageSize:    1,
+			PageIndex:   0,
+			ExceptCount: 0,
+			Error:       true,
+		},
+		{
+			Name:        "success",
+			PageSize:    1,
+			PageIndex:   2,
+			ExceptLen:   1,
+			ExceptCount: 2,
+			Error:       false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			infos, err := userLogic.PaginationGetUserInfo(context.Background(), test.PageIndex, test.PageSize, 0)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error && err == nil {
+				t.Errorf("Get: %v Except: %v", err, test.Error)
+			}
+			if test.ExceptLen != len(infos.Infos) {
+				t.Errorf("Get: %v Except: %v", infos, test.ExceptCount)
+			}
+			if test.ExceptCount != infos.Count {
+				t.Errorf("Get: %v Except: %v", infos, test.ExceptCount)
+			}
+		})
+	}
+}
+
+func TestChangeUserGroup(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		UserID  int
+		GroupID int
+
+		Error bool
+	}{
+		{
+			Name:    "success1",
+			UserID:  22,
+			GroupID: 2,
+			Error:   false,
+		},
+		{
+			Name:    "success2",
+			UserID:  22,
+			GroupID: 0,
+			Error:   false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			err := userLogic.ChangeUserGroup(context.Background(), test.UserID, test.GroupID)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v, Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v, Except: %v", err, test.Error)
+			}
+		})
+	}
 }

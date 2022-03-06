@@ -37,35 +37,35 @@ type User struct {
 }
 
 // LoginCheck 检查用户名密码是否正确并返回用户ID
-func (u *User) LoginCheck(username, password string) (bool, error) {
+func (u *User) LoginCheck(ctx context.Context, username, password string) (bool, error) {
 	md5Password := fmt.Sprintf("%x", md5.Sum([]byte(password)))
 	md5Password = strings.ToUpper(md5Password)
-	return u.userDB.LoginQuery(username, md5Password)
+	return u.userDB.LoginQuery(ctx, username, md5Password)
 }
 
 // CreateToken 为指定用户名创建token
-func (u *User) CreateToken(username string) string {
+func (u *User) CreateToken(ctx context.Context, username string) string {
 	// 单点登录
-	u.DeleteToken(username)
+	u.DeleteToken(ctx, username)
 	token := uuid.New().String()
 	token = strings.Replace(token, "-", "", -1)
 	u.mutex.Lock()
-	u.redisClient.SetEX(context.Background(), TokenPrefix+token, username, u.TokenExpireTime)
-	u.redisClient.SetEX(context.Background(), LoginUserTokenPrefix+username, token, u.TokenExpireTime)
+	u.redisClient.SetEX(ctx, TokenPrefix+token, username, u.TokenExpireTime)
+	u.redisClient.SetEX(ctx, LoginUserTokenPrefix+username, token, u.TokenExpireTime)
 	u.mutex.Unlock()
 	return token
 }
 
 // DeleteToken 删除指定用户名的登录token
-func (u *User) DeleteToken(username string) {
-	token := u.GetToken(username)
-	u.redisClient.Do(context.Background(), "del", TokenPrefix+token)
-	u.redisClient.Do(context.Background(), "del", LoginUserTokenPrefix+username)
+func (u *User) DeleteToken(ctx context.Context, username string) {
+	token := u.GetToken(ctx, username)
+	u.redisClient.Do(ctx, "del", TokenPrefix+token)
+	u.redisClient.Do(ctx, "del", LoginUserTokenPrefix+username)
 }
 
 // GetToken 查询用户的token
-func (u *User) GetToken(username string) string {
-	token, err := u.redisClient.Get(context.Background(), LoginUserTokenPrefix+username).Result()
+func (u *User) GetToken(ctx context.Context, username string) string {
+	token, err := u.redisClient.Get(ctx, LoginUserTokenPrefix+username).Result()
 	if err != nil {
 		return ""
 	}
@@ -73,12 +73,12 @@ func (u *User) GetToken(username string) string {
 }
 
 // GetUserByToken 通过token查询对应者的信息
-func (u *User) GetUserByToken(token string) (*db.User, error) {
-	username, err := u.redisClient.Get(context.Background(), TokenPrefix+token).Result()
+func (u *User) GetUserByToken(ctx context.Context, token string) (*db.User, error) {
+	username, err := u.redisClient.Get(ctx, TokenPrefix+token).Result()
 	if err != nil {
 		return nil, err
 	}
-	info, err := u.GetByUsername(username)
+	info, err := u.GetByUsername(ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -86,12 +86,12 @@ func (u *User) GetUserByToken(token string) (*db.User, error) {
 }
 
 // GetByUsername 通过用户名查询用户信息
-func (u *User) GetByUsername(username string) (*db.User, error) {
-	return u.userDB.QueryByUsername(username)
+func (u *User) GetByUsername(ctx context.Context, username string) (*db.User, error) {
+	return u.userDB.QueryByUsername(ctx, username)
 }
 
 // AddUser 添加新的用户
-func (u *User) AddUser(userInfo *db.User) (int, error) {
+func (u *User) AddUser(ctx context.Context, userInfo *db.User) (int, error) {
 	if userInfo.Username == "" {
 		return 0, errors.New("username can't be empty")
 	}
@@ -111,11 +111,63 @@ func (u *User) AddUser(userInfo *db.User) (int, error) {
 	// password进行MD5加密
 	md5Password := fmt.Sprintf("%x", md5.Sum([]byte(userInfo.Password)))
 	userInfo.Password = strings.ToUpper(md5Password)
-	id, err := u.userDB.InsertUser(userInfo)
+	id, err := u.userDB.InsertUser(ctx, userInfo)
 	if err != nil {
 		return 0, err
 	}
 	return id, nil
+}
+
+// GetUserInfoByID 通过ID查询用户信息
+func (u *User) GetUserInfoByID(ctx context.Context, userid int) (*db.User, error) {
+	return u.userDB.QueryByID(ctx, userid)
+}
+
+// PaginationUserResult 分页查询用户信息的结果
+type PaginationUserResult struct {
+	Infos []*db.User
+	Count int
+}
+
+// PaginationGetUserInfo 分页查询用户信息
+func (u *User) PaginationGetUserInfo(ctx context.Context, pageIndex, pageSize, groupID int) (*PaginationUserResult, error) {
+	if pageIndex < 1 {
+		return nil, errors.New("pageIndex must large than 0")
+	}
+	if pageSize <= 0 || pageSize > 200 {
+		return nil, errors.New("pageSize must large than 0 and less than 200")
+	}
+	// 先查询总数
+	count, err := u.userDB.QueryAllUserCount(ctx, groupID)
+	if err != nil {
+		return nil, err
+	}
+	if count == 0 {
+		return &PaginationUserResult{
+			Infos: make([]*db.User, 0),
+			Count: 0,
+		}, nil
+	}
+	offset := pageSize * (pageIndex - 1)
+	infos, err := u.userDB.PaginationQuery(ctx, offset, pageSize, groupID)
+	if err != nil {
+		return nil, err
+	}
+	return &PaginationUserResult{
+		Infos: infos,
+		Count: count,
+	}, nil
+
+}
+
+// ChangeUserGroup 修改用户的组信息
+func (u *User) ChangeUserGroup(ctx context.Context, userID int, groupID int) error {
+	return u.userDB.UpdateUserGroup(ctx, userID, groupID)
+}
+
+// SetHpcUserID 设置用户对应的计算节点上的用户信息表的ID
+func (u *User) SetHpcUserID(ctx context.Context, userID, hpcUserID int) error {
+	return u.userDB.UpdateHpcUserID(ctx, userID, hpcUserID)
 }
 
 // NewUser 创建一个新的userLogic

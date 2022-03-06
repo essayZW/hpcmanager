@@ -39,7 +39,7 @@ func (user *User) ping(ctx *gin.Context) {
 func (user *User) login(ctx *gin.Context) {
 	var params jsonparam.Login
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		rep := response.New(200, err, false, "username or password validate error")
+		rep := response.New(500, err.Error(), false, "用户名或者密码格式错误")
 		rep.Send(ctx)
 		return
 	}
@@ -50,7 +50,7 @@ func (user *User) login(ctx *gin.Context) {
 		BaseRequest: baseReq.(*gatewaypb.BaseRequest),
 	})
 	if err != nil {
-		rep := response.New(200, err, false, "login fail")
+		rep := response.New(500, err, false, "用户名或者密码错误")
 		rep.Send(ctx)
 		return
 	}
@@ -58,20 +58,52 @@ func (user *User) login(ctx *gin.Context) {
 	rep.Send(ctx)
 }
 
+// loginValid /api/user/token GET query token info of user
+func (user *User) loginValid(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	// 暂时直接返回中间件处理的信息
+	rep := response.New(200, baseReq.(*gatewaypb.BaseRequest).UserInfo, true, "success")
+	rep.Send(ctx)
+}
+
+// logout /api/user/token DELETE 删除用户token,退出登录
+func (user *User) logout(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	_, err := user.userService.Logout(context.Background(), &userpb.LogoutRequest{
+		BaseRequest: baseRequest,
+		Username:    baseRequest.UserInfo.Username,
+	})
+	if err != nil {
+		res := response.New(500, nil, false, err.Error())
+		res.Send(ctx)
+		return
+	}
+	res := response.New(200, nil, true, "推出登录成功")
+	res.Send(ctx)
+	return
+
+}
+
 // Registry 为用户控制器注册相应的处理函数
 func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller User")
 	userRouter := router.Group("/user")
 	userRouter.GET("/ping", user.ping)
-	middleware.RegistryExcludeAPIPath("/api/user/ping")
+	middleware.RegistryExcludeAPIPath("GET:/api/user/ping")
 
 	userRouter.POST("/token", user.login)
-	middleware.RegistryExcludeAPIPath("/api/user/token")
+	middleware.RegistryExcludeAPIPath("POST:/api/user/token")
+
+	userRouter.GET("/token", user.loginValid)
+
+	userRouter.DELETE("/token", user.logout)
 	return userRouter
 }
 
 // NewUser 创建一个用户控制器
-func NewUser(client client.Client, configConn config.DynamicConfig) *User {
+func NewUser(client client.Client, configConn config.DynamicConfig) Controller {
 	return &User{
 		userService: userpb.NewUserService("user", client),
 	}

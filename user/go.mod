@@ -8,12 +8,15 @@ require (
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/hpc v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/permission v0.0.0-00010101000000-000000000000
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/google/uuid v1.3.0
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/mozillazg/go-pinyin v0.19.0
-	go-micro.dev/v4 v4.5.0
+	go-micro.dev/v4 v4.6.0
 	google.golang.org/protobuf v1.26.0
+	gopkg.in/guregu/null.v4 v4.0.0
 )
 
 require (
@@ -74,3 +77,7 @@ require (
 replace github.com/essayZW/hpcmanager/gateway => ../gateway
 
 replace github.com/essayZW/hpcmanager/user => ./
+
+replace github.com/essayZW/hpcmanager/hpc => ../hpc
+
+replace github.com/essayZW/hpcmanager/permission => ../permission

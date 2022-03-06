@@ -2,17 +2,24 @@ syntax = "proto3";
 
 option go_package = "github.com/essayZW/hpcmanager/user/proto;user";
 
+package user;
+
 import "proto/ping.proto";
 import "proto/common.proto";
 import "gateway/proto/baserequest.proto";
-import "proto/public.proto";
+import "proto/userpublic.proto";
 
 service User {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc Login(LoginRequest) returns (LoginResponse) {}
+    rpc Logout(LogoutRequest) returns (LogoutResponse) {}
     rpc CheckLogin(CheckLoginRequest) returns (CheckLoginResponse) {}
     rpc ExistUsername(ExistUsernameRequest) returns (ExistUsernameResponse) {}
     rpc AddUser(AddUserRequest) returns (AddUserResponse) {}
+    rpc CreateToken(CreateTokenRequest) returns (CreateTokenResponse) {}
+    rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse) {}
+    rpc PaginationGetUserInfo(PaginationGetUserInfoRequest) returns (PaginationGetUserInfoResponse) {}
+    rpc JoinGroup(JoinGroupRequest) returns (JoinGroupResponse) {}
 }
 
 message LoginRequest {
@@ -56,4 +63,53 @@ message AddUserRequest {
 
 message AddUserResponse {
     int32 userid = 1;
+}
+
+message CreateTokenRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+
+message CreateTokenResponse {
+    string token = 1;
+    user.UserInfo userInfo = 2;
+}
+
+message GetUserInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userid = 2;
+}
+
+message GetUserInfoResponse {
+    user.UserInfo userInfo = 1;
+}
+
+message PaginationGetUserInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageSize = 2;
+    int32 pageIndex = 3;
+}
+
+message PaginationGetUserInfoResponse {
+    repeated user.UserInfo userInfos = 1;
+    int32 count = 2;
+}
+
+message JoinGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userID = 2;
+    int32 groupID = 3;
+}
+
+message JoinGroupResponse {
+    bool success = 1;
+}
+
+message LogoutRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+
+message LogoutResponse {
+    bool success = 1;
 }

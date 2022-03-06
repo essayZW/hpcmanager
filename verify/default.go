@@ -25,7 +25,58 @@ func (verify *hardcodeVerify) AllowedActions(permissionLevel []Level) []Permissi
 func newDefault() *hardcodeVerify {
 	return &hardcodeVerify{
 		actionsLevel: map[PermissionAction]*actionVerify{
+			// 普通管理员及以上
 			AddUserAction: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			// 普通管理员及以上
+			AddUserPermissionAction: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			// 普通管理员及以上
+			RemoveUserPermissionAction: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			// 超级管理员及以上
+			AddPermission: {
+				maxLevel: MaxLevel,
+				minLevel: SuperAdmin,
+			},
+			// 普通成员权限及以上
+			GetUserInfo: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 导师权限及以上
+			GetGroupInfo: {
+				maxLevel: MaxLevel,
+				minLevel: Tutor,
+			},
+			// 游客权限
+			ApplyJoinGroup: {
+				maxLevel: Guest,
+				minLevel: Guest,
+			},
+			// 游客权限
+			SearchTutorInfo: {
+				maxLevel: Guest,
+				minLevel: Guest,
+			},
+			// 需要导师及以上权限
+			CheckJoinGroupApply: {
+				maxLevel: MaxLevel,
+				minLevel: Tutor,
+			},
+			// 需要普通管理员及以上权限
+			CreateGroup: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			// 需要普通管理员及以上权限
+			JoinGroup: {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},

@@ -44,7 +44,7 @@ func (hpc *Hpc) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 }
 
 // NewHpc 创建新的hpc控制器
-func NewHpc(client client.Client, configConn config.DynamicConfig) *Hpc {
+func NewHpc(client client.Client, configConn config.DynamicConfig) Controller {
 	return &Hpc{
 		hpcService: hpcpb.NewHpcService("hpc", client),
 	}

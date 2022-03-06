@@ -6,6 +6,26 @@ type PermissionAction string
 const (
 	// AddUserAction 添加用户操作
 	AddUserAction = "__ADD_USER__"
+	// AddUserPermissionAction 添加用户权限操作
+	AddUserPermissionAction = "__ADD_USER_PERMISSION__"
+	// RemoveUserPermissionAction 删除用户权限操作
+	RemoveUserPermissionAction = "__REMOVE_USER_PERMISSION__"
+	// AddPermission 添加权限等级
+	AddPermission = "__ADD_PERMISSION__"
+	// GetUserInfo 查询用户信息
+	GetUserInfo = "__GET_USER_INFO__"
+	// GetGroupInfo 查询用户组信息
+	GetGroupInfo = "__GET_GROUP_INFO__"
+	// ApplyJoinGroup 申请加入组操作
+	ApplyJoinGroup = "__ADD_APPLY_GROUP__"
+	// SearchTutorInfo 搜索导师以及组基本信息
+	SearchTutorInfo = "__SEARCH_TUTOR_INFO__"
+	// CheckJoinGroupApply 审核加入组申请
+	CheckJoinGroupApply = "__CHECK_JOIN_GROUP_APPLY__"
+	// CreateGroup 创建组
+	CreateGroup = "__CREATE_GROUP__"
+	// JoinGroup 用户加入某个组
+	JoinGroup = "__JOIN_GROUP__"
 )
 
 // Verify 进行操作的权限验证
@@ -39,6 +59,26 @@ func AllowedActions(permissionLevel []Level) []PermissionAction {
 	return DefaultVerify.AllowedActions(permissionLevel)
 }
 
+// IsAdmin 是否是管理员
+func IsAdmin(permissionLevel []int32) bool {
+	for _, level := range permissionLevel {
+		if level == int32(CommonAdmin) || level == int32(SuperAdmin) {
+			return true
+		}
+	}
+	return false
+}
+
+// IsTutor 是否是导师
+func IsTutor(permissionLevel []int32) bool {
+	for _, level := range permissionLevel {
+		if level == int32(Tutor) {
+			return true
+		}
+	}
+	return false
+}
+
 // Level 权限等级
 type Level int
 
@@ -46,7 +86,7 @@ const (
 	// MinLevel 权限值的下界
 	MinLevel Level = -128
 	// Guest 游客级别的权限，基本没有什么权限
-	Guest Level = iota
+	Guest Level = iota - 1
 	// Common 普通用户的权限
 	Common
 	// Tutor 导师用户的权限

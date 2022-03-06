@@ -40,9 +40,14 @@ func NewUserEndpoints() []*api.Endpoint {
 type UserService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error)
+	Logout(ctx context.Context, in *LogoutRequest, opts ...client.CallOption) (*LogoutResponse, error)
 	CheckLogin(ctx context.Context, in *CheckLoginRequest, opts ...client.CallOption) (*CheckLoginResponse, error)
 	ExistUsername(ctx context.Context, in *ExistUsernameRequest, opts ...client.CallOption) (*ExistUsernameResponse, error)
 	AddUser(ctx context.Context, in *AddUserRequest, opts ...client.CallOption) (*AddUserResponse, error)
+	CreateToken(ctx context.Context, in *CreateTokenRequest, opts ...client.CallOption) (*CreateTokenResponse, error)
+	GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...client.CallOption) (*GetUserInfoResponse, error)
+	PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, opts ...client.CallOption) (*PaginationGetUserInfoResponse, error)
+	JoinGroup(ctx context.Context, in *JoinGroupRequest, opts ...client.CallOption) (*JoinGroupResponse, error)
 }
 
 type userService struct {
@@ -70,6 +75,16 @@ func (c *userService) Ping(ctx context.Context, in *proto1.Empty, opts ...client
 func (c *userService) Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error) {
 	req := c.c.NewRequest(c.name, "User.Login", in)
 	out := new(LoginResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) Logout(ctx context.Context, in *LogoutRequest, opts ...client.CallOption) (*LogoutResponse, error) {
+	req := c.c.NewRequest(c.name, "User.Logout", in)
+	out := new(LogoutResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -107,23 +122,73 @@ func (c *userService) AddUser(ctx context.Context, in *AddUserRequest, opts ...c
 	return out, nil
 }
 
+func (c *userService) CreateToken(ctx context.Context, in *CreateTokenRequest, opts ...client.CallOption) (*CreateTokenResponse, error) {
+	req := c.c.NewRequest(c.name, "User.CreateToken", in)
+	out := new(CreateTokenResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...client.CallOption) (*GetUserInfoResponse, error) {
+	req := c.c.NewRequest(c.name, "User.GetUserInfo", in)
+	out := new(GetUserInfoResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, opts ...client.CallOption) (*PaginationGetUserInfoResponse, error) {
+	req := c.c.NewRequest(c.name, "User.PaginationGetUserInfo", in)
+	out := new(PaginationGetUserInfoResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) JoinGroup(ctx context.Context, in *JoinGroupRequest, opts ...client.CallOption) (*JoinGroupResponse, error) {
+	req := c.c.NewRequest(c.name, "User.JoinGroup", in)
+	out := new(JoinGroupResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
 	Login(context.Context, *LoginRequest, *LoginResponse) error
+	Logout(context.Context, *LogoutRequest, *LogoutResponse) error
 	CheckLogin(context.Context, *CheckLoginRequest, *CheckLoginResponse) error
 	ExistUsername(context.Context, *ExistUsernameRequest, *ExistUsernameResponse) error
 	AddUser(context.Context, *AddUserRequest, *AddUserResponse) error
+	CreateToken(context.Context, *CreateTokenRequest, *CreateTokenResponse) error
+	GetUserInfo(context.Context, *GetUserInfoRequest, *GetUserInfoResponse) error
+	PaginationGetUserInfo(context.Context, *PaginationGetUserInfoRequest, *PaginationGetUserInfoResponse) error
+	JoinGroup(context.Context, *JoinGroupRequest, *JoinGroupResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
 	type user interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
 		Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error
+		Logout(ctx context.Context, in *LogoutRequest, out *LogoutResponse) error
 		CheckLogin(ctx context.Context, in *CheckLoginRequest, out *CheckLoginResponse) error
 		ExistUsername(ctx context.Context, in *ExistUsernameRequest, out *ExistUsernameResponse) error
 		AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error
+		CreateToken(ctx context.Context, in *CreateTokenRequest, out *CreateTokenResponse) error
+		GetUserInfo(ctx context.Context, in *GetUserInfoRequest, out *GetUserInfoResponse) error
+		PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, out *PaginationGetUserInfoResponse) error
+		JoinGroup(ctx context.Context, in *JoinGroupRequest, out *JoinGroupResponse) error
 	}
 	type User struct {
 		user
@@ -144,6 +209,10 @@ func (h *userHandler) Login(ctx context.Context, in *LoginRequest, out *LoginRes
 	return h.UserHandler.Login(ctx, in, out)
 }
 
+func (h *userHandler) Logout(ctx context.Context, in *LogoutRequest, out *LogoutResponse) error {
+	return h.UserHandler.Logout(ctx, in, out)
+}
+
 func (h *userHandler) CheckLogin(ctx context.Context, in *CheckLoginRequest, out *CheckLoginResponse) error {
 	return h.UserHandler.CheckLogin(ctx, in, out)
 }
@@ -154,4 +223,20 @@ func (h *userHandler) ExistUsername(ctx context.Context, in *ExistUsernameReques
 
 func (h *userHandler) AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error {
 	return h.UserHandler.AddUser(ctx, in, out)
+}
+
+func (h *userHandler) CreateToken(ctx context.Context, in *CreateTokenRequest, out *CreateTokenResponse) error {
+	return h.UserHandler.CreateToken(ctx, in, out)
+}
+
+func (h *userHandler) GetUserInfo(ctx context.Context, in *GetUserInfoRequest, out *GetUserInfoResponse) error {
+	return h.UserHandler.GetUserInfo(ctx, in, out)
+}
+
+func (h *userHandler) PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, out *PaginationGetUserInfoResponse) error {
+	return h.UserHandler.PaginationGetUserInfo(ctx, in, out)
+}
+
+func (h *userHandler) JoinGroup(ctx context.Context, in *JoinGroupRequest, out *JoinGroupResponse) error {
+	return h.UserHandler.JoinGroup(ctx, in, out)
 }
