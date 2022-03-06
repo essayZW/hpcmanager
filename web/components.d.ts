@@ -20,10 +20,8 @@ declare module 'vue' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElMain: typeof import('element-plus/es')['ElMain']
     ElRow: typeof import('element-plus/es')['ElRow']
-    IEpAddLocation: typeof import('~icons/ep/add-location')['default']
     IEpArrowDown: typeof import('~icons/ep/arrow-down')['default']
     IEpAvatar: typeof import('~icons/ep/avatar')['default']
-    IIcRoundSupervisedUserCircle: typeof import('~icons/ic/round-supervised-user-circle')['default']
   }
 }
 
