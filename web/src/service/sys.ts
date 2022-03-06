@@ -1,40 +1,25 @@
-import { CreateUserParam } from './user';
-import { ApiRequest } from '../api/api';
+import { getInstallStatus, installRequest, installSys } from '../api/sys';
 
 // install 初始化系统,添加系统默认管理员
-export async function install(param: CreateUserParam): Promise<{
+export async function install(param: installRequest): Promise<{
   status: boolean;
   message: string;
 }> {
   try {
-    const resp = await ApiRequest.request<null>(
-      '/sys/install',
-      'POST',
-      {},
-      {
-        ...param,
-      }
-    );
-    return resp;
+    const resp = await installSys(param);
+    return {
+      status: resp,
+      message: '安装成功',
+    };
   } catch (error) {
     return {
       status: false,
-      message: '初始化失败',
+      message: `${error}`,
     };
   }
 }
 
 // 判断系统是否已经被安装
 export async function isInstall(): Promise<boolean> {
-  try {
-    const { status } = await ApiRequest.request<null>(
-      '/sys/install',
-      'GET',
-      {},
-      {}
-    );
-    return status;
-  } catch (error) {
-    return false;
-  }
+  return await getInstallStatus();
 }

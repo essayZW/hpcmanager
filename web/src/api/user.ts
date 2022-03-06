@@ -47,3 +47,29 @@ export async function createToken(param: loginRequest): Promise<loginResponse> {
   }
   return resp.data;
 }
+
+// 获取登录的用户的信息
+export async function getLoginedInfo(): Promise<loginUserInfo | null> {
+  try {
+    const { status, data } = await ApiRequest.request<loginUserInfo>(
+      '/user/token',
+      'GET'
+    );
+    if (!status) {
+      return null;
+    }
+    return data;
+  } catch (error) {
+    return null;
+  }
+}
+
+// 创建用户参数
+export interface createUserRequest {
+  username: string;
+  password: string;
+  name: string;
+  tel: string;
+  email: string;
+  collegeName: string;
+}
