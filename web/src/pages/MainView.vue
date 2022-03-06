@@ -1,5 +1,37 @@
 <script setup lang="ts">
+import { onBeforeMount, reactive } from 'vue';
 import LogoImageSrc from '../assets/logo.png';
+import { isLogin } from '../service/user';
+import { loginUserInfo } from '../api/user';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const loginInfo = reactive<{ userInfo: loginUserInfo }>({
+  userInfo: {
+    Username: 'unknown',
+    Name: 'unknown',
+    UserID: 0,
+    GroupID: 0,
+    Levels: [],
+  },
+});
+
+onBeforeMount(async () => {
+  // 判断是否已经登录,未登录跳转到登录页面
+  const info = await isLogin();
+  if (info == null) {
+    ElMessage({
+      type: 'error',
+      message: '未登录,请先登录',
+    });
+    router.push({
+      path: '/login',
+    });
+    return;
+  }
+  loginInfo.userInfo = info;
+});
 </script>
 <template>
   <el-container>
@@ -8,7 +40,7 @@ import LogoImageSrc from '../assets/logo.png';
         <el-image :src="LogoImageSrc" class="logo"></el-image>
         <h1>计算平台管理系统</h1>
       </div>
-      <div class="login-user">Login User</div>
+      <div class="login-user">{{ loginInfo.userInfo.Name }}</div>
     </el-header>
     <el-container>
       <el-aside class="aside"> Aside </el-aside>

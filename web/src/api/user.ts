@@ -13,11 +13,11 @@ export async function ping(): Promise<pingResponse> {
 
 // 登录后的用户信息
 export interface loginUserInfo {
-  userID: number;
-  username: string;
-  userName: string;
-  groupID: number;
-  levels: number[];
+  UserID: number;
+  Username: string;
+  Name: string;
+  GroupID: number;
+  Levels: number[];
 }
 
 // login需要用到的参数

@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { requiredWithLength, FormInstance } from '../utils/validateRule';
 import { login } from '../service/user';
+
+const router = useRouter();
 
 const loginFormElem = ref<FormInstance>();
 
@@ -36,7 +39,10 @@ const loginSubmit = (elem: FormInstance | undefined) => {
           type: 'success',
           message: '登录成功',
         });
-        // TODO 跳转
+        // 跳转
+        router.push({
+          path: '/',
+        });
       }
     }
     return valid;
