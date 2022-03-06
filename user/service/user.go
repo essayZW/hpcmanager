@@ -326,6 +326,13 @@ func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupReques
 	return err
 }
 
+// Logout 用户退出登录
+func (s *UserService) Logout(ctx context.Context, req *userpb.LogoutRequest, resp *userpb.LogoutResponse) error {
+	logger.Infof("Logout: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	s.userLogic.DeleteToken(ctx, req.Username)
+	return nil
+}
+
 var _ userpb.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例

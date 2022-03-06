@@ -12,6 +12,7 @@ import "proto/userpublic.proto";
 service User {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc Login(LoginRequest) returns (LoginResponse) {}
+    rpc Logout(LogoutRequest) returns (LogoutResponse) {}
     rpc CheckLogin(CheckLoginRequest) returns (CheckLoginResponse) {}
     rpc ExistUsername(ExistUsernameRequest) returns (ExistUsernameResponse) {}
     rpc AddUser(AddUserRequest) returns (AddUserResponse) {}
@@ -101,5 +102,14 @@ message JoinGroupRequest {
 }
 
 message JoinGroupResponse {
+    bool success = 1;
+}
+
+message LogoutRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+
+message LogoutResponse {
     bool success = 1;
 }

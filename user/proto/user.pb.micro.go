@@ -40,6 +40,7 @@ func NewUserEndpoints() []*api.Endpoint {
 type UserService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error)
+	Logout(ctx context.Context, in *LogoutRequest, opts ...client.CallOption) (*LogoutResponse, error)
 	CheckLogin(ctx context.Context, in *CheckLoginRequest, opts ...client.CallOption) (*CheckLoginResponse, error)
 	ExistUsername(ctx context.Context, in *ExistUsernameRequest, opts ...client.CallOption) (*ExistUsernameResponse, error)
 	AddUser(ctx context.Context, in *AddUserRequest, opts ...client.CallOption) (*AddUserResponse, error)
@@ -74,6 +75,16 @@ func (c *userService) Ping(ctx context.Context, in *proto1.Empty, opts ...client
 func (c *userService) Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error) {
 	req := c.c.NewRequest(c.name, "User.Login", in)
 	out := new(LoginResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) Logout(ctx context.Context, in *LogoutRequest, opts ...client.CallOption) (*LogoutResponse, error) {
+	req := c.c.NewRequest(c.name, "User.Logout", in)
+	out := new(LogoutResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -156,6 +167,7 @@ func (c *userService) JoinGroup(ctx context.Context, in *JoinGroupRequest, opts 
 type UserHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
 	Login(context.Context, *LoginRequest, *LoginResponse) error
+	Logout(context.Context, *LogoutRequest, *LogoutResponse) error
 	CheckLogin(context.Context, *CheckLoginRequest, *CheckLoginResponse) error
 	ExistUsername(context.Context, *ExistUsernameRequest, *ExistUsernameResponse) error
 	AddUser(context.Context, *AddUserRequest, *AddUserResponse) error
@@ -169,6 +181,7 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 	type user interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
 		Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error
+		Logout(ctx context.Context, in *LogoutRequest, out *LogoutResponse) error
 		CheckLogin(ctx context.Context, in *CheckLoginRequest, out *CheckLoginResponse) error
 		ExistUsername(ctx context.Context, in *ExistUsernameRequest, out *ExistUsernameResponse) error
 		AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error
@@ -194,6 +207,10 @@ func (h *userHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1.Pi
 
 func (h *userHandler) Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error {
 	return h.UserHandler.Login(ctx, in, out)
+}
+
+func (h *userHandler) Logout(ctx context.Context, in *LogoutRequest, out *LogoutResponse) error {
+	return h.UserHandler.Logout(ctx, in, out)
 }
 
 func (h *userHandler) CheckLogin(ctx context.Context, in *CheckLoginRequest, out *CheckLoginResponse) error {

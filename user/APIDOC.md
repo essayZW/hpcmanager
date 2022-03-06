@@ -1,8 +1,8 @@
-# user服务接口文档
+# user 服务接口文档
 
 ## Ping
 
-描述：ping测试，返回请求ID等基本信息
+描述：ping 测试，返回请求 ID 等基本信息
 
 原型定义：`rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}`
 
@@ -28,7 +28,7 @@ message PingResponse {
 
 ## Login
 
-描述：登录认证接口，在redis中创建对应的登录token
+描述：登录认证接口，在 redis 中创建对应的登录 token
 
 需求权限：无
 
@@ -55,7 +55,7 @@ message LoginResponse {
 
 ## CheckLogin
 
-描述：验证登录token接口，验证传入的token信息并返回对应用户的相关信息以及权限信息
+描述：验证登录 token 接口，验证传入的 token 信息并返回对应用户的相关信息以及权限信息
 
 需求权限：无
 
@@ -107,7 +107,7 @@ message ExistUsernameResponse {
 
 ## AddUser
 
-描述：添加一个新的用户，返回新添加用户的用户id
+描述：添加一个新的用户，返回新添加用户的用户 id
 
 需求权限：`SuperAdmin`,`CommonAdmin`
 
@@ -132,7 +132,7 @@ message AddUserResponse {
 
 ## CreateToken
 
-描述：传入用户名，为其创建登录token
+描述：传入用户名，为其创建登录 token
 
 需求权限：无
 
@@ -158,7 +158,7 @@ message CreateTokenResponse {
 
 ## GetUserInfo
 
-描述：传入目标用户ID，查询用户的详细个人信息，对于不同权限的查询者其能查询的范围不同
+描述：传入目标用户 ID，查询用户的详细个人信息，对于不同权限的查询者其能查询的范围不同
 
 需求权限：`Common`及以上
 
@@ -183,7 +183,7 @@ message GetUserInfoResponse {
 
 ## GetGroupInfoByID
 
-描述：传入目标组的ID，查询组的基本信息，对于不同权限的查询者其能查询的范围不同
+描述：传入目标组的 ID，查询组的基本信息，对于不同权限的查询者其能查询的范围不同
 
 需求权限：`Tutor`及以上
 
@@ -261,7 +261,7 @@ message PaginationGetUserInfoResponse {
 
 ## CreateJoinGroupApply
 
-描述：传入申请的组的ID信息，创建一个当前用户申请加入组的新的申请
+描述：传入申请的组的 ID 信息，创建一个当前用户申请加入组的新的申请
 
 需求权限：仅`Guest`权限
 
@@ -360,7 +360,7 @@ message CheckApplyRequest {
 }
 ```
 
-响应参数： 
+响应参数：
 
 ```protobuf
 message CheckApplyResponse {
@@ -398,7 +398,7 @@ message CreateGroupResponse {
 
 ## JoinGroup
 
-描述：添加现有的没有i组的用户到一个组中
+描述：添加现有的没有 i 组的用户到一个组中
 
 需求权限：`CommonAdmin`及以上
 
@@ -422,11 +422,36 @@ message JoinGroupResponse {
 }
 ```
 
+## Logout
+
+描述: 用户退出登录,销毁 token
+
+原型定义: `rpc Logout(LogoutRequest) returns (LogoutResponse) {}`
+
+需求权限: 无
+
+请求参数:
+
+```protobuf
+message LogoutRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message LogoutResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## UserInfo
 
-描述：UserInfo消息
+描述：UserInfo 消息
 
 ```protobuf
 // UserInfo 用户基本信息
@@ -448,7 +473,7 @@ message UserInfo {
 
 ## GroupInfo
 
-描述：Group相关的信息
+描述：Group 相关的信息
 
 ```protobuf
 // GroupInfo 用户组基本信息
@@ -470,7 +495,7 @@ message GroupInfo {
 
 ## UserGroupApply
 
-描述：group申请相关的信息
+描述：group 申请相关的信息
 
 ```protobuf
 // UserGroupApply 用户加入组申请记录信息
@@ -497,4 +522,3 @@ message UserGroupApply {
     string extraAttributes = 20;
 }
 ```
-
