@@ -7,11 +7,11 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type install struct {
+type sys struct {
 	redis *redis.Client
 }
 
-func (i *install) check(ctx *gin.Context) {
+func (i *sys) checkInstall(ctx *gin.Context) {
 	status := utils.IsInstall(i.redis)
 	if ctx.Request.URL.Path != "/api/sys/install" && !status {
 		resp := response.New(403, nil, false, "系统还未初始化,需要进行系统初始化")

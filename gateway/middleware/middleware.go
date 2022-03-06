@@ -12,11 +12,11 @@ var verifyMiddleware *verify
 func Registry(router *gin.RouterGroup, client client.Client, redisConn *redis.Client) {
 	router.Use(gin.Recovery())
 
-	install := &install{
+	install := &sys{
 		redis: redisConn,
 	}
 	// 注册检查安装状态的中间件
-	router.Use(install.check)
+	router.Use(install.checkInstall)
 	// 注册添加基础请求信息的中间件
 	router.Use(baseReq)
 	// 注册进行日志输出的中间件
