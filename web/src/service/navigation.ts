@@ -2,6 +2,7 @@ import { UserLevels } from './user';
 import { RouteRecordRaw, Router } from 'vue-router';
 
 import ApplyGroup from '../components/guest/ApplyGroup.vue';
+import CreateGroup from '../components/admin/CreateGroup.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -27,6 +28,39 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '申请加入组',
           to: 'apply_group',
+        },
+      },
+    ],
+  ],
+  [
+    UserLevels.CommonAdmin,
+    [
+      {
+        routerRaw: {
+          path: 'create_group',
+          name: 'CreateGroup',
+          component: CreateGroup,
+        },
+        item: {
+          name: '创建用户组',
+          to: 'create_group',
+        },
+      },
+    ],
+  ],
+  // 超级管理员和普通管理员都这项操作
+  [
+    UserLevels.SuperAdmin,
+    [
+      {
+        routerRaw: {
+          path: 'create_group',
+          name: 'CreateGroup',
+          component: CreateGroup,
+        },
+        item: {
+          name: '创建用户组',
+          to: 'create_group',
         },
       },
     ],

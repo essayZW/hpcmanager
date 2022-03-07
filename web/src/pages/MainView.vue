@@ -115,7 +115,7 @@ const logout = async () => {
   }
 }
 .aside {
-  width: 150px;
+  width: 180px;
   border-right: 1px solid var(--el-border-color-base);
 }
 .main-content-area {

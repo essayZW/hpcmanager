@@ -27,7 +27,7 @@ if (info == null) {
       <el-menu-item
         v-for="item in routerNum.get(UserLevels.SuperAdmin)"
         :key="item.name"
-        router
+        :route="item.to"
         index="{{ item.to }}"
         >{{ item.name }}</el-menu-item
       >
@@ -39,7 +39,7 @@ if (info == null) {
       <el-menu-item
         v-for="item in routerNum.get(UserLevels.CommonAdmin)"
         :key="item.name"
-        router
+        :route="item.to"
         index="{{ item.to }}"
         >{{ item.name }}</el-menu-item
       >
@@ -51,7 +51,7 @@ if (info == null) {
       <el-menu-item
         v-for="item in routerNum.get(UserLevels.Tutor)"
         :key="item.name"
-        router
+        :route="item.to"
         index="{{ item.to }}"
         >{{ item.name }}</el-menu-item
       >
@@ -63,15 +63,12 @@ if (info == null) {
       <el-menu-item
         v-for="item in routerNum.get(UserLevels.Common)"
         :key="item.name"
-        router
+        :route="item.to"
         index="{{ item.to }}"
         >{{ item.name }}</el-menu-item
       >
     </el-sub-menu>
-    <el-sub-menu v-if="routerNum.has(UserLevels.Guest)" index="5">
-      <template #title>
-        <span>游客操作</span>
-      </template>
+    <el-menu-item-group v-if="routerNum.has(UserLevels.Guest)">
       <el-menu-item
         v-for="item in routerNum.get(UserLevels.Guest)"
         :key="item.name"
@@ -79,7 +76,7 @@ if (info == null) {
         index="{{ item.to }}"
         >{{ item.name }}</el-menu-item
       >
-    </el-sub-menu>
+    </el-menu-item-group>
   </el-menu>
 </template>
 <style lang="less">
