@@ -52,7 +52,7 @@ func (db *UserDB) InsertUser(ctx context.Context, userinfo *User) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	if res, err := result.RowsAffected(); err == nil {
+	if res, err := result.LastInsertId(); err == nil {
 		return int(res), nil
 	}
 	return 0, err
