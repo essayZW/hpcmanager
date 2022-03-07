@@ -42,3 +42,14 @@ export async function logout(): Promise<boolean> {
   }
   return status;
 }
+
+/*
+ * 用户权限等级定义
+ */
+export enum UserLevels {
+  Guest,
+  Common,
+  Tutor,
+  CommonAdmin,
+  SuperAdmin,
+}

@@ -4,6 +4,8 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    ApplyGroup: typeof import('./src/components/guest/ApplyGroup.vue')['default']
+    AsideNavigation: typeof import('./src/components/AsideNavigation.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']
@@ -19,9 +21,13 @@ declare module 'vue' {
     ElImage: typeof import('element-plus/es')['ElImage']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElMain: typeof import('element-plus/es')['ElMain']
+    ElMenu: typeof import('element-plus/es')['ElMenu']
+    ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElRow: typeof import('element-plus/es')['ElRow']
+    ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     IEpArrowDown: typeof import('~icons/ep/arrow-down')['default']
     IEpAvatar: typeof import('~icons/ep/avatar')['default']
+    Navigation: typeof import('./src/components/navigation.vue')['default']
   }
 }
 

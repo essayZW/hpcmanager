@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { onBeforeMount, reactive } from 'vue';
+import { reactive } from 'vue';
 import LogoImageSrc from '../assets/logo.png';
 import { isLogin, logout as userLogout } from '../service/user';
 import { loginUserInfo } from '../api/user';
 import { useRouter } from 'vue-router';
 import getQuery from '../utils/urlQuery';
 import { accessTokenKey } from '../api/api';
+
+import AsideNavigation from '../components/AsideNavigation.vue';
 
 const router = useRouter();
 
@@ -19,28 +21,25 @@ const loginInfo = reactive<{ userInfo: loginUserInfo }>({
   },
 });
 
-onBeforeMount(async () => {
-  // 检查setToken参数
-  const tokenValue = getQuery('setToken');
-  if (tokenValue != null) {
-    localStorage.setItem(accessTokenKey, tokenValue);
-    window.location.href = '/';
-    return;
-  }
-  // 判断是否已经登录,未登录跳转到登录页面
-  const info = await isLogin();
-  if (info == null) {
-    ElMessage({
-      type: 'error',
-      message: '未登录,请先登录',
-    });
-    router.push({
-      path: '/login',
-    });
-    return;
-  }
-  loginInfo.userInfo = info;
-});
+// 检查setToken参数
+const tokenValue = getQuery('setToken');
+if (tokenValue != null) {
+  localStorage.setItem(accessTokenKey, tokenValue);
+  window.location.href = '/';
+}
+
+// 判断是否已经登录,未登录跳转到登录页面
+const info = await isLogin();
+if (info == null) {
+  ElMessage({
+    type: 'error',
+    message: '未登录,请先登录',
+  });
+  router.push({
+    path: '/login',
+  });
+}
+loginInfo.userInfo = info as loginUserInfo;
 
 // 退出登录处理函数
 const logout = async () => {
@@ -82,9 +81,13 @@ const logout = async () => {
       </div>
     </el-header>
     <el-container>
-      <el-aside class="aside"> Aside </el-aside>
+      <el-aside class="aside">
+        <AsideNavigation :levels="loginInfo.userInfo.Levels"></AsideNavigation>
+      </el-aside>
       <el-container class="main-content-area">
-        <el-main class="main-content"> Main </el-main>
+        <el-main class="main-content">
+          <router-view></router-view>
+        </el-main>
         <el-footer class="footer"
           >&copy; 2022 essay.AllRightsReserved
         </el-footer>
@@ -126,7 +129,6 @@ const logout = async () => {
 }
 .aside {
   width: 150px;
-  padding: 12px 8px;
   border-right: 1px solid var(--el-border-color-base);
 }
 .main-content-area {
