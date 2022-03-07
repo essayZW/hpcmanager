@@ -80,7 +80,7 @@ func (user *User) logout(ctx *gin.Context) {
 		res.Send(ctx)
 		return
 	}
-	res := response.New(200, nil, true, "推出登录成功")
+	res := response.New(200, nil, true, "退出登录成功")
 	res.Send(ctx)
 	return
 

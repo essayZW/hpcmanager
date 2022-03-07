@@ -193,14 +193,21 @@ func (sys *System) casAuthValid(ctx *gin.Context) {
 	}
 	if !resp.Exist {
 		// 用户不存在,创建用户
+		// 临时赋予此次操作CommonAdmin权限
+		logger.Debug(info)
+		baseRequest.UserInfo.Levels = append(baseRequest.UserInfo.Levels, int32(verify.CommonAdmin))
 		_, err := sys.userService.AddUser(c, &userpb.AddUserRequest{
 			UserInfo: &userpb.UserInfo{
 				Username: info.User,
-				Name:     info.Name,
+				Name:     info.Attributes.Name,
+				Password: info.User,
 			},
 			BaseRequest: baseRequest,
 		})
+		// 取消权限
+		baseRequest.UserInfo.Levels = baseRequest.UserInfo.Levels[:len(baseRequest.UserInfo.Levels)-1]
 		if err != nil {
+			logger.Warn(err)
 			resp := response.New(200, nil, false, "用户添加失败")
 			resp.Send(ctx)
 			return
