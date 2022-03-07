@@ -4,6 +4,8 @@ import LogoImageSrc from '../assets/logo.png';
 import { isLogin } from '../service/user';
 import { loginUserInfo } from '../api/user';
 import { useRouter } from 'vue-router';
+import getQuery from '../utils/urlQuery';
+import { accessTokenKey } from '../api/api';
 
 const router = useRouter();
 
@@ -18,6 +20,13 @@ const loginInfo = reactive<{ userInfo: loginUserInfo }>({
 });
 
 onBeforeMount(async () => {
+  // 检查setToken参数
+  const tokenValue = getQuery('setToken');
+  if (tokenValue != null) {
+    localStorage.setItem(accessTokenKey, tokenValue);
+    window.location.href = '/';
+    return;
+  }
   // 判断是否已经登录,未登录跳转到登录页面
   const info = await isLogin();
   if (info == null) {

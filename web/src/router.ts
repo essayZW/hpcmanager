@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import { isInstall } from './service/sys';
+import { isInstall, getCasConfig } from './service/sys';
 import { isLogin } from './service/user';
 
 import MainView from './pages/MainView.vue';
@@ -41,6 +41,15 @@ const Router: RouteRecordRaw[] = [
         });
         return '/';
       }
+      // 判断是否启用cas登录
+      const config = await getCasConfig();
+      if (config == null) {
+        return;
+      }
+      if (!config.Enable) {
+        return;
+      }
+      window.location.href = `${config.AuthServer}/cas/login?service=${config.ServiceAddr}${config.ValidPath}`;
     },
   },
   {
