@@ -61,8 +61,15 @@ func (user *User) login(ctx *gin.Context) {
 // loginValid /api/user/token GET query token info of user
 func (user *User) loginValid(ctx *gin.Context) {
 	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
 	// 暂时直接返回中间件处理的信息
-	rep := response.New(200, baseReq.(*gatewaypb.BaseRequest).UserInfo, true, "success")
+	rep := response.New(200, map[string]interface{}{
+		"Username": baseRequest.UserInfo.Username,
+		"Name":     baseRequest.UserInfo.Name,
+		"UserId":   baseRequest.UserInfo.UserId,
+		"GroupId":  baseRequest.UserInfo.GroupId,
+		"Levels":   baseRequest.UserInfo.Levels,
+	}, true, "success")
 	rep.Send(ctx)
 }
 
