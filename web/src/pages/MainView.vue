@@ -21,25 +21,30 @@ const loginInfo = reactive<{ userInfo: loginUserInfo }>({
   },
 });
 
-// 检查setToken参数
-const tokenValue = getQuery('setToken');
-if (tokenValue != null) {
-  localStorage.setItem(accessTokenKey, tokenValue);
-  window.location.href = '/';
-}
+const getUserInfo = async () => {
+  // 检查setToken参数
+  const tokenValue = getQuery('setToken');
+  if (tokenValue != null) {
+    localStorage.setItem(accessTokenKey, tokenValue);
+    window.location.href = '/';
+    return;
+  }
 
-// 判断是否已经登录,未登录跳转到登录页面
-const info = await isLogin();
-if (info == null) {
-  ElMessage({
-    type: 'error',
-    message: '未登录,请先登录',
-  });
-  router.push({
-    path: '/login',
-  });
-}
-loginInfo.userInfo = info as loginUserInfo;
+  // 判断是否已经登录,未登录跳转到登录页面
+  const info = await isLogin();
+  if (info == null) {
+    ElMessage({
+      type: 'error',
+      message: '未登录,请先登录',
+    });
+    router.push({
+      path: '/login',
+    });
+    return;
+  }
+  loginInfo.userInfo = info;
+};
+getUserInfo();
 
 // 退出登录处理函数
 const logout = async () => {

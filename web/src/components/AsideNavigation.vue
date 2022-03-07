@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { registryRouter } from '../service/navigation';
+import { ref } from 'vue';
+import { registryRouter, NavigationItem } from '../service/navigation';
 import { UserLevels } from '../service/user';
 import { useRouter } from 'vue-router';
+import { watchEffect } from 'vue';
 
 const router = useRouter();
 
@@ -9,7 +11,14 @@ const props = defineProps<{
   levels: number[];
 }>();
 
-const routerNum = registryRouter('Main', router, props.levels as UserLevels[]);
+let routerNum = ref(new Map<UserLevels, NavigationItem[]>());
+watchEffect(() => {
+  routerNum.value = registryRouter(
+    'Main',
+    router,
+    props.levels as UserLevels[]
+  );
+});
 </script>
 <template>
   <el-menu class="aside-menu">

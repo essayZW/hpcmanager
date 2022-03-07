@@ -12,9 +12,7 @@ window.addEventListener('resize', () => {
 });
 </script>
 <template>
-  <suspense>
-    <router-view id="main-view"></router-view>
-  </suspense>
+  <router-view id="main-view"></router-view>
 </template>
 
 <style scoped lang="less">

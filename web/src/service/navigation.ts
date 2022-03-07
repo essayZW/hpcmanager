@@ -36,7 +36,7 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
 /**
  * 导航item定义
  */
-type NavigationItem = {
+export type NavigationItem = {
   name: string;
   to: string;
 };
