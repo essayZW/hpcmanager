@@ -20,13 +20,13 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
     [
       {
         routerRaw: {
-          path: '/apply_group',
+          path: 'apply_group',
           name: 'ApplyGroup',
           component: ApplyGroup,
         },
         item: {
           name: '申请加入组',
-          to: '/apply_group',
+          to: 'apply_group',
         },
       },
     ],
@@ -56,7 +56,7 @@ export function registryRouter(
     if (navigationItem == undefined) {
       continue;
     }
-    const items = new Array<NavigationItem>(navigationItem.length);
+    const items = new Array<NavigationItem>();
     for (const item of navigationItem) {
       items.push(item.item);
       router.addRoute(parentName, item.routerRaw);

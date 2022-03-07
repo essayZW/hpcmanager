@@ -10,8 +10,14 @@ import LoginView from './pages/LoginView.vue';
 const Router: RouteRecordRaw[] = [
   {
     path: '/',
+    name: 'Index',
+    redirect: '/main/',
+  },
+  {
+    path: '/main/',
     name: 'Main',
     component: MainView,
+    children: [],
   },
   {
     path: '/install',
@@ -56,6 +62,13 @@ const Router: RouteRecordRaw[] = [
     path: '/:pathMatch(.*)',
     name: 'NotFound',
     component: NotFound,
+    beforeEnter: (to) => {
+      if (/^\/main*/.test(to.fullPath)) {
+        return {
+          name: 'Main',
+        };
+      }
+    },
   },
 ];
 
