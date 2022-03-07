@@ -132,3 +132,43 @@ Method: GET
 
 响应：states 表明是否已经初始化
 
+### /sys/cas/config
+
+Method: GET
+
+描述: 获取系统 cas 配置参数
+
+参数:
+
+```text
+// 服务的地址
+serviceHost=
+```
+
+响应:
+
+```go
+type casConfig struct {
+    Enable      bool
+    AuthServer  string
+    ValidPath   string
+    ServiceAddr string
+}
+```
+
+### /sys/cas/valid
+
+Method: GET
+
+描述: 进行 cas 验证的回调验证
+
+参数:
+
+```text
+// 票据
+ticket=
+```
+
+响应:
+
+若验证成功跳转到主页,否则返回错误信息

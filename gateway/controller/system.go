@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/essayZW/hpcmanager/gateway/middleware"
@@ -23,6 +24,7 @@ type System struct {
 	userService       userpb.UserService
 	permissionService permissionpb.PermissionService
 	redisConn         *redis.Client
+	casServer         *utils.Cas
 }
 
 // install /api/sys/install POST 初始化系统相关的设置
@@ -125,10 +127,97 @@ func (sys *System) initPermision(ctx context.Context, baseReq *gatewaypb.BaseReq
 	return true
 }
 
+// isInstall /api/sys/install GET 获取系统安装的参数
 func (sys *System) isInstall(ctx *gin.Context) {
 	status := utils.IsInstall(sys.redisConn)
 	resp := response.New(200, nil, status, "query success")
 	resp.Send(ctx)
+}
+
+// TODO 目前cas配置暂时定死,后面迁移到动态配置平台
+// casConfig 系统的cas配置
+type casConfig struct {
+	Enable      bool
+	AuthServer  string
+	ValidPath   string
+	ServiceAddr string
+}
+
+var casConfigMutex sync.Mutex
+
+var defaultCasConfig = casConfig{
+	Enable:     false,
+	AuthServer: "",
+	ValidPath:  "/api/sys/cas/valid",
+}
+
+// casAuthConfig /api/sys/cas/config GET 获取CAS认证的配置
+func (sys *System) casAuthConfig(ctx *gin.Context) {
+	casConfigMutex.Lock()
+	defer casConfigMutex.Unlock()
+	// 由于可能存在反代的情况,需要前端提供回调server的地址
+	defaultCasConfig.ServiceAddr, _ = ctx.GetQuery("serviceHost")
+	resp := response.New(200, defaultCasConfig, true, "success")
+	resp.Send(ctx)
+}
+
+// casAuthValid /api/sys/cas/valid POST 进行cas回调的验证
+func (sys *System) casAuthValid(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+	// 进行cas的回调验证
+	ticket, ok := ctx.GetQuery("ticket")
+	if !ok {
+		resp := response.New(200, nil, false, "缺少ticket参数")
+		resp.Send(ctx)
+		return
+	}
+
+	info, err := sys.casServer.ValidToken(defaultCasConfig.ServiceAddr+defaultCasConfig.ValidPath, ticket)
+	if err != nil {
+		resp := response.New(200, nil, false, err.Error())
+		resp.Send(ctx)
+		return
+	}
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	// 判断该用户是否存在
+	resp, err := sys.userService.ExistUsername(c, &userpb.ExistUsernameRequest{
+		Username:    info.User,
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		resp := response.New(200, nil, false, "用户信息查询失败")
+		resp.Send(ctx)
+		return
+	}
+	if !resp.Exist {
+		// 用户不存在,创建用户
+		_, err := sys.userService.AddUser(c, &userpb.AddUserRequest{
+			UserInfo: &userpb.UserInfo{
+				Username: info.User,
+				Name:     info.Name,
+			},
+			BaseRequest: baseRequest,
+		})
+		if err != nil {
+			resp := response.New(200, nil, false, "用户添加失败")
+			resp.Send(ctx)
+			return
+		}
+	}
+	// 创建用户登录token
+	tokenResp, err := sys.userService.CreateToken(c, &userpb.CreateTokenRequest{
+		Username:    info.User,
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		resp := response.New(200, nil, false, "用户登录失败")
+		resp.Send(ctx)
+		return
+	}
+	// 传递token参数给前台
+	ctx.Redirect(302, "/?setToken="+tokenResp.Token)
 }
 
 // Registry 注册system控制器的相关函数
@@ -140,6 +229,12 @@ func (sys *System) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	middleware.RegistryExcludeAPIPath("POST:/api/sys/install")
 	sysRouter.GET("/install", sys.isInstall)
 	middleware.RegistryExcludeAPIPath("GET:/api/sys/install")
+
+	sysRouter.GET("/cas/config", sys.casAuthConfig)
+	middleware.RegistryExcludeAPIPath("GET:/api/sys/cas/config")
+
+	sysRouter.GET("/cas/valid", sys.casAuthValid)
+	middleware.RegistryExcludeAPIPath("GET:" + defaultCasConfig.ValidPath)
 	return sysRouter
 }
 
@@ -151,6 +246,9 @@ func NewSystem(client client.Client, redisConn *redis.Client) Controller {
 		userService:       userService,
 		permissionService: permissionService,
 		redisConn:         redisConn,
+		casServer: &utils.Cas{
+			AuthServer: defaultCasConfig.AuthServer,
+		},
 	}
 
 }
