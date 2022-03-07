@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount, reactive } from 'vue';
 import LogoImageSrc from '../assets/logo.png';
-import { isLogin } from '../service/user';
+import { isLogin, logout as userLogout } from '../service/user';
 import { loginUserInfo } from '../api/user';
 import { useRouter } from 'vue-router';
 import getQuery from '../utils/urlQuery';
@@ -41,6 +41,21 @@ onBeforeMount(async () => {
   }
   loginInfo.userInfo = info;
 });
+
+// 退出登录处理函数
+const logout = async () => {
+  let status = await userLogout();
+  if (!status) {
+    ElMessage({
+      type: 'error',
+      message: '退出登录失败',
+    });
+  } else {
+    router.push({
+      path: '/login',
+    });
+  }
+};
 </script>
 <template>
   <el-container>
@@ -60,7 +75,7 @@ onBeforeMount(async () => {
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item>退出登录</el-dropdown-item>
+              <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>

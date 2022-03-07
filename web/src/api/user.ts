@@ -73,3 +73,15 @@ export interface createUserRequest {
   email: string;
   collegeName: string;
 }
+
+/**
+ * 删除用户登录token
+ */
+export async function deleteToken(): Promise<boolean> {
+  try {
+    const resp = await ApiRequest.request('/user/token', 'DELETE');
+    return resp.status;
+  } catch (eror) {
+    return false;
+  }
+}
