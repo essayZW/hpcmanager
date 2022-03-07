@@ -1,0 +1,7 @@
+{
+    "volar.maxMemory": 1536,
+    "volar.autoClosingTags": false,
+    "typescript.suggest.autoImports": false,
+    "javascript.suggest.autoImports": false,
+    "volar.lowPowerMode": true
+}
