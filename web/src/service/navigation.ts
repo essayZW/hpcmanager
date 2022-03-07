@@ -2,7 +2,7 @@ import { UserLevels } from './user';
 import { RouteRecordRaw, Router } from 'vue-router';
 
 import ApplyGroup from '../components/guest/ApplyGroup.vue';
-import CreateGroup from '../components/admin/CreateGroup.vue';
+import GroupManager from '../components/admin/GroupManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -37,13 +37,13 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
     [
       {
         routerRaw: {
-          path: 'create_group',
-          name: 'CreateGroup',
-          component: CreateGroup,
+          path: 'group_manager',
+          name: 'GroupManager',
+          component: GroupManager,
         },
         item: {
           name: '创建用户组',
-          to: 'create_group',
+          to: 'group_manager',
         },
       },
     ],
@@ -54,13 +54,13 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
     [
       {
         routerRaw: {
-          path: 'create_group',
-          name: 'CreateGroup',
-          component: CreateGroup,
+          path: 'group_manager',
+          name: 'GroupManager',
+          component: GroupManager,
         },
         item: {
           name: '创建用户组',
-          to: 'create_group',
+          to: 'group_manager',
         },
       },
     ],
