@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { isInstall, getCasConfig } from './service/sys';
-import { isLogin } from './service/user';
+import { isLogin, setUserInfoToStorage } from './service/user';
+import getQuery from './utils/urlQuery';
+import { accessTokenKey } from './api/api';
 
 import MainView from './pages/MainView.vue';
 import NotFound from './pages/NotFound.vue';
@@ -17,7 +19,26 @@ const Router: RouteRecordRaw[] = [
     path: '/main/',
     name: 'Main',
     component: MainView,
-    children: [],
+    beforeEnter: async () => {
+      // 检查setToken参数
+      const tokenValue = getQuery('setToken');
+      if (tokenValue != null) {
+        localStorage.setItem(accessTokenKey, tokenValue);
+        window.location.href = '/';
+      }
+
+      // 判断是否已经登录,未登录跳转到登录页面
+      const info = await isLogin();
+      if (info == null) {
+        ElMessage({
+          type: 'error',
+          message: '未登录,请先登录',
+        });
+        return '/login';
+      }
+      // 存储用户信息到storge中
+      setUserInfoToStorage(info);
+    },
   },
   {
     path: '/install',

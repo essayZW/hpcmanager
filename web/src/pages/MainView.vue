@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 import LogoImageSrc from '../assets/logo.png';
-import { isLogin, logout as userLogout } from '../service/user';
+import { getUserInfoFromStorage, logout as userLogout } from '../service/user';
 import { loginUserInfo } from '../api/user';
 import { useRouter } from 'vue-router';
-import getQuery from '../utils/urlQuery';
-import { accessTokenKey } from '../api/api';
 
 import AsideNavigation from '../components/AsideNavigation.vue';
 
@@ -21,30 +19,14 @@ const loginInfo = reactive<{ userInfo: loginUserInfo }>({
   },
 });
 
-const getUserInfo = async () => {
-  // 检查setToken参数
-  const tokenValue = getQuery('setToken');
-  if (tokenValue != null) {
-    localStorage.setItem(accessTokenKey, tokenValue);
-    window.location.href = '/';
-    return;
-  }
-
-  // 判断是否已经登录,未登录跳转到登录页面
-  const info = await isLogin();
-  if (info == null) {
-    ElMessage({
-      type: 'error',
-      message: '未登录,请先登录',
-    });
-    router.push({
-      path: '/login',
-    });
-    return;
-  }
+const info = getUserInfoFromStorage();
+if (info == null) {
+  router.push({
+    path: '/login',
+  });
+} else {
   loginInfo.userInfo = info;
-};
-getUserInfo();
+}
 
 // 退出登录处理函数
 const logout = async () => {
@@ -87,7 +69,7 @@ const logout = async () => {
     </el-header>
     <el-container>
       <el-aside class="aside">
-        <AsideNavigation :levels="loginInfo.userInfo.Levels"></AsideNavigation>
+        <AsideNavigation></AsideNavigation>
       </el-aside>
       <el-container class="main-content-area">
         <el-main class="main-content">

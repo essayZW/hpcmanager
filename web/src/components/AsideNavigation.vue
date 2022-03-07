@@ -3,24 +3,20 @@ import { ref } from 'vue';
 import { registryRouter, NavigationItem } from '../service/navigation';
 import { UserLevels } from '../service/user';
 import { useRouter } from 'vue-router';
-import { watchEffect } from 'vue';
+import { getUserInfoFromStorage } from '../service/user';
 
 const router = useRouter();
-console.log(router);
-
-const props = defineProps<{
-  levels: number[];
-}>();
 
 let routerNum = ref(new Map<UserLevels, NavigationItem[]>());
 
-watchEffect(() => {
-  routerNum.value = registryRouter(
-    'Main',
-    router,
-    props.levels as UserLevels[]
-  );
-});
+const info = getUserInfoFromStorage();
+if (info == null) {
+  router.push({
+    path: '/login',
+  });
+} else {
+  routerNum.value = registryRouter('Main', router, info.Levels);
+}
 </script>
 <template>
   <el-menu class="aside-menu" router>

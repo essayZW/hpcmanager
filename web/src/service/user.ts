@@ -53,3 +53,23 @@ export enum UserLevels {
   CommonAdmin,
   SuperAdmin,
 }
+
+const userInfoLocalStorageKey = 'userInfo';
+/**
+ * 存储用户信息到storge中
+ */
+export function setUserInfoToStorage(info: loginUserInfo) {
+  localStorage.setItem(userInfoLocalStorageKey, JSON.stringify(info));
+}
+
+export function getUserInfoFromStorage(): loginUserInfo | null {
+  const str = localStorage.getItem(userInfoLocalStorageKey);
+  if (str == null) {
+    return null;
+  }
+  try {
+    return JSON.parse(str) as loginUserInfo;
+  } catch (error) {
+    return null;
+  }
+}
