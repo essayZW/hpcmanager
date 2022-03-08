@@ -99,6 +99,28 @@ Method: GET
 
 响应：请求 ID、PONG
 
+### /group
+
+Method: GET
+
+描述: 分页查询用户组信息
+
+参数:
+
+```text
+pageIndex: number 页码
+pageSize: number 页大小
+```
+
+响应:
+
+```go
+type paginationGetGroupInfoResponse struct {
+    Count int
+    Data  []*userpb.GroupInfo
+}
+```
+
 ## system 控制器
 
 ### /sys/install
