@@ -398,7 +398,7 @@ message CreateGroupResponse {
 
 ## JoinGroup
 
-描述：添加现有的没有 i 组的用户到一个组中
+描述：添加现有的没有组的用户到一个组中
 
 需求权限：`CommonAdmin`及以上
 
