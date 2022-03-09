@@ -98,7 +98,9 @@ func (ug *UserGroup) createGroup(ctx *gin.Context) {
 	if err != nil {
 		httpResp = response.New(200, nil, false, "创建组失败")
 	} else {
-		httpResp = response.New(200, resp, true, "success")
+		httpResp = response.New(200, map[string]interface{}{
+			"id": resp.GroupID,
+		}, true, "success")
 	}
 	httpResp.Send(ctx)
 }
