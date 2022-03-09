@@ -150,7 +150,9 @@ func (user *User) getIDByUsername(ctx *gin.Context) {
 	var httpResp *response.Response
 	if resp.Exist {
 		httpResp = response.New(200, map[string]interface{}{
-			"id": resp.UserID,
+			"id":      resp.UserInfo.Id,
+			"groupID": resp.UserInfo.GroupId,
+			"name":    resp.UserInfo.Name,
 		}, true, "success")
 	} else {
 		httpResp = response.New(200, nil, false, "用户不存在")

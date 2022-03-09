@@ -110,7 +110,12 @@ func (s *UserService) ExistUsername(ctx context.Context, req *userpb.ExistUserna
 		return nil
 	}
 	resp.Exist = true
-	resp.UserID = int32(info.ID)
+	resp.UserInfo = &userpb.UserInfo{
+		Id:       int32(info.ID),
+		GroupId:  int32(info.GroupID),
+		Username: info.Username,
+		Name:     info.Name,
+	}
 	return nil
 }
 

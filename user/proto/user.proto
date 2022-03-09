@@ -54,7 +54,7 @@ message ExistUsernameRequest {
 
 message ExistUsernameResponse {
     bool exist = 1;
-    int32 userID = 2;
+    user.UserInfo userInfo = 2;
 }
 
 message AddUserRequest {
