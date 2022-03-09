@@ -105,11 +105,12 @@ func (s *UserService) ExistUsername(ctx context.Context, req *userpb.ExistUserna
 	logger.Infof("ExistUsername: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	thisCtx := context.Background()
 	// 直接通过用户名查询用户信息
-	resp.Exist = true
-	if info, err := s.userLogic.GetByUsername(thisCtx, req.GetUsername()); err != nil {
-		resp.Exist = false
-		resp.UserID = int32(info.ID)
+	info, err := s.userLogic.GetByUsername(thisCtx, req.GetUsername())
+	if err != nil {
+		return nil
 	}
+	resp.Exist = true
+	resp.UserID = int32(info.ID)
 	return nil
 }
 
