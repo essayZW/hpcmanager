@@ -2,6 +2,8 @@ package controller
 
 import (
 	"context"
+	"strconv"
+	"time"
 
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
@@ -93,6 +95,34 @@ func (user *User) logout(ctx *gin.Context) {
 
 }
 
+// getByUserID 通过用户ID查询用户信息
+func (user *User) getByUserID(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	idParam := ctx.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		resp := response.New(200, nil, false, "id参数错误")
+		resp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := user.userService.GetUserInfo(c, &userpb.GetUserInfoRequest{
+		BaseRequest: baseRequest,
+		Userid:      int32(id),
+	})
+	if err != nil {
+		resp := response.New(200, nil, false, "用户信息查询失败")
+		resp.Send(ctx)
+		return
+	}
+	httpResponse := response.New(200, resp.UserInfo, true, "success")
+	httpResponse.Send(ctx)
+}
+
 // Registry 为用户控制器注册相应的处理函数
 func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller User")
@@ -106,6 +136,7 @@ func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	userRouter.GET("/token", user.loginValid)
 
 	userRouter.DELETE("/token", user.logout)
+	userRouter.GET("/:id", user.getByUserID)
 	return userRouter
 }
 

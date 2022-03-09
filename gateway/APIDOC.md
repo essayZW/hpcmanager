@@ -63,6 +63,16 @@ Method: DELETE
 
 无
 
+### /user/:id
+
+Method: GET
+
+描述: 根据用户 ID 查询用户信息
+
+参数: 用户 ID
+
+响应: 用户信息
+
 ## hpc 控制器
 
 ### /hpc/ping
