@@ -141,6 +141,25 @@ type paginationGetGroupInfoResponse struct {
 }
 ```
 
+### /group
+
+Method: POST
+
+描述: 新建组信息
+
+参数:
+
+```go
+// CreateGroupParam 创建组的参数
+type CreateGroupParam struct {
+    GroupName string `form:"groupName" json:"groupName" binding:"required"`
+    QueueName string `form:"queueName" json:"queueName" binding:"required"`
+    TutorID   int    `form:"tutorID" json:"tutorID" binding:"required"`
+}
+```
+
+响应: 组 ID 以及操作是否成功
+
 ## system 控制器
 
 ### /sys/install

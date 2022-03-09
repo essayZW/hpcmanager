@@ -6,6 +6,7 @@ import (
 
 	"github.com/essayZW/hpcmanager/gateway/middleware"
 	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
+	"github.com/essayZW/hpcmanager/gateway/request/json"
 	"github.com/essayZW/hpcmanager/gateway/response"
 	"github.com/essayZW/hpcmanager/gateway/utils"
 	"github.com/essayZW/hpcmanager/proto"
@@ -74,6 +75,34 @@ func (ug *UserGroup) paginationGetGroupInfo(ctx *gin.Context) {
 	sendResponse.Send(ctx)
 }
 
+func (ug *UserGroup) createGroup(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	param := json.CreateGroupParam{}
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := ug.userGroupService.CreateGroup(c, &userpb.CreateGroupRequest{
+		TutorID:     int32(param.TutorID),
+		Name:        param.GroupName,
+		QueueName:   param.QueueName,
+		BaseRequest: baseRequest,
+	})
+	var httpResp *response.Response
+	if err != nil {
+		httpResp = response.New(200, nil, false, "创建组失败")
+	} else {
+		httpResp = response.New(200, resp, true, "success")
+	}
+	httpResp.Send(ctx)
+}
+
 // Registry 为用户组控制器注册相应的接口
 func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller UserGroup")
@@ -83,6 +112,7 @@ func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	middleware.RegistryExcludeAPIPath("GET:/api/group/ping")
 
 	userGroup.GET("", ug.paginationGetGroupInfo)
+	userGroup.POST("", ug.createGroup)
 	return userGroup
 }
 
