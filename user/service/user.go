@@ -106,8 +106,9 @@ func (s *UserService) ExistUsername(ctx context.Context, req *userpb.ExistUserna
 	thisCtx := context.Background()
 	// 直接通过用户名查询用户信息
 	resp.Exist = true
-	if _, err := s.userLogic.GetByUsername(thisCtx, req.GetUsername()); err != nil {
+	if info, err := s.userLogic.GetByUsername(thisCtx, req.GetUsername()); err != nil {
 		resp.Exist = false
+		resp.UserID = int32(info.ID)
 	}
 	return nil
 }
