@@ -123,6 +123,41 @@ func (user *User) getByUserID(ctx *gin.Context) {
 	httpResponse.Send(ctx)
 }
 
+// getByUsername 通过用户帐号查询用户基础信息,主要用于判断用户是否存在以及获取其用户ID
+func (user *User) getIDByUsername(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	username := ctx.Param("username")
+	if username == "" {
+		resp := response.New(200, nil, false, "用户帐号错误")
+		resp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := user.userService.ExistUsername(c, &userpb.ExistUsernameRequest{
+		Username:    username,
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		logger.Warn(err)
+		httpResp := response.New(200, nil, false, "用户信息查询失败")
+		httpResp.Send(ctx)
+		return
+	}
+	var httpResp *response.Response
+	if resp.Exist {
+		httpResp = response.New(200, map[string]interface{}{
+			"id": resp.UserID,
+		}, true, "success")
+	} else {
+		httpResp = response.New(200, nil, false, "用户不存在")
+	}
+	httpResp.Send(ctx)
+}
+
 // Registry 为用户控制器注册相应的处理函数
 func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller User")
@@ -137,6 +172,7 @@ func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	userRouter.DELETE("/token", user.logout)
 	userRouter.GET("/:id", user.getByUserID)
+	userRouter.GET("/name/:username", user.getIDByUsername)
 	return userRouter
 }
 

@@ -73,6 +73,16 @@ Method: GET
 
 响应: 用户信息
 
+### /user/name/:username
+
+Method: GET
+
+描述: 根据用户的账户查询用户对应的 ID
+
+参数: 用户账户
+
+响应: 用户的 ID
+
 ## hpc 控制器
 
 ### /hpc/ping
