@@ -1,11 +1,11 @@
-import { createUserRequest } from './user';
+import { CreateUserRequest } from './user';
 import { ApiRequest } from './api';
 
 // installRequest 安装系统的请求
-export type installRequest = createUserRequest;
+export type InstallRequest = CreateUserRequest;
 
 // 安装系统
-export async function installSys(param: installRequest): Promise<boolean> {
+export async function installSys(param: InstallRequest): Promise<boolean> {
   const resp = await ApiRequest.request<null>(
     '/sys/install',
     'POST',
@@ -36,7 +36,7 @@ export async function getInstallStatus(): Promise<boolean> {
 }
 
 // cas配置
-export interface casConfig {
+export interface CasConfig {
   Enable: boolean;
   AuthServer: string;
   ValidPath: string;
@@ -45,9 +45,9 @@ export interface casConfig {
 // 加载系统的cas配置
 export async function loadCasConfig(
   serviceAddr: string
-): Promise<casConfig | null> {
+): Promise<CasConfig | null> {
   try {
-    const resp = await ApiRequest.request<casConfig>('/sys/cas/config', 'GET', {
+    const resp = await ApiRequest.request<CasConfig>('/sys/cas/config', 'GET', {
       serviceHost: serviceAddr,
     });
     if (!resp.status) {

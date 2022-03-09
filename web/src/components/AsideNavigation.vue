@@ -82,5 +82,8 @@ if (info == null) {
 <style lang="less">
 .aside-menu {
   border: none;
+  .el-menu-item {
+    min-width: 100px;
+  }
 }
 </style>

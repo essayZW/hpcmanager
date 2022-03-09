@@ -2,14 +2,18 @@ import { accessTokenKey } from '../api/api';
 import {
   createToken,
   getLoginedInfo,
-  loginResponse,
-  loginUserInfo,
+  LoginResponse,
+  LoginUserInfo,
   deleteToken,
+  UserInfo,
+  queryUserInfoByID,
+  queryUserInfoByUsername,
+  QueryUserIDResponse,
 } from '../api/user';
 import { getCasConfig } from '../service/sys';
 
 // 判断用户是否已经登录,如果已经登录,返回登录的用户的信息
-export async function isLogin(): Promise<loginUserInfo | null> {
+export async function isLogin(): Promise<LoginUserInfo | null> {
   return getLoginedInfo();
 }
 
@@ -17,7 +21,7 @@ export async function isLogin(): Promise<loginUserInfo | null> {
 export async function login(
   username: string,
   password: string
-): Promise<loginResponse | string> {
+): Promise<LoginResponse | string> {
   try {
     const data = await createToken({
       username,
@@ -58,18 +62,36 @@ const userInfoLocalStorageKey = 'userInfo';
 /**
  * 存储用户信息到storge中
  */
-export function setUserInfoToStorage(info: loginUserInfo) {
+export function setUserInfoToStorage(info: LoginUserInfo) {
   localStorage.setItem(userInfoLocalStorageKey, JSON.stringify(info));
 }
 
-export function getUserInfoFromStorage(): loginUserInfo | null {
+export function getUserInfoFromStorage(): LoginUserInfo | null {
   const str = localStorage.getItem(userInfoLocalStorageKey);
   if (str == null) {
     return null;
   }
   try {
-    return JSON.parse(str) as loginUserInfo;
+    return JSON.parse(str) as LoginUserInfo;
   } catch (error) {
     return null;
   }
+}
+
+/**
+ * 通过用户ID获取用户信息
+ */
+export async function getUserInfoById(id: number): Promise<UserInfo | string> {
+  try {
+    const data = await queryUserInfoByID(id);
+    return data as UserInfo;
+  } catch (error) {
+    return `${error}`;
+  }
+}
+
+export async function getUserIdByUsername(
+  username: string
+): Promise<QueryUserIDResponse> {
+  return await queryUserInfoByUsername(username);
 }

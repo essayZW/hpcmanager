@@ -1,8 +1,9 @@
-import { pingResponse, ApiRequest } from './api';
+import { PingResponse, ApiRequest } from './api';
+import { undefinedWithDefault } from '../utils/obj';
 
 // 用户服务ping测试
-export async function ping(): Promise<pingResponse> {
-  const { data } = await ApiRequest.request<pingResponse>(
+export async function ping(): Promise<PingResponse> {
+  const { data } = await ApiRequest.request<PingResponse>(
     '/user/ping',
     'GET',
     {},
@@ -12,7 +13,7 @@ export async function ping(): Promise<pingResponse> {
 }
 
 // 登录后的用户信息
-export interface loginUserInfo {
+export interface LoginUserInfo {
   UserID: number;
   Username: string;
   Name: string;
@@ -21,20 +22,20 @@ export interface loginUserInfo {
 }
 
 // login需要用到的参数
-export interface loginRequest {
+export interface LoginRequest {
   username: string;
   password: string;
 }
 
 // login 登录后返回的数据格式
-export interface loginResponse {
-  userInfo: loginUserInfo;
+export interface LoginResponse {
+  userInfo: LoginUserInfo;
   token: string;
 }
 
 // 创建登录token
-export async function createToken(param: loginRequest): Promise<loginResponse> {
-  const resp = await ApiRequest.request<loginResponse>(
+export async function createToken(param: LoginRequest): Promise<LoginResponse> {
+  const resp = await ApiRequest.request<LoginResponse>(
     '/user/token',
     'POST',
     {},
@@ -49,9 +50,9 @@ export async function createToken(param: loginRequest): Promise<loginResponse> {
 }
 
 // 获取登录的用户的信息
-export async function getLoginedInfo(): Promise<loginUserInfo | null> {
+export async function getLoginedInfo(): Promise<LoginUserInfo | null> {
   try {
-    const { status, data } = await ApiRequest.request<loginUserInfo>(
+    const { status, data } = await ApiRequest.request<LoginUserInfo>(
       '/user/token',
       'GET'
     );
@@ -65,7 +66,7 @@ export async function getLoginedInfo(): Promise<loginUserInfo | null> {
 }
 
 // 创建用户参数
-export interface createUserRequest {
+export interface CreateUserRequest {
   username: string;
   password: string;
   name: string;
@@ -84,4 +85,62 @@ export async function deleteToken(): Promise<boolean> {
   } catch (eror) {
     return false;
   }
+}
+
+/**
+ * 用户信息
+ */
+export type UserInfo = {
+  id: number;
+  username: string;
+  tel: string;
+  email: string;
+  name: string;
+  pyName: string;
+  college: string;
+  groupID: number;
+  createTime: number;
+  extraAttributes: string;
+  hpcUserID: number;
+};
+
+/**
+ * 通过用户ID查询用户信息
+ */
+export async function queryUserInfoByID(id: number): Promise<UserInfo> {
+  const resp = await ApiRequest.request(`/user/${id}`, 'GET');
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  undefinedWithDefault(resp.data as UserInfo, 'id', 0);
+  undefinedWithDefault(resp.data as UserInfo, 'username', '');
+  undefinedWithDefault(resp.data as UserInfo, 'tel', '');
+  undefinedWithDefault(resp.data as UserInfo, 'email', '');
+  undefinedWithDefault(resp.data as UserInfo, 'name', '');
+  undefinedWithDefault(resp.data as UserInfo, 'pyName', '');
+  undefinedWithDefault(resp.data as UserInfo, 'college', '');
+  undefinedWithDefault(resp.data as UserInfo, 'groupID', 0);
+  undefinedWithDefault(resp.data as UserInfo, 'createTime', 0);
+  undefinedWithDefault(resp.data as UserInfo, 'extraAttributes', '');
+  undefinedWithDefault(resp.data as UserInfo, 'hpcUserID', 0);
+  return resp.data as UserInfo;
+}
+
+export type QueryUserIDResponse = {
+  id: number;
+  groupID: number;
+  name: string;
+};
+
+/**
+ * 查询用户ID
+ */
+export async function queryUserInfoByUsername(
+  username: string
+): Promise<QueryUserIDResponse> {
+  const resp = await ApiRequest.request(`/user/name/${username}`, 'GET');
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data as QueryUserIDResponse;
 }

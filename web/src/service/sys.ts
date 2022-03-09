@@ -1,13 +1,13 @@
 import {
   getInstallStatus,
-  installRequest,
+  InstallRequest,
   installSys,
-  casConfig,
+  CasConfig,
   loadCasConfig,
 } from '../api/sys';
 
 // install 初始化系统,添加系统默认管理员
-export async function install(param: installRequest): Promise<{
+export async function install(param: InstallRequest): Promise<{
   status: boolean;
   message: string;
 }> {
@@ -31,7 +31,7 @@ export async function isInstall(): Promise<boolean> {
 }
 
 // 获取系统cas配置
-export async function getCasConfig(): Promise<casConfig | null> {
+export async function getCasConfig(): Promise<CasConfig | null> {
   const serviceAddr = window.location.protocol + '//' + window.location.host;
   return await loadCasConfig(serviceAddr);
 }

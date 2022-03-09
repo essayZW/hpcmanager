@@ -8,7 +8,7 @@ export interface HTTPResponse<T> {
   message: string;
 }
 
-export interface pingResponse {
+export interface PingResponse {
   Msg: string;
   Ip: string;
   RequestId: string;
@@ -44,6 +44,9 @@ export class ApiRequest {
         },
       });
       const responseData = data as HTTPResponse<T>;
+      if (responseData.code < 200 && responseData.code >= 300) {
+        console.error(`http request fail: ${responseData.message}`);
+      }
       return responseData;
     } catch (error) {
       console.error(`http request fail: ${error}`);
@@ -51,3 +54,11 @@ export class ApiRequest {
     }
   }
 }
+
+/**
+ * 分页查询返回信息格式
+ */
+export type PaginationQueryResponse<T> = {
+  Data: T[];
+  Count: number;
+};

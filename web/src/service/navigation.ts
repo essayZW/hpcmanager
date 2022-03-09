@@ -42,7 +42,7 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           component: GroupManager,
         },
         item: {
-          name: '创建用户组',
+          name: '管理用户组',
           to: 'group_manager',
         },
       },
@@ -59,7 +59,7 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           component: GroupManager,
         },
         item: {
-          name: '创建用户组',
+          name: '管理用户组',
           to: 'group_manager',
         },
       },

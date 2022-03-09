@@ -2,14 +2,14 @@
 import { reactive } from 'vue';
 import LogoImageSrc from '../assets/logo.png';
 import { getUserInfoFromStorage, logout as userLogout } from '../service/user';
-import { loginUserInfo } from '../api/user';
+import { LoginUserInfo } from '../api/user';
 import { useRouter } from 'vue-router';
 
 import AsideNavigation from '../components/AsideNavigation.vue';
 
 const router = useRouter();
 
-const loginInfo = reactive<{ userInfo: loginUserInfo }>({
+const loginInfo = reactive<{ userInfo: LoginUserInfo }>({
   userInfo: {
     Username: 'unknown',
     Name: 'unknown',
@@ -53,7 +53,7 @@ const logout = async () => {
       <div class="login-user">
         <el-dropdown trigger="hover">
           <span>
-            <el-icon class="el-icon--right"> <i-ep-avatar /> </el-icon>
+            <el-icon class="el-icon--left"> <i-ep-avatar /> </el-icon>
             {{ loginInfo.userInfo.Username }}
             <el-icon class="el-icon--right">
               <i-ep-arrow-down />
@@ -115,7 +115,7 @@ const logout = async () => {
   }
 }
 .aside {
-  width: 180px;
+  width: 160px;
   border-right: 1px solid var(--el-border-color-base);
 }
 .main-content-area {
