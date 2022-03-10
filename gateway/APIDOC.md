@@ -179,7 +179,7 @@ pageSize: number 页大小
 响应:
 
 ```go
-type paginationGetGroupInfoResponse struct {
+type PaginationQueryResponse struct {
     Count int
     Data  []*userpb.GroupInfo
 }
@@ -203,6 +203,26 @@ type CreateGroupParam struct {
 ```
 
 响应: 组 ID 以及操作是否成功
+
+### /group/apply
+
+Method: GET
+
+参数:
+
+```text
+pageIndex: number 页码
+pageSize: number 页大小
+```
+
+响应:
+
+```go
+type PaginationQueryResponse struct {
+    Count int
+    Data  []*userpb.GroupInfo
+}
+```
 
 ## system 控制器
 

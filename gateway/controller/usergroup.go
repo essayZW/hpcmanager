@@ -36,11 +36,6 @@ func (ug *UserGroup) ping(ctx *gin.Context) {
 	resp.Send(ctx)
 }
 
-type paginationGetGroupInfoResponse struct {
-	Count int
-	Data  []*userpb.GroupInfo
-}
-
 // paginationGetGroupInfo 分页查询用户组信息
 func (ug *UserGroup) paginationGetGroupInfo(ctx *gin.Context) {
 	pageIndex, pageSize, err := utils.ParsePagination(ctx)
@@ -64,11 +59,11 @@ func (ug *UserGroup) paginationGetGroupInfo(ctx *gin.Context) {
 		res.Send(ctx)
 		return
 	}
-	res := paginationGetGroupInfoResponse{
+	res := response.PaginationQueryResponse{
 		Count: int(resp.Count),
 		Data:  resp.GroupInfos,
 	}
-	if res.Data == nil {
+	if resp.GroupInfos == nil {
 		res.Data = make([]*userpb.GroupInfo, 0)
 	}
 	sendResponse := response.New(200, res, true, "success")
@@ -105,6 +100,41 @@ func (ug *UserGroup) createGroup(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+func (ug *UserGroup) paginationGetApplyJoinGroup(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	groupResp, err := ug.userGroupService.PageGetApplyGroupInfo(c, &userpb.PageGetApplyGroupInfoRequest{
+		PageIndex:   int32(pageIndex),
+		PageSize:    int32(pageSize),
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, "用户组申请信息查询失败")
+		httpResp.Send(ctx)
+		return
+	}
+	resData := response.PaginationQueryResponse{
+		Count: int(groupResp.Count),
+		Data:  groupResp.Applies,
+	}
+	if groupResp.Applies == nil {
+		resData.Data = make([]*userpb.UserGroupApply, 0)
+	}
+	httpResp := response.New(200, resData, true, "success")
+	httpResp.Send(ctx)
+	return
+}
+
 // Registry 为用户组控制器注册相应的接口
 func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller UserGroup")
@@ -115,6 +145,8 @@ func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	userGroup.GET("", ug.paginationGetGroupInfo)
 	userGroup.POST("", ug.createGroup)
+
+	userGroup.GET("/apply", ug.paginationGetApplyJoinGroup)
 	return userGroup
 }
 
