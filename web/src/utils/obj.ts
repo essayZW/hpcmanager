@@ -15,7 +15,7 @@ export function undefinedWithDefault(
  * 如果某个变量的值是零值则返回预设的值,否则返回原值
  */
 export function zeroWithDefault(
-  value: string | number | boolean,
+  value: string | number | boolean | undefined,
   newValue: string | number | boolean
 ): string | number | boolean {
   if (!value) {

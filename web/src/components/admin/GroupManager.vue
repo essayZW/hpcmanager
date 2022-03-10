@@ -8,6 +8,8 @@ import { getUserInfoById } from '../../service/user';
 import { UserInfo } from '../../api/user';
 import { requiredWithLength, FormInstance } from '../../utils/validateRule';
 import { zeroWithDefault } from '../../utils/obj';
+import { HpcGroup } from '../../api/hpc';
+import { getHpcGroupInfoByID } from '../../service/hpc';
 
 const tableData = reactive<{
   count: number;
@@ -60,7 +62,8 @@ const handleCurrentChange = (index: number) => {
 
 const tableRowExtraInfo = reactive<{
   [id: number]: {
-    user: UserInfo;
+    user?: UserInfo;
+    group?: HpcGroup;
   };
 }>({});
 const rowExpanded = async (row: GroupInfo) => {
@@ -68,6 +71,7 @@ const rowExpanded = async (row: GroupInfo) => {
   if (tableRowExtraInfo[row.id] && tableRowExtraInfo[row.id].user) {
     return;
   }
+  tableRowExtraInfo[row.id] = {};
   const tutorInfo = await getUserInfoById(row.tutorID);
   if (typeof tutorInfo == 'string') {
     ElMessage({
@@ -75,9 +79,17 @@ const rowExpanded = async (row: GroupInfo) => {
       message: tutorInfo,
     });
   } else {
-    tableRowExtraInfo[row.id] = {
-      user: tutorInfo as UserInfo,
-    };
+    tableRowExtraInfo[row.id].user = tutorInfo;
+  }
+
+  const hpcGroupInfo = await getHpcGroupInfoByID(row.hpcGroupID);
+  if (typeof hpcGroupInfo == 'string') {
+    ElMessage({
+      type: 'error',
+      message: hpcGroupInfo,
+    });
+  } else {
+    tableRowExtraInfo[row.id].group = hpcGroupInfo;
   }
 };
 
@@ -191,15 +203,15 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
               <p v-if="tableRowExtraInfo[props.row.id]" class="info">
                 <span
                   ><strong>工号: </strong>
-                  {{ tableRowExtraInfo[props.row.id].user.username }}</span
+                  {{ tableRowExtraInfo[props.row.id].user?.username }}</span
                 >
                 <span
                   ><strong>姓名: </strong>
-                  {{ tableRowExtraInfo[props.row.id].user.name }}</span
+                  {{ tableRowExtraInfo[props.row.id].user?.name }}</span
                 >
                 <span
                   ><strong>用户ID: </strong
-                  >{{ tableRowExtraInfo[props.row.id].user.id }}</span
+                  >{{ tableRowExtraInfo[props.row.id].user?.id }}</span
                 >
               </p>
               <p v-if="tableRowExtraInfo[props.row.id]" class="info">
@@ -207,7 +219,7 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
                   ><strong>电话: </strong
                   >{{
                     zeroWithDefault(
-                      tableRowExtraInfo[props.row.id].user.tel,
+                      tableRowExtraInfo[props.row.id].user?.tel,
                       '无'
                     )
                   }}</span
@@ -216,7 +228,7 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
                   ><strong>邮箱: </strong
                   >{{
                     zeroWithDefault(
-                      tableRowExtraInfo[props.row.id].user.email,
+                      tableRowExtraInfo[props.row.id].user?.email,
                       '无'
                     )
                   }}</span
@@ -225,7 +237,7 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
                   ><strong>学院: </strong
                   >{{
                     zeroWithDefault(
-                      tableRowExtraInfo[props.row.id].user.college,
+                      tableRowExtraInfo[props.row.id].user?.college,
                       '无'
                     )
                   }}</span
@@ -247,6 +259,33 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
               <p class="info">
                 <span
                   ><strong>用户组余额: </strong>{{ props.row.balance }}元</span
+                >
+                <span
+                  ><strong>私有队列名称: </strong
+                  >{{
+                    zeroWithDefault(
+                      tableRowExtraInfo[props.row.id].group?.queueName,
+                      '无'
+                    )
+                  }}</span
+                >
+                <span
+                  ><strong>计算节点用户组名: </strong
+                  >{{
+                    zeroWithDefault(
+                      tableRowExtraInfo[props.row.id].group?.name,
+                      '无'
+                    )
+                  }}</span
+                >
+                <span
+                  ><strong>计算节点GID: </strong
+                  >{{
+                    zeroWithDefault(
+                      tableRowExtraInfo[props.row.id].group?.gID,
+                      '无'
+                    )
+                  }}</span
                 >
               </p>
             </div>
