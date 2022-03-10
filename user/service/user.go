@@ -340,6 +340,48 @@ func (s *UserService) Logout(ctx context.Context, req *userpb.LogoutRequest, res
 	return nil
 }
 
+// GetUserInfoByHpcID 通过hpc_user_id查询用户信息
+func (s *UserService) GetUserInfoByHpcID(ctx context.Context, req *userpb.GetUserInfoByHpcIDRequest, resp *userpb.GetUserInfoByHpcIDResponse) error {
+	logger.Info("GetUserInfoByHpcID: ", req.BaseRequest)
+	if !verify.Identify(verify.GetUserInfo, req.GetBaseRequest().GetUserInfo().GetLevels()) {
+		logger.Info("GetUserInfoByHpcID permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("GetUserInfoByHpcID permission forbidden")
+	}
+	info, err := s.userLogic.GetUserInfoByHpcID(context.Background(), int(req.HpcUserID))
+	if err != nil {
+		return errors.New("user info query fail")
+	}
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	if !isTutor && !isAdmin {
+		// 普通用户,需判断自己是不是该hpc_user的记录对应者
+		if int32(info.HpcUserID) != req.HpcUserID {
+			return errors.New("user only can query self hpc user info")
+		}
+	} else if !isAdmin && isTutor {
+		// 导师用户,需判断该hpc_user对应的用户是否属于自己的组
+		if info.GroupID != int(req.BaseRequest.UserInfo.GroupId) {
+			return errors.New("tutor can only query self group's user info")
+		}
+	}
+	resp.Info = &userpb.UserInfo{
+		Id:         int32(info.ID),
+		GroupId:    int32(info.GroupID),
+		Username:   info.Username,
+		Name:       info.Name,
+		Tel:        info.Tel,
+		Email:      info.Email,
+		PyName:     info.PinyinName,
+		College:    info.CollegeName,
+		CreateTime: info.CreateTime.Unix(),
+		HpcUserID:  int32(info.HpcUserID),
+	}
+	if info.ExtraAttributes != nil {
+		resp.Info.ExtraAttributes = info.ExtraAttributes.String()
+	}
+	return nil
+}
+
 var _ userpb.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例

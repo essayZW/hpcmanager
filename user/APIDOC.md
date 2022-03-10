@@ -447,6 +447,31 @@ message LogoutResponse {
 }
 ```
 
+## GetUserInfoByHpcID
+
+描述: 通过 hpc_user 的 id 查询对应的用户的信息
+
+原型定义: `rpc GetUserInfoByHpcID(GetUserInfoByHpcIDRequest) returns (GetUserInfoByHpcIDResponse) {}`
+
+需求权限: `Common`及以上
+
+请求参数:
+
+```protobuf
+message GetUserInfoByHpcIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcUserID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetUserInfoByHpcIDResponse {
+    user.UserInfo info = 1;
+}
+```
+
 # 附录
 
 ## UserInfo

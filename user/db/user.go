@@ -148,6 +148,22 @@ func (db *UserDB) UpdateHpcUserID(ctx context.Context, userID, hpcUserID int) er
 	return nil
 }
 
+// QueryByHpcID 通过hpc_user_id查询用户信息
+func (db *UserDB) QueryByHpcID(ctx context.Context, hpcID int) (*User, error) {
+	res, err := db.conn.QueryRow(ctx, "SELECT * FROM `user` FROM `hpc_user_id`=?", hpcID)
+	if err != nil {
+		logger.Warn("QueryByHpcID error: ", err, " with hpc id: ", hpcID)
+		return nil, errors.New("QueryByHpcID error")
+	}
+	var info User
+	err = res.StructScan(&info)
+	if err != nil {
+		logger.Warn("QueryByHpcID struct scan error: ", err, " with hpc id: ", hpcID)
+		return nil, errors.New("QueryByHpcID struct scan error")
+	}
+	return &info, nil
+}
+
 // NewUser 创建一个新的操作用户数据库结构体
 func NewUser(db *db.DB) *UserDB {
 	return &UserDB{
