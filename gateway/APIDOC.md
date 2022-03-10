@@ -95,6 +95,29 @@ Method: GET
 
 响应：请求 ID、PONG
 
+### /hpc/user/:id
+
+Method: GET
+
+描述: 通过查询 hpc 用户信息
+
+参数: id,hpc_user 表的主键 ID
+
+响应:
+
+```protobuf
+// HpcUser hpc_user表的消息映射
+message HpcUser {
+    int32 id = 1;
+    string nodeUsername = 2;
+    int32 nodeUID = 3;
+    int32 nodeMaxQuota = 4;
+    int64 quotaStartTime = 5;
+    int64 quotaEndTime = 6;
+    string extraAttributes = 7;
+}
+```
+
 ## permission 控制器
 
 ### /permission/ping
