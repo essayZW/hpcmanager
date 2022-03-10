@@ -6,6 +6,7 @@ import {
 import { PaginationQueryResponse } from '../api/api';
 import { getUserIdByUsername } from './user';
 import moment from 'moment';
+import { undefinedWithDefault } from '../utils/obj';
 
 /**
  * 分页查询用户组信息
@@ -21,6 +22,7 @@ export async function paginationGetGroupInfo(
       data[i].createTime = moment((data[i].createTime as number) * 1000).format(
         'YYYY年MM月DD日'
       );
+      undefinedWithDefault(data[i], 'balance', 0);
     }
     return resp;
   } catch (error) {

@@ -4,9 +4,10 @@ import { reactive, ref } from 'vue';
 import { GroupInfo } from '../../api/group';
 import { paginationGetGroupInfo, createGroup } from '../../service/group';
 import { PaginationQueryResponse } from '../../api/api';
-import { getUserInfoById, getUserIdByUsername } from '../../service/user';
+import { getUserInfoById } from '../../service/user';
 import { UserInfo } from '../../api/user';
 import { requiredWithLength, FormInstance } from '../../utils/validateRule';
+import { zeroWithDefault } from '../../utils/obj';
 
 const tableData = reactive<{
   count: number;
@@ -63,7 +64,10 @@ const tableRowExtraInfo = reactive<{
   };
 }>({});
 const rowExpanded = async (row: GroupInfo) => {
-  // TODO 查询信息是否已经存储在缓存中
+  // TODO 考虑使用缓存淘汰
+  if (tableRowExtraInfo[row.id] != undefined) {
+    return;
+  }
   const tutorInfo = await getUserInfoById(row.tutorID);
   if (typeof tutorInfo == 'string') {
     ElMessage({
@@ -71,7 +75,9 @@ const rowExpanded = async (row: GroupInfo) => {
       message: tutorInfo,
     });
   } else {
-    tableRowExtraInfo[row.id].user = tutorInfo as UserInfo;
+    tableRowExtraInfo[row.id] = {
+      user: tutorInfo as UserInfo,
+    };
   }
 };
 
@@ -180,8 +186,42 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
         ></el-table-column>
         <el-table-column label="信息" type="expand" align="center">
           <template #default="props">
-            <p>创建者帐号: {{ props.row.createrUsername }}</p>
-            <p>创建者姓名: {{ props.row.createrName }}</p>
+            <div class="row-expand-info">
+              <p><strong>用户组创建者信息: </strong></p>
+              <p class="info">
+                <span
+                  ><strong>帐号: </strong> {{ props.row.createrUsername }}</span
+                >
+                <span><strong>姓名: </strong> {{ props.row.createrName }}</span>
+                <span><strong>用户ID: </strong>{{ props.row.createrID }}</span>
+              </p>
+              <p v-if="tableRowExtraInfo[props.row.id]" class="info">
+                <span
+                  ><strong>电话: </strong
+                  >{{
+                    zeroWithDefault(
+                      tableRowExtraInfo[props.row.id].user.tel,
+                      '无'
+                    )
+                  }}</span
+                >
+                <span
+                  ><strong>邮箱: </strong
+                  >{{
+                    zeroWithDefault(
+                      tableRowExtraInfo[props.row.id].user.email,
+                      '无'
+                    )
+                  }}</span
+                >
+              </p>
+              <p><strong>用户组信息: </strong></p>
+              <p class="info">
+                <span
+                  ><strong>用户组余额: </strong>{{ props.row.balance }}元</span
+                >
+              </p>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -259,5 +299,14 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
 .operation-row {
   margin-top: 16px;
   justify-content: space-between;
+}
+.row-expand-info {
+  padding: 0px 12px;
+  span {
+    margin: 12px 12px 0px 0px;
+  }
+  .info {
+    margin-left: 16px;
+  }
 }
 </style>
