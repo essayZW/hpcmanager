@@ -76,24 +76,21 @@ export type NavigationItem = {
 };
 
 /**
- * 根据用户权限注册路由
+ * 过滤出可用的所有NaigationItem项
  */
-export function registryRouter(
-  parentName: string,
-  router: Router,
+function filterAvailableNavigation(
   levels: UserLevels[]
-): Map<UserLevels, NavigationItem[]> {
-  const res = new Map<UserLevels, NavigationItem[]>();
+): Map<UserLevels, UserNavigationItem[]> {
+  const res = new Map<UserLevels, UserNavigationItem[]>();
   for (const i in levels) {
     const level = levels[i];
     const navigationItem = UserNavigation.get(level);
     if (navigationItem == undefined) {
       continue;
     }
-    const items = new Array<NavigationItem>();
+    const items = new Array<UserNavigationItem>();
     for (const item of navigationItem) {
-      items.push(item.item);
-      router.addRoute(parentName, item.routerRaw);
+      items.push(item);
     }
     if (items.length == 0) {
       continue;
@@ -101,4 +98,38 @@ export function registryRouter(
     res.set(level, items);
   }
   return res;
+}
+
+/**
+ * 根据用户权限注册路由
+ */
+export function registryRouter(
+  parentName: string,
+  router: Router,
+  levels: UserLevels[]
+): number {
+  let num = 0;
+  const itemMap = filterAvailableNavigation(levels);
+  itemMap.forEach((items) => {
+    for (const item of items) {
+      num++;
+      router.addRoute(parentName, item.routerRaw);
+    }
+  });
+  return num;
+}
+
+export function getAvailableNavigation(
+  levels: UserLevels[]
+): Map<UserLevels, NavigationItem[]> {
+  const maps = filterAvailableNavigation(levels);
+  const resMaps = new Map<UserLevels, NavigationItem[]>();
+  maps.forEach((userNavigations, key) => {
+    const items = new Array<NavigationItem>();
+    for (const userNavigation of userNavigations) {
+      items.push(userNavigation.item);
+    }
+    resMaps.set(key, items);
+  });
+  return resMaps;
 }

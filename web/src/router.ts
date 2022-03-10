@@ -8,6 +8,9 @@ import MainView from './pages/MainView.vue';
 import NotFound from './pages/NotFound.vue';
 import InstallView from './pages/InstallView.vue';
 import LoginView from './pages/LoginView.vue';
+import { registryRouter } from './service/navigation';
+
+let registerFlag = false;
 
 const Router: RouteRecordRaw[] = [
   {
@@ -83,17 +86,26 @@ const Router: RouteRecordRaw[] = [
     path: '/:pathMatch(.*)',
     name: 'NotFound',
     component: NotFound,
-    beforeEnter: (to) => {
-      if (/^\/main*/.test(to.fullPath)) {
-        return {
-          name: 'Main',
-        };
-      }
-    },
   },
 ];
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes: Router,
 });
+router.beforeEach(async (to) => {
+  // 尝试加载动态路由
+  const userInfo = await isLogin();
+  if (userInfo == null) {
+    registerFlag = false;
+    return;
+  }
+  if (!registerFlag) {
+    const num = registryRouter('Main', router, userInfo.Levels);
+    registerFlag = true;
+    console.log(`register ${num} routers, redirect to ${to.fullPath}`);
+    return to.fullPath;
+  }
+});
+
+export default router;

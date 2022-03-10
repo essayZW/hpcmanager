@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { registryRouter, NavigationItem } from '../service/navigation';
+import { getAvailableNavigation, NavigationItem } from '../service/navigation';
 import { UserLevels } from '../service/user';
 import { useRouter } from 'vue-router';
 import { getUserInfoFromStorage } from '../service/user';
@@ -15,7 +15,7 @@ if (info == null) {
     path: '/login',
   });
 } else {
-  routerNum.value = registryRouter('Main', router, info.Levels);
+  routerNum.value = getAvailableNavigation(info.Levels);
 }
 </script>
 <template>
