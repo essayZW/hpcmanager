@@ -41,6 +41,8 @@ type HpcService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
 	AddUserWithGroup(ctx context.Context, in *AddUserWithGroupRequest, opts ...client.CallOption) (*AddUserWithGroupResponse, error)
 	AddUserToGroup(ctx context.Context, in *AddUserToGroupRequest, opts ...client.CallOption) (*AddUserToGroupResponse, error)
+	GetUserInfoByID(ctx context.Context, in *GetUserInfoByIDRequest, opts ...client.CallOption) (*GetUserInfoByIDResponse, error)
+	GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, opts ...client.CallOption) (*GetGroupInfoByIDResponse, error)
 }
 
 type hpcService struct {
@@ -85,12 +87,34 @@ func (c *hpcService) AddUserToGroup(ctx context.Context, in *AddUserToGroupReque
 	return out, nil
 }
 
+func (c *hpcService) GetUserInfoByID(ctx context.Context, in *GetUserInfoByIDRequest, opts ...client.CallOption) (*GetUserInfoByIDResponse, error) {
+	req := c.c.NewRequest(c.name, "Hpc.GetUserInfoByID", in)
+	out := new(GetUserInfoByIDResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *hpcService) GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, opts ...client.CallOption) (*GetGroupInfoByIDResponse, error) {
+	req := c.c.NewRequest(c.name, "Hpc.GetGroupInfoByID", in)
+	out := new(GetGroupInfoByIDResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Hpc service
 
 type HpcHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
 	AddUserWithGroup(context.Context, *AddUserWithGroupRequest, *AddUserWithGroupResponse) error
 	AddUserToGroup(context.Context, *AddUserToGroupRequest, *AddUserToGroupResponse) error
+	GetUserInfoByID(context.Context, *GetUserInfoByIDRequest, *GetUserInfoByIDResponse) error
+	GetGroupInfoByID(context.Context, *GetGroupInfoByIDRequest, *GetGroupInfoByIDResponse) error
 }
 
 func RegisterHpcHandler(s server.Server, hdlr HpcHandler, opts ...server.HandlerOption) error {
@@ -98,6 +122,8 @@ func RegisterHpcHandler(s server.Server, hdlr HpcHandler, opts ...server.Handler
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
 		AddUserWithGroup(ctx context.Context, in *AddUserWithGroupRequest, out *AddUserWithGroupResponse) error
 		AddUserToGroup(ctx context.Context, in *AddUserToGroupRequest, out *AddUserToGroupResponse) error
+		GetUserInfoByID(ctx context.Context, in *GetUserInfoByIDRequest, out *GetUserInfoByIDResponse) error
+		GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, out *GetGroupInfoByIDResponse) error
 	}
 	type Hpc struct {
 		hpc
@@ -120,4 +146,12 @@ func (h *hpcHandler) AddUserWithGroup(ctx context.Context, in *AddUserWithGroupR
 
 func (h *hpcHandler) AddUserToGroup(ctx context.Context, in *AddUserToGroupRequest, out *AddUserToGroupResponse) error {
 	return h.HpcHandler.AddUserToGroup(ctx, in, out)
+}
+
+func (h *hpcHandler) GetUserInfoByID(ctx context.Context, in *GetUserInfoByIDRequest, out *GetUserInfoByIDResponse) error {
+	return h.HpcHandler.GetUserInfoByID(ctx, in, out)
+}
+
+func (h *hpcHandler) GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, out *GetGroupInfoByIDResponse) error {
+	return h.HpcHandler.GetGroupInfoByID(ctx, in, out)
 }
