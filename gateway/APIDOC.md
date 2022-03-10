@@ -185,6 +185,20 @@ type PaginationQueryResponse struct {
 }
 ```
 
+### /group/:id
+
+Method: GET
+
+描述: 通过组 ID 查询组信息
+
+参数:
+
+```text
+id: 组ID
+```
+
+响应: 组信息
+
 ### /group
 
 Method: POST

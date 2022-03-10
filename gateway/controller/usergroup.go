@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"github.com/essayZW/hpcmanager/gateway/middleware"
@@ -135,6 +136,33 @@ func (ug *UserGroup) paginationGetApplyJoinGroup(ctx *gin.Context) {
 	return
 }
 
+func (ug *UserGroup) getGroupInfoByID(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	idParam := ctx.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		resp := response.New(200, nil, false, "id参数错误")
+		resp.Send(ctx)
+		return
+	}
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := ug.userGroupService.GetGroupInfoByID(c, &userpb.GetGroupInfoByIDRequest{
+		GroupID:     int32(id),
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, "用户组信息查询失败")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, resp.GroupInfo, true, "success")
+	httpResp.Send(ctx)
+	return
+}
+
 // Registry 为用户组控制器注册相应的接口
 func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller UserGroup")
@@ -147,6 +175,8 @@ func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	userGroup.POST("", ug.createGroup)
 
 	userGroup.GET("/apply", ug.paginationGetApplyJoinGroup)
+
+	userGroup.GET("/:id", ug.getGroupInfoByID)
 	return userGroup
 }
 
