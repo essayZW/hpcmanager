@@ -99,7 +99,7 @@ Method: GET
 
 Method: GET
 
-描述: 通过查询 hpc 用户信息
+描述: 通过 ID 查询 hpc 用户信息
 
 参数: id,hpc_user 表的主键 ID
 
@@ -115,6 +115,27 @@ message HpcUser {
     int64 quotaStartTime = 5;
     int64 quotaEndTime = 6;
     string extraAttributes = 7;
+}
+```
+
+### /hpc/group/:id
+
+Method: GET
+
+描述: 通过 ID 查询 hpc 用户组信息
+
+参数: id, hpc_group 表的主键 ID
+
+响应:
+
+```protobuf
+// HpcGroup hpc_group表的消息映射
+message HpcGroup {
+    int32 id = 1;
+    string name = 2;
+    string queueName = 3;
+    int32 gID = 4;
+    string extraAttributes = 5;
 }
 ```
 
