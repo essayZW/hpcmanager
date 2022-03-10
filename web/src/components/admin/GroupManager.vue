@@ -65,7 +65,7 @@ const tableRowExtraInfo = reactive<{
 }>({});
 const rowExpanded = async (row: GroupInfo) => {
   // TODO 考虑使用缓存淘汰
-  if (tableRowExtraInfo[row.id] != undefined) {
+  if (tableRowExtraInfo[row.id] && tableRowExtraInfo[row.id].user) {
     return;
   }
   const tutorInfo = await getUserInfoById(row.tutorID);
@@ -170,7 +170,7 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
           align="center"
         ></el-table-column>
         <el-table-column
-          label="导师用户名"
+          label="导师工号"
           prop="tutorUsername"
           align="center"
         ></el-table-column>
@@ -187,13 +187,20 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
         <el-table-column label="信息" type="expand" align="center">
           <template #default="props">
             <div class="row-expand-info">
-              <p><strong>用户组创建者信息: </strong></p>
-              <p class="info">
+              <p><strong>导师信息: </strong></p>
+              <p v-if="tableRowExtraInfo[props.row.id]" class="info">
                 <span
-                  ><strong>帐号: </strong> {{ props.row.createrUsername }}</span
+                  ><strong>工号: </strong>
+                  {{ tableRowExtraInfo[props.row.id].user.username }}</span
                 >
-                <span><strong>姓名: </strong> {{ props.row.createrName }}</span>
-                <span><strong>用户ID: </strong>{{ props.row.createrID }}</span>
+                <span
+                  ><strong>姓名: </strong>
+                  {{ tableRowExtraInfo[props.row.id].user.name }}</span
+                >
+                <span
+                  ><strong>用户ID: </strong
+                  >{{ tableRowExtraInfo[props.row.id].user.id }}</span
+                >
               </p>
               <p v-if="tableRowExtraInfo[props.row.id]" class="info">
                 <span
@@ -214,6 +221,27 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
                     )
                   }}</span
                 >
+                <span
+                  ><strong>学院: </strong
+                  >{{
+                    zeroWithDefault(
+                      tableRowExtraInfo[props.row.id].user.college,
+                      '无'
+                    )
+                  }}</span
+                >
+              </p>
+              <p><strong>用户组创建者信息: </strong></p>
+              <p class="info">
+                <span>
+                  <strong>用户ID: </strong>{{ props.row.createrID }}
+                </span>
+                <span>
+                  <strong>工号: </strong>{{ props.row.createrUsername }}
+                </span>
+                <span>
+                  <strong>姓名: </strong>{{ props.row.createrName }}
+                </span>
               </p>
               <p><strong>用户组信息: </strong></p>
               <p class="info">
@@ -303,10 +331,10 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
 .row-expand-info {
   padding: 0px 12px;
   span {
-    margin: 12px 12px 0px 0px;
+    padding: 12px 12px 0px 0px;
   }
   .info {
-    margin-left: 16px;
+    padding-left: 16px;
   }
 }
 </style>
