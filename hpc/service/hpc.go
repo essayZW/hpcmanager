@@ -157,7 +157,17 @@ func (h *HpcService) GetUserInfoByID(ctx context.Context, req *hpcproto.GetUserI
 			return errors.New("user only can query self hpc user info")
 		}
 	} else if !isAdmin && isTutor {
-		// TODO 导师用户,需判断该hpc_user对应的用户是否属于自己的组
+		// 导师用户,需判断该hpc_user对应的用户是否属于自己的组
+		userResp, err := h.userService.GetUserInfoByHpcID(ctx, &userpb.GetUserInfoByHpcIDRequest{
+			BaseRequest: req.BaseRequest,
+			HpcUserID:   req.HpcUserID,
+		})
+		if err != nil {
+			return errors.New("user info get error")
+		}
+		if userResp.Info.GroupId != req.BaseRequest.UserInfo.GroupId {
+			return errors.New("tutor only can query self group's user info")
+		}
 	}
 	resp.User = &hpcproto.HpcUser{
 		Id:             int32(info.ID),
