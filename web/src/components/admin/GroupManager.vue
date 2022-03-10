@@ -157,7 +157,7 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
         class="group-table"
         @expand-change="rowExpanded"
       >
-        <el-table-column label="ID" prop="ID" align="center"></el-table-column>
+        <el-table-column label="id" prop="id" align="center"></el-table-column>
         <el-table-column
           label="组名"
           prop="name"
@@ -165,7 +165,7 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
         ></el-table-column>
         <el-table-column
           label="导师用户名"
-          prop="tutorUserName"
+          prop="tutorUsername"
           align="center"
         ></el-table-column>
         <el-table-column

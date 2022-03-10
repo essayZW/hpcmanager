@@ -18,7 +18,9 @@ export async function paginationGetGroupInfo(
     const resp = await paginationQueryGroup(pageIndex, pageSize);
     const data = resp.Data;
     for (const i in data) {
-      data[i].createTime = moment(data[i].createTime).format('YYYY年MM月DD日');
+      data[i].createTime = moment((data[i].createTime as number) * 1000).format(
+        'YYYY年MM月DD日'
+      );
     }
     return resp;
   } catch (error) {

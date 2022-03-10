@@ -6,7 +6,7 @@ import { ApiRequest, PaginationQueryResponse } from './api';
 export type GroupInfo = {
   id: number;
   name: string;
-  createTime: string;
+  createTime: number | string;
   createrID: string;
   createUsername: string;
   createrName: string;
