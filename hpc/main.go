@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
+	"github.com/essayZW/hpcmanager"
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/db"
 	hpcdb "github.com/essayZW/hpcmanager/hpc/db"
@@ -69,8 +71,10 @@ func main() {
 	//logger.Fatal("Redis ping get: ", ok)
 	//}
 
+	env := os.Getenv(hpcmanager.EnvName)
 	hpcSource := source.New(
 		source.WithCmdBaseDir(hpcCmdBaseDir),
+		source.WithDevSource(env == "dev"),
 	)
 
 	hpcLogic := logic.NewHpc(hpcSource, hpcdb.NewHpcUser(sqlConn), hpcdb.NewHpcGroup(sqlConn))

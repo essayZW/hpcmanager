@@ -47,12 +47,8 @@ func (source *defaultSource) timeoutExec(executor, file string, args ...string) 
 	return source.exec(ctx, executor, file, args...)
 }
 
-func newSource(options ...Option) HpcSource {
-	opts := Options{}
-	for _, option := range options {
-		option(&opts)
-	}
+func newSource(options *Options) HpcSource {
 	source := defaultSource{}
-	source.baseDir = opts.CmdBaseDir
+	source.baseDir = options.CmdBaseDir
 	return &source
 }
