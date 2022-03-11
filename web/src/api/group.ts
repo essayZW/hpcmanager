@@ -65,3 +65,68 @@ export async function createGroup(param: CreateGroupRequest): Promise<number> {
   }
   return (resp.data as CreateGroupResponse).id;
 }
+
+/**
+ * 通过ID查询用户组信息
+ */
+export async function queryGroupByID(id: number): Promise<GroupInfo> {
+  const resp = await ApiRequest.request<GroupInfo>(`/group/${id}`, 'GET');
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}
+
+/**
+ * 搜索导师信息的响应数据格式
+ */
+export type SearchTutorInfoResponse = {
+  tutorID: number;
+  tutorUsername: string;
+  tutorName: string;
+  groupID: number;
+  groupName: string;
+};
+
+/**
+ * 通过导师工号查询相关的信息
+ */
+export async function queryTutorInfoByUsername(
+  username: string
+): Promise<SearchTutorInfoResponse> {
+  const resp = await ApiRequest.request<SearchTutorInfoResponse>(
+    `/group/tutor/${username}`,
+    'GET'
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}
+
+/**
+ * 创建加入组申请接口返回数据
+ */
+export type CreateJoinGroupApplyResponse = {
+  applyID: number;
+};
+
+/**
+ * 创建加入组申请
+ */
+export async function createJoinGroupApply(
+  applyGroupID: number
+): Promise<CreateJoinGroupApplyResponse> {
+  const resp = await ApiRequest.request<CreateJoinGroupApplyResponse>(
+    '/group/apply',
+    'POST',
+    {},
+    {
+      applyGroupID,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}

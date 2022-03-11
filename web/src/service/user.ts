@@ -90,6 +90,9 @@ export async function getUserInfoById(id: number): Promise<UserInfo | string> {
   }
 }
 
+/**
+ * 通过用户名查询用户ID等基础信息
+ */
 export async function getUserIdByUsername(
   username: string
 ): Promise<QueryUserIDResponse> {

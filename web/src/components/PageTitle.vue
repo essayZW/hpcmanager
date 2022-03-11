@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, onBeforeMount } from 'vue';
 
 const props = defineProps<{
   title: string;
   des: string;
 }>();
+
+onBeforeMount(() => {
+  if (props.title) {
+    document.title = props.title;
+  }
+});
 </script>
 <template>
   <el-row class="title-area">

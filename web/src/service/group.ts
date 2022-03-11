@@ -2,6 +2,9 @@ import {
   paginationQueryGroup,
   GroupInfo,
   createGroup as createGroupApi,
+  SearchTutorInfoResponse,
+  queryTutorInfoByUsername,
+  createJoinGroupApply,
 } from '../api/group';
 import { PaginationQueryResponse } from '../api/api';
 import { getUserIdByUsername } from './user';
@@ -48,4 +51,21 @@ export async function createGroup(
     queueName: queueName,
     tutorID: userInfo.id,
   });
+}
+
+/**
+ * 通过用户名搜索导师信息
+ */
+export async function searchTutorInfo(
+  username: string
+): Promise<SearchTutorInfoResponse> {
+  return await queryTutorInfoByUsername(username);
+}
+
+/**
+ * 申请加入组
+ */
+export async function applyJoinGroup(applyGroupID: number): Promise<number> {
+  const res = await createJoinGroupApply(applyGroupID);
+  return res.applyID;
 }
