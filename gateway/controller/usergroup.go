@@ -196,6 +196,36 @@ func (ug *UserGroup) searchTutorInfo(ctx *gin.Context) {
 	return
 }
 
+// createJoinGroupApply /api/group/apply POST 创建新的加入用户组申请
+func (ug *UserGroup) createJoinGroupApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.CreateJoinGroupApplyParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := ug.userGroupService.CreateJoinGroupApply(c, &userpb.CreateJoinGroupApplyRequest{
+		ApplyGroupID: int32(param.ApplyGroupID),
+		BaseRequest:  baseRequest,
+	})
+	if err != nil || !resp.Success {
+		httpResp := response.New(200, nil, false, "创建加入组申请失败:"+err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, map[string]interface{}{
+		"applyID": resp.ApplyID,
+	}, true, "success")
+	httpResp.Send(ctx)
+	return
+}
+
 // Registry 为用户组控制器注册相应的接口
 func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller UserGroup")
@@ -211,6 +241,7 @@ func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	userGroup.GET("/:id", ug.getGroupInfoByID)
 	userGroup.GET("/tutor/:username", ug.searchTutorInfo)
+	userGroup.POST("/apply", ug.createJoinGroupApply)
 	return userGroup
 }
 

@@ -238,6 +238,27 @@ type PaginationQueryResponse struct {
 }
 ```
 
+### /group/apply
+
+Method: POST
+
+参数:
+
+```go
+// CreateJoinGroupApplyParam 创建加入组申请参数
+type CreateJoinGroupApplyParam struct {
+    ApplyGroupID int
+}
+```
+
+响应:
+
+```go
+map[string]interface{}{
+        "applyID": resp.ApplyID,
+}
+```
+
 ### /group/tutor/:username
 
 Method: GET
@@ -333,3 +354,7 @@ ticket=
 响应:
 
 若验证成功跳转到主页,否则返回错误信息
+
+```
+
+```

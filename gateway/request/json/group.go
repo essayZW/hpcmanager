@@ -12,6 +12,8 @@ func init() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		createUserParam := CreateGroupParam{}
 		v.RegisterStructValidation(createUserParam.Validator(), &createUserParam)
+		createJoinGroupApplyParam := CreateJoinGroupApplyParam{}
+		v.RegisterStructValidation(createJoinGroupApplyParam.Validator(), &createJoinGroupApplyParam)
 	}
 }
 
@@ -34,6 +36,21 @@ func (cgp *CreateGroupParam) Validator() validator.StructLevelFunc {
 		}
 		if len(data.QueueName) == 0 || len(data.QueueName) > 64 {
 			sl.ReportError(reflect.ValueOf(data.QueueName), "queueName", "queueName", "binding", "queueName length error")
+		}
+	}
+}
+
+// CreateJoinGroupApplyParam 创建加入组申请参数
+type CreateJoinGroupApplyParam struct {
+	ApplyGroupID int
+}
+
+// Validator 验证器
+func (c *CreateJoinGroupApplyParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(CreateJoinGroupApplyParam)
+		if data.ApplyGroupID <= 0 {
+			sl.ReportError(reflect.ValueOf(data.ApplyGroupID), "applyGroupID", "applyGroupID", "binding", "applyGroupID error")
 		}
 	}
 }
