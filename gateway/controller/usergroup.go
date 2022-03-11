@@ -163,6 +163,39 @@ func (ug *UserGroup) getGroupInfoByID(ctx *gin.Context) {
 	return
 }
 
+// searchTutorInfo /api/user/tutor/:username GET 通过用户帐号搜索导师信息(其实就是查询,不是模糊搜索)
+func (ug *UserGroup) searchTutorInfo(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	username := ctx.Param("username")
+	if username == "" {
+		resp := response.New(200, nil, false, "用户帐号错误")
+		resp.Send(ctx)
+		return
+	}
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := ug.userGroupService.SearchTutorInfo(c, &userpb.SearchTutorInfoRequest{
+		Username:    username,
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, "查询导师信息失败")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, map[string]interface{}{
+		"tutorUsername": resp.TutorUsername,
+		"tutorName":     resp.TutorName,
+		"tutorID":       resp.TutorID,
+		"groupID":       resp.GroupID,
+		"groupName":     resp.GroupName,
+	}, true, "success")
+	httpResp.Send(ctx)
+	return
+}
+
 // Registry 为用户组控制器注册相应的接口
 func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller UserGroup")
@@ -177,6 +210,7 @@ func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	userGroup.GET("/apply", ug.paginationGetApplyJoinGroup)
 
 	userGroup.GET("/:id", ug.getGroupInfoByID)
+	userGroup.GET("/tutor/:username", ug.searchTutorInfo)
 	return userGroup
 }
 

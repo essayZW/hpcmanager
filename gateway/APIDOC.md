@@ -238,6 +238,28 @@ type PaginationQueryResponse struct {
 }
 ```
 
+### /group/tutor/:username
+
+Method: GET
+
+参数:
+
+```text
+:username 用户帐号
+```
+
+响应:
+
+```go
+map[string]interface{}{
+    "tutorUsername": resp.TutorUsername,
+    "tutorName":     resp.TutorName,
+    "tutorID":       resp.TutorID,
+    "groupID":       resp.GroupID,
+    "groupName":     resp.GroupName,
+}
+```
+
 ## system 控制器
 
 ### /sys/install
