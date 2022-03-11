@@ -42,7 +42,7 @@ func (cgp *CreateGroupParam) Validator() validator.StructLevelFunc {
 
 // CreateJoinGroupApplyParam 创建加入组申请参数
 type CreateJoinGroupApplyParam struct {
-	ApplyGroupID int
+	ApplyGroupID int `form:"applyGroupID" json:"applyGroupID" binding:"required"`
 }
 
 // Validator 验证器
