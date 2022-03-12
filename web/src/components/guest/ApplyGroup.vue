@@ -5,6 +5,8 @@ import { FormInstance, requiredWithLength } from '../../utils/validateRule';
 import { searchTutorInfo, applyJoinGroup } from '../../service/group';
 import { zeroWithDefault } from '../../utils/obj';
 
+import ApplyTable from '../ApplyTable.vue';
+
 // 当前激活的tab的名称,以数字编号标识
 const activeName = ref('createApply');
 
@@ -173,7 +175,9 @@ const submitJoinGroupApply = async () => {
           </div>
         </el-col>
       </el-tab-pane>
-      <el-tab-pane label="查看申请" name="showApplies">Show</el-tab-pane>
+      <el-tab-pane label="查看申请" name="showApplies">
+        <apply-table ref="tableElem"></apply-table>
+      </el-tab-pane>
     </el-tabs>
   </el-row>
 </template>

@@ -5,6 +5,8 @@ import {
   SearchTutorInfoResponse,
   queryTutorInfoByUsername,
   createJoinGroupApply,
+  ApplyInfo,
+  paginationQueryApplyInfo,
 } from '../api/group';
 import { PaginationQueryResponse } from '../api/api';
 import { getUserIdByUsername } from './user';
@@ -68,4 +70,14 @@ export async function searchTutorInfo(
 export async function applyJoinGroup(applyGroupID: number): Promise<number> {
   const res = await createJoinGroupApply(applyGroupID);
   return res.applyID;
+}
+
+/**
+ * 分页查询申请加入用户组申请记录信息
+ */
+export async function paginationGetApplyInfo(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<ApplyInfo>> {
+  return await paginationQueryApplyInfo(pageIndex, pageSize);
 }

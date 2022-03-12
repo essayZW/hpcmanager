@@ -5,9 +5,11 @@
 declare module 'vue' {
   export interface GlobalComponents {
     ApplyGroup: typeof import('./src/components/guest/ApplyGroup.vue')['default']
+    ApplyTable: typeof import('./src/components/ApplyTable.vue')['default']
     AsideNavigation: typeof import('./src/components/AsideNavigation.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElCard: typeof import('element-plus/es')['ElCard']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElCols: typeof import('element-plus/es')['ElCols']
     ElContainer: typeof import('element-plus/es')['ElContainer']
@@ -33,6 +35,8 @@ declare module 'vue' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
+    ElTimeline: typeof import('element-plus/es')['ElTimeline']
+    ElTimelineItem: typeof import('element-plus/es')['ElTimelineItem']
     GroupManager: typeof import('./src/components/admin/GroupManager.vue')['default']
     IEpArrowDown: typeof import('~icons/ep/arrow-down')['default']
     IEpAvatar: typeof import('~icons/ep/avatar')['default']

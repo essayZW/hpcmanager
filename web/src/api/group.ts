@@ -1,3 +1,4 @@
+import { undefinedWithDefault } from '../utils/obj';
 import { ApiRequest, PaginationQueryResponse } from './api';
 
 /**
@@ -127,6 +128,76 @@ export async function createJoinGroupApply(
   );
   if (!resp.status) {
     throw new Error(resp.message);
+  }
+  return resp.data;
+}
+
+/**
+ * 申请信息的消息定义
+ */
+export type ApplyInfo = {
+  id: number;
+  userID: number;
+  userUsername: string;
+  userName: string;
+  applyGroupID: number;
+  tutorID: number;
+  tutorUsername: string;
+  tutorName: string;
+  tutorCheckStatus: number;
+  managerCheckStatus: number;
+  status: number;
+  messageTutor: string;
+  messageManager: string;
+  tutorCheckTime: number;
+  managerCheckTime: number;
+  managerCheckerID: number;
+  managerCheckerUsername: string;
+  managerCheckerName: string;
+  createTime: number;
+  extraAttributes: string;
+};
+
+/**
+ * 分页查询用户申请加入用户组信息
+ */
+export async function paginationQueryApplyInfo(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<ApplyInfo>> {
+  const resp = await ApiRequest.request<PaginationQueryResponse<ApplyInfo>>(
+    '/group/apply',
+    'GET',
+    {
+      pageIndex,
+      pageSize,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  // 处理resp.data中的undefined字段为对应的默认值
+  for (const i in resp.data.Data) {
+    undefinedWithDefault(resp.data.Data[i], 'id', 0);
+    undefinedWithDefault(resp.data.Data[i], 'userID', 0);
+    undefinedWithDefault(resp.data.Data[i], 'userUsername', '');
+    undefinedWithDefault(resp.data.Data[i], 'userName', '');
+    undefinedWithDefault(resp.data.Data[i], 'applyGroupID', 0);
+    undefinedWithDefault(resp.data.Data[i], 'tutorID', 0);
+    undefinedWithDefault(resp.data.Data[i], 'tutorUsername', '');
+    undefinedWithDefault(resp.data.Data[i], 'tutorName', '');
+    undefinedWithDefault(resp.data.Data[i], 'tutorCheckStatus', 0);
+    undefinedWithDefault(resp.data.Data[i], 'managerCheckStatus', 0);
+    undefinedWithDefault(resp.data.Data[i], 'status', 0);
+    undefinedWithDefault(resp.data.Data[i], 'messageTutor', '');
+    undefinedWithDefault(resp.data.Data[i], 'messageManager', '');
+    undefinedWithDefault(resp.data.Data[i], 'tutorCheckTime', 0);
+    undefinedWithDefault(resp.data.Data[i], 'managerCheckTime', 0);
+    undefinedWithDefault(resp.data.Data[i], 'managerCheckerID', 0);
+    undefinedWithDefault(resp.data.Data[i], 'managerCheckerUsername', '');
+    undefinedWithDefault(resp.data.Data[i], 'managerCheckerName', '');
+    undefinedWithDefault(resp.data.Data[i], 'createTime', 0);
+    undefinedWithDefault(resp.data.Data[i], 'extraAttributes', '');
   }
   return resp.data;
 }
