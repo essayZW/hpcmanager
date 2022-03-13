@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { ApplyInfo } from '../api/group';
-import { paginationGetApplyInfo } from '../service/group';
+import { paginationGetApplyInfo, checkJoinGroupApply } from '../service/group';
 import { zeroWithDefault } from '../utils/obj';
 import dayjs from 'dayjs';
 import { isTutor, isAdmin } from '../service/user';
@@ -57,10 +57,13 @@ const handleSizeChange = (pageSize: number) => {
 // 返回格式化的时间或者空时间
 const timeOrBlank = (time: number): string => {
   const date = dayjs(time * 1000);
-  if (date.isValid()) {
+  if (time < 0) {
     return '';
   }
-  return date.format('YYYY-MM-DD hh:mm:ss');
+  if (!date.isValid()) {
+    return '';
+  }
+  return date.format('YYYY-MM-DD HH:mm:ss');
 };
 
 // 审核意见输入框数据
@@ -80,6 +83,31 @@ const checkButtonHandler = async (
 ) => {
   if (!confirm(!checkStatus ? '确认不通过该条申请吗' : '确认通过该条申请吗')) {
     return;
+  }
+
+  try {
+    await checkJoinGroupApply(
+      applyID,
+      checkStatus,
+      tutorCheck ? checkMessageInput.tutor : checkMessageInput.manager,
+      tutorCheck
+    );
+    ElMessage({
+      type: 'success',
+      message: `审核状态变更成功`,
+    });
+    refreshTableData();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  } finally {
+    if (tutorCheck) {
+      checkMessageInput.tutor = '';
+    } else {
+      checkMessageInput.manager = '';
+    }
   }
 };
 </script>
@@ -124,17 +152,27 @@ const checkButtonHandler = async (
               >未审核</span
             >
             <span v-if="scope.row.status == 0" class="red">已经撤销</span>
-            <span v-else-if="scope.row.tutorCheckStatus == 1" class="green"
+            <span
+              v-else-if="
+                scope.row.tutorCheckStatus == 1 &&
+                scope.row.managerCheckStatus == -1
+              "
+              class="green"
               >导师审核通过</span
             >
-            <span v-else-if="scope.row.tutorCheckStatus == 0" class="red"
-              >导师审核失败</span
+            <span
+              v-else-if="
+                scope.row.tutorCheckStatus == 0 &&
+                scope.row.managerCheckStatus == -1
+              "
+              class="red"
+              >导师审核未通过</span
             >
             <span v-else-if="scope.row.managerCheckStatus == 1" class="green"
-              >导师审核失败</span
+              >管理员审核通过</span
             >
             <span v-else-if="scope.row.managerCheckStatus == 0" class="red"
-              >导师审核失败</span
+              >管理员审核未通过</span
             >
           </template>
         </el-table-column>
@@ -183,10 +221,13 @@ const checkButtonHandler = async (
                           {{ zeroWithDefault(props.row.messageTutor, '无') }}
                         </span>
                       </p>
-                      <p v-if="isTutor()" class="box-title">
+                      <p
+                        v-if="isTutor() && props.row.tutorCheckStatus == -1"
+                        class="box-title"
+                      >
                         <strong>操作</strong>
                       </p>
-                      <p v-if="isTutor()">
+                      <p v-if="isTutor() && props.row.tutorCheckStatus == -1">
                         <el-form class="form">
                           <el-form-item label="审核">
                             <el-button
@@ -216,6 +257,7 @@ const checkButtonHandler = async (
                     </el-card>
                   </el-timeline-item>
                   <el-timeline-item
+                    v-if="props.row.tutorCheckStatus == 1"
                     placement="top"
                     :timestamp="timeOrBlank(props.row.managerCheckTime)"
                   >
@@ -260,10 +302,13 @@ const checkButtonHandler = async (
                           {{ zeroWithDefault(props.row.messageManager, '无') }}
                         </span>
                       </p>
-                      <p v-if="isAdmin()" class="box-title">
+                      <p
+                        v-if="isAdmin() && props.row.managerCheckStatus == -1"
+                        class="box-title"
+                      >
                         <strong>操作</strong>
                       </p>
-                      <p v-if="isAdmin()">
+                      <p v-if="isAdmin() && props.row.managerCheckStatus == -1">
                         <el-form class="form">
                           <el-form-item label="审核">
                             <el-button
