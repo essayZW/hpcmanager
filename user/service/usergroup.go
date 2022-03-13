@@ -220,11 +220,20 @@ func (group *UserGroupService) CheckApply(ctx context.Context, req *userpb.Check
 	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
 	var status bool
 	var err error
-	if isAdmin {
-		status, err = group.userGroupLogic.AdminCheckApply(ctx, int(req.ApplyID), int(req.BaseRequest.UserInfo.UserId),
-			req.BaseRequest.UserInfo.Username, req.BaseRequest.UserInfo.Name, req.CheckStatus, req.CheckMessage)
-	} else if isTutor {
-		status, err = group.userGroupLogic.TutorCheckApply(ctx, int(req.BaseRequest.UserInfo.UserId), int(req.ApplyID), req.CheckStatus, req.CheckMessage)
+	// 需要考虑身份同时是导师以及是管理员的情况下审核的冲突情况
+	if req.TutorCheck {
+		if isTutor {
+			status, err = group.userGroupLogic.TutorCheckApply(ctx, int(req.BaseRequest.UserInfo.UserId), int(req.ApplyID), req.CheckStatus, req.CheckMessage)
+		} else {
+			return errors.New("must be tutor user")
+		}
+	} else {
+		if isAdmin {
+			status, err = group.userGroupLogic.AdminCheckApply(ctx, int(req.ApplyID), int(req.BaseRequest.UserInfo.UserId),
+				req.BaseRequest.UserInfo.Username, req.BaseRequest.UserInfo.Name, req.CheckStatus, req.CheckMessage)
+		} else {
+			return errors.New("must be admin")
+		}
 	}
 	if err != nil {
 		return err
