@@ -18,6 +18,7 @@ const Router: RouteRecordRaw[] = [
     name: 'Index',
     redirect: '/main/',
   },
+  // TODO 访问 /main 情况下动态添加的路由会失效
   {
     path: '/main/',
     name: 'Main',
