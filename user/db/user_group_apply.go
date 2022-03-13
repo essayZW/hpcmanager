@@ -34,8 +34,9 @@ func (ugadb *UserGroupApplyDB) Insert(ctx context.Context, apply *UserGroupApply
 func (ugadb *UserGroupApplyDB) ExistsApply(ctx context.Context, userID int, applyGroupID int) bool {
 	// 查询通过userID发起的applyGroupID的申请，且status状态正常即未撤销以及管理员还未审核的记录
 	// 管理员是审核的最后一环，因此管理员未审核代表该记录还在处理中
+	// 但是管理员未审核可能是由于导师审核未通过,因此需要排除这个情况
 	row, err := ugadb.db.QueryRow(ctx, "SELECT COUNT(*) FROM `user_group_apply`"+
-		"WHERE `user_id`=? AND `apply_group_id`=? AND `status`=1 AND `manager_check_status`=-1", userID, applyGroupID)
+		"WHERE `user_id`=? AND `apply_group_id`=? AND `status`=1 AND `tutor_check_status` != 0 AND`manager_check_status`=-1", userID, applyGroupID)
 	if err != nil {
 		logger.Warn("ExistsApply error: ", err)
 		return false
