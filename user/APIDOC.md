@@ -357,6 +357,7 @@ message CheckApplyRequest {
     int32 applyID = 2;
     bool checkStatus = 3;
     string checkMessage = 4;
+    bool tutorCheck = 5;
 }
 ```
 
