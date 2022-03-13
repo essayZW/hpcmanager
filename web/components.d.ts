@@ -5,6 +5,7 @@
 declare module 'vue' {
   export interface GlobalComponents {
     ApplyGroup: typeof import('./src/components/guest/ApplyGroup.vue')['default']
+    ApplyGroupTable: typeof import('./src/components/ApplyGroupTable.vue')['default']
     ApplyTable: typeof import('./src/components/ApplyTable.vue')['default']
     AsideNavigation: typeof import('./src/components/AsideNavigation.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']

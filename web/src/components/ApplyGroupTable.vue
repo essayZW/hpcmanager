@@ -3,7 +3,8 @@ import { reactive, ref } from 'vue';
 import { ApplyInfo } from '../api/group';
 import { paginationGetApplyInfo } from '../service/group';
 import { zeroWithDefault } from '../utils/obj';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import { isTutor, isAdmin } from '../service/user';
 
 // 表格数据
 const tableData = ref<ApplyInfo[]>([]);
@@ -38,7 +39,10 @@ const refreshTableData = () => {
   loadTableData(paginationInfo.pageIndex, paginationInfo.pageSize);
 };
 
-refreshTableData();
+// 暴露出相关的方法
+defineExpose({
+  refreshTableData,
+});
 
 const handleCurrentChange = (pageIndex: number) => {
   paginationInfo.pageIndex = pageIndex;
@@ -52,11 +56,18 @@ const handleSizeChange = (pageSize: number) => {
 
 // 返回格式化的时间或者空时间
 const timeOrBlank = (time: number): string => {
-  const date = moment(time * 1000);
+  const date = dayjs(time * 1000);
   if (date.isValid()) {
     return '';
   }
   return date.format('YYYY-MM-DD hh:mm:ss');
+};
+
+// 审批按钮处理函数
+const checkButtonHandler = (applyID: number, checkStatus: boolean) => {
+  if (!confirm(!checkStatus ? '确认不通过该条申请吗' : '确认通过该条申请吗')) {
+    return;
+  }
 };
 </script>
 <template>
@@ -85,14 +96,33 @@ const timeOrBlank = (time: number): string => {
         <el-table-column label="申请时间">
           <template #default="scope">
             {{
-              moment(scope.row.createTime * 1000).format('YYYY-MM-DD HH:mm:ss')
+              dayjs(scope.row.createTime * 1000).format('YYYY-MM-DD HH:mm:ss')
             }}
           </template>
         </el-table-column>
         <el-table-column label="状态">
           <template #default="scope">
-            <span v-if="scope.row.status == 1">正常</span>
-            <span v-else class="red">已经撤销</span>
+            <span
+              v-if="
+                scope.row.status == 1 &&
+                scope.row.tutorCheckStatus == -1 &&
+                scope.row.managerCheckStatus == -1
+              "
+              >未审核</span
+            >
+            <span v-if="scope.row.status == 0" class="red">已经撤销</span>
+            <span v-else-if="scope.row.tutorCheckStatus == 1" class="green"
+              >导师审核通过</span
+            >
+            <span v-else-if="scope.row.tutorCheckStatus == 0" class="red"
+              >导师审核失败</span
+            >
+            <span v-else-if="scope.row.managerCheckStatus == 1" class="green"
+              >导师审核失败</span
+            >
+            <span v-else-if="scope.row.managerCheckStatus == 0" class="red"
+              >导师审核失败</span
+            >
           </template>
         </el-table-column>
         <el-table-column label="更多" type="expand">
@@ -119,8 +149,23 @@ const timeOrBlank = (time: number): string => {
                         <span
                           >审核状态:
                           <span v-if="props.row.tutorCheckStatus == -1"
-                            >未审核</span
-                          >
+                            >未审核
+                            <span v-if="isTutor()">
+                              <el-button
+                                type="success"
+                                size="small"
+                                class="check-pass-button"
+                                @click="checkButtonHandler(props.row.id, true)"
+                                >通过</el-button
+                              >
+                              <el-button
+                                type="danger"
+                                size="small"
+                                @click="checkButtonHandler(props.row.id, false)"
+                                >不通过</el-button
+                              >true
+                            </span>
+                          </span>
 
                           <span
                             v-else-if="props.row.tutorCheckStatus == 1"
@@ -166,8 +211,23 @@ const timeOrBlank = (time: number): string => {
                         <span
                           >审核状态:
                           <span v-if="props.row.managerCheckStatus == -1"
-                            >未审核</span
-                          >
+                            >未审核
+                            <span v-if="isAdmin()">
+                              <el-button
+                                type="success"
+                                size="small"
+                                class="check-pass-button"
+                                @click="checkButtonHandler(props.row.id, true)"
+                                >通过</el-button
+                              >
+                              <el-button
+                                type="danger"
+                                size="small"
+                                @click="checkButtonHandler(props.row.id, false)"
+                                >不通过</el-button
+                              >
+                            </span>
+                          </span>
 
                           <span
                             v-else-if="props.row.managerCheckStatus == 1"
@@ -220,5 +280,8 @@ const timeOrBlank = (time: number): string => {
 }
 .green {
   color: green;
+}
+.check-pass-button {
+  margin-left: 16px;
 }
 </style>

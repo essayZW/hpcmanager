@@ -60,7 +60,7 @@ export enum UserLevels {
 
 const userInfoLocalStorageKey = 'userInfo';
 /**
- * 存储用户信息到storge中
+ * 存储用户信息到storage中
  */
 export function setUserInfoToStorage(info: LoginUserInfo) {
   localStorage.setItem(userInfoLocalStorageKey, JSON.stringify(info));
@@ -97,4 +97,36 @@ export async function getUserIdByUsername(
   username: string
 ): Promise<QueryUserIDResponse> {
   return await queryUserInfoByUsername(username);
+}
+
+/**
+ * 判断是否是导师
+ */
+export function isTutor(): boolean {
+  const info = getUserInfoFromStorage();
+  if (!info) {
+    return false;
+  }
+  for (const level of info.Levels) {
+    if (level == UserLevels.Tutor) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * 判断是否是管理员
+ */
+export function isAdmin(): boolean {
+  const info = getUserInfoFromStorage();
+  if (!info) {
+    return false;
+  }
+  for (const level of info.Levels) {
+    if (level == UserLevels.CommonAdmin || level == UserLevels.SuperAdmin) {
+      return true;
+    }
+  }
+  return false;
 }

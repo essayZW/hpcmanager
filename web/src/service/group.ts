@@ -10,7 +10,7 @@ import {
 } from '../api/group';
 import { PaginationQueryResponse } from '../api/api';
 import { getUserIdByUsername } from './user';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { undefinedWithDefault } from '../utils/obj';
 
 /**
@@ -24,7 +24,7 @@ export async function paginationGetGroupInfo(
     const resp = await paginationQueryGroup(pageIndex, pageSize);
     const data = resp.Data;
     for (const i in data) {
-      data[i].createTime = moment((data[i].createTime as number) * 1000).format(
+      data[i].createTime = dayjs((data[i].createTime as number) * 1000).format(
         'YYYY年MM月DD日'
       );
       undefinedWithDefault(data[i], 'balance', 0);

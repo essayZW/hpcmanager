@@ -1,14 +1,39 @@
 <script setup lang="ts">
 import PageTitle from '../PageTitle.vue';
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { FormInstance, requiredWithLength } from '../../utils/validateRule';
 import { searchTutorInfo, applyJoinGroup } from '../../service/group';
 import { zeroWithDefault } from '../../utils/obj';
 
-import ApplyTable from '../ApplyTable.vue';
+import ApplyGroupTable from '../ApplyGroupTable.vue';
 
-// 当前激活的tab的名称,以数字编号标识
+// 表格实例
+const tableElem = ref<typeof ApplyGroupTable | null>(null);
+
+const router = useRouter();
+
+// 当前激活的tab的名称
 const activeName = ref('createApply');
+
+onMounted(() => {
+  if (router.currentRoute.value.query?.view == 'showApplies') {
+    activeName.value = 'showApplies';
+    if (tableElem.value) {
+      tableElem.value.refreshTableData();
+    }
+  }
+});
+// tab点击事件处理
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+const tabClickHandler = (tab: any, event: Event) => {
+  if (!tableElem.value) {
+    return;
+  }
+  if (tab.paneName == 'showApplies') {
+    tableElem.value.refreshTableData();
+  }
+};
 
 // 搜索导师信息表单数据
 const searchTutorFormData = reactive<{
@@ -117,7 +142,7 @@ const submitJoinGroupApply = async () => {
     justify="start"
     class="tab-panes-row"
   >
-    <el-tabs v-model="activeName" type="card">
+    <el-tabs v-model="activeName" type="card" @tab-click="tabClickHandler">
       <el-tab-pane label="创建申请" name="createApply">
         <el-col :sm="22" :lg="16">
           <el-form
@@ -176,7 +201,7 @@ const submitJoinGroupApply = async () => {
         </el-col>
       </el-tab-pane>
       <el-tab-pane label="查看申请" name="showApplies">
-        <apply-table ref="tableElem"></apply-table>
+        <apply-group-table ref="tableElem"></apply-group-table>
       </el-tab-pane>
     </el-tabs>
   </el-row>
