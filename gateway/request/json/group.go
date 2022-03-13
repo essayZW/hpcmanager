@@ -15,7 +15,7 @@ func init() {
 		createJoinGroupApplyParam := CreateJoinGroupApplyParam{}
 		v.RegisterStructValidation(createJoinGroupApplyParam.Validator(), &createJoinGroupApplyParam)
 		checkJoinGroupApplyParam := CheckJoinGroupApplyParam{}
-		v.RegisterStructValidation(createJoinGroupApplyParam.Validator(), &checkJoinGroupApplyParam)
+		v.RegisterStructValidation(checkJoinGroupApplyParam.Validator(), &checkJoinGroupApplyParam)
 	}
 }
 
@@ -59,10 +59,12 @@ func (c *CreateJoinGroupApplyParam) Validator() validator.StructLevelFunc {
 
 // CheckJoinGroupApplyParam 审核
 type CheckJoinGroupApplyParam struct {
-	ApplyID      int    `form:"applyID" json:"applyID" binding:"required"`
-	CheckStatus  bool   `form:"checkStatus" json:"checkStatus" binding:"required"`
-	CheckMessage string `form:"checkMessage" json:"checkMessage" binding:"required"`
-	TutorCheck   bool   `form:"tutorCheck" json:"tutorCheck" binding:"required"`
+	ApplyID int `form:"applyID" json:"applyID" binding:"required"`
+	// CheckStatus 默认不存在则为false
+	CheckStatus  bool   `form:"checkStatus" json:"checkStatus"`
+	CheckMessage string `form:"checkMessage" json:"checkMessage"`
+	// TutorCheck 默认不存在则为false
+	TutorCheck bool `form:"tutorCheck" json:"tutorCheck"`
 }
 
 // Validator 验证器
