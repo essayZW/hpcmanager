@@ -226,6 +226,37 @@ func (ug *UserGroup) createJoinGroupApply(ctx *gin.Context) {
 	return
 }
 
+// checkApply /group/apply PATCH 审核用户加入组申请
+func (ug *UserGroup) checkApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.CheckJoinGroupApplyParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, "参数验证失败:"+err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := ug.userGroupService.CheckApply(c, &userpb.CheckApplyRequest{
+		ApplyID:      int32(param.ApplyID),
+		CheckStatus:  param.CheckStatus,
+		CheckMessage: param.CheckMessage,
+		TutorCheck:   param.TutorCheck,
+		BaseRequest:  baseRequest,
+	})
+	if err != nil || !resp.Success {
+		httpResp := response.New(200, nil, false, "申请审核失败: "+err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+	return
+}
+
 // Registry 为用户组控制器注册相应的接口
 func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller UserGroup")
@@ -242,6 +273,7 @@ func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	userGroup.GET("/:id", ug.getGroupInfoByID)
 	userGroup.GET("/tutor/:username", ug.searchTutorInfo)
 	userGroup.POST("/apply", ug.createJoinGroupApply)
+	userGroup.PATCH("/apply", ug.checkApply)
 	return userGroup
 }
 

@@ -259,6 +259,24 @@ map[string]interface{}{
 }
 ```
 
+### /group/apply
+
+Method: PATCH
+
+参数:
+
+```go
+// CheckJoinGroupApplyParam 审核
+type CheckJoinGroupApplyParam struct {
+    ApplyID      int    `form:"applyID" json:"applyID" binding:"required"`
+    CheckStatus  bool   `form:"checkStatus" json:"checkStatus" binding:"required"`
+    CheckMessage string `form:"checkMessage" json:"checkMessage" binding:"required"`
+    TutorCheck   bool   `form:"tutorCheck" json:"tutorCheck" binding:"required"`
+}
+```
+
+响应: 无
+
 ### /group/tutor/:username
 
 Method: GET

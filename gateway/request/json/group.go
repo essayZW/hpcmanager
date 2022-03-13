@@ -14,6 +14,8 @@ func init() {
 		v.RegisterStructValidation(createUserParam.Validator(), &createUserParam)
 		createJoinGroupApplyParam := CreateJoinGroupApplyParam{}
 		v.RegisterStructValidation(createJoinGroupApplyParam.Validator(), &createJoinGroupApplyParam)
+		checkJoinGroupApplyParam := CheckJoinGroupApplyParam{}
+		v.RegisterStructValidation(createJoinGroupApplyParam.Validator(), &checkJoinGroupApplyParam)
 	}
 }
 
@@ -51,6 +53,25 @@ func (c *CreateJoinGroupApplyParam) Validator() validator.StructLevelFunc {
 		data := sl.Current().Interface().(CreateJoinGroupApplyParam)
 		if data.ApplyGroupID <= 0 {
 			sl.ReportError(reflect.ValueOf(data.ApplyGroupID), "applyGroupID", "applyGroupID", "binding", "applyGroupID error")
+		}
+	}
+}
+
+// CheckJoinGroupApplyParam 审核
+type CheckJoinGroupApplyParam struct {
+	ApplyID      int    `form:"applyID" json:"applyID" binding:"required"`
+	CheckStatus  bool   `form:"checkStatus" json:"checkStatus" binding:"required"`
+	CheckMessage string `form:"checkMessage" json:"checkMessage" binding:"required"`
+	TutorCheck   bool   `form:"tutorCheck" json:"tutorCheck" binding:"required"`
+}
+
+// Validator 验证器
+func (c *CheckJoinGroupApplyParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(CheckJoinGroupApplyParam)
+
+		if data.ApplyID <= 0 {
+			sl.ReportError(reflect.ValueOf(data.ApplyID), "applyID", "applyID", "binding", "applyID error")
 		}
 	}
 }
