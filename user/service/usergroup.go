@@ -9,10 +9,12 @@ import (
 	"github.com/essayZW/hpcmanager/logger"
 	permissionpb "github.com/essayZW/hpcmanager/permission/proto"
 	publicpb "github.com/essayZW/hpcmanager/proto"
+	userbroker "github.com/essayZW/hpcmanager/user/broker"
 	userdb "github.com/essayZW/hpcmanager/user/db"
 	"github.com/essayZW/hpcmanager/user/logic"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
+	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/client"
 )
 
@@ -23,6 +25,8 @@ type UserGroupService struct {
 
 	permissionService permissionpb.PermissionService
 	hpcService        hpcpb.HpcService
+
+	rabbitmqBroker broker.Broker
 }
 
 // Ping 用户组服务ping测试
@@ -239,6 +243,17 @@ func (group *UserGroupService) CheckApply(ctx context.Context, req *userpb.Check
 		return err
 	}
 	resp.Success = status
+
+	// 发送mq消息
+	message := userbroker.CheckApplyMessage{
+		ApplyID:      int(req.ApplyID),
+		CheckStatus:  req.CheckStatus,
+		CheckMessage: req.CheckMessage,
+		TutorCheck:   req.TutorCheck,
+	}
+	if err := message.Public(group.rabbitmqBroker, req.BaseRequest); err != nil {
+		logger.Warn("Message public error: ", err)
+	}
 	return nil
 }
 
@@ -325,11 +340,12 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务
-func NewGroup(client client.Client, userGroupLogic *logic.UserGroup, userLogic *logic.User) *UserGroupService {
+func NewGroup(client client.Client, userGroupLogic *logic.UserGroup, userLogic *logic.User, mqBroker broker.Broker) *UserGroupService {
 	return &UserGroupService{
 		userGroupLogic:    userGroupLogic,
 		userLogic:         userLogic,
 		permissionService: permissionpb.NewPermissionService("permission", client),
 		hpcService:        hpcpb.NewHpcService("hpc", client),
+		rabbitmqBroker:    mqBroker,
 	}
 }
