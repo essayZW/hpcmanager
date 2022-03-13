@@ -7,6 +7,7 @@ import {
   createJoinGroupApply,
   ApplyInfo,
   paginationQueryApplyInfo,
+  checkApply,
 } from '../api/group';
 import { PaginationQueryResponse } from '../api/api';
 import { getUserIdByUsername } from './user';
@@ -80,4 +81,22 @@ export async function paginationGetApplyInfo(
   pageSize: number
 ): Promise<PaginationQueryResponse<ApplyInfo>> {
   return await paginationQueryApplyInfo(pageIndex, pageSize);
+}
+
+/**
+ * 审核用户加入用户组申请
+ */
+export async function checkJoinGroupApply(
+  applyID: number,
+  checkStatus: boolean,
+  checkMessage: string,
+  tutorCheck: boolean
+): Promise<boolean> {
+  await checkApply({
+    applyID,
+    checkMessage,
+    checkStatus,
+    tutorCheck,
+  });
+  return true;
 }

@@ -3,6 +3,7 @@ import { RouteRecordRaw, Router } from 'vue-router';
 
 import ApplyGroup from '../components/guest/ApplyGroup.vue';
 import GroupManager from '../components/admin/GroupManager.vue';
+import CheckGroupApply from '../components/tutor/CheckGroupApply.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -33,6 +34,22 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
     ],
   ],
   [
+    UserLevels.Tutor,
+    [
+      {
+        routerRaw: {
+          path: 'tutor_check_group_apply',
+          name: 'TutorCheckGroupApply',
+          component: CheckGroupApply,
+        },
+        item: {
+          name: '审核用户组申请',
+          to: 'tutor_check_group_apply',
+        },
+      },
+    ],
+  ],
+  [
     UserLevels.CommonAdmin,
     [
       {
@@ -46,9 +63,21 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: 'group_manager',
         },
       },
+      {
+        routerRaw: {
+          path: 'admin_check_group_apply',
+          name: 'AdminCheckGroupApply',
+          component: CheckGroupApply,
+        },
+        item: {
+          name: '审核用户组申请',
+          to: 'admin_check_group_apply',
+        },
+      },
     ],
   ],
   // 超级管理员和普通管理员都这项操作
+  // NOTE 由于一个用户不能同时是超级管理员以及普通管理员,因此这里注册同样的路由信息
   [
     UserLevels.SuperAdmin,
     [
@@ -61,6 +90,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '管理用户组',
           to: 'group_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: 'admin_check_group_apply',
+          name: 'AdminCheckGroupApply',
+          component: CheckGroupApply,
+        },
+        item: {
+          name: '审核用户组申请',
+          to: 'admin_check_group_apply',
         },
       },
     ],

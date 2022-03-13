@@ -8,6 +8,7 @@ declare module 'vue' {
     ApplyGroupTable: typeof import('./src/components/ApplyGroupTable.vue')['default']
     ApplyTable: typeof import('./src/components/ApplyTable.vue')['default']
     AsideNavigation: typeof import('./src/components/AsideNavigation.vue')['default']
+    CheckGroupApply: typeof import('./src/components/tutor/CheckGroupApply.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']

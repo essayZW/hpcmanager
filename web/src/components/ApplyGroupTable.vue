@@ -63,8 +63,21 @@ const timeOrBlank = (time: number): string => {
   return date.format('YYYY-MM-DD hh:mm:ss');
 };
 
+// 审核意见输入框数据
+const checkMessageInput = reactive<{
+  tutor: string;
+  manager: string;
+}>({
+  tutor: '',
+  manager: '',
+});
+
 // 审批按钮处理函数
-const checkButtonHandler = (applyID: number, checkStatus: boolean) => {
+const checkButtonHandler = async (
+  applyID: number,
+  checkStatus: boolean,
+  tutorCheck = true
+) => {
   if (!confirm(!checkStatus ? '确认不通过该条申请吗' : '确认通过该条申请吗')) {
     return;
   }
@@ -135,36 +148,25 @@ const checkButtonHandler = (applyID: number, checkStatus: boolean) => {
                     placement="top"
                     :timestamp="timeOrBlank(props.row.tutorCheckTime)"
                   >
-                    <el-card>
+                    <el-card class="check-card">
+                      <p class="box-title"><strong>审核情况</strong></p>
                       <p>
                         <span
-                          >审核人姓名:
+                          ><strong>审核人姓名: </strong>
                           {{ zeroWithDefault(props.row.tutorName, '无') }}</span
                         >
                       </p>
                       <p>
-                        <span> 审核人工号: {{ props.row.tutorUsername }} </span>
+                        <span
+                          ><strong>审核人工号: </strong>
+                          {{ props.row.tutorUsername }}
+                        </span>
                       </p>
                       <p>
                         <span
-                          >审核状态:
+                          ><strong>审核状态: </strong>
                           <span v-if="props.row.tutorCheckStatus == -1"
                             >未审核
-                            <span v-if="isTutor()">
-                              <el-button
-                                type="success"
-                                size="small"
-                                class="check-pass-button"
-                                @click="checkButtonHandler(props.row.id, true)"
-                                >通过</el-button
-                              >
-                              <el-button
-                                type="danger"
-                                size="small"
-                                @click="checkButtonHandler(props.row.id, false)"
-                                >不通过</el-button
-                              >true
-                            </span>
                           </span>
 
                           <span
@@ -177,9 +179,39 @@ const checkButtonHandler = (applyID: number, checkStatus: boolean) => {
                       </p>
                       <p>
                         <span>
-                          审批意见:
+                          <strong>审批意见: </strong>
                           {{ zeroWithDefault(props.row.messageTutor, '无') }}
                         </span>
+                      </p>
+                      <p v-if="isTutor()" class="box-title">
+                        <strong>操作</strong>
+                      </p>
+                      <p v-if="isTutor()">
+                        <el-form class="form">
+                          <el-form-item label="审核">
+                            <el-button
+                              type="success"
+                              size="small"
+                              class="check-pass-button"
+                              @click="checkButtonHandler(props.row.id, true)"
+                              >通过</el-button
+                            >
+                            <el-button
+                              type="danger"
+                              size="small"
+                              @click="checkButtonHandler(props.row.id, false)"
+                              >不通过</el-button
+                            >
+                          </el-form-item>
+                          <el-form-item label="审核意见">
+                            <el-input
+                              v-model="checkMessageInput.tutor"
+                              autosize
+                              type="textarea"
+                              placeholder="请输入审核意见(0~280字)"
+                            />
+                          </el-form-item>
+                        </el-form>
                       </p>
                     </el-card>
                   </el-timeline-item>
@@ -187,18 +219,19 @@ const checkButtonHandler = (applyID: number, checkStatus: boolean) => {
                     placement="top"
                     :timestamp="timeOrBlank(props.row.managerCheckTime)"
                   >
-                    <el-card>
+                    <el-card class="check-card">
+                      <p class="box-title"><strong>审核情况</strong></p>
                       <p>
                         <span
-                          >审核人姓名:
+                          ><strong>审核人姓名: </strong>
                           {{
                             zeroWithDefault(props.row.managerCheckerName, '无')
                           }}</span
                         >
                       </p>
                       <p>
-                        <span>
-                          审核人工号:
+                        <span
+                          ><strong>审核人工号: </strong>
                           {{
                             zeroWithDefault(
                               props.row.managerCheckerUsername,
@@ -209,26 +242,10 @@ const checkButtonHandler = (applyID: number, checkStatus: boolean) => {
                       </p>
                       <p>
                         <span
-                          >审核状态:
+                          ><strong>审核状态: </strong>
                           <span v-if="props.row.managerCheckStatus == -1"
                             >未审核
-                            <span v-if="isAdmin()">
-                              <el-button
-                                type="success"
-                                size="small"
-                                class="check-pass-button"
-                                @click="checkButtonHandler(props.row.id, true)"
-                                >通过</el-button
-                              >
-                              <el-button
-                                type="danger"
-                                size="small"
-                                @click="checkButtonHandler(props.row.id, false)"
-                                >不通过</el-button
-                              >
-                            </span>
                           </span>
-
                           <span
                             v-else-if="props.row.managerCheckStatus == 1"
                             class="green"
@@ -239,9 +256,43 @@ const checkButtonHandler = (applyID: number, checkStatus: boolean) => {
                       </p>
                       <p>
                         <span>
-                          审批意见:
+                          <strong>审批意见: </strong>
                           {{ zeroWithDefault(props.row.messageManager, '无') }}
                         </span>
+                      </p>
+                      <p v-if="isAdmin()" class="box-title">
+                        <strong>操作</strong>
+                      </p>
+                      <p v-if="isAdmin()">
+                        <el-form class="form">
+                          <el-form-item label="审核">
+                            <el-button
+                              type="success"
+                              size="small"
+                              class="check-pass-button"
+                              @click="
+                                checkButtonHandler(props.row.id, true, false)
+                              "
+                              >通过</el-button
+                            >
+                            <el-button
+                              type="danger"
+                              size="small"
+                              @click="
+                                checkButtonHandler(props.row.id, false, false)
+                              "
+                              >不通过</el-button
+                            >
+                          </el-form-item>
+                          <el-form-item label="审核意见">
+                            <el-input
+                              v-model="checkMessageInput.manager"
+                              autosize
+                              type="textarea"
+                              placeholder="请输入审核意见(0~280字)"
+                            />
+                          </el-form-item>
+                        </el-form>
                       </p>
                     </el-card>
                   </el-timeline-item>
@@ -281,7 +332,14 @@ const checkButtonHandler = (applyID: number, checkStatus: boolean) => {
 .green {
   color: green;
 }
-.check-pass-button {
-  margin-left: 16px;
+
+.check-card {
+  p {
+    padding-left: 12px;
+  }
+  .box-title {
+    padding-left: 0px;
+    font-size: 16px;
+  }
 }
 </style>

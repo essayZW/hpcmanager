@@ -201,3 +201,33 @@ export async function paginationQueryApplyInfo(
   }
   return resp.data;
 }
+
+/**
+ * 审核用户加入用户组申请接口请求参数
+ */
+export type CheckJoinGroupApplyRequest = {
+  checkStatus: boolean;
+  checkMessage: string;
+  applyID: number;
+  tutorCheck: boolean;
+};
+
+/**
+ * 调用审核用户加入组申请接口
+ */
+export async function checkApply(
+  param: CheckJoinGroupApplyRequest
+): Promise<boolean> {
+  const resp = await ApiRequest.request<null>(
+    '/group/apply',
+    'PATCH',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}
