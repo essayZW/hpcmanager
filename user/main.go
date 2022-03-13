@@ -70,8 +70,9 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
+
 	// 注册消费者
-	go userbroker.RegistryCustomer(rabbitmqBroker)
+	go userbroker.RegistryCustomer(rabbitmqBroker, serviceClient)
 
 	userLogic := logic.NewUser(userdb.NewUser(sqldb), etcdConfig, redisConn)
 	userGroupLogic := logic.NewUserGroup(userdb.NewUserGroup(sqldb), userdb.NewUserGroupApply(sqldb))

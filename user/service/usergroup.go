@@ -186,7 +186,7 @@ func (group *UserGroupService) PageGetApplyGroupInfo(ctx context.Context, req *u
 	for index := range result.Applies {
 		resp.Applies[index] = &userpb.UserGroupApply{
 			Id:                     int32(result.Applies[index].ID),
-			UserID:                 int32(result.Applies[index].ApplyGroupID),
+			UserID:                 int32(result.Applies[index].UserID),
 			UserUsername:           result.Applies[index].UserUsername,
 			UserName:               result.Applies[index].UserName,
 			ApplyGroupID:           int32(result.Applies[index].ApplyGroupID),
@@ -346,7 +346,7 @@ func (group *UserGroupService) GetApplyInfoByID(ctx context.Context, req *userpb
 	}
 	resp.Apply = &userpb.UserGroupApply{
 		Id:                     int32(apply.ID),
-		UserID:                 int32(apply.ApplyGroupID),
+		UserID:                 int32(apply.UserID),
 		UserUsername:           apply.UserUsername,
 		UserName:               apply.UserName,
 		ApplyGroupID:           int32(apply.ApplyGroupID),
