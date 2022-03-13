@@ -38,7 +38,7 @@ func (h *HpcService) AddUserWithGroup(ctx context.Context, req *hpcproto.AddUser
 		logger.Info("AddUserWithGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("AddUserWithGroup permission forbidden")
 	}
-	_, err := db.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+	_, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
 		// 通过source在机器上创建用户组并添加导师用户到新创建的组
 		data, err := h.hpcLogic.AddUserWithGroup(c, req.TutorUsername, req.GroupName)
 		if err != nil {
@@ -100,7 +100,7 @@ func (h *HpcService) AddUserToGroup(ctx context.Context, req *hpcproto.AddUserTo
 		logger.Info("AddUserToGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("AddUserToGroup permission forbidden")
 	}
-	_, err := db.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+	_, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
 		groupInfo, err := h.hpcLogic.GetGroupInfoByID(c, int(req.HpcGroupID))
 		if err != nil {
 			return nil, errors.New("invalid hpc group id")
@@ -203,7 +203,7 @@ func (h *HpcService) GetGroupInfoByID(ctx context.Context, req *hpcproto.GetGrou
 			return errors.New("get group info error")
 		}
 		if groupResp.GroupInfo.HpcGroupID != req.HpcGroupID {
-			return errors.New("get group info error: permision forbiden")
+			return errors.New("get group info error: permission forbiden")
 		}
 	}
 	info, err := h.hpcLogic.GetGroupInfoByID(context.Background(), int(req.HpcGroupID))

@@ -126,7 +126,7 @@ func (s *UserService) AddUser(ctx context.Context, req *userpb.AddUserRequest, r
 		logger.Info("Adduser permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("Adduser permission forbidden")
 	}
-	_, err := hpcDB.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+	_, err := hpcDB.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
 		extraAttributes, err := hpcDB.NewJSON(req.UserInfo.GetExtraAttributes())
 		if err != nil {
 			return nil, fmt.Errorf("Parse extraAttributes error: %v", err)
@@ -280,7 +280,7 @@ func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupReques
 		logger.Info("JoinGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("JoinGroup permission forbidden")
 	}
-	_, err := hpcDB.Transication(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
+	_, err := hpcDB.Transaction(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
 		// 验证用户不属于任何一个组
 		userInfo, err := s.userLogic.GetUserInfoByID(ctx, int(req.UserID))
 		if err != nil {

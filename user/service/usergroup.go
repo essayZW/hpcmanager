@@ -36,7 +36,7 @@ func (group *UserGroupService) Ping(ctx context.Context, req *publicpb.Empty, re
 
 // GetGroupInfoByID 查询用户组信息
 func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb.GetGroupInfoByIDRequest, resp *userpb.GetGroupInfoByIDResponse) error {
-	logger.Infof("GetGrouoInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	logger.Infof("GetGroupInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
 		logger.Info("GetGroupInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("GetGroupInfo permission forbidden")
@@ -125,7 +125,7 @@ func (group *UserGroupService) CreateJoinGroupApply(ctx context.Context, req *us
 	if userInfo.GroupID != 0 {
 		return errors.New("apply fail: user have a group")
 	}
-	id, err := db.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+	id, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
 		return group.userGroupLogic.CreateUserJoinGroupApply(c, userInfo, int(req.ApplyGroupID))
 	})
 	if err != nil {
@@ -147,7 +147,7 @@ func (group *UserGroupService) SearchTutorInfo(ctx context.Context, req *userpb.
 	}
 	info, err := group.userGroupLogic.GetByTutorUsername(ctx, req.Username)
 	if err != nil {
-		return errors.New("tutor dones not exists")
+		return errors.New("tutor does not exists")
 	}
 	resp.GroupID = int32(info.ID)
 	resp.TutorID = int32(info.TutorID)
@@ -240,7 +240,7 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 		logger.Info("CreateGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("CreateGroup permission forbidden")
 	}
-	idInterface, err := db.Transication(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
+	idInterface, err := db.Transaction(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
 		// 查询新组的新导师的信息
 		tutorInfo, err := group.userLogic.GetUserInfoByID(c, int(req.TutorID))
 		if err != nil {
