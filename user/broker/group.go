@@ -41,5 +41,13 @@ func checkApplyCustomer(p broker.Event) error {
 	if err := gob.NewDecoder(buff).Decode(&body); err != nil {
 		logger.Warn("Message customer: decode error: ", err)
 	}
+	// 只关注管理员审核通过的消息
+	if body.TutorCheck {
+		return nil
+	}
+	if !body.CheckStatus {
+		return nil
+	}
+	// 添加用户到组
 	return nil
 }

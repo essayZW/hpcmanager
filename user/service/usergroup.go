@@ -337,6 +337,40 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 	return nil
 }
 
+// GetApplyInfoByID 通过ID查询用户申请加入组信息
+func (group *UserGroupService) GetApplyInfoByID(ctx context.Context, req *userpb.GetApplyInfoByIDRequest, resp *userpb.GetApplyInfoByIDResponse) error {
+	logger.Info("GetApplyInfoByID: %s", req.BaseRequest)
+	apply, err := group.userGroupLogic.GetApplyInfoByID(context.Background(), int(req.ApplyID))
+	if err != nil {
+		return errors.New("Apply info query error")
+	}
+	resp.Apply = &userpb.UserGroupApply{
+		Id:                     int32(apply.ID),
+		UserID:                 int32(apply.ApplyGroupID),
+		UserUsername:           apply.UserUsername,
+		UserName:               apply.UserName,
+		ApplyGroupID:           int32(apply.ApplyGroupID),
+		TutorID:                int32(apply.TutorID),
+		TutorUsername:          apply.TutorUsername,
+		TutorName:              apply.TutorName,
+		TutorCheckStatus:       int32(apply.TutorCheckStatus),
+		ManagerCheckStatus:     int32(apply.ManagerCheckStatus),
+		Status:                 int32(apply.Status),
+		MessageTutor:           apply.MessageTutor.String,
+		MessageManager:         apply.MessageManager.String,
+		TutorCheckTime:         apply.TutorCheckTime.Time.Unix(),
+		ManagerCheckTime:       apply.ManagerCheckTime.Time.Unix(),
+		ManagerCheckerID:       int32(apply.ManagerCheckerID.Int64),
+		ManagerCheckerUsername: apply.ManagerCheckerUsername.String,
+		ManagerCheckerName:     apply.ManagerCheckerName.String,
+		CreateTime:             apply.CreateTime.Time.Unix(),
+	}
+	if apply.ExtraAttributes != nil {
+		resp.Apply.ExtraAttributes = apply.ExtraAttributes.String()
+	}
+	return nil
+}
+
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务
