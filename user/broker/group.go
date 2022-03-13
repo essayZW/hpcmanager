@@ -24,7 +24,7 @@ func (message *CheckApplyMessage) Public(rabbitmqBroker broker.Broker, baseReque
 	if err != nil {
 		return err
 	}
-	if err := rabbitmqBroker.Publish(hpcbroker.Topic("group.CheckApply"), m); err != nil {
+	if err := rabbitmqBroker.Publish(hpcbroker.Topic("group.apply.check"), m); err != nil {
 		return err
 	}
 	logger.Info("Public message: ", message, " with request: ", baseRequest)
@@ -41,6 +41,5 @@ func checkApplyCustomer(p broker.Event) error {
 	if err := gob.NewDecoder(buff).Decode(&body); err != nil {
 		logger.Warn("Message customer: decode error: ", err)
 	}
-	logger.Debug(body)
 	return nil
 }

@@ -8,8 +8,8 @@ import (
 
 // RegistryCustomer 注册broker消费者
 func RegistryCustomer(rabbitmqBroker broker.Broker) {
-	rabbitmqBroker.Subscribe(hpcbroker.Topic("group.CheckApply"),
+	rabbitmqBroker.Subscribe(hpcbroker.Topic("group.apply.check"),
 		checkApplyCustomer,
-		broker.Queue(hpcbroker.Topic("group.CheckApply")),
+		broker.Queue(hpcbroker.Topic("group.apply.check")),
 		rabbitmq.AckOnSuccess())
 }
