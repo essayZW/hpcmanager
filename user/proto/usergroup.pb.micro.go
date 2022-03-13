@@ -46,6 +46,7 @@ type GroupService interface {
 	PageGetApplyGroupInfo(ctx context.Context, in *PageGetApplyGroupInfoRequest, opts ...client.CallOption) (*PageGetApplyGroupInfoResponse, error)
 	CheckApply(ctx context.Context, in *CheckApplyRequest, opts ...client.CallOption) (*CheckApplyResponse, error)
 	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*CreateGroupResponse, error)
+	GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByIDRequest, opts ...client.CallOption) (*GetApplyInfoByIDResponse, error)
 }
 
 type groupService struct {
@@ -140,6 +141,16 @@ func (c *groupService) CreateGroup(ctx context.Context, in *CreateGroupRequest, 
 	return out, nil
 }
 
+func (c *groupService) GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByIDRequest, opts ...client.CallOption) (*GetApplyInfoByIDResponse, error) {
+	req := c.c.NewRequest(c.name, "GroupService.GetApplyInfoByID", in)
+	out := new(GetApplyInfoByIDResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for GroupService service
 
 type GroupServiceHandler interface {
@@ -151,6 +162,7 @@ type GroupServiceHandler interface {
 	PageGetApplyGroupInfo(context.Context, *PageGetApplyGroupInfoRequest, *PageGetApplyGroupInfoResponse) error
 	CheckApply(context.Context, *CheckApplyRequest, *CheckApplyResponse) error
 	CreateGroup(context.Context, *CreateGroupRequest, *CreateGroupResponse) error
+	GetApplyInfoByID(context.Context, *GetApplyInfoByIDRequest, *GetApplyInfoByIDResponse) error
 }
 
 func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts ...server.HandlerOption) error {
@@ -163,6 +175,7 @@ func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts
 		PageGetApplyGroupInfo(ctx context.Context, in *PageGetApplyGroupInfoRequest, out *PageGetApplyGroupInfoResponse) error
 		CheckApply(ctx context.Context, in *CheckApplyRequest, out *CheckApplyResponse) error
 		CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error
+		GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByIDRequest, out *GetApplyInfoByIDResponse) error
 	}
 	type GroupService struct {
 		groupService
@@ -205,4 +218,8 @@ func (h *groupServiceHandler) CheckApply(ctx context.Context, in *CheckApplyRequ
 
 func (h *groupServiceHandler) CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error {
 	return h.GroupServiceHandler.CreateGroup(ctx, in, out)
+}
+
+func (h *groupServiceHandler) GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByIDRequest, out *GetApplyInfoByIDResponse) error {
+	return h.GroupServiceHandler.GetApplyInfoByID(ctx, in, out)
 }

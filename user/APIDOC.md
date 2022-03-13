@@ -473,6 +473,31 @@ message GetUserInfoByHpcIDResponse {
 }
 ```
 
+## GetApplyInfoByID
+
+描述: 通过 ID 查询用户申请加入组信息
+
+原型定义: `rpc GetApplyInfoByID(GetApplyInfoByIDRequest) returns (GetApplyInfoByIDResponse) {}`
+
+需求权限: 无
+
+请求参数:
+
+```protobuf
+message GetApplyInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetApplyInfoByIDResponse {
+    user.UserGroupApply apply = 1;
+}
+```
+
 # 附录
 
 ## UserInfo

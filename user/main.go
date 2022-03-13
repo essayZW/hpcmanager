@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
+	hpcbroker "github.com/essayZW/hpcmanager/broker"
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
+	userbroker "github.com/essayZW/hpcmanager/user/broker"
 	userdb "github.com/essayZW/hpcmanager/user/db"
 	"github.com/essayZW/hpcmanager/user/logic"
 	user "github.com/essayZW/hpcmanager/user/proto"
@@ -64,6 +66,14 @@ func main() {
 	if ok != "PONG" {
 		logger.Fatal("Redis ping get: ", ok)
 	}
+	rabbitmqBroker, err := hpcbroker.NewRabbitmq()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	// 注册消费者
+	go userbroker.RegistryCustomer(rabbitmqBroker, serviceClient)
+
 	userLogic := logic.NewUser(userdb.NewUser(sqldb), etcdConfig, redisConn)
 	userGroupLogic := logic.NewUserGroup(userdb.NewUserGroup(sqldb), userdb.NewUserGroupApply(sqldb))
 
@@ -72,7 +82,7 @@ func main() {
 	userService := service.NewUser(serviceClient, userLogic, userGroupLogic)
 	user.RegisterUserHandler(serviceServer, userService)
 
-	userGroupService := service.NewGroup(serviceClient, userGroupLogic, userLogic)
+	userGroupService := service.NewGroup(serviceClient, userGroupLogic, userLogic, rabbitmqBroker)
 	user.RegisterGroupServiceHandler(serviceServer, userGroupService)
 
 	srv.Init()

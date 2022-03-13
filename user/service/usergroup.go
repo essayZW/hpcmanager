@@ -9,10 +9,12 @@ import (
 	"github.com/essayZW/hpcmanager/logger"
 	permissionpb "github.com/essayZW/hpcmanager/permission/proto"
 	publicpb "github.com/essayZW/hpcmanager/proto"
+	userbroker "github.com/essayZW/hpcmanager/user/broker"
 	userdb "github.com/essayZW/hpcmanager/user/db"
 	"github.com/essayZW/hpcmanager/user/logic"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
+	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/client"
 )
 
@@ -23,6 +25,8 @@ type UserGroupService struct {
 
 	permissionService permissionpb.PermissionService
 	hpcService        hpcpb.HpcService
+
+	rabbitmqBroker broker.Broker
 }
 
 // Ping 用户组服务ping测试
@@ -182,7 +186,7 @@ func (group *UserGroupService) PageGetApplyGroupInfo(ctx context.Context, req *u
 	for index := range result.Applies {
 		resp.Applies[index] = &userpb.UserGroupApply{
 			Id:                     int32(result.Applies[index].ID),
-			UserID:                 int32(result.Applies[index].ApplyGroupID),
+			UserID:                 int32(result.Applies[index].UserID),
 			UserUsername:           result.Applies[index].UserUsername,
 			UserName:               result.Applies[index].UserName,
 			ApplyGroupID:           int32(result.Applies[index].ApplyGroupID),
@@ -239,6 +243,17 @@ func (group *UserGroupService) CheckApply(ctx context.Context, req *userpb.Check
 		return err
 	}
 	resp.Success = status
+
+	// 发送mq消息
+	message := userbroker.CheckApplyMessage{
+		ApplyID:      int(req.ApplyID),
+		CheckStatus:  req.CheckStatus,
+		CheckMessage: req.CheckMessage,
+		TutorCheck:   req.TutorCheck,
+	}
+	if err := message.Public(group.rabbitmqBroker, req.BaseRequest); err != nil {
+		logger.Warn("Message public error: ", err)
+	}
 	return nil
 }
 
@@ -322,14 +337,49 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 	return nil
 }
 
+// GetApplyInfoByID 通过ID查询用户申请加入组信息
+func (group *UserGroupService) GetApplyInfoByID(ctx context.Context, req *userpb.GetApplyInfoByIDRequest, resp *userpb.GetApplyInfoByIDResponse) error {
+	logger.Info("GetApplyInfoByID: %s", req.BaseRequest)
+	apply, err := group.userGroupLogic.GetApplyInfoByID(context.Background(), int(req.ApplyID))
+	if err != nil {
+		return errors.New("Apply info query error")
+	}
+	resp.Apply = &userpb.UserGroupApply{
+		Id:                     int32(apply.ID),
+		UserID:                 int32(apply.UserID),
+		UserUsername:           apply.UserUsername,
+		UserName:               apply.UserName,
+		ApplyGroupID:           int32(apply.ApplyGroupID),
+		TutorID:                int32(apply.TutorID),
+		TutorUsername:          apply.TutorUsername,
+		TutorName:              apply.TutorName,
+		TutorCheckStatus:       int32(apply.TutorCheckStatus),
+		ManagerCheckStatus:     int32(apply.ManagerCheckStatus),
+		Status:                 int32(apply.Status),
+		MessageTutor:           apply.MessageTutor.String,
+		MessageManager:         apply.MessageManager.String,
+		TutorCheckTime:         apply.TutorCheckTime.Time.Unix(),
+		ManagerCheckTime:       apply.ManagerCheckTime.Time.Unix(),
+		ManagerCheckerID:       int32(apply.ManagerCheckerID.Int64),
+		ManagerCheckerUsername: apply.ManagerCheckerUsername.String,
+		ManagerCheckerName:     apply.ManagerCheckerName.String,
+		CreateTime:             apply.CreateTime.Time.Unix(),
+	}
+	if apply.ExtraAttributes != nil {
+		resp.Apply.ExtraAttributes = apply.ExtraAttributes.String()
+	}
+	return nil
+}
+
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务
-func NewGroup(client client.Client, userGroupLogic *logic.UserGroup, userLogic *logic.User) *UserGroupService {
+func NewGroup(client client.Client, userGroupLogic *logic.UserGroup, userLogic *logic.User, mqBroker broker.Broker) *UserGroupService {
 	return &UserGroupService{
 		userGroupLogic:    userGroupLogic,
 		userLogic:         userLogic,
 		permissionService: permissionpb.NewPermissionService("permission", client),
 		hpcService:        hpcpb.NewHpcService("hpc", client),
+		rabbitmqBroker:    mqBroker,
 	}
 }

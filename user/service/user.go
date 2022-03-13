@@ -276,7 +276,7 @@ func (s *UserService) PaginationGetUserInfo(ctx context.Context, req *userpb.Pag
 // JoinGroup 将一个没有组的用户加入到一个已经存在的组中,并提升其权限为Common
 func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupRequest, resp *userpb.JoinGroupResponse) error {
 	logger.Infof("JoinGroup: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
-	if !verify.Identify(verify.GetUserInfo, req.GetBaseRequest().GetUserInfo().GetLevels()) {
+	if !verify.Identify(verify.JoinGroup, req.GetBaseRequest().GetUserInfo().GetLevels()) {
 		logger.Info("JoinGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("JoinGroup permission forbidden")
 	}
@@ -296,8 +296,9 @@ func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupReques
 		}
 
 		hpcResp, err := s.hpcService.AddUserToGroup(ctx, &hpcpb.AddUserToGroupRequest{
-			UserName:   userInfo.Username,
-			HpcGroupID: int32(groupInfo.HpcGroupID),
+			UserName:    userInfo.Username,
+			HpcGroupID:  int32(groupInfo.HpcGroupID),
+			BaseRequest: req.BaseRequest,
 		})
 		if err != nil {
 			return nil, err
@@ -313,13 +314,15 @@ func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupReques
 
 		// 删除原来的Guest权限
 		s.permissionService.RemoveUserPermission(ctx, &permissionpb.RemoveUserPermissionRequest{
-			Userid: int32(userInfo.ID),
-			Level:  int32(verify.Guest),
+			Userid:      int32(userInfo.ID),
+			Level:       int32(verify.Guest),
+			BaseRequest: req.BaseRequest,
 		})
 		// 添加Common权限
 		addResp, err := s.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
-			Userid: int32(userInfo.ID),
-			Level:  int32(verify.Common),
+			Userid:      int32(userInfo.ID),
+			Level:       int32(verify.Common),
+			BaseRequest: req.BaseRequest,
 		})
 		if err != nil {
 			return nil, err
@@ -390,6 +393,7 @@ func NewUser(client client.Client, userLogic *logic.User, groupLogic *logic.User
 	hpcService := hpcpb.NewHpcService("hpc", client)
 	return &UserService{
 		userLogic:         userLogic,
+		groupLogic:        groupLogic,
 		permissionService: permissionService,
 		hpcService:        hpcService,
 	}
