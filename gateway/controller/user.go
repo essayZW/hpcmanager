@@ -10,6 +10,7 @@ import (
 	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
 	jsonparam "github.com/essayZW/hpcmanager/gateway/request/json"
 	"github.com/essayZW/hpcmanager/gateway/response"
+	"github.com/essayZW/hpcmanager/gateway/utils"
 	"github.com/essayZW/hpcmanager/logger"
 	"github.com/essayZW/hpcmanager/proto"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
@@ -160,6 +161,40 @@ func (user *User) getIDByUsername(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// paginationGetUserInfo /api/group GET 分页查询用户信息
+func (user *User) paginationGetUserInfo(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := user.userService.PaginationGetUserInfo(c, &userpb.PaginationGetUserInfoRequest{
+		BaseRequest: baseRequest,
+		PageIndex:   int32(pageIndex),
+		PageSize:    int32(pageSize),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, "查询用户信息失败")
+		httpResp.Send(ctx)
+		return
+	}
+	responseData := response.PaginationQueryResponse{
+		Count: int(resp.Count),
+		Data:  resp.UserInfos,
+	}
+	if resp.UserInfos == nil {
+		responseData.Data = make([]*userpb.UserInfo, 0)
+	}
+	httpResp := response.New(200, responseData, true, "success")
+	httpResp.Send(ctx)
+}
+
 // Registry 为用户控制器注册相应的处理函数
 func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller User")
@@ -175,6 +210,7 @@ func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	userRouter.DELETE("/token", user.logout)
 	userRouter.GET("/:id", user.getByUserID)
 	userRouter.GET("/name/:username", user.getIDByUsername)
+	userRouter.GET("", user.paginationGetUserInfo)
 	return userRouter
 }
 

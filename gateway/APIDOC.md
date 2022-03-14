@@ -83,6 +83,21 @@ Method: GET
 
 响应: 用户的基础信息包括 ID 姓名以及组 ID
 
+### /user
+
+Method: GET
+
+描述: 分页查询用户信息
+
+参数:
+
+```text
+pageIndex: number,
+pageSize: number
+```
+
+响应: 分页的用户信息
+
 ## hpc 控制器
 
 ### /hpc/ping
@@ -372,7 +387,3 @@ ticket=
 响应:
 
 若验证成功跳转到主页,否则返回错误信息
-
-```
-
-```
