@@ -1,4 +1,4 @@
-import { PingResponse, ApiRequest } from './api';
+import { PingResponse, ApiRequest, PaginationQueryResponse } from './api';
 import { undefinedWithDefault } from '../utils/obj';
 
 // 用户服务ping测试
@@ -82,7 +82,7 @@ export async function deleteToken(): Promise<boolean> {
   try {
     const resp = await ApiRequest.request('/user/token', 'DELETE');
     return resp.status;
-  } catch (eror) {
+  } catch (error) {
     return false;
   }
 }
@@ -143,4 +143,25 @@ export async function queryUserInfoByUsername(
     throw new Error(resp.message);
   }
   return resp.data as QueryUserIDResponse;
+}
+
+/**
+ * 分页查询用户信息
+ */
+export async function paginationQueryUserInfo(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<UserInfo>> {
+  const resp = await ApiRequest.request<PaginationQueryResponse<UserInfo>>(
+    '/user',
+    'GET',
+    {
+      pageIndex,
+      pageSize,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
 }

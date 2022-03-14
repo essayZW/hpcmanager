@@ -4,6 +4,7 @@ import { RouteRecordRaw, Router } from 'vue-router';
 import ApplyGroup from '../components/guest/ApplyGroup.vue';
 import GroupManager from '../components/admin/GroupManager.vue';
 import CheckGroupApply from '../components/tutor/CheckGroupApply.vue';
+import UserManager from '../components/admin/UserManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -47,6 +48,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: 'tutor_check_group_apply',
         },
       },
+      {
+        routerRaw: {
+          path: 'tutor_manager_user',
+          name: 'TutorManagerUser',
+          component: UserManager,
+        },
+        item: {
+          name: '用户管理',
+          to: 'tutor_manager_user',
+        },
+      },
     ],
   ],
   [
@@ -72,6 +84,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '审核用户组申请',
           to: 'admin_check_group_apply',
+        },
+      },
+      {
+        routerRaw: {
+          path: 'admin_manager_user',
+          name: 'AdminManagerUser',
+          component: UserManager,
+        },
+        item: {
+          name: '用户管理',
+          to: 'admin_manager_user',
         },
       },
     ],
@@ -103,6 +126,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: 'admin_check_group_apply',
         },
       },
+      {
+        routerRaw: {
+          path: 'admin_manager_user',
+          name: 'AdminManagerUser',
+          component: UserManager,
+        },
+        item: {
+          name: '用户管理',
+          to: 'admin_manager_user',
+        },
+      },
     ],
   ],
 ]);
@@ -116,7 +150,7 @@ export type NavigationItem = {
 };
 
 /**
- * 过滤出可用的所有NaigationItem项
+ * 过滤出可用的所有NavigationItem项
  */
 function filterAvailableNavigation(
   levels: UserLevels[]

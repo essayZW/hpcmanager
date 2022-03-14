@@ -1,4 +1,4 @@
-import { accessTokenKey } from '../api/api';
+import { accessTokenKey, PaginationQueryResponse } from '../api/api';
 import {
   createToken,
   getLoginedInfo,
@@ -9,6 +9,7 @@ import {
   queryUserInfoByID,
   queryUserInfoByUsername,
   QueryUserIDResponse,
+  paginationQueryUserInfo,
 } from '../api/user';
 import { getCasConfig } from '../service/sys';
 
@@ -129,4 +130,14 @@ export function isAdmin(): boolean {
     }
   }
   return false;
+}
+
+/**
+ * 分页查询用户信息
+ */
+export async function paginationGetUserInfo(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<UserInfo>> {
+  return await paginationQueryUserInfo(pageIndex, pageSize);
 }
