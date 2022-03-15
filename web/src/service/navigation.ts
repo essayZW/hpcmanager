@@ -156,6 +156,7 @@ function filterAvailableNavigation(
   levels: UserLevels[]
 ): Map<UserLevels, UserNavigationItem[]> {
   const res = new Map<UserLevels, UserNavigationItem[]>();
+  const flag = new Map<string, boolean>();
   for (const i in levels) {
     const level = levels[i];
     const navigationItem = UserNavigation.get(level);
@@ -164,6 +165,10 @@ function filterAvailableNavigation(
     }
     const items = new Array<UserNavigationItem>();
     for (const item of navigationItem) {
+      if (flag.has(item.routerRaw.path)) {
+        continue;
+      }
+      flag.set(item.routerRaw.path, true);
       items.push(item);
     }
     if (items.length == 0) {

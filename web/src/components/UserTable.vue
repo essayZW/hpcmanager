@@ -7,6 +7,7 @@ import { paginationGetUserInfo } from '../service/user';
 import dayjs from 'dayjs';
 import { HpcUser } from '../api/hpc';
 import { getHpcUserInfoByID } from '../service/hpc';
+import { zeroWithDefault } from '../utils/obj';
 
 // 表格数据
 const tableData = reactive<{
@@ -112,7 +113,7 @@ const expandChangeHandler = async (row: UserInfo) => {
 };
 </script>
 <template>
-  <el-row justify="end">
+  <el-row justify="end" class="refresh-button-row">
     <el-button type="primary" @click="refreshTable">
       <el-icon class="el-icon--left">
         <i-ic-round-refresh />
@@ -124,15 +125,28 @@ const expandChangeHandler = async (row: UserInfo) => {
     <el-col>
       <el-table
         v-loading="tableData.loading"
+        border
         :data="tableData.data"
         @expand-change="expandChangeHandler"
       >
         <el-table-column label="ID" prop="id"></el-table-column>
         <el-table-column label="姓名" prop="name"></el-table-column>
         <el-table-column label="学号" prop="username"></el-table-column>
-        <el-table-column label="学院" prop="college"></el-table-column>
-        <el-table-column label="电话" prop="tel"></el-table-column>
-        <el-table-column label="邮箱" prop="email"></el-table-column>
+        <el-table-column label="学院">
+          <template #default="props">
+            {{ zeroWithDefault(props.row.college, '无') }}
+          </template>
+        </el-table-column>
+        <el-table-column label="电话">
+          <template #default="props">
+            {{ zeroWithDefault(props.row.tel, '无') }}
+          </template>
+        </el-table-column>
+        <el-table-column label="邮箱" prop="email">
+          <template #default="props">
+            {{ zeroWithDefault(props.row.email, '无') }}
+          </template>
+        </el-table-column>
         <el-table-column label="创建时间">
           <template #default="props">
             {{ dayjs(props.row.createTime * 1000).format('YYYY-MM-DD HH:mm') }}
@@ -205,5 +219,8 @@ const expandChangeHandler = async (row: UserInfo) => {
 }
 p.info {
   padding-left: 16px;
+}
+.refresh-button-row {
+  margin: 16px 0px;
 }
 </style>
