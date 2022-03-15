@@ -66,8 +66,24 @@ func (user *CreateUserParam) Validator() validator.StructLevelFunc {
 
 // UpdateUserInfoParam 用户信息更新参数
 type UpdateUserInfoParam struct {
-	ID      int    `form:"id" json:"id"`
+	ID      int    `form:"id" json:"id" binding:"required"`
 	Tel     string `form:"tel" json:"tel"`
 	Email   string `form:"email" json:"email"`
 	College string `form:"college" json:"college"`
+}
+
+// Validator 验证器
+func (param *UpdateUserInfoParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(UpdateUserInfoParam)
+		if data.ID == 0 {
+			sl.ReportError(reflect.ValueOf(data.ID), "id", "id", "binding", "invalid id")
+		}
+
+		pattern := `\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*` //匹配电子邮箱
+		reg := regexp.MustCompile(pattern)
+		if data.Email != "" && !reg.MatchString(data.Email) {
+			sl.ReportError(reflect.ValueOf(data.Email), "email", "email", "binding", "invalid email")
+		}
+	}
 }

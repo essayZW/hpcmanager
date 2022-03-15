@@ -389,7 +389,7 @@ func (s *UserService) GetUserInfoByHpcID(ctx context.Context, req *userpb.GetUse
 func (s *UserService) UpdateUserInfo(ctx context.Context, req *userpb.UpdateUserInfoRequest, resp *userpb.UpdateUserInfoResponse) error {
 	logger.Info("UpdateUserInfo: ", req.BaseRequest)
 	if req.BaseRequest.UserInfo.UserId != req.NewInfos.Id {
-		return errors.New("permision forbidden for update other user's info")
+		return errors.New("permission forbidden for update other user's info")
 	}
 
 	var extraAttributes *hpcDB.JSON
@@ -405,6 +405,7 @@ func (s *UserService) UpdateUserInfo(ctx context.Context, req *userpb.UpdateUser
 		Tel:             req.NewInfos.Tel,
 		Email:           req.NewInfos.Email,
 		CollegeName:     req.NewInfos.College,
+		ID:              int(req.NewInfos.Id),
 		ExtraAttributes: extraAttributes,
 	})
 	if err != nil {

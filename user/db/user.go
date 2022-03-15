@@ -166,7 +166,7 @@ func (db *UserDB) QueryByHpcID(ctx context.Context, hpcID int) (*User, error) {
 
 // Update 更新用户信息
 func (db *UserDB) Update(ctx context.Context, newInfo *User) error {
-	res, err := db.conn.Exec(ctx, "UPDATE `user` SET `tel`=?, `email`=?, `college_name=?, `extraAttributes`=?"+
+	res, err := db.conn.Exec(ctx, "UPDATE `user` SET `tel`=?, `email`=?, `college_name`=?, `extraAttributes`=? "+
 		"WHERE `id`=?", newInfo.Tel, newInfo.Email, newInfo.CollegeName, newInfo.ExtraAttributes, newInfo.ID)
 	if err != nil {
 		logger.Warn("Update user info error: ", err)

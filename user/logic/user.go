@@ -177,7 +177,7 @@ func (u *User) GetUserInfoByHpcID(ctx context.Context, hpcID int) (*db.User, err
 
 // UpdateUserInfo 更新用户信息
 func (u *User) UpdateUserInfo(ctx context.Context, newUserInfo *db.User) error {
-	if newUserInfo.ID != 0 {
+	if newUserInfo.ID == 0 {
 		return errors.New("user's id can't be zero")
 	}
 	return u.userDB.Update(ctx, newUserInfo)

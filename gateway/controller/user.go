@@ -220,6 +220,7 @@ func (user *User) updateUserInfo(ctx *gin.Context) {
 		},
 	})
 	if err != nil || !resp.Success {
+		logger.Warn(err)
 		httpResp := response.New(200, nil, false, "更改用户信息失败")
 		httpResp.Send(ctx)
 		return
