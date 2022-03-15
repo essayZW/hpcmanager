@@ -8,6 +8,7 @@ import {
   ApplyInfo,
   paginationQueryApplyInfo,
   checkApply,
+  queryGroupByID,
 } from '../api/group';
 import { PaginationQueryResponse } from '../api/api';
 import { getUserIdByUsername } from './user';
@@ -99,4 +100,11 @@ export async function checkJoinGroupApply(
     tutorCheck,
   });
   return true;
+}
+
+/**
+ * 通过ID查询用户组信息
+ */
+export async function getGroupInfoByID(id: number): Promise<GroupInfo> {
+  return queryGroupByID(id);
 }

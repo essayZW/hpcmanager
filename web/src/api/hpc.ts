@@ -27,3 +27,29 @@ export async function getHpcGroupInfo(id: number): Promise<HpcGroup> {
   undefinedWithDefault(resp.data, 'extraAttributes', '');
   return resp.data;
 }
+
+/**
+ * hpc_user信息
+ */
+export type HpcUser = {
+  id: number;
+  nodeUsername: string;
+  nodeUID: number;
+  nodeMaxQuota: number;
+  nodeStartTime: number;
+  nodeEndTime: number;
+  extraAttributes: string;
+};
+
+/**
+ * 通过ID查询hpc用户信息
+ * @param id hpc_user参数
+ * @returns hpc_user信息
+ */
+export async function queryHpcUserInfo(id: number): Promise<HpcUser> {
+  const resp = await ApiRequest.request<HpcUser>(`/hpc/user/${id}`, 'GET');
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}

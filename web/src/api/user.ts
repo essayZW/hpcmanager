@@ -98,7 +98,7 @@ export type UserInfo = {
   name: string;
   pyName: string;
   college: string;
-  groupID: number;
+  groupId: number;
   createTime: number;
   extraAttributes: string;
   hpcUserID: number;
@@ -162,6 +162,9 @@ export async function paginationQueryUserInfo(
   );
   if (!resp.status) {
     throw new Error(resp.message);
+  }
+  for (const user of resp.data.Data) {
+    undefinedWithDefault(user, 'groupId', 0);
   }
   return resp.data;
 }
