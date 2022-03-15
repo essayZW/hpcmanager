@@ -16,11 +16,10 @@ const Router: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'Index',
-    redirect: '/main/',
+    redirect: '/main',
   },
-  // TODO 访问 /main 情况下动态添加的路由会失效
   {
-    path: '/main/',
+    path: '/main',
     name: 'Main',
     component: MainView,
     beforeEnter: async () => {
@@ -40,7 +39,7 @@ const Router: RouteRecordRaw[] = [
         });
         return '/login';
       }
-      // 存储用户信息到storge中
+      // 存储用户信息到storage中
       setUserInfoToStorage(info);
     },
   },
