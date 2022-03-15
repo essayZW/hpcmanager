@@ -367,7 +367,7 @@ const checkButtonHandler = async (
     </el-col>
   </el-row>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .pagination-row {
   margin: 16px 0px;
 }

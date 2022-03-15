@@ -81,7 +81,7 @@ const loginSubmit = (elem: FormInstance | undefined) => {
     </el-col>
   </el-row>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .form-row {
   padding-top: 150px;
 }

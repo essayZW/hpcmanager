@@ -351,7 +351,7 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
     </template>
   </el-dialog>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .group-table {
   width: 100%;
   margin-top: 24px;

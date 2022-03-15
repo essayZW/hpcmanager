@@ -206,7 +206,7 @@ const submitJoinGroupApply = async () => {
     </el-tabs>
   </el-row>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .tab-panes-row {
   margin-top: 16px;
   .el-tabs {

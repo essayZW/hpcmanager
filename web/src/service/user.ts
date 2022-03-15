@@ -10,6 +10,7 @@ import {
   queryUserInfoByUsername,
   QueryUserIDResponse,
   paginationQueryUserInfo,
+  updateUserInfo,
 } from '../api/user';
 import { getCasConfig } from '../service/sys';
 
@@ -140,4 +141,21 @@ export async function paginationGetUserInfo(
   pageSize: number
 ): Promise<PaginationQueryResponse<UserInfo>> {
   return await paginationQueryUserInfo(pageIndex, pageSize);
+}
+
+/**
+ * 通过用户ID修改用户的电话、学院以及邮箱信息
+ */
+export async function updateUserInfoByID(
+  id: number,
+  tel: string,
+  college: string,
+  email: string
+) {
+  return updateUserInfo({
+    id,
+    tel,
+    college,
+    email,
+  });
 }

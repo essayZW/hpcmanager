@@ -62,6 +62,11 @@ const logout = async () => {
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
+              <el-dropdown-item
+                ><router-link to="/main/update_user_info" class="link"
+                  >修改用户信息</router-link
+                ></el-dropdown-item
+              >
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -129,5 +134,10 @@ const logout = async () => {
     text-align: center;
     border-top: 1px solid var(--el-border-color-base);
   }
+}
+.link {
+  text-decoration: none;
+  color: inherit;
+  font-size: inherit;
 }
 </style>

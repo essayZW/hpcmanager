@@ -6,4 +6,4 @@ import UserTable from '../UserTable.vue';
   <page-title title="用户管理" des="查看所有的用户信息"></page-title>
   <user-table></user-table>
 </template>
-<style lang="ts"></style>
+<style lang="ts" scoped></style>

@@ -20,7 +20,7 @@ onBeforeMount(() => {
     </el-col>
   </el-row>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .title-area {
   h1 {
     display: inline-block;

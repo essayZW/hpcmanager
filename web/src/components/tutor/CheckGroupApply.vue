@@ -24,4 +24,4 @@ onMounted(() => {
     </el-col>
   </el-row>
 </template>
-<style lang="less"></style>
+<style lang="less" scoped></style>

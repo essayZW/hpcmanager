@@ -79,7 +79,7 @@ if (info == null) {
     </el-menu-item-group>
   </el-menu>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .aside-menu {
   border: none;
   .el-menu-item {

@@ -8,6 +8,7 @@ import MainView from './pages/MainView.vue';
 import NotFound from './pages/NotFound.vue';
 import InstallView from './pages/InstallView.vue';
 import LoginView from './pages/LoginView.vue';
+import UpdateUserInfo from './components/UpdateUserInfo.vue';
 import { registryRouter } from './service/navigation';
 
 let registerFlag = false;
@@ -42,6 +43,13 @@ const Router: RouteRecordRaw[] = [
       // 存储用户信息到storage中
       setUserInfoToStorage(info);
     },
+    children: [
+      {
+        path: '/main/update_user_info',
+        name: 'UpdateUserInfo',
+        component: UpdateUserInfo,
+      },
+    ],
   },
   {
     path: '/install',

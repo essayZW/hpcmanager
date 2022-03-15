@@ -213,7 +213,7 @@ const expandChangeHandler = async (row: UserInfo) => {
     </el-col>
   </el-row>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .pagination-row {
   margin: 16px 0px;
 }

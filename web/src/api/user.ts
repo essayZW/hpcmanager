@@ -14,10 +14,10 @@ export async function ping(): Promise<PingResponse> {
 
 // 登录后的用户信息
 export interface LoginUserInfo {
-  UserID: number;
+  UserId: number;
   Username: string;
   Name: string;
-  GroupID: number;
+  GroupId: number;
   Levels: number[];
 }
 
@@ -167,4 +167,31 @@ export async function paginationQueryUserInfo(
     undefinedWithDefault(user, 'groupId', 0);
   }
   return resp.data;
+}
+
+/**
+ * 修改用户信息接口请求参数格式定义
+ */
+export type UpdateUserInfoRequest = {
+  college: string;
+  email: string;
+  tel: string;
+  id: number;
+};
+
+/**
+ * 修改用户信息
+ */
+export async function updateUserInfo(newInfo: UpdateUserInfoRequest) {
+  const resp = await ApiRequest.request(
+    '/user',
+    'PATCH',
+    {},
+    {
+      ...newInfo,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
 }
