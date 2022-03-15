@@ -278,7 +278,7 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 		hpcResp, err := group.hpcService.AddUserWithGroup(c, &hpcpb.AddUserWithGroupRequest{
 			// 使用导师的英语姓名作为计算节点上的用户组名
 			TutorUsername: tutorInfo.PinyinName,
-			GroupName:     req.Name,
+			GroupName:     tutorInfo.PinyinName,
 			QueueName:     req.QueueName,
 			BaseRequest:   req.BaseRequest,
 		})
