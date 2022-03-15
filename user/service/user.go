@@ -296,7 +296,7 @@ func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupReques
 		}
 
 		hpcResp, err := s.hpcService.AddUserToGroup(ctx, &hpcpb.AddUserToGroupRequest{
-			UserName:    userInfo.Username,
+			UserName:    userInfo.PinyinName,
 			HpcGroupID:  int32(groupInfo.HpcGroupID),
 			BaseRequest: req.BaseRequest,
 		})
