@@ -175,6 +175,14 @@ func (u *User) GetUserInfoByHpcID(ctx context.Context, hpcID int) (*db.User, err
 	return u.userDB.QueryByHpcID(ctx, hpcID)
 }
 
+// UpdateUserInfo 更新用户信息
+func (u *User) UpdateUserInfo(ctx context.Context, newUserInfo *db.User) error {
+	if newUserInfo.ID != 0 {
+		return errors.New("user's id can't be zero")
+	}
+	return u.userDB.Update(ctx, newUserInfo)
+}
+
 // NewUser 创建一个新的userLogic
 func NewUser(db *db.UserDB, configConn config.DynamicConfig, redisConn *redis.Client) *User {
 	user := &User{

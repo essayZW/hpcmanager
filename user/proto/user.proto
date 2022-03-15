@@ -21,6 +21,7 @@ service User {
     rpc PaginationGetUserInfo(PaginationGetUserInfoRequest) returns (PaginationGetUserInfoResponse) {}
     rpc JoinGroup(JoinGroupRequest) returns (JoinGroupResponse) {}
     rpc GetUserInfoByHpcID(GetUserInfoByHpcIDRequest) returns (GetUserInfoByHpcIDResponse) {}
+    rpc UpdateUserInfo(UpdateUserInfoRequest) returns (UpdateUserInfoResponse) {}
 }
 
 message LoginRequest {
@@ -123,4 +124,13 @@ message GetUserInfoByHpcIDRequest {
 
 message GetUserInfoByHpcIDResponse {
     user.UserInfo info = 1;
+}
+
+message UpdateUserInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    user.UserInfo newInfos = 2;
+}
+
+message UpdateUserInfoResponse {
+    bool success = 1;
 }

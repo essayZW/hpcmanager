@@ -164,6 +164,22 @@ func (db *UserDB) QueryByHpcID(ctx context.Context, hpcID int) (*User, error) {
 	return &info, nil
 }
 
+// Update 更新用户信息
+func (db *UserDB) Update(ctx context.Context, newInfo *User) error {
+	res, err := db.conn.Exec(ctx, "UPDATE `user` SET `password`=?, `tel`=?, `email`=?, `college_name=?, `extraAttributes`=?"+
+		"WHERE `id`=?", newInfo.Password, newInfo.Tel, newInfo.Email, newInfo.CollegeName, newInfo.ExtraAttributes, newInfo.ID)
+	if err != nil {
+		logger.Warn("Update user info error: ", err)
+		return errors.New("update user info error")
+	}
+	_, err = res.RowsAffected()
+	if err != nil {
+		logger.Warn("Update user info error: ", err)
+		return errors.New("update user info error")
+	}
+	return nil
+}
+
 // NewUser 创建一个新的操作用户数据库结构体
 func NewUser(db *db.DB) *UserDB {
 	return &UserDB{

@@ -385,6 +385,35 @@ func (s *UserService) GetUserInfoByHpcID(ctx context.Context, req *userpb.GetUse
 	return nil
 }
 
+// UpdateUserInfo 更新用户信息
+func (s *UserService) UpdateUserInfo(ctx context.Context, req *userpb.UpdateUserInfoRequest, resp *userpb.UpdateUserInfoResponse) error {
+	logger.Info("UpdateUserInfo: ", req.BaseRequest)
+	if req.BaseRequest.UserInfo.UserId != req.NewInfos.Id {
+		return errors.New("permision forbidden for update other user's info")
+	}
+
+	var extraAttributes *hpcDB.JSON
+	var err error
+	if req.NewInfos.ExtraAttributes != "" {
+		extraAttributes, err = hpcDB.NewJSON(req.NewInfos.ExtraAttributes)
+		if err != nil {
+			return errors.New("extraAttributes json parse error")
+		}
+	}
+	err = s.userLogic.UpdateUserInfo(ctx, &db.User{
+		Password:        req.NewInfos.Password,
+		Tel:             req.NewInfos.Tel,
+		Email:           req.NewInfos.Email,
+		CollegeName:     req.NewInfos.College,
+		ExtraAttributes: extraAttributes,
+	})
+	if err != nil {
+		return err
+	}
+	resp.Success = true
+	return nil
+}
+
 var _ userpb.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例

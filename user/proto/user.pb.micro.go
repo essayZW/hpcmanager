@@ -49,6 +49,7 @@ type UserService interface {
 	PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, opts ...client.CallOption) (*PaginationGetUserInfoResponse, error)
 	JoinGroup(ctx context.Context, in *JoinGroupRequest, opts ...client.CallOption) (*JoinGroupResponse, error)
 	GetUserInfoByHpcID(ctx context.Context, in *GetUserInfoByHpcIDRequest, opts ...client.CallOption) (*GetUserInfoByHpcIDResponse, error)
+	UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, opts ...client.CallOption) (*UpdateUserInfoResponse, error)
 }
 
 type userService struct {
@@ -173,6 +174,16 @@ func (c *userService) GetUserInfoByHpcID(ctx context.Context, in *GetUserInfoByH
 	return out, nil
 }
 
+func (c *userService) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, opts ...client.CallOption) (*UpdateUserInfoResponse, error) {
+	req := c.c.NewRequest(c.name, "User.UpdateUserInfo", in)
+	out := new(UpdateUserInfoResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
@@ -187,6 +198,7 @@ type UserHandler interface {
 	PaginationGetUserInfo(context.Context, *PaginationGetUserInfoRequest, *PaginationGetUserInfoResponse) error
 	JoinGroup(context.Context, *JoinGroupRequest, *JoinGroupResponse) error
 	GetUserInfoByHpcID(context.Context, *GetUserInfoByHpcIDRequest, *GetUserInfoByHpcIDResponse) error
+	UpdateUserInfo(context.Context, *UpdateUserInfoRequest, *UpdateUserInfoResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
@@ -202,6 +214,7 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, out *PaginationGetUserInfoResponse) error
 		JoinGroup(ctx context.Context, in *JoinGroupRequest, out *JoinGroupResponse) error
 		GetUserInfoByHpcID(ctx context.Context, in *GetUserInfoByHpcIDRequest, out *GetUserInfoByHpcIDResponse) error
+		UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, out *UpdateUserInfoResponse) error
 	}
 	type User struct {
 		user
@@ -256,4 +269,8 @@ func (h *userHandler) JoinGroup(ctx context.Context, in *JoinGroupRequest, out *
 
 func (h *userHandler) GetUserInfoByHpcID(ctx context.Context, in *GetUserInfoByHpcIDRequest, out *GetUserInfoByHpcIDResponse) error {
 	return h.UserHandler.GetUserInfoByHpcID(ctx, in, out)
+}
+
+func (h *userHandler) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, out *UpdateUserInfoResponse) error {
+	return h.UserHandler.UpdateUserInfo(ctx, in, out)
 }

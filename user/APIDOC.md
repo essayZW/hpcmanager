@@ -498,6 +498,31 @@ message GetApplyInfoByIDResponse {
 }
 ```
 
+## UpdateUserInfo
+
+描述: 更新用户信息
+
+原型定义: `rpc UpdateUserInfo(UpdateUserInfoRequest) returns (UpdateUserInfoResponse) {}`
+
+需求权限: 无
+
+请求参数:
+
+```protobuf
+message UpdateUserInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    user.UserInfo newInfos = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message UpdateUserInfoResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## UserInfo
