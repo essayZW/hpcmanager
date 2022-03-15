@@ -150,7 +150,7 @@ func (db *UserDB) UpdateHpcUserID(ctx context.Context, userID, hpcUserID int) er
 
 // QueryByHpcID 通过hpc_user_id查询用户信息
 func (db *UserDB) QueryByHpcID(ctx context.Context, hpcID int) (*User, error) {
-	res, err := db.conn.QueryRow(ctx, "SELECT * FROM `user` FROM `hpc_user_id`=?", hpcID)
+	res, err := db.conn.QueryRow(ctx, "SELECT * FROM `user` WHERE `hpc_user_id`=?", hpcID)
 	if err != nil {
 		logger.Warn("QueryByHpcID error: ", err, " with hpc id: ", hpcID)
 		return nil, errors.New("QueryByHpcID error")
