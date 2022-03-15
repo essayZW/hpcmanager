@@ -98,6 +98,26 @@ pageSize: number
 
 响应: 分页的用户信息
 
+### /user
+
+Method: PATCH
+
+描述: 修改用户信息，包括用户的邮箱地址，电话以及学院信息
+
+参数:
+
+```go
+// UpdateUserInfoParam 用户信息更新参数
+type UpdateUserInfoParam struct {
+    ID      int    `form:"id" json:"id"`
+    Tel     string `form:"tel" json:"tel"`
+    Email   string `form:"email" json:"email"`
+    College string `form:"college" json:"college"`
+}
+```
+
+响应: 是否修改成功
+
 ## hpc 控制器
 
 ### /hpc/ping
@@ -387,3 +407,4 @@ ticket=
 响应:
 
 若验证成功跳转到主页,否则返回错误信息
+

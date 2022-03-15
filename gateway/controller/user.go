@@ -8,6 +8,7 @@ import (
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
 	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
+	"github.com/essayZW/hpcmanager/gateway/request/json"
 	jsonparam "github.com/essayZW/hpcmanager/gateway/request/json"
 	"github.com/essayZW/hpcmanager/gateway/response"
 	"github.com/essayZW/hpcmanager/gateway/utils"
@@ -195,6 +196,38 @@ func (user *User) paginationGetUserInfo(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// updateUserInfo /api/user PATCH 更新用户信息
+func (user *User) updateUserInfo(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.UpdateUserInfoParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := user.userService.UpdateUserInfo(c, &userpb.UpdateUserInfoRequest{
+		BaseRequest: baseRequest,
+		NewInfos: &userpb.UserInfo{
+			Id:      int32(param.ID),
+			Tel:     param.Tel,
+			Email:   param.Email,
+			College: param.College,
+		},
+	})
+	if err != nil || !resp.Success {
+		httpResp := response.New(200, nil, false, "更改用户信息失败")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
 // Registry 为用户控制器注册相应的处理函数
 func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller User")
@@ -211,6 +244,7 @@ func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	userRouter.GET("/:id", user.getByUserID)
 	userRouter.GET("/name/:username", user.getIDByUsername)
 	userRouter.GET("", user.paginationGetUserInfo)
+	userRouter.PATCH("", user.updateUserInfo)
 	return userRouter
 }
 

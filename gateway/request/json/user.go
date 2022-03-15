@@ -63,3 +63,11 @@ func (user *CreateUserParam) Validator() validator.StructLevelFunc {
 		}
 	}
 }
+
+// UpdateUserInfoParam 用户信息更新参数
+type UpdateUserInfoParam struct {
+	ID      int    `form:"id" json:"id"`
+	Tel     string `form:"tel" json:"tel"`
+	Email   string `form:"email" json:"email"`
+	College string `form:"college" json:"college"`
+}
