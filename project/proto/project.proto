@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option go_package="github.com/essayZW/hpcmanager/project/proto;project";
+
+package project;
+
+import "proto/ping.proto";
+import "proto/common.proto";
+
+service Project {
+    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+}
