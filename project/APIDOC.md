@@ -32,7 +32,7 @@ message PingResponse {
 
 原型定义: `rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse) {}`
 
-需求权限: guest 及以上
+需求权限: `Guest` 及以上
 
 请求参数:
 
@@ -48,6 +48,31 @@ message CreateProjectRequest {
 ```protobuf
 message CreateProjectResponse {
     int32 projectID = 1;
+}
+```
+
+## GetProjectInfoByID
+
+描述: 通过项目 ID 查询项目信息
+
+原型定义: `rpc GetProjectInfoByID(GetProjectInfoByIDRequest) returns (GetProjectInfoByIDResponse) {}`
+
+需求权限: `Guest` 及以上
+
+请求参数:
+
+```protobuf
+message GetProjectInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 id = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetProjectInfoByIDResponse {
+    project.ProjectInfo data = 1;
 }
 ```
 

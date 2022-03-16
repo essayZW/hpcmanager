@@ -106,3 +106,52 @@ func TestInsert(t *testing.T) {
 		})
 	}
 }
+
+func TestQueryByID(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		ID int
+
+		ExceptName string
+		Error      bool
+	}{
+		{
+			Name:       "query exists",
+			ID:         1,
+			ExceptName: "单元测试1",
+			Error:      false,
+		},
+		{
+			Name:       "query exists2",
+			ID:         2,
+			ExceptName: "单元测试2",
+			Error:      false,
+		},
+		{
+			Name:       "query not exists",
+			ID:         10086,
+			ExceptName: "",
+			Error:      true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			info, err := projectDB.QueryByID(context.Background(), test.ID)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v, Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v, Except: %v", err, test.Error)
+				return
+			}
+			if test.ExceptName != info.Name {
+				t.Errorf("Get: %v, Except: %v", info, test.ExceptName)
+			}
+		})
+	}
+}

@@ -12,6 +12,7 @@ import "proto/project_public.proto";
 service Project {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse) {}
+    rpc GetProjectInfoByID(GetProjectInfoByIDRequest) returns (GetProjectInfoByIDResponse) {}
 }
 
 message CreateProjectRequest {
@@ -21,4 +22,12 @@ message CreateProjectRequest {
 
 message CreateProjectResponse {
     int32 projectID = 1;
+}
+
+message GetProjectInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 id = 2;
+}
+message GetProjectInfoByIDResponse {
+    project.ProjectInfo data = 1;
 }

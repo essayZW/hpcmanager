@@ -38,6 +38,11 @@ func (p *Project) Create(ctx context.Context, createrUserID int, createrUserName
 	})
 }
 
+// GetByID 通过ID获取项目信息
+func (p *Project) GetByID(ctx context.Context, id int) (*projectdb.Project, error) {
+	return p.projectDB.QueryByID(ctx, id)
+}
+
 // NewProject 创建新的project的logic
 func NewProject(projectDB *projectdb.ProjectDB) *Project {
 	return &Project{

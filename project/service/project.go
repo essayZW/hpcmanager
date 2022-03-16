@@ -48,6 +48,39 @@ func (ps *ProjectService) CreateProject(ctx context.Context, req *projectpb.Crea
 	return nil
 }
 
+// GetProjectInfoByID 通过ID查询项目信息
+func (ps *ProjectService) GetProjectInfoByID(ctx context.Context, req *projectpb.GetProjectInfoByIDRequest, resp *projectpb.GetProjectInfoByIDResponse) error {
+	logger.Info("GetProjectInfoByID: ", req.BaseRequest)
+	if !verify.Identify(verify.GetProjectInfo, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("GetProjectInfoByID permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("GetProjectInfoByID permission forbidden")
+	}
+	info, err := ps.projectLogic.GetByID(context.Background(), int(req.Id))
+	if err != nil {
+		return err
+	}
+	resp.Data = &projectpb.ProjectInfo{
+		Id:              int32(info.ID),
+		Name:            info.Name,
+		From:            info.From,
+		Numbering:       info.Numbering,
+		Expenses:        info.Expenses,
+		Description:     info.Description,
+		CreaterUserID:   int32(info.CreaterUserID),
+		CreaterUsername: info.CreaterUsername,
+		CreaterName:     info.CreaterUserName,
+		CreateTime:      info.CreateTime.Unix(),
+		ModifyUserID:    int32(info.ModifyUserID),
+		ModifyUsername:  info.ModifyUsername,
+		ModifyName:      info.ModifyUserName,
+		ModifyTime:      info.ModifyTime.Unix(),
+	}
+	if info.ExtraAttributes != nil {
+		resp.Data.ExtraAttributes = info.ExtraAttributes.String()
+	}
+	return nil
+}
+
 var _ projectpb.ProjectHandler = (*ProjectService)(nil)
 
 // NewProject 创建用户服务

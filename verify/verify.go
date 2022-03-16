@@ -28,6 +28,8 @@ const (
 	JoinGroup = "__JOIN_GROUP__"
 	// CreateProject 创建新的项目记录
 	CreateProject = "__CREATE_PROJECT__"
+	// GetProjectInfo 查询项目信息
+	GetProjectInfo = "__GET_PROJECT_INFO__"
 )
 
 // Verify 进行操作的权限验证

@@ -85,6 +85,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: Guest,
 			},
+			// 暂定所有权限等级都可以
+			GetProjectInfo: {
+				maxLevel: MaxLevel,
+				minLevel: Guest,
+			},
 		},
 	}
 }

@@ -34,6 +34,21 @@ func (pdb *ProjectDB) Insert(ctx context.Context, newProject *Project) (int64, e
 	return id, nil
 }
 
+// QueryByID 通过ID查询记录
+func (pdb *ProjectDB) QueryByID(ctx context.Context, id int) (*Project, error) {
+	res, err := pdb.conn.QueryRow(ctx, "SELECT * FROM `project` WHERE `id`=?", id)
+	if err != nil {
+		logger.Warn("QueryByID error: ", err)
+		return nil, errors.New("QueryByID error")
+	}
+	var info Project
+	if err = res.StructScan(&info); err != nil {
+		logger.Warn("QueryByID error: ", err)
+		return nil, errors.New("QueryByID error")
+	}
+	return &info, nil
+}
+
 // NewProject 创建新的数据库操作结构
 func NewProject(sqlConn *db.DB) *ProjectDB {
 	return &ProjectDB{

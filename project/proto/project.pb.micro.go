@@ -40,6 +40,7 @@ func NewProjectEndpoints() []*api.Endpoint {
 type ProjectService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...client.CallOption) (*CreateProjectResponse, error)
+	GetProjectInfoByID(ctx context.Context, in *GetProjectInfoByIDRequest, opts ...client.CallOption) (*GetProjectInfoByIDResponse, error)
 }
 
 type projectService struct {
@@ -74,17 +75,29 @@ func (c *projectService) CreateProject(ctx context.Context, in *CreateProjectReq
 	return out, nil
 }
 
+func (c *projectService) GetProjectInfoByID(ctx context.Context, in *GetProjectInfoByIDRequest, opts ...client.CallOption) (*GetProjectInfoByIDResponse, error) {
+	req := c.c.NewRequest(c.name, "Project.GetProjectInfoByID", in)
+	out := new(GetProjectInfoByIDResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Project service
 
 type ProjectHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
 	CreateProject(context.Context, *CreateProjectRequest, *CreateProjectResponse) error
+	GetProjectInfoByID(context.Context, *GetProjectInfoByIDRequest, *GetProjectInfoByIDResponse) error
 }
 
 func RegisterProjectHandler(s server.Server, hdlr ProjectHandler, opts ...server.HandlerOption) error {
 	type project interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
 		CreateProject(ctx context.Context, in *CreateProjectRequest, out *CreateProjectResponse) error
+		GetProjectInfoByID(ctx context.Context, in *GetProjectInfoByIDRequest, out *GetProjectInfoByIDResponse) error
 	}
 	type Project struct {
 		project
@@ -103,4 +116,8 @@ func (h *projectHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1
 
 func (h *projectHandler) CreateProject(ctx context.Context, in *CreateProjectRequest, out *CreateProjectResponse) error {
 	return h.ProjectHandler.CreateProject(ctx, in, out)
+}
+
+func (h *projectHandler) GetProjectInfoByID(ctx context.Context, in *GetProjectInfoByIDRequest, out *GetProjectInfoByIDResponse) error {
+	return h.ProjectHandler.GetProjectInfoByID(ctx, in, out)
 }
