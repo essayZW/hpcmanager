@@ -9,7 +9,7 @@ replace github.com/essayZW/hpcmanager/gateway => ../gateway
 require (
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
-	github.com/essayZW/hpcmanager/user v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
 	github.com/go-redis/redis/v8 v8.11.4
 	go-micro.dev/v4 v4.6.0
 	google.golang.org/protobuf v1.26.0
@@ -29,7 +29,6 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
