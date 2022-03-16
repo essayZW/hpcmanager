@@ -110,7 +110,7 @@ func TestPaginationGetGroupInfo(t *testing.T) {
 			infos, err := userGroupLogic.PaginationGetGroupInfo(context.Background(), test.PageIndex, test.PageSize)
 			if err != nil {
 				if !test.Error {
-					t.Errorf("Get:%v Exceot: %v", err, test.Error)
+					t.Errorf("Get:%v Except: %v", err, test.Error)
 				}
 				return
 			}
