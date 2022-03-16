@@ -81,6 +81,16 @@ func (ps *ProjectService) GetProjectInfoByID(ctx context.Context, req *projectpb
 	return nil
 }
 
+// PaginationGetProjectInfos 分页查询项目信息
+func (ps *ProjectService) PaginationGetProjectInfos(ctx context.Context, req *projectpb.PaginationGetProjectInfosRequest, resp *projectpb.PaginationGetProjectInfosResponse) error {
+	logger.Info("PaginationGetProjectInfos: ", req.BaseRequest)
+	if !verify.Identify(verify.GetProjectInfo, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("PaginationGetProjectInfos permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("PaginationGetProjectInfos permission forbidden")
+	}
+	return nil
+}
+
 var _ projectpb.ProjectHandler = (*ProjectService)(nil)
 
 // NewProject 创建用户服务

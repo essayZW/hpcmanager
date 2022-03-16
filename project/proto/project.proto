@@ -13,6 +13,7 @@ service Project {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse) {}
     rpc GetProjectInfoByID(GetProjectInfoByIDRequest) returns (GetProjectInfoByIDResponse) {}
+    rpc PaginationGetProjectInfos(PaginationGetProjectInfosRequest) returns (PaginationGetProjectInfosResponse) {}
 }
 
 message CreateProjectRequest {
@@ -30,4 +31,14 @@ message GetProjectInfoByIDRequest {
 }
 message GetProjectInfoByIDResponse {
     project.ProjectInfo data = 1;
+}
+
+message PaginationGetProjectInfosRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+message PaginationGetProjectInfosResponse {
+    repeated project.ProjectInfo infos = 1;
+    int32 count = 2;
 }
