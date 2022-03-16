@@ -6,7 +6,19 @@ package project;
 
 import "proto/ping.proto";
 import "proto/common.proto";
+import "gateway/proto/baserequest.proto";
+import "proto/project_public.proto";
 
 service Project {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+    rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse) {}
+}
+
+message CreateProjectRequest {
+    request.BaseRequest baseRequest = 1;
+    project.ProjectInfo projectInfo = 2;
+}
+
+message CreateProjectResponse {
+    int32 projectID = 1;
 }

@@ -26,6 +26,8 @@ const (
 	CreateGroup = "__CREATE_GROUP__"
 	// JoinGroup 用户加入某个组
 	JoinGroup = "__JOIN_GROUP__"
+	// CreateProject 创建新的项目记录
+	CreateProject = "__CREATE_PROJECT__"
 )
 
 // Verify 进行操作的权限验证

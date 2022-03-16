@@ -5,6 +5,7 @@ package project
 
 import (
 	fmt "fmt"
+	_ "github.com/essayZW/hpcmanager/gateway/proto"
 	proto1 "github.com/essayZW/hpcmanager/proto"
 	proto "google.golang.org/protobuf/proto"
 	math "math"
@@ -38,6 +39,7 @@ func NewProjectEndpoints() []*api.Endpoint {
 
 type ProjectService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
+	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...client.CallOption) (*CreateProjectResponse, error)
 }
 
 type projectService struct {
@@ -62,15 +64,27 @@ func (c *projectService) Ping(ctx context.Context, in *proto1.Empty, opts ...cli
 	return out, nil
 }
 
+func (c *projectService) CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...client.CallOption) (*CreateProjectResponse, error) {
+	req := c.c.NewRequest(c.name, "Project.CreateProject", in)
+	out := new(CreateProjectResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Project service
 
 type ProjectHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
+	CreateProject(context.Context, *CreateProjectRequest, *CreateProjectResponse) error
 }
 
 func RegisterProjectHandler(s server.Server, hdlr ProjectHandler, opts ...server.HandlerOption) error {
 	type project interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
+		CreateProject(ctx context.Context, in *CreateProjectRequest, out *CreateProjectResponse) error
 	}
 	type Project struct {
 		project
@@ -85,4 +99,8 @@ type projectHandler struct {
 
 func (h *projectHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error {
 	return h.ProjectHandler.Ping(ctx, in, out)
+}
+
+func (h *projectHandler) CreateProject(ctx context.Context, in *CreateProjectRequest, out *CreateProjectResponse) error {
+	return h.ProjectHandler.CreateProject(ctx, in, out)
 }
