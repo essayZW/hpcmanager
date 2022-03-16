@@ -100,3 +100,62 @@ func TestCreate(t *testing.T) {
 		})
 	}
 }
+
+func TestPaginationGet(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		PageIndex int
+		PageSize  int
+
+		Error       bool
+		ExceptCount int
+		ExceptLen   int
+	}{
+		{
+			Name:        "test1",
+			PageIndex:   1,
+			PageSize:    2,
+			Error:       false,
+			ExceptCount: 4,
+			ExceptLen:   2,
+		},
+		{
+			Name:        "test2",
+			PageIndex:   2,
+			PageSize:    4,
+			Error:       false,
+			ExceptCount: 4,
+			ExceptLen:   0,
+		},
+		{
+			Name:        "test error",
+			PageIndex:   0,
+			PageSize:    2,
+			Error:       true,
+			ExceptCount: 4,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			res, err := projectLogic.PaginationGet(context.Background(), test.PageIndex, test.PageSize)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v, Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v, Except: %v", err, test.Error)
+				return
+			}
+			if len(res.Data) != test.ExceptLen {
+				t.Errorf("Get: %v Except: %v", res, test.ExceptLen)
+			}
+			if res.Count != test.ExceptCount {
+				t.Errorf("Get: %v Except: %v", res, test.ExceptCount)
+			}
+		})
+	}
+}

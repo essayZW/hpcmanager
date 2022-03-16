@@ -155,3 +155,129 @@ func TestQueryByID(t *testing.T) {
 		})
 	}
 }
+
+func TestLimitQueryByCreaterUserID(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		Limit  int
+		Offset int
+		UserID int
+
+		Error       bool
+		ExceptCount int
+	}{
+		{
+			Name:        "limit 0, 2",
+			Limit:       0,
+			Offset:      2,
+			Error:       false,
+			UserID:      1,
+			ExceptCount: 2,
+		},
+		{
+			Name:        "limit 0, 5",
+			Limit:       0,
+			Offset:      5,
+			UserID:      2,
+			Error:       false,
+			ExceptCount: 2,
+		},
+		{
+			Name:        "limit 5, 1",
+			Limit:       5,
+			Offset:      1,
+			Error:       false,
+			ExceptCount: 0,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			infos, err := projectDB.LimitQueryByCreaterUserID(context.Background(), test.Limit, test.Offset, test.UserID)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v, Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v, Except: %v", err, test.Error)
+				return
+			}
+			if len(infos) != test.ExceptCount {
+				t.Errorf("Get: %v, Except: %v", infos, test.ExceptCount)
+			}
+		})
+	}
+}
+
+func TestQueryCount(t *testing.T) {
+	count, err := projectDB.QueryCount(context.Background())
+	if err != nil {
+		t.Error(err)
+	}
+	if count != 4 {
+		t.Error(count)
+	}
+}
+
+func TestQueryCountByCreaterUserID(t *testing.T) {
+	count, err := projectDB.QueryCountByCreaterUserID(context.Background(), 1)
+	if err != nil {
+		t.Error(err)
+	}
+	if count != 2 {
+		t.Error(count)
+	}
+}
+func TestLimitQuery(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		Limit  int
+		Offset int
+
+		Error       bool
+		ExceptCount int
+	}{
+		{
+			Name:        "limit 0, 2",
+			Limit:       0,
+			Offset:      2,
+			Error:       false,
+			ExceptCount: 2,
+		},
+		{
+			Name:        "limit 0, 5",
+			Limit:       0,
+			Offset:      5,
+			Error:       false,
+			ExceptCount: 4,
+		},
+		{
+			Name:        "limit 5, 1",
+			Limit:       5,
+			Offset:      1,
+			Error:       false,
+			ExceptCount: 0,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			infos, err := projectDB.LimitQuery(context.Background(), test.Limit, test.Offset)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v, Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v, Except: %v", err, test.Error)
+				return
+			}
+			if len(infos) != test.ExceptCount {
+				t.Errorf("Get: %v, Except: %v", infos, test.ExceptCount)
+			}
+		})
+	}
+}

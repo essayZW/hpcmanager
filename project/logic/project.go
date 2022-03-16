@@ -43,6 +43,58 @@ func (p *Project) GetByID(ctx context.Context, id int) (*projectdb.Project, erro
 	return p.projectDB.QueryByID(ctx, id)
 }
 
+// PaginationProjectResult 分页查询项目信息的结果
+type PaginationProjectResult struct {
+	Data  []*projectdb.Project
+	Count int
+}
+
+// PaginationGet 分页查询项目信息
+func (p *Project) PaginationGet(ctx context.Context, pageIndex, pageSize int) (*PaginationProjectResult, error) {
+	if pageIndex == 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize == 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+	count, err := p.projectDB.QueryCount(ctx)
+	if err != nil {
+		return nil, errors.New("query count error")
+	}
+	limit := pageSize * (pageIndex - 1)
+	infos, err := p.projectDB.LimitQuery(ctx, limit, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	return &PaginationProjectResult{
+		Data:  infos,
+		Count: count,
+	}, nil
+}
+
+// PaginationGetByCreaterUserID 分页查询某个用户创建的所有项目信息
+func (p *Project) PaginationGetByCreaterUserID(ctx context.Context, pageIndex, pageSize, userID int) (*PaginationProjectResult, error) {
+	if pageIndex == 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize == 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+	count, err := p.projectDB.QueryCountByCreaterUserID(ctx, userID)
+	if err != nil {
+		return nil, errors.New("query count error")
+	}
+	limit := pageSize * (pageIndex - 1)
+	infos, err := p.projectDB.LimitQueryByCreaterUserID(ctx, limit, pageSize, userID)
+	if err != nil {
+		return nil, err
+	}
+	return &PaginationProjectResult{
+		Data:  infos,
+		Count: count,
+	}, nil
+}
+
 // NewProject 创建新的project的logic
 func NewProject(projectDB *projectdb.ProjectDB) *Project {
 	return &Project{

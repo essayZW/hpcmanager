@@ -49,6 +49,74 @@ func (pdb *ProjectDB) QueryByID(ctx context.Context, id int) (*Project, error) {
 	return &info, nil
 }
 
+// LimitQuery 通过limit查询一系列的项目信息
+func (pdb *ProjectDB) LimitQuery(ctx context.Context, limit int, offset int) ([]*Project, error) {
+	res, err := pdb.conn.Query(ctx, "SELECT * FROM `project` LIMIT ?, ?", limit, offset)
+	if err != nil {
+		logger.Warn("LimitQuery error: ", err)
+		return nil, errors.New("LimitQuery error")
+	}
+	infos := make([]*Project, 0)
+	for res.Next() {
+		var info Project
+		if err := res.StructScan(&info); err != nil {
+			logger.Warn("LimitQuery struct scan error: ", err)
+			return nil, errors.New("LimitQuery struct scan error")
+		}
+		infos = append(infos, &info)
+	}
+	return infos, nil
+}
+
+// QueryCount 查询所有的项目数量
+func (pdb *ProjectDB) QueryCount(ctx context.Context) (int, error) {
+	row, err := pdb.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `project`")
+	if err != nil {
+		logger.Warn("QueryCount error: ", err)
+		return 0, errors.New("QueryCount error")
+	}
+	var count int
+	if err := row.Scan(&count); err != nil {
+		logger.Warn("QueryCount error: ", err)
+		return 0, errors.New("QueryCount error")
+	}
+	return count, nil
+}
+
+// QueryCountByCreaterUserID 查询某一个用户创建的所有项目的总数
+func (pdb *ProjectDB) QueryCountByCreaterUserID(ctx context.Context, userID int) (int, error) {
+	row, err := pdb.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `project` WHERE `creater_user_id`=?", userID)
+	if err != nil {
+		logger.Warn("QueryCountByCreaterUserID error: ", err)
+		return 0, errors.New("QueryCountByCreaterUserID error")
+	}
+	var count int
+	if err := row.Scan(&count); err != nil {
+		logger.Warn("QueryCountByCreaterUserID error: ", err)
+		return 0, errors.New("QueryCountByCreaterUserID error")
+	}
+	return count, nil
+}
+
+// LimitQueryByCreaterUserID 通过limit查询某个用户创建的所有项目信息
+func (pdb *ProjectDB) LimitQueryByCreaterUserID(ctx context.Context, limit, offset, userID int) ([]*Project, error) {
+	res, err := pdb.conn.Query(ctx, "SELECT * FROM `project` WHERE `creater_user_id`=? LIMIT ?, ?", userID, limit, offset)
+	if err != nil {
+		logger.Warn("LimitQueryByCreaterUserID error: ", err)
+		return nil, errors.New("LimitQueryByCreaterUserID error")
+	}
+	infos := make([]*Project, 0)
+	for res.Next() {
+		var info Project
+		if err := res.StructScan(&info); err != nil {
+			logger.Warn("LimitQueryByCreaterUserID struct scan error: ", err)
+			return nil, errors.New("LimitQueryByCreaterUserID struct scan error")
+		}
+		infos = append(infos, &info)
+	}
+	return infos, nil
+}
+
 // NewProject 创建新的数据库操作结构
 func NewProject(sqlConn *db.DB) *ProjectDB {
 	return &ProjectDB{

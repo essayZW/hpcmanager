@@ -101,3 +101,73 @@ func TestGetByID(t *testing.T) {
 		})
 	}
 }
+
+func TestPaginationGetProjectInfos(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		PageIndex int
+		PageSize  int
+		UserID    int
+		Levels    []int32
+
+		ExceptCount int
+		ExceptLen   int
+		Error       bool
+	}{
+		{
+			Name:      "test admin",
+			PageIndex: 1,
+			PageSize:  3,
+			UserID:    1,
+			Levels: []int32{
+				int32(verify.CommonAdmin),
+			},
+			ExceptCount: 4,
+			ExceptLen:   3,
+			Error:       false,
+		},
+		{
+			Name:      "test common",
+			PageIndex: 1,
+			PageSize:  3,
+			UserID:    1,
+			Levels: []int32{
+				int32(verify.Common),
+			},
+			ExceptCount: 2,
+			ExceptLen:   2,
+			Error:       false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			var req projectpb.PaginationGetProjectInfosRequest
+			req.BaseRequest = baseRequest
+			req.BaseRequest.UserInfo.UserId = int32(test.UserID)
+			req.BaseRequest.UserInfo.Levels = test.Levels
+			req.PageIndex = int32(test.PageIndex)
+			req.PageSize = int32(test.PageSize)
+			var resp projectpb.PaginationGetProjectInfosResponse
+			err := projectService.PaginationGetProjectInfos(context.Background(), &req, &resp)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v Except: %v", err, test.Error)
+				return
+			}
+			if test.ExceptCount != int(resp.Count) {
+				t.Errorf("Get: %v, Except: %v", resp.Count, test.ExceptCount)
+				return
+			}
+			if test.ExceptLen != len(resp.Infos) {
+				t.Errorf("Get: %v, Except: %v", resp.Infos, test.ExceptLen)
+			}
+		})
+	}
+}

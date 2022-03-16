@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/essayZW/hpcmanager/logger"
 	projectdb "github.com/essayZW/hpcmanager/project/db"
@@ -109,6 +110,47 @@ func (ps *ProjectService) PaginationGetProjectInfos(ctx context.Context, req *pr
 	if !verify.Identify(verify.GetProjectInfo, req.BaseRequest.UserInfo.Levels) {
 		logger.Info("PaginationGetProjectInfos permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("PaginationGetProjectInfos permission forbidden")
+	}
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	var err error
+	var res *logic.PaginationProjectResult
+	// 验证查询范围
+	if !isAdmin && !isTutor {
+		// 普通用户只可以查询自己创建的项目信息
+		res, err = ps.projectLogic.PaginationGetByCreaterUserID(context.Background(), int(req.PageIndex), int(req.PageSize), int(req.BaseRequest.UserInfo.UserId))
+	} else if !isAdmin && isTutor {
+		// TODO 导师用户只可以查询自己组用户的所有的项目信息
+	} else {
+		// 管理员用户可以查看所有的用户创建的项目信息
+		res, err = ps.projectLogic.PaginationGet(context.Background(), int(req.PageIndex), int(req.PageSize))
+	}
+	if err != nil {
+		return fmt.Errorf("PaginationGetProjectInfos error: %s", err.Error())
+	}
+	resp.Count = int32(res.Count)
+	resp.Infos = make([]*projectpb.ProjectInfo, 0)
+	for _, info := range res.Data {
+		tempInfo := &projectpb.ProjectInfo{
+			Id:              int32(info.ID),
+			Name:            info.Name,
+			From:            info.From,
+			Numbering:       info.Numbering,
+			Expenses:        info.Expenses,
+			Description:     info.Description,
+			CreaterUserID:   int32(info.CreaterUserID),
+			CreaterUsername: info.CreaterUsername,
+			CreaterName:     info.CreaterUserName,
+			CreateTime:      info.CreateTime.Unix(),
+			ModifyUserID:    int32(info.ModifyUserID),
+			ModifyUsername:  info.ModifyUsername,
+			ModifyName:      info.ModifyUserName,
+			ModifyTime:      info.ModifyTime.Unix(),
+		}
+		if info.ExtraAttributes != nil {
+			tempInfo.ExtraAttributes = info.ExtraAttributes.String()
+		}
+		resp.Infos = append(resp.Infos, tempInfo)
 	}
 	return nil
 }
