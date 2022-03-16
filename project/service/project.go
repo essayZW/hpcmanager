@@ -9,6 +9,7 @@ import (
 	"github.com/essayZW/hpcmanager/project/logic"
 	projectpb "github.com/essayZW/hpcmanager/project/proto"
 	publicproto "github.com/essayZW/hpcmanager/proto"
+	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
 	"go-micro.dev/v4/client"
 )
@@ -16,6 +17,7 @@ import (
 // ProjectService 用户服务
 type ProjectService struct {
 	projectLogic *logic.Project
+	userService  userpb.UserService
 }
 
 // Ping ping测试
@@ -59,6 +61,26 @@ func (ps *ProjectService) GetProjectInfoByID(ctx context.Context, req *projectpb
 	if err != nil {
 		return err
 	}
+	// 进行用户查询范围权限鉴定,普通用户只可以查询自己的,导师可以查询自己组的,管理员可以查询所有人的
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	if !isAdmin && !isTutor {
+		// 普通用户
+		if info.CreaterUserID != int(req.BaseRequest.UserInfo.UserId) {
+			return errors.New("user only can query self project info")
+		}
+	}
+	if !isAdmin && isTutor {
+		// 导师用户
+		// 查询项目所属用户的组
+		resp, err := ps.userService.GetUserInfo(ctx, &userpb.GetUserInfoRequest{
+			Userid:      int32(info.CreaterUserID),
+			BaseRequest: req.BaseRequest,
+		})
+		if err != nil || resp.UserInfo.GroupId != req.BaseRequest.UserInfo.GroupId {
+			return errors.New("tutor only can query self group's user's project info")
+		}
+	}
 	resp.Data = &projectpb.ProjectInfo{
 		Id:              int32(info.ID),
 		Name:            info.Name,
@@ -95,7 +117,9 @@ var _ projectpb.ProjectHandler = (*ProjectService)(nil)
 
 // NewProject 创建用户服务
 func NewProject(client client.Client, projectLogic *logic.Project) *ProjectService {
+	userService := userpb.NewUserService("user", client)
 	return &ProjectService{
 		projectLogic: projectLogic,
+		userService:  userService,
 	}
 }
