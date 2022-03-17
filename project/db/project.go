@@ -86,6 +86,7 @@ func (pdb *ProjectDB) QueryCount(ctx context.Context) (int, error) {
 }
 
 func (pdb *ProjectDB) expandOrSQL(ctx context.Context, field string, len int) string {
+	// TODO 多个or语句拼接情况下也会导致全表扫描
 	str := strings.Builder{}
 	item := fmt.Sprintf("`%s`=?", field)
 	for i := 0; i < len; i++ {
