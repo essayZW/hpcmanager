@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/essayZW/hpcmanager/db"
 	"go-micro.dev/v4/logger"
@@ -83,9 +85,25 @@ func (pdb *ProjectDB) QueryCount(ctx context.Context) (int, error) {
 	return count, nil
 }
 
+func (pdb *ProjectDB) expandOrSQL(ctx context.Context, field string, len int) string {
+	str := strings.Builder{}
+	item := fmt.Sprintf("`%s`=?", field)
+	for i := 0; i < len; i++ {
+		str.WriteString(item)
+		if i != len-1 {
+			str.WriteString(" OR ")
+		}
+	}
+	return str.String()
+}
+
 // QueryCountByCreaterUserID 查询某一个用户创建的所有项目的总数
-func (pdb *ProjectDB) QueryCountByCreaterUserID(ctx context.Context, userID int) (int, error) {
-	row, err := pdb.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `project` WHERE `creater_user_id`=?", userID)
+func (pdb *ProjectDB) QueryCountByCreaterUserID(ctx context.Context, userID ...int) (int, error) {
+	params := make([]interface{}, len(userID))
+	for i := range params {
+		params[i] = userID[i]
+	}
+	row, err := pdb.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `project` WHERE "+pdb.expandOrSQL(ctx, "creater_user_id", len(params)), params...)
 	if err != nil {
 		logger.Warn("QueryCountByCreaterUserID error: ", err)
 		return 0, errors.New("QueryCountByCreaterUserID error")
@@ -99,8 +117,15 @@ func (pdb *ProjectDB) QueryCountByCreaterUserID(ctx context.Context, userID int)
 }
 
 // LimitQueryByCreaterUserID 通过limit查询某个用户创建的所有项目信息
-func (pdb *ProjectDB) LimitQueryByCreaterUserID(ctx context.Context, limit, offset, userID int) ([]*Project, error) {
-	res, err := pdb.conn.Query(ctx, "SELECT * FROM `project` WHERE `creater_user_id`=? LIMIT ?, ?", userID, limit, offset)
+func (pdb *ProjectDB) LimitQueryByCreaterUserID(ctx context.Context, limit, offset int, userID ...int) ([]*Project, error) {
+	params := make([]interface{}, len(userID))
+	for i := range userID {
+		params[i] = userID[i]
+	}
+	params = append(params, limit)
+	params = append(params, offset)
+	sql := "SELECT * FROM `project` WHERE " + pdb.expandOrSQL(ctx, "creater_user_id", len(userID)) + " LIMIT ?, ?"
+	res, err := pdb.conn.Query(ctx, sql, params...)
 	if err != nil {
 		logger.Warn("LimitQueryByCreaterUserID error: ", err)
 		return nil, errors.New("LimitQueryByCreaterUserID error")

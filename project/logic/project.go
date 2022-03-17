@@ -73,19 +73,19 @@ func (p *Project) PaginationGet(ctx context.Context, pageIndex, pageSize int) (*
 }
 
 // PaginationGetByCreaterUserID 分页查询某个用户创建的所有项目信息
-func (p *Project) PaginationGetByCreaterUserID(ctx context.Context, pageIndex, pageSize, userID int) (*PaginationProjectResult, error) {
+func (p *Project) PaginationGetByCreaterUserID(ctx context.Context, pageIndex, pageSize int, userID ...int) (*PaginationProjectResult, error) {
 	if pageIndex == 0 {
 		return nil, errors.New("invalid pageIndex")
 	}
 	if pageSize == 0 {
 		return nil, errors.New("invalid pageSize")
 	}
-	count, err := p.projectDB.QueryCountByCreaterUserID(ctx, userID)
+	count, err := p.projectDB.QueryCountByCreaterUserID(ctx, userID...)
 	if err != nil {
 		return nil, errors.New("query count error")
 	}
 	limit := pageSize * (pageIndex - 1)
-	infos, err := p.projectDB.LimitQueryByCreaterUserID(ctx, limit, pageSize, userID)
+	infos, err := p.projectDB.LimitQueryByCreaterUserID(ctx, limit, pageSize, userID...)
 	if err != nil {
 		return nil, err
 	}

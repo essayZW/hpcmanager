@@ -120,7 +120,19 @@ func (ps *ProjectService) PaginationGetProjectInfos(ctx context.Context, req *pr
 		// 普通用户只可以查询自己创建的项目信息
 		res, err = ps.projectLogic.PaginationGetByCreaterUserID(context.Background(), int(req.PageIndex), int(req.PageSize), int(req.BaseRequest.UserInfo.UserId))
 	} else if !isAdmin && isTutor {
-		// TODO 导师用户只可以查询自己组用户的所有的项目信息
+		// 导师用户只可以查询自己组用户的所有的项目信息
+		ids, err := ps.userService.ListGroupUser(ctx, &userpb.ListGroupUserRequest{
+			BaseRequest: req.BaseRequest,
+			GroupID:     req.BaseRequest.UserInfo.GroupId,
+		})
+		if err != nil {
+			return err
+		}
+		intIds := make([]int, len(ids.Ids))
+		for i := range intIds {
+			intIds[i] = int(ids.Ids[i])
+		}
+		res, err = ps.projectLogic.PaginationGetByCreaterUserID(context.Background(), int(req.PageIndex), int(req.PageSize), intIds...)
 	} else {
 		// 管理员用户可以查看所有的用户创建的项目信息
 		res, err = ps.projectLogic.PaginationGet(context.Background(), int(req.PageIndex), int(req.PageSize))
