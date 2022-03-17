@@ -408,3 +408,31 @@ ticket=
 
 若验证成功跳转到主页,否则返回错误信息
 
+## project 控制器
+
+### /project 控制器
+
+Method: POST
+
+描述: 创建新的 project 项目
+
+参数:
+
+```go
+// CreateProjectParam 创建新的项目记录请求参数
+type CreateProjectParam struct {
+    Name        string `form:"name" json:"name" binding:"required"`
+    From        string `form:"from" json:"from"`
+    Numbering   string `form:"numbering" json:"numbering"`
+    Expenses    string `form:"expenses" json:"expenses"`
+    Description string `form:"description" json:"description"`
+}
+```
+
+响应:
+
+```go
+map[string]interface{
+    "id": id,
+}
+```

@@ -37,7 +37,7 @@ func (ps *ProjectService) CreateProject(ctx context.Context, req *projectpb.Crea
 		logger.Info("CreateProject permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("CreateProject permission forbidden")
 	}
-	id, err := ps.projectLogic.Create(context.Background(), int(req.ProjectInfo.CreaterUserID), req.ProjectInfo.CreaterName, req.ProjectInfo.CreaterUsername, &projectdb.Project{
+	id, err := ps.projectLogic.Create(context.Background(), int(req.BaseRequest.UserInfo.UserId), req.BaseRequest.UserInfo.Name, req.BaseRequest.UserInfo.Username, &projectdb.Project{
 		Name:        req.ProjectInfo.Name,
 		From:        req.ProjectInfo.From,
 		Numbering:   req.ProjectInfo.Numbering,
