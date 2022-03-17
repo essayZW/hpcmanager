@@ -68,3 +68,45 @@ func TestLoginQuery(t *testing.T) {
 
 	}
 }
+
+func TestQueryByGroupID(t *testing.T) {
+	tests := []struct {
+		Name string
+
+		GroupID int
+
+		ExceptCount int
+		Error       bool
+	}{
+		{
+			Name:        "test success",
+			GroupID:     0,
+			ExceptCount: 3,
+			Error:       false,
+		},
+		{
+			Name:        "test success2",
+			GroupID:     1,
+			ExceptCount: 1,
+			Error:       false,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			ids, err := userDb.QueryUserByGroupID(context.Background(), test.GroupID)
+			if err != nil {
+				if !test.Error {
+					t.Errorf("Get: %v, Except: %v", err, test.Error)
+				}
+				return
+			}
+			if test.Error {
+				t.Errorf("Get: %v, Except: %v", err, test.Error)
+			}
+			if len(ids) != test.ExceptCount {
+				t.Errorf("Get: %v, Except: %v", ids, test.ExceptCount)
+			}
+		})
+	}
+}

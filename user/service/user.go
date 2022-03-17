@@ -415,6 +415,20 @@ func (s *UserService) UpdateUserInfo(ctx context.Context, req *userpb.UpdateUser
 	return nil
 }
 
+// ListGroupUser 列出用户组的所有用户的基础信息,目前默认为所有的用户ID
+func (s *UserService) ListGroupUser(ctx context.Context, req *userpb.ListGroupUserRequest, resp *userpb.ListGroupUserResponse) error {
+	logger.Info("ListGroupUser: ", req.BaseRequest)
+	ids, err := s.userLogic.ListGroupUser(ctx, int(req.GroupID))
+	if err != nil {
+		return err
+	}
+	resp.Ids = make([]int32, len(ids))
+	for _, id := range ids {
+		resp.Ids = append(resp.Ids, int32(id))
+	}
+	return nil
+}
+
 var _ userpb.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例

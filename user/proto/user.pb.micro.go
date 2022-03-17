@@ -50,6 +50,7 @@ type UserService interface {
 	JoinGroup(ctx context.Context, in *JoinGroupRequest, opts ...client.CallOption) (*JoinGroupResponse, error)
 	GetUserInfoByHpcID(ctx context.Context, in *GetUserInfoByHpcIDRequest, opts ...client.CallOption) (*GetUserInfoByHpcIDResponse, error)
 	UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, opts ...client.CallOption) (*UpdateUserInfoResponse, error)
+	ListGroupUser(ctx context.Context, in *ListGroupUserRequest, opts ...client.CallOption) (*ListGroupUserResponse, error)
 }
 
 type userService struct {
@@ -184,6 +185,16 @@ func (c *userService) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequ
 	return out, nil
 }
 
+func (c *userService) ListGroupUser(ctx context.Context, in *ListGroupUserRequest, opts ...client.CallOption) (*ListGroupUserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.ListGroupUser", in)
+	out := new(ListGroupUserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
@@ -199,6 +210,7 @@ type UserHandler interface {
 	JoinGroup(context.Context, *JoinGroupRequest, *JoinGroupResponse) error
 	GetUserInfoByHpcID(context.Context, *GetUserInfoByHpcIDRequest, *GetUserInfoByHpcIDResponse) error
 	UpdateUserInfo(context.Context, *UpdateUserInfoRequest, *UpdateUserInfoResponse) error
+	ListGroupUser(context.Context, *ListGroupUserRequest, *ListGroupUserResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
@@ -215,6 +227,7 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		JoinGroup(ctx context.Context, in *JoinGroupRequest, out *JoinGroupResponse) error
 		GetUserInfoByHpcID(ctx context.Context, in *GetUserInfoByHpcIDRequest, out *GetUserInfoByHpcIDResponse) error
 		UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, out *UpdateUserInfoResponse) error
+		ListGroupUser(ctx context.Context, in *ListGroupUserRequest, out *ListGroupUserResponse) error
 	}
 	type User struct {
 		user
@@ -273,4 +286,8 @@ func (h *userHandler) GetUserInfoByHpcID(ctx context.Context, in *GetUserInfoByH
 
 func (h *userHandler) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, out *UpdateUserInfoResponse) error {
 	return h.UserHandler.UpdateUserInfo(ctx, in, out)
+}
+
+func (h *userHandler) ListGroupUser(ctx context.Context, in *ListGroupUserRequest, out *ListGroupUserResponse) error {
+	return h.UserHandler.ListGroupUser(ctx, in, out)
 }

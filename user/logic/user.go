@@ -183,6 +183,11 @@ func (u *User) UpdateUserInfo(ctx context.Context, newUserInfo *db.User) error {
 	return u.userDB.Update(ctx, newUserInfo)
 }
 
+// ListGroupUser 列出用户组的所有用户的信息
+func (u *User) ListGroupUser(ctx context.Context, groupID int) ([]int, error) {
+	return u.userDB.QueryUserByGroupID(ctx, groupID)
+}
+
 // NewUser 创建一个新的userLogic
 func NewUser(db *db.UserDB, configConn config.DynamicConfig, redisConn *redis.Client) *User {
 	user := &User{

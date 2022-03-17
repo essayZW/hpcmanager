@@ -523,6 +523,31 @@ message UpdateUserInfoResponse {
 }
 ```
 
+## ListGroupUser
+
+描述: 查询某个用户组下的所有用户的 ID
+
+原型定义: `rpc ListGroupUser(ListGroupUserRequest) returns (ListGroupUserResponse) {}`
+
+需求权限: 无
+
+请求参数:
+
+```protobuf
+message ListGroupUserRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message ListGroupUserResponse {
+    repeated int32 ids = 1;
+}
+```
+
 # 附录
 
 ## UserInfo

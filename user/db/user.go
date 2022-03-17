@@ -180,6 +180,25 @@ func (db *UserDB) Update(ctx context.Context, newInfo *User) error {
 	return nil
 }
 
+// QueryUserByGroupID 通过用户组ID查询用户
+func (db *UserDB) QueryUserByGroupID(ctx context.Context, groupID int) ([]int, error) {
+	row, err := db.conn.Query(ctx, "SELECT `id` FROM `user` WHERE `group_id`=?", groupID)
+	if err != nil {
+		logger.Warn("QueryUserByGroupID error: ", err)
+		return nil, errors.New("QueryUserByGroupID error")
+	}
+	ids := make([]int, 0)
+	for row.Next() {
+		var id int
+		if err := row.Scan(&id); err != nil {
+			logger.Warn("QueryUserByGroupID struct scan error: ", err)
+			return nil, errors.New("QueryUserByGroupID struct scan error")
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
 // NewUser 创建一个新的操作用户数据库结构体
 func NewUser(db *db.DB) *UserDB {
 	return &UserDB{
