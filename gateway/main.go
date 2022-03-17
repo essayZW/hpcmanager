@@ -90,6 +90,8 @@ func main() {
 	systemController.Registry(api)
 	projectController := controller.NewProject(serviceClient)
 	projectController.Registry(api)
+	nodeController := controller.NewNode(serviceClient)
+	nodeController.Registry(api)
 
 	// 注册404处理
 	server.NoRoute(func(c *gin.Context) {

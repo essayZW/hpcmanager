@@ -410,7 +410,17 @@ ticket=
 
 ## project 控制器
 
-### /project 控制器
+### /project/ping
+
+Method: GET
+
+描述：进行 group 服务的 ping 测试
+
+参数：无
+
+响应：请求 ID、PONG
+
+### /project
 
 Method: POST
 
@@ -436,3 +446,15 @@ map[string]interface{
     "id": id,
 }
 ```
+
+## node 控制器
+
+### /node/ping
+
+Method: GET
+
+描述：进行 group 服务的 ping 测试
+
+参数：无
+
+响应：请求 ID、PONG
