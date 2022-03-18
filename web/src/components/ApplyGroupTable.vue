@@ -370,6 +370,10 @@ const checkButtonHandler = async (
 <style lang="less" scoped>
 .pagination-row {
   margin: 16px 0px;
+  .pagination-control-panel {
+    margin: 0px auto;
+    justify-content: center;
+  }
 }
 .red {
   color: red;
