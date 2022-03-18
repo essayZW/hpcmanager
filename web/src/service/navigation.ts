@@ -5,6 +5,7 @@ import ApplyGroup from '../components/guest/ApplyGroup.vue';
 import GroupManager from '../components/admin/GroupManager.vue';
 import CheckGroupApply from '../components/tutor/CheckGroupApply.vue';
 import UserManager from '../components/admin/UserManager.vue';
+import ProjectManager from '../components/ProjectManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -32,6 +33,33 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/apply_group',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/project_manager',
+          name: 'ProjectManager',
+          component: ProjectManager,
+        },
+        item: {
+          name: '项目管理',
+          to: '/main/project_manager',
+        },
+      },
+    ],
+  ],
+  [
+    UserLevels.Common,
+    [
+      {
+        routerRaw: {
+          path: '/main/project_manager',
+          name: 'ProjectManager',
+          component: ProjectManager,
+        },
+        item: {
+          name: '项目管理',
+          to: '/main/project_manager',
+        },
+      },
     ],
   ],
   [
@@ -57,6 +85,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '用户管理',
           to: '/main/tutor_manager_user',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/project_manager',
+          name: 'ProjectManager',
+          component: ProjectManager,
+        },
+        item: {
+          name: '项目管理',
+          to: '/main/project_manager',
         },
       },
     ],
@@ -97,6 +136,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/admin_manager_user',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/project_manager',
+          name: 'ProjectManager',
+          component: ProjectManager,
+        },
+        item: {
+          name: '项目管理',
+          to: '/main/project_manager',
+        },
+      },
     ],
   ],
   // 超级管理员和普通管理员都这项操作
@@ -135,6 +185,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '用户管理',
           to: '/main/admin_manager_user',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/project_manager',
+          name: 'ProjectManager',
+          component: ProjectManager,
+        },
+        item: {
+          name: '项目管理',
+          to: '/main/project_manager',
         },
       },
     ],

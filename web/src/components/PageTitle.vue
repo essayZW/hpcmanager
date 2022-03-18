@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, onBeforeMount } from 'vue';
+import { onBeforeMount } from 'vue';
 
 const props = defineProps<{
   title: string;

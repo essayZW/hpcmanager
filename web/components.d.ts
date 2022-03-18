@@ -45,6 +45,7 @@ declare module 'vue' {
     IIcRoundRefresh: typeof import('~icons/ic/round-refresh')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     PageTitle: typeof import('./src/components/PageTitle.vue')['default']
+    ProjectManager: typeof import('./src/components/ProjectManager.vue')['default']
     UpdateUserInfo: typeof import('./src/components/UpdateUserInfo.vue')['default']
     UserManager: typeof import('./src/components/admin/UserManager.vue')['default']
     UserTable: typeof import('./src/components/UserTable.vue')['default']
