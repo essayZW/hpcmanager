@@ -43,6 +43,15 @@ const refreshTableData = () => {
 };
 
 refreshTableData();
+
+const handleSizeChange = (pageSize: number) => {
+  paginationInfo.pageSize = pageSize;
+  refreshTableData();
+};
+const handleCurrentChange = (pageIndex: number) => {
+  paginationInfo.pageIndex = pageIndex;
+  refreshTableData();
+};
 </script>
 <template>
   <page-title title="项目管理" des="项目管理、查看页面"></page-title>
@@ -68,10 +77,34 @@ refreshTableData();
       </el-table>
     </el-col>
   </el-row>
+  <el-row justify="center" class="pagination-row">
+    <el-col :span="18">
+      <el-pagination
+        v-model:currentPage="paginationInfo.pageIndex"
+        v-model:page-size="paginationInfo.pageSize"
+        class="pagination-control-panel"
+        :page-sizes="[5, 10, 25, 50]"
+        background
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="tableData.count"
+        :hide-on-single-page="true"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      >
+      </el-pagination>
+    </el-col>
+  </el-row>
 </template>
 <style lang="less" scoped>
 .button-area-row {
   margin-top: 16px;
   margin-bottom: 8px;
+}
+.pagination-row {
+  margin: 16px 0px;
+  .pagination-control-panel {
+    margin: 0px auto;
+    justify-content: center;
+  }
 }
 </style>
