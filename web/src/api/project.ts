@@ -40,3 +40,35 @@ export async function paginationQueryProjectInfos(
   }
   return resp.data;
 }
+
+/**
+ * 新建一个新的项目参数
+ */
+export type CreateProjectParam = {
+  name: string;
+  from: string;
+  numbering: string;
+  expenses: string;
+  description: string;
+};
+/**
+ * 创建一个新的项目信息
+ */
+export async function createProject(
+  param: CreateProjectParam
+): Promise<number> {
+  const resp = await ApiRequest.request<{
+    id: number;
+  }>(
+    '/project',
+    'POST',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data.id;
+}
