@@ -113,7 +113,6 @@ CREATE TABLE `node_apply` (
   `id` int NOT NULL AUTO_INCREMENT,
   `create_time` timestamp NOT NULL,
   `creater_id` int NOT NULL,
-  `tutor_id` int NOT NULL,
   `project_id` int NOT NULL,
   `tutor_check_status` tinyint NOT NULL DEFAULT '-1',
   `manager_check_status` tinyint NOT NULL DEFAULT '-1',
@@ -121,13 +120,17 @@ CREATE TABLE `node_apply` (
   `message_tutor` varchar(300) DEFAULT NULL,
   `message_manager` varchar(300) DEFAULT NULL,
   `tutor_check_time` timestamp NULL DEFAULT NULL,
-  `tutor_checker_id` int DEFAULT NULL,
-  `tutor_checker_name` varchar(32) DEFAULT NULL,
+  `tutor_id` int NOT NULL,
+  `tutor_name` varchar(32) NOT NULL,
+  `tutor_username` varchar(32) NOT NULL,
   `manager_check_time` timestamp NULL DEFAULT NULL,
   `manager_checker_id` int DEFAULT NULL,
+  `manager_checker_username` varchar(32) DEFAULT NULL,
   `manager_checker_name` varchar(32) DEFAULT NULL,
   `modify_time` timestamp NULL DEFAULT NULL,
   `modify_userid` int DEFAULT NULL,
+  `modify_name` varchar(32) DEFAULT NULL,
+  `modify_username` varchar(32) DEFAULT NULL,
   `node_type` varchar(64) DEFAULT NULL,
   `node_num` int DEFAULT NULL,
   `start_time` timestamp NULL DEFAULT NULL,
@@ -419,4 +422,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-03-16 18:00:11
+-- Dump completed on 2022-03-18 20:41:30
