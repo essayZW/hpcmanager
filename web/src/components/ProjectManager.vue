@@ -6,14 +6,13 @@ import { paginationGetProjectInfo } from '../service/project';
 import PageTitle from './PageTitle.vue';
 
 // 项目表格的数据
-const tableData = reactive<
-  [
-    {
-      data: ProjectInfo[];
-      count: number;
-    }
-  ]
->([]);
+const tableData = reactive<{
+  data: ProjectInfo[];
+  count: number;
+}>({
+  data: [],
+  count: 0,
+});
 
 // 表格当前的分页信息
 const paginationInfo = reactive<{
