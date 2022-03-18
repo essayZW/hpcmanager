@@ -13,8 +13,8 @@ const loginInfo = reactive<{ userInfo: LoginUserInfo }>({
   userInfo: {
     Username: 'unknown',
     Name: 'unknown',
-    UserID: 0,
-    GroupID: 0,
+    UserId: 0,
+    GroupId: 0,
     Levels: [],
   },
 });
