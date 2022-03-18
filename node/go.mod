@@ -8,8 +8,10 @@ require github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
 
 require (
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220314060314-356448017f02
+	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
 	go-micro.dev/v4 v4.6.0
 	google.golang.org/protobuf v1.26.0
+	gopkg.in/guregu/null.v4 v4.0.0
 )
 
 require (
@@ -24,7 +26,6 @@ require (
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
@@ -77,3 +78,5 @@ replace github.com/essayZW/hpcmanager/user => ../user
 replace github.com/essayZW/hpcmanager/permission => ../permission
 
 replace github.com/essayZW/hpcmanager/project => ../project
+
+replace github.com/essayZW/hpcmanager/node => ./

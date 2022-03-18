@@ -90,6 +90,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: Guest,
 			},
+			// 需要普通用户及以上权限
+			CreateNodeApply: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
 		},
 	}
 }

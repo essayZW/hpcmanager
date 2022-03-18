@@ -3,7 +3,10 @@ package main
 import (
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
 	"github.com/essayZW/hpcmanager/config"
+	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
+	nodedb "github.com/essayZW/hpcmanager/node/db"
+	"github.com/essayZW/hpcmanager/node/logic"
 	nodepb "github.com/essayZW/hpcmanager/node/proto"
 	"github.com/essayZW/hpcmanager/node/service"
 	"go-micro.dev/v4"
@@ -30,12 +33,14 @@ func main() {
 	serviceClient := srv.Client()
 
 	// 创建数据库连接
-	// sqldb, err := db.NewDB()
-	// if err != nil {
-	// logger.Fatal("MySQL conn error: ", err)
-	// }
+	sqldb, err := db.NewDB()
+	if err != nil {
+		logger.Fatal("MySQL conn error: ", err)
+	}
 
-	nodeService := service.NewNode(serviceClient)
+	nodeApplyDB := nodedb.NewNodeApply(sqldb)
+
+	nodeService := service.NewNode(serviceClient, logic.NewNodeApply(nodeApplyDB))
 	nodepb.RegisterNodeHandler(srv.Server(), nodeService)
 
 	srv.Init()

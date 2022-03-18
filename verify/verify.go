@@ -30,6 +30,8 @@ const (
 	CreateProject = "__CREATE_PROJECT__"
 	// GetProjectInfo 查询项目信息
 	GetProjectInfo = "__GET_PROJECT_INFO__"
+	// CreateNodeApply 创建计算节点申请
+	CreateNodeApply = "__CREATE_NODE_APPLY__"
 )
 
 // Verify 进行操作的权限验证
