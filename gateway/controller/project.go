@@ -9,6 +9,7 @@ import (
 	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
 	"github.com/essayZW/hpcmanager/gateway/request/json"
 	"github.com/essayZW/hpcmanager/gateway/response"
+	"github.com/essayZW/hpcmanager/gateway/utils"
 	projectpb "github.com/essayZW/hpcmanager/project/proto"
 	"github.com/essayZW/hpcmanager/proto"
 	"github.com/gin-gonic/gin"
@@ -70,6 +71,40 @@ func (p *Project) createProject(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+func (p *Project) paginationGet(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := p.projectService.PaginationGetProjectInfos(c, &projectpb.PaginationGetProjectInfosRequest{
+		PageIndex:   int32(pageIndex),
+		PageSize:    int32(pageSize),
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询项目信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	res := response.PaginationQueryResponse{
+		Data:  resp.Infos,
+		Count: int(resp.Count),
+	}
+	if resp.Infos == nil {
+		res.Data = make([]*projectpb.ProjectInfo, 0)
+	}
+	httpResp := response.New(200, res, true, "success")
+	httpResp.Send(ctx)
+}
+
 // Registry 注册控制器方法
 func (p *Project) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	projectGroup := router.Group("/project")
@@ -77,6 +112,7 @@ func (p *Project) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	middleware.RegistryExcludeAPIPath("GET:/api/project/ping")
 
 	projectGroup.POST("", p.createProject)
+	projectGroup.GET("", p.paginationGet)
 	return projectGroup
 }
 

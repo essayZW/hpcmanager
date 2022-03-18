@@ -447,6 +447,23 @@ map[string]interface{
 }
 ```
 
+### /project
+
+Method: GET
+
+描述: 分页查询项目信息
+
+参数:
+
+```typescript
+{
+    pageSize: number,
+    pageIndex: number
+}
+```
+
+响应: 分页查询的结果
+
 ## node 控制器
 
 ### /node/ping
