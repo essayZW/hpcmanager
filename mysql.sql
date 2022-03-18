@@ -113,6 +113,8 @@ CREATE TABLE `node_apply` (
   `id` int NOT NULL AUTO_INCREMENT,
   `create_time` timestamp NOT NULL,
   `creater_id` int NOT NULL,
+  `creater_username` varchar(32) NOT NULL,
+  `creater_name` varchar(32) NOT NULL,
   `project_id` int NOT NULL,
   `tutor_check_status` tinyint NOT NULL DEFAULT '-1',
   `manager_check_status` tinyint NOT NULL DEFAULT '-1',
@@ -131,10 +133,10 @@ CREATE TABLE `node_apply` (
   `modify_userid` int DEFAULT NULL,
   `modify_name` varchar(32) DEFAULT NULL,
   `modify_username` varchar(32) DEFAULT NULL,
-  `node_type` varchar(64) DEFAULT NULL,
-  `node_num` int DEFAULT NULL,
-  `start_time` timestamp NULL DEFAULT NULL,
-  `end_time` timestamp NULL DEFAULT NULL,
+  `node_type` varchar(64) NOT NULL,
+  `node_num` int NOT NULL,
+  `start_time` timestamp NOT NULL,
+  `end_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -422,4 +424,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-03-18 20:41:30
+-- Dump completed on 2022-03-18 21:33:21
