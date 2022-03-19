@@ -41,6 +41,7 @@ func (group *UserGroupService) Ping(ctx context.Context, req *publicpb.Empty, re
 // GetGroupInfoByID 查询用户组信息
 func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb.GetGroupInfoByIDRequest, resp *userpb.GetGroupInfoByIDResponse) error {
 	logger.Infof("GetGroupInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	// 鉴权,只有导师及以上用户可以查看组信息
 	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
 		logger.Info("GetGroupInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("GetGroupInfo permission forbidden")
@@ -48,8 +49,9 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 	// 只有组管理员或者系统管理员才可以查看组信息
 	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
 	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
-	// FIXME 如果是普通用户的话,该if语句不生效
+	// NOTE 由于前面鉴权已经确认其不是普通用户，因此这里只用判断导师用户即可
 	if isTutor && !isAdmin && req.GroupID != req.BaseRequest.UserInfo.GroupId {
+		// 是导师用户,但是不是管理员,因此只可以查看自己组的用户组信息
 		return errors.New("Tutor can only view group information for his managed group")
 	}
 	info, err := group.userGroupLogic.GetGroupInfoByID(ctx, int(req.GetGroupID()))
