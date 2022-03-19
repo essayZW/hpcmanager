@@ -48,6 +48,7 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 	// 只有组管理员或者系统管理员才可以查看组信息
 	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
 	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	// FIXME 如果是普通用户的话,该if语句不生效
 	if isTutor && !isAdmin && req.GroupID != req.BaseRequest.UserInfo.GroupId {
 		return errors.New("Tutor can only view group information for his managed group")
 	}
