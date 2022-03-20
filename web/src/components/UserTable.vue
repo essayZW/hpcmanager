@@ -216,6 +216,10 @@ const expandChangeHandler = async (row: UserInfo) => {
 <style lang="less" scoped>
 .pagination-row {
   margin: 16px 0px;
+  .pagination-control-panel {
+    margin: 0px auto;
+    justify-content: center;
+  }
 }
 p.info {
   padding-left: 16px;

@@ -44,6 +44,8 @@ declare module 'vue' {
     IEpAvatar: typeof import('~icons/ep/avatar')['default']
     IIcRoundRefresh: typeof import('~icons/ic/round-refresh')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
+    NodeApplyManager: typeof import('./src/components/common/NodeApplyManager.vue')['default']
+    NodeApplyTable: typeof import('./src/components/NodeApplyTable.vue')['default']
     PageTitle: typeof import('./src/components/PageTitle.vue')['default']
     ProjectManager: typeof import('./src/components/ProjectManager.vue')['default']
     UpdateUserInfo: typeof import('./src/components/UpdateUserInfo.vue')['default']
