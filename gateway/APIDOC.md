@@ -476,7 +476,7 @@ Method: GET
 
 响应：请求 ID、PONG
 
-### /node
+### /node/apply
 
 Method: POST
 
@@ -496,3 +496,20 @@ type CreateNodeApplyParam struct {
 ```
 
 响应: 创建申请记录的 ID
+
+### /node/apply
+
+Method: GET
+
+描述: 分页查询计算节点申请记录
+
+参数:
+
+```typescript
+type param = {
+  pageIndex: number;
+  pageSize: number;
+};
+```
+
+响应: 分页查询的结果

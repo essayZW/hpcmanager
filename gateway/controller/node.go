@@ -9,6 +9,7 @@ import (
 	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
 	"github.com/essayZW/hpcmanager/gateway/request/json"
 	"github.com/essayZW/hpcmanager/gateway/response"
+	"github.com/essayZW/hpcmanager/gateway/utils"
 	nodepb "github.com/essayZW/hpcmanager/node/proto"
 	"github.com/essayZW/hpcmanager/proto"
 	"github.com/gin-gonic/gin"
@@ -36,7 +37,7 @@ func (n *node) ping(ctx *gin.Context) {
 	resp.Send(ctx)
 }
 
-// createNodeApply /api/node POST 创建新的机器节点申请信息
+// createNodeApply /api/node/apply POST 创建新的机器节点申请信息
 func (n *node) createNodeApply(ctx *gin.Context) {
 	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
 	baseRequest := baseReq.(*gatewaypb.BaseRequest)
@@ -70,13 +71,50 @@ func (n *node) createNodeApply(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// paginationGet /api/node/apply GET 分页查询机器节点申请信息
+func (n *node) paginationGet(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := n.nodeService.PaginationGetNodeApply(c, &nodepb.PaginationGetNodeApplyRequest{
+		BaseRequest: baseRequest,
+		PageIndex:   int32(pageIndex),
+		PageSize:    int32(pageSize),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询机器节点申请记录失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	respData := &response.PaginationQueryResponse{
+		Data:  resp.Applies,
+		Count: int(resp.Count),
+	}
+	if resp.Applies == nil {
+		respData.Data = make([]*nodepb.NodeApply, 0)
+	}
+	httpResp := response.New(200, respData, true, "success")
+	httpResp.Send(ctx)
+
+}
+
 func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter := router.Group("/node")
 
 	nodeRouter.GET("/ping", n.ping)
 	middleware.RegistryExcludeAPIPath("GET:/api/node/ping")
 
-	nodeRouter.POST("", n.createNodeApply)
+	nodeRouter.POST("/apply", n.createNodeApply)
+	nodeRouter.GET("/apply", n.paginationGet)
 	return nodeRouter
 }
 
