@@ -7,10 +7,12 @@ package node;
 import "proto/ping.proto";
 import "proto/common.proto";
 import "gateway/proto/baserequest.proto";
+import "proto/node_public.proto";
 
 service Node {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc CreateNodeApply(CreateNodeApplyRequest) returns (CreateNodeApplyResponse) {}
+    rpc PaginationGetNodeApply(PaginationGetNodeApplyRequest) returns (PaginationGetNodeApplyResponse) {}
 }
 
 message CreateNodeApplyRequest {
@@ -24,4 +26,15 @@ message CreateNodeApplyRequest {
 
 message CreateNodeApplyResponse {
    int32 id = 1;
+}
+
+message PaginationGetNodeApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+
+message PaginationGetNodeApplyResponse {
+    repeated node.NodeApply applies = 1;
+    int32 count = 2;
 }

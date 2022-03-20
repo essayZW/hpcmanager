@@ -26,7 +26,7 @@ message PingResponse {
 }
 ```
 
-# CreateNodeApply
+## CreateNodeApply
 
 描述: 创建新的机器节点包机申请
 
@@ -52,5 +52,32 @@ message CreateNodeApplyRequest {
 ```protobuf
 message CreateNodeApplyResponse {
    int32 id = 1;
+}
+```
+
+## PaginationGetNodeApply
+
+描述: 分页查询用户申请机器节点申请信息
+
+原型定义: `rpc PaginationGetNodeApply(PaginationGetNodeApplyRequest) returns (PaginationGetNodeApplyResponse) {}`
+
+需求权限: `Common` 及以上
+
+请求参数:
+
+```protobuf
+message PaginationGetNodeApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message PaginationGetNodeApplyResponse {
+    repeated node.NodeApply applies = 1;
+    int32 count = 2;
 }
 ```

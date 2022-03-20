@@ -40,6 +40,7 @@ func NewNodeEndpoints() []*api.Endpoint {
 type NodeService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
 	CreateNodeApply(ctx context.Context, in *CreateNodeApplyRequest, opts ...client.CallOption) (*CreateNodeApplyResponse, error)
+	PaginationGetNodeApply(ctx context.Context, in *PaginationGetNodeApplyRequest, opts ...client.CallOption) (*PaginationGetNodeApplyResponse, error)
 }
 
 type nodeService struct {
@@ -74,17 +75,29 @@ func (c *nodeService) CreateNodeApply(ctx context.Context, in *CreateNodeApplyRe
 	return out, nil
 }
 
+func (c *nodeService) PaginationGetNodeApply(ctx context.Context, in *PaginationGetNodeApplyRequest, opts ...client.CallOption) (*PaginationGetNodeApplyResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.PaginationGetNodeApply", in)
+	out := new(PaginationGetNodeApplyResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Node service
 
 type NodeHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
 	CreateNodeApply(context.Context, *CreateNodeApplyRequest, *CreateNodeApplyResponse) error
+	PaginationGetNodeApply(context.Context, *PaginationGetNodeApplyRequest, *PaginationGetNodeApplyResponse) error
 }
 
 func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.HandlerOption) error {
 	type node interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
 		CreateNodeApply(ctx context.Context, in *CreateNodeApplyRequest, out *CreateNodeApplyResponse) error
+		PaginationGetNodeApply(ctx context.Context, in *PaginationGetNodeApplyRequest, out *PaginationGetNodeApplyResponse) error
 	}
 	type Node struct {
 		node
@@ -103,4 +116,8 @@ func (h *nodeHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1.Pi
 
 func (h *nodeHandler) CreateNodeApply(ctx context.Context, in *CreateNodeApplyRequest, out *CreateNodeApplyResponse) error {
 	return h.NodeHandler.CreateNodeApply(ctx, in, out)
+}
+
+func (h *nodeHandler) PaginationGetNodeApply(ctx context.Context, in *PaginationGetNodeApplyRequest, out *PaginationGetNodeApplyResponse) error {
+	return h.NodeHandler.PaginationGetNodeApply(ctx, in, out)
 }

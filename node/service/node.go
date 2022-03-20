@@ -67,6 +67,70 @@ func (ns *NodeService) CreateNodeApply(ctx context.Context, req *nodepb.CreateNo
 	return nil
 }
 
+// PaginationGetNodeApply 分页查询用户申请机器节点包机申请表
+func (ns *NodeService) PaginationGetNodeApply(ctx context.Context, req *nodepb.PaginationGetNodeApplyRequest, resp *nodepb.PaginationGetNodeApplyResponse) error {
+	logger.Info("PaginationGetNodeApply: ", req.BaseRequest)
+	if !verify.Identify(verify.GetNodeApplyInfo, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("PaginationGetNodeApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("PaginationGetNodeApply permission forbidden")
+	}
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	var paginationRes *logic.PaginationGetResult
+	var err error
+	if !isAdmin && !isTutor {
+		// 普通用户,只可以查看自己的包机申请记录
+		paginationRes, err = ns.nodeApplyLogic.PaginationGetByCreaterID(ctx, int(req.BaseRequest.UserInfo.UserId), int(req.PageIndex), int(req.PageSize))
+	} else if !isAdmin && isTutor {
+		// 导师用户,可以查看自己组的所有的包机申请记录
+		paginationRes, err = ns.nodeApplyLogic.PaginationGetByTutorID(ctx, int(req.BaseRequest.UserInfo.UserId), int(req.PageIndex), int(req.PageSize))
+	} else {
+		// 管理员用户,可以查看所有人的并且已经被导师审核通过的包机申请记录
+		paginationRes, err = ns.nodeApplyLogic.PaginationWithTutorChecked(ctx, int(req.PageIndex), int(req.PageSize))
+	}
+	if err != nil {
+		return err
+	}
+	resp.Applies = make([]*nodepb.NodeApply, 0)
+	resp.Count = int32(paginationRes.Count)
+	for _, apply := range paginationRes.Data {
+		respApply := &nodepb.NodeApply{
+			Id:                     int32(apply.ID),
+			CreateTime:             apply.CreateTime.Unix(),
+			CreaterID:              int32(apply.CreaterID),
+			CreaterUsername:        apply.CreaterUsername,
+			CreaterName:            apply.CreaterName,
+			ProjectID:              int32(apply.ProjectID),
+			TutorCheckStatus:       int32(apply.TutorCheckStatus),
+			ManagerCheckStatus:     int32(apply.ManagerCheckStatus),
+			Status:                 int32(apply.Status),
+			MessageTutor:           apply.MessageTutor.String,
+			MessageManager:         apply.MessageManager.String,
+			TutorCheckTime:         apply.TutorCheckTime.Time.Unix(),
+			TutorID:                int32(apply.TutorID),
+			TutorUsername:          apply.TutorUsername,
+			TutorName:              apply.TutorName,
+			ManagerCheckTime:       apply.ManagerCheckTime.Time.Unix(),
+			ManagerCheckerID:       int32(apply.ManagerCheckerID.Int64),
+			ManagerCheckerUsername: apply.ManagerCheckerUsername.String,
+			ManagerCheckerName:     apply.ManagerCheckerName.String,
+			ModifyTime:             apply.ModifyTime.Time.Unix(),
+			ModifyUserID:           int32(apply.ModifyUserID),
+			ModifyName:             apply.ModifyName,
+			ModifyUsername:         apply.ModifyUsername,
+			NodeType:               apply.NodeType,
+			NodeNum:                int32(apply.NodeNum),
+			StartTime:              apply.StartTime.Unix(),
+			EndTime:                apply.EndTime.Unix(),
+		}
+		if apply.ExtraAttributes != nil {
+			respApply.ExtraAttributes = apply.ExtraAttributes.String()
+		}
+		resp.Applies = append(resp.Applies, respApply)
+	}
+	return nil
+}
+
 var _ nodepb.NodeHandler = (*NodeService)(nil)
 
 // NewNode 创建新的机器节点管理服务
