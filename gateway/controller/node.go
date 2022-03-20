@@ -2,9 +2,12 @@ package controller
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/essayZW/hpcmanager/gateway/middleware"
 	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
+	"github.com/essayZW/hpcmanager/gateway/request/json"
 	"github.com/essayZW/hpcmanager/gateway/response"
 	nodepb "github.com/essayZW/hpcmanager/node/proto"
 	"github.com/essayZW/hpcmanager/proto"
@@ -33,11 +36,47 @@ func (n *node) ping(ctx *gin.Context) {
 	resp.Send(ctx)
 }
 
+// createNodeApply /api/node POST 创建新的机器节点申请信息
+func (n *node) createNodeApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.CreateNodeApplyParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := n.nodeService.CreateNodeApply(c, &nodepb.CreateNodeApplyRequest{
+		ProjectID:   int32(param.ProjectID),
+		NodeType:    param.NodeType,
+		NodeNum:     int32(param.NodeNum),
+		StartTime:   param.StartTime,
+		EndTime:     param.StartTime,
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("创建机器节点申请信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, map[string]interface{}{
+		"id": resp.Id,
+	}, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter := router.Group("/node")
 
 	nodeRouter.GET("/ping", n.ping)
 	middleware.RegistryExcludeAPIPath("GET:/api/node/ping")
+
+	nodeRouter.POST("", n.createNodeApply)
 	return nodeRouter
 }
 

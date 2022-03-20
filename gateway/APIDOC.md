@@ -475,3 +475,24 @@ Method: GET
 参数：无
 
 响应：请求 ID、PONG
+
+### /node
+
+Method: POST
+
+描述: 创建新的计算节点申请记录
+
+参数:
+
+```go
+// CreateNodeApplyParam 创建机器节点申请记录请求参数
+type CreateNodeApplyParam struct {
+    ProjectID int    `form:"projectID" json:"projectID" binding:"required"`
+    NodeType  string `form:"nodeType" json:"nodeType" binding:"required"`
+    NodeNum   int    `form:"nodeNum" json:"nodeNum" binding:"required"`
+    StartTime int64  `form:"startTime" json:"startTime" binding:"required"`
+    EndTime   int64  `form:"endTime" json:"endTime" binding:"required"`
+}
+```
+
+响应: 创建申请记录的 ID
