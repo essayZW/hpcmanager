@@ -223,6 +223,9 @@ const expandChangeHandler = async (row: UserInfo) => {
 }
 p.info {
   padding-left: 16px;
+  span {
+    margin-right: 12px;
+  }
 }
 .refresh-button-row {
   margin: 16px 0px;
