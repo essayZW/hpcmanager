@@ -35,7 +35,6 @@ func (node *NodeApplyDB) Insert(ctx context.Context, nodeApplyInfo *NodeApply) (
 }
 
 // LimitQueryByCreaterUserID 通过创建者的ID分页查询机器节点申请信息
-// TODO need testing
 func (node *NodeApplyDB) LimitQueryByCreaterUserID(ctx context.Context, userID, limit, offset int) ([]*NodeApply, error) {
 	row, err := node.conn.Query(ctx, "SELECT * FROM `node_apply` WHERE `creater_id`=? LIMIT ?, ?", userID, limit, offset)
 	if err != nil {
@@ -136,6 +135,40 @@ func (node *NodeApplyDB) QueryCountWithTutorChecked(ctx context.Context) (int, e
 		return 0, errors.New("QueryCountByTutorID int scan error")
 	}
 	return count, nil
+}
+
+// UpdateTutorCheckStatus 更新导师审核的状态
+func (node *NodeApplyDB) UpdateTutorCheckStatus(ctx context.Context, newStatus *NodeApply) (bool, error) {
+	res, err := node.conn.Exec(ctx, "UPDATE `node_apply` SET `tutor_check_status`=?, `tutor_check_time`=?, `message_tutor`=? WHERE `tutor_check_status`==-1 "+
+		"AND `id`=? AND `status`==1", newStatus.TutorCheckStatus, newStatus.TutorCheckTime, newStatus.MessageTutor, newStatus.ID)
+	if err != nil {
+		logger.Warn("UpdateTutorCheckStatus error: ", err)
+		return false, errors.New("UpdateTutorCheckStatus error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateTutorCheckStatus error: ", err)
+		return false, errors.New("UpdateTutorCheckStatus error")
+	}
+	return count != 0, nil
+}
+
+// UpdateAdminCheckStatus 更新管理员审核的状态
+func (node *NodeApplyDB) UpdateAdminCheckStatus(ctx context.Context, newStatus *NodeApply) (bool, error) {
+	res, err := node.conn.Exec(ctx, "UPDATE `node_apply` SET `manager_check_status`=?, `manager_check_time`=?, `message_manager`=?, "+
+		"`manager_checker_id`=?, `manager_checker_name`=?, `manager_checker_username`=? "+
+		"`id`=? AND `tutor_check_status`=1 AND `status`=1", newStatus.ManagerCheckStatus, newStatus.ManagerCheckTime, newStatus.MessageManager,
+		newStatus.ManagerCheckerID, newStatus.ManagerCheckerName, newStatus.ManagerCheckerUsername, newStatus.ID)
+	if err != nil {
+		logger.Warn("UpdateAdminCheckStatus error: ", err)
+		return false, errors.New("UpdateAdminCheckStatus error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateAdminCheckStatus error: ", err)
+		return false, errors.New("UpdateAdminCheckStatus error")
+	}
+	return count != 0, nil
 }
 
 // NewNodeApply 创建新的node_apply数据库操作

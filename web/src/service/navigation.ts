@@ -184,7 +184,7 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
     ],
   ],
   // 超级管理员和普通管理员都这项操作
-  // NOTE 由于一个用户不能同时是超级管理员以及普通管理员,因此这里注册同样的路由信息
+  // NOTE: 由于一个用户不能同时是超级管理员以及普通管理员,因此这里注册同样的路由信息
   [
     UserLevels.SuperAdmin,
     [

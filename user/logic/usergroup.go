@@ -79,7 +79,8 @@ func (group *UserGroup) CreateUserJoinGroupApply(ctx context.Context, userInfo *
 		TutorID:       groupInfo.TutorID,
 		TutorUsername: groupInfo.TutorUsername,
 		TutorName:     groupInfo.TutorName,
-		CreateTime:    null.NewTime(time.Now(), true),
+		// FIXME 使用TimeFrom函数生成,不止这一个地方需要修改
+		CreateTime: null.NewTime(time.Now(), true),
 	})
 }
 

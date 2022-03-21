@@ -100,6 +100,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: Common,
 			},
+			// 需要导师及以上的权限
+			CheckNodeApply: {
+				maxLevel: MaxLevel,
+				minLevel: Tutor,
+			},
 		},
 	}
 }

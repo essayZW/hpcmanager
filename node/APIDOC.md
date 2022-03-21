@@ -81,3 +81,31 @@ message PaginationGetNodeApplyResponse {
     int32 count = 2;
 }
 ```
+
+## CheckNodeApply
+
+描述: 审核机器节点包机申请
+
+原型定义: `rpc CheckNodeApply(CheckNodeApplyRequest) returns (CheckNodeApplyResponse) {}`
+
+需求权限: `Tutor` 及以上
+
+请求参数:
+
+```protobuf
+message CheckNodeApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    bool checkStatus = 3;
+    string checkMessage = 4;
+    bool tutorCheck = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message CheckNodeApplyResponse {
+    bool success = 1;
+}
+```

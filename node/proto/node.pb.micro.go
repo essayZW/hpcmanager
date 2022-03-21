@@ -41,6 +41,7 @@ type NodeService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
 	CreateNodeApply(ctx context.Context, in *CreateNodeApplyRequest, opts ...client.CallOption) (*CreateNodeApplyResponse, error)
 	PaginationGetNodeApply(ctx context.Context, in *PaginationGetNodeApplyRequest, opts ...client.CallOption) (*PaginationGetNodeApplyResponse, error)
+	CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequest, opts ...client.CallOption) (*CheckNodeApplyResponse, error)
 }
 
 type nodeService struct {
@@ -85,12 +86,23 @@ func (c *nodeService) PaginationGetNodeApply(ctx context.Context, in *Pagination
 	return out, nil
 }
 
+func (c *nodeService) CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequest, opts ...client.CallOption) (*CheckNodeApplyResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.CheckNodeApply", in)
+	out := new(CheckNodeApplyResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Node service
 
 type NodeHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
 	CreateNodeApply(context.Context, *CreateNodeApplyRequest, *CreateNodeApplyResponse) error
 	PaginationGetNodeApply(context.Context, *PaginationGetNodeApplyRequest, *PaginationGetNodeApplyResponse) error
+	CheckNodeApply(context.Context, *CheckNodeApplyRequest, *CheckNodeApplyResponse) error
 }
 
 func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.HandlerOption) error {
@@ -98,6 +110,7 @@ func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.Handl
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
 		CreateNodeApply(ctx context.Context, in *CreateNodeApplyRequest, out *CreateNodeApplyResponse) error
 		PaginationGetNodeApply(ctx context.Context, in *PaginationGetNodeApplyRequest, out *PaginationGetNodeApplyResponse) error
+		CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequest, out *CheckNodeApplyResponse) error
 	}
 	type Node struct {
 		node
@@ -120,4 +133,8 @@ func (h *nodeHandler) CreateNodeApply(ctx context.Context, in *CreateNodeApplyRe
 
 func (h *nodeHandler) PaginationGetNodeApply(ctx context.Context, in *PaginationGetNodeApplyRequest, out *PaginationGetNodeApplyResponse) error {
 	return h.NodeHandler.PaginationGetNodeApply(ctx, in, out)
+}
+
+func (h *nodeHandler) CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequest, out *CheckNodeApplyResponse) error {
+	return h.NodeHandler.CheckNodeApply(ctx, in, out)
 }

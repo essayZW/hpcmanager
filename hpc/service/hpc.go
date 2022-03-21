@@ -57,7 +57,7 @@ func (h *HpcService) AddUserWithGroup(ctx context.Context, req *hpcproto.AddUser
 		// 同步hpc_group表中的相关信息
 		hpcGroupID, err := h.hpcLogic.CreateGroup(c, groupname, req.QueueName, gid)
 		if err != nil {
-			// NOTE 数据库数据更新失败,但是执行的脚本命令不可以恢复,需要联系管理员手动同步数据
+			// NOTE: 数据库数据更新失败,但是执行的脚本命令不可以恢复,需要联系管理员手动同步数据
 			return nil, err
 		}
 		resp.HpcGroupID = int32(hpcGroupID)
@@ -74,14 +74,14 @@ func (h *HpcService) AddUserWithGroup(ctx context.Context, req *hpcproto.AddUser
 		}
 		if halfFlag {
 			// 只成功创建了组，没有成功创建用户
-			// NOTE 这种情况应该认为操作不成功,但是返回err会导致group回滚从而导致数据不一致
+			// NOTE: 这种情况应该认为操作不成功,但是返回err会导致group回滚从而导致数据不一致
 			// 因此可能需要联系管理员进行手动数据同步
 			return nil, nil
 		}
 		// 同步hpc_user表中的相关信息
 		hpcUserID, err := h.hpcLogic.CreateUser(c, username, uid)
 		if err != nil {
-			// NOTE 数据库数据更新失败,但是执行的脚本命令不可以恢复,需要联系管理员手动同步数据
+			// NOTE: 数据库数据更新失败,但是执行的脚本命令不可以恢复,需要联系管理员手动同步数据
 			return nil, err
 		}
 		resp.HpcUserID = int32(hpcUserID)

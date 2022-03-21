@@ -131,6 +131,48 @@ func (ns *NodeService) PaginationGetNodeApply(ctx context.Context, req *nodepb.P
 	return nil
 }
 
+// CheckNodeApply 审核机器节点申请
+func (ns *NodeService) CheckNodeApply(ctx context.Context, req *nodepb.CheckNodeApplyRequest, resp *nodepb.CheckNodeApplyResponse) error {
+	logger.Info("CheckNodeApply: ", req.BaseRequest)
+	if !verify.Identify(verify.CheckNodeApply, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("CheckNodeApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("CheckNodeApply permission forbidden")
+	}
+
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+
+	var status bool
+	var err error
+	if req.TutorCheck {
+		if isTutor {
+			status, err = ns.nodeApplyLogic.CheckNodeApplyByTutor(ctx, int(req.ApplyID), req.CheckStatus, req.CheckMessage)
+		} else {
+			err = errors.New("must be tutor")
+		}
+	} else {
+		if isAdmin {
+			status, err = ns.nodeApplyLogic.CheckNodeApplyByAdmin(ctx, int(req.ApplyID), req.CheckStatus, req.CheckMessage, &logic.ApplyItemUserInfo{
+				ID:       int(req.BaseRequest.UserInfo.UserId),
+				Username: req.BaseRequest.UserInfo.Username,
+				Name:     req.BaseRequest.UserInfo.Name,
+			})
+		} else {
+			err = errors.New("must be admin")
+		}
+	}
+	if err != nil {
+		return err
+	}
+	if !status {
+		return errors.New("check error")
+	}
+	resp.Success = true
+
+	// TODO: 发送MQ消息
+	return nil
+}
+
 var _ nodepb.NodeHandler = (*NodeService)(nil)
 
 // NewNode 创建新的机器节点管理服务

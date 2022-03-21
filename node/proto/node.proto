@@ -13,6 +13,7 @@ service Node {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc CreateNodeApply(CreateNodeApplyRequest) returns (CreateNodeApplyResponse) {}
     rpc PaginationGetNodeApply(PaginationGetNodeApplyRequest) returns (PaginationGetNodeApplyResponse) {}
+    rpc CheckNodeApply(CheckNodeApplyRequest) returns (CheckNodeApplyResponse) {}
 }
 
 message CreateNodeApplyRequest {
@@ -37,4 +38,16 @@ message PaginationGetNodeApplyRequest {
 message PaginationGetNodeApplyResponse {
     repeated node.NodeApply applies = 1;
     int32 count = 2;
+}
+
+message CheckNodeApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    bool checkStatus = 3;
+    string checkMessage = 4;
+    bool tutorCheck = 5;
+}
+
+message CheckNodeApplyResponse {
+    bool success = 1;
 }

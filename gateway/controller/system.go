@@ -134,7 +134,7 @@ func (sys *System) isInstall(ctx *gin.Context) {
 	resp.Send(ctx)
 }
 
-// TODO 目前cas配置暂时定死,后面迁移到动态配置平台
+// TODO: 目前cas配置暂时定死,后面迁移到动态配置平台
 // casConfig 系统的cas配置
 type casConfig struct {
 	Enable      bool

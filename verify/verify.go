@@ -34,6 +34,8 @@ const (
 	CreateNodeApply = "__CREATE_NODE_APPLY__"
 	// GetNodeApplyInfo 查询个计算节点包机申请
 	GetNodeApplyInfo = "__GET_NODE_APPLY_INFO__"
+	// CheckNodeApply 审核机器节点申请
+	CheckNodeApply = "__CHECK_NODE_APPLY__"
 )
 
 // Verify 进行操作的权限验证

@@ -144,6 +144,37 @@ func (node *NodeApply) PaginationWithTutorChecked(ctx context.Context, pageIndex
 	}, nil
 }
 
+// CheckNodeApplyByTutor 导师审核机器节点申请信息
+func (node *NodeApply) CheckNodeApplyByTutor(ctx context.Context, applyID int, status bool, message string) (bool, error) {
+	var tutorCheckStatus int8 = 1
+	if !status {
+		tutorCheckStatus = 0
+	}
+	return node.nodeApplyDB.UpdateTutorCheckStatus(ctx, &db.NodeApply{
+		ID:               applyID,
+		TutorCheckStatus: tutorCheckStatus,
+		MessageTutor:     null.StringFrom(message),
+		TutorCheckTime:   null.TimeFrom(time.Now()),
+	})
+}
+
+// CheckNodeApplyByAdmin 管理员审核机器节点申请信息
+func (node *NodeApply) CheckNodeApplyByAdmin(ctx context.Context, applyID int, status bool, message string, checkerInfo *ApplyItemUserInfo) (bool, error) {
+	var adminCheckStatus int8 = 1
+	if !status {
+		adminCheckStatus = 0
+	}
+	return node.nodeApplyDB.UpdateAdminCheckStatus(ctx, &db.NodeApply{
+		ID:                     applyID,
+		ManagerCheckStatus:     adminCheckStatus,
+		MessageManager:         null.StringFrom(message),
+		ManagerCheckTime:       null.TimeFrom(time.Now()),
+		ManagerCheckerID:       null.IntFrom(int64(checkerInfo.ID)),
+		ManagerCheckerName:     null.StringFrom(checkerInfo.Name),
+		ManagerCheckerUsername: null.StringFrom(checkerInfo.Username),
+	})
+}
+
 // NewNodeApply 创建机器节点申请相关的逻辑操作
 func NewNodeApply(nodeApplyDB *db.NodeApplyDB) *NodeApply {
 	return &NodeApply{

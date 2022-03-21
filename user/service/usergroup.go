@@ -49,7 +49,7 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 	// 只有组管理员或者系统管理员才可以查看组信息
 	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
 	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
-	// NOTE 由于前面鉴权已经确认其不是普通用户，因此这里只用判断导师用户即可
+	// NOTE:由于前面鉴权已经确认其不是普通用户，因此这里只用判断导师用户即可
 	if isTutor && !isAdmin && req.GroupID != req.BaseRequest.UserInfo.GroupId {
 		// 是导师用户,但是不是管理员,因此只可以查看自己组的用户组信息
 		return errors.New("Tutor can only view group information for his managed group")
@@ -141,7 +141,7 @@ func (group *UserGroupService) CreateJoinGroupApply(ctx context.Context, req *us
 	resp.ApplyID = int32(id.(int64))
 	logger.Info("Create new user join group apply: ", id)
 	resp.Success = true
-	// TODO 发送异步消息，表明申请已经创建
+	// TODO: 发送异步消息，表明申请已经创建
 	return nil
 }
 
@@ -308,7 +308,7 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 			return nil, err
 		}
 		// 删除该用户原来的Guest权限
-		// NOTE 删除不管是否删除成功,若存在则会删除成功,不存在则忽略删除失败的错误消息
+		// NOTE: 删除不管是否删除成功,若存在则会删除成功,不存在则忽略删除失败的错误消息
 		group.permissionService.RemoveUserPermission(ctx, &permissionpb.RemoveUserPermissionRequest{
 			Userid:      int32(tutorInfo.ID),
 			Level:       int32(verify.Guest),
