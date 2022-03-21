@@ -148,6 +148,7 @@ func (p *Project) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	projectGroup.POST("", p.createProject)
 	projectGroup.GET("", p.paginationGet)
+	projectGroup.GET("/:id", p.getProjectInfoByID)
 	return projectGroup
 }
 
