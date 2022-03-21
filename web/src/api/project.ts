@@ -72,3 +72,14 @@ export async function createProject(
   }
   return resp.data.id;
 }
+
+/**
+ * 通过ID查询项目信息
+ */
+export async function queryByID(id: number): Promise<ProjectInfo> {
+  const resp = await ApiRequest.request<ProjectInfo>(`/project/${id}`, 'GET');
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}

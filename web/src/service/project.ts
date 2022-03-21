@@ -2,6 +2,7 @@ import {
   ProjectInfo,
   paginationQueryProjectInfos,
   createProject as apiCreateProject,
+  queryByID,
 } from '../api/project';
 import { PaginationQueryResponse } from '../api/api';
 
@@ -38,4 +39,11 @@ export async function createProject(
     expenses,
     description,
   });
+}
+
+/**
+ * 通过ID查询项目信息
+ */
+export async function getProjectInfoByID(id: number): Promise<ProjectInfo> {
+  return queryByID(id);
 }

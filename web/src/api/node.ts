@@ -54,3 +54,34 @@ export async function paginationQueryNodeApplyInfo(
   }
   return resp.data;
 }
+
+/**
+ * 创建机器节点申请信息的请求参数
+ */
+export type CreateNodeApplyParam = {
+  projectID: number;
+  nodeType: string;
+  nodeNum: number;
+  startTime: number;
+  endTime: number;
+};
+
+export async function createNodeApply(
+  param: CreateNodeApplyParam
+): Promise<number> {
+  const resp = await ApiRequest.request<{
+    id: number;
+  }>(
+    '/node/apply',
+    'POST',
+    {},
+    {
+      ...param,
+    }
+  );
+
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data.id;
+}

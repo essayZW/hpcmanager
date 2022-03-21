@@ -50,6 +50,10 @@ const refreshTableData = () => {
 
 refreshTableData();
 
+defineExpose({
+  refreshTableData,
+});
+
 const handleCurrentChange = (pageIndex: number) => {
   paginationInfo.pageIndex = pageIndex;
 };
@@ -59,7 +63,10 @@ const handleSizeChange = (pageSize: number) => {
 };
 </script>
 <template>
-  <el-row justify="end" class="button-row">
+  <el-row justify="space-between" class="button-row">
+    <div>
+      <slot name="tool"></slot>
+    </div>
     <el-button type="primary" @click="refreshTableData">
       <el-icon class="el-icon--left">
         <i-ic-round-refresh />
