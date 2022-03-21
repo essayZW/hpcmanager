@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/essayZW/hpcmanager/logger"
 	"github.com/essayZW/hpcmanager/node/logic"
@@ -57,8 +58,10 @@ func (ns *NodeService) CreateNodeApply(ctx context.Context, req *nodepb.CreateNo
 		Username: groupResp.GroupInfo.TutorUsername,
 		Name:     groupResp.GroupInfo.TutorName,
 	}, &logic.ApplyNodeInfo{
-		NodeType: req.NodeType,
-		NodeNum:  int(req.NodeNum),
+		NodeType:  req.NodeType,
+		NodeNum:   int(req.NodeNum),
+		StartTime: time.UnixMicro(req.StartTime),
+		EndTime:   time.UnixMicro(req.EndTime),
 	}, int(req.ProjectID))
 	if err != nil {
 		return fmt.Errorf("create node apply info error: %s", err.Error())
