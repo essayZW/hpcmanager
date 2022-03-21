@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/essayZW/hpcmanager/gateway/middleware"
@@ -102,6 +103,40 @@ func (p *Project) paginationGet(ctx *gin.Context) {
 		res.Data = make([]*projectpb.ProjectInfo, 0)
 	}
 	httpResp := response.New(200, res, true, "success")
+	httpResp.Send(ctx)
+}
+
+// getProjectInfoByID /api/project/:id GET 通过ID查询项目信息
+func (p *Project) getProjectInfoByID(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	idStr, ok := ctx.Params.Get("id")
+	if !ok {
+		httpResp := response.New(200, nil, false, "invalid id param")
+		httpResp.Send(ctx)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "invalid id param")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := p.projectService.GetProjectInfoByID(c, &projectpb.GetProjectInfoByIDRequest{
+		Id:          int32(id),
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询项目信息错误: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, resp.Data, true, "success")
 	httpResp.Send(ctx)
 }
 

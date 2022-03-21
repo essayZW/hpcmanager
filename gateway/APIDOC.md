@@ -464,6 +464,20 @@ Method: GET
 
 响应: 分页查询的结果
 
+### /project/:id
+
+Method: GET
+
+描述: 通过 ID 查询项目信息
+
+参数:
+
+```text
+id: number
+```
+
+响应: 项目信息
+
 ## node 控制器
 
 ### /node/ping
