@@ -107,6 +107,36 @@ func (n *node) paginationGet(ctx *gin.Context) {
 
 }
 
+// checkNodeApply /api/node/apply PATCH 审核机器节点申请记录
+func (n *node) checkNodeApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.CheckNodeApplyParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	rpcResp, err := n.nodeService.CheckNodeApply(c, &nodepb.CheckNodeApplyRequest{
+		BaseRequest:  baseRequest,
+		ApplyID:      int32(param.ApplyID),
+		CheckStatus:  param.CheckStatus,
+		CheckMessage: param.CheckMessage,
+		TutorCheck:   param.TutorCheck,
+	})
+	if err != nil || !rpcResp.Success {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("审核失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter := router.Group("/node")
 
@@ -115,6 +145,7 @@ func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	nodeRouter.POST("/apply", n.createNodeApply)
 	nodeRouter.GET("/apply", n.paginationGet)
+	nodeRouter.PATCH("/apply", n.checkNodeApply)
 	return nodeRouter
 }
 

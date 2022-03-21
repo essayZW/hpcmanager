@@ -513,3 +513,24 @@ type param = {
 ```
 
 响应: 分页查询的结果
+
+### /node/apply
+
+Method: PATCH
+
+描述: 审核机器节点申请
+
+参数:
+
+```go
+// CreateNodeApplyParam 创建机器节点申请记录请求参数
+type CreateNodeApplyParam struct {
+    ProjectID int    `form:"projectID" json:"projectID" binding:"required"`
+    NodeType  string `form:"nodeType" json:"nodeType" binding:"required"`
+    NodeNum   int    `form:"nodeNum" json:"nodeNum" binding:"required"`
+    StartTime int64  `form:"startTime" json:"startTime" binding:"required"`
+    EndTime   int64  `form:"endTime" json:"endTime" binding:"required"`
+}
+```
+
+响应: 是否审核成功
