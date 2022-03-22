@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 import { NodeApplyInfo } from '../api/node';
-import { paginationGetNodeApplyInfo, nodeTypeToName } from '../service/node';
+import {
+  paginationGetNodeApplyInfo,
+  nodeTypeToName,
+  checkNodeApply,
+} from '../service/node';
 import dayjs from 'dayjs';
 import { ProjectInfo } from '../api/project';
 import { UserInfo } from '../api/user';
-import { getUserInfoById } from '../service/user';
+import { getUserInfoById, isAdmin, isTutor } from '../service/user';
 import { getProjectInfoByID } from '../service/project';
-import { zeroWithDefault } from '../utils/obj';
+import { zeroWithDefault, timeOrBlank } from '../utils/obj';
 
 // 表格数据
 const tableData = reactive<{
@@ -122,6 +126,51 @@ const handlerTableExpand = async (row: NodeApplyInfo) => {
   }
   tableExpandRowInfo[row.id].loading = false;
 };
+
+// 审核意见输入框数据
+const checkMessageInput = reactive<{
+  tutor: string;
+  manager: string;
+}>({
+  tutor: '',
+  manager: '',
+});
+
+// 审批按钮处理函数
+const checkButtonHandler = async (
+  applyID: number,
+  checkStatus: boolean,
+  tutorCheck = true
+) => {
+  if (!confirm(!checkStatus ? '确认不通过该条申请吗' : '确认通过该条申请吗')) {
+    return;
+  }
+
+  try {
+    await checkNodeApply(
+      applyID,
+      checkStatus,
+      tutorCheck ? checkMessageInput.tutor : checkMessageInput.manager,
+      tutorCheck
+    );
+    ElMessage({
+      type: 'success',
+      message: `审核状态变更成功`,
+    });
+    refreshTableData();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  } finally {
+    if (tutorCheck) {
+      checkMessageInput.tutor = '';
+    } else {
+      checkMessageInput.manager = '';
+    }
+  }
+};
 </script>
 <template>
   <el-row justify="space-between" class="button-row">
@@ -171,12 +220,48 @@ const handlerTableExpand = async (row: NodeApplyInfo) => {
           </template>
         </el-table-column>
         <el-table-column label="节点数目" prop="nodeNum"></el-table-column>
+        <el-table-column label="状态">
+          <template #default="scope">
+            <span
+              v-if="
+                scope.row.status == 1 &&
+                scope.row.tutorCheckStatus == -1 &&
+                scope.row.managerCheckStatus == -1
+              "
+              >未审核</span
+            >
+            <span v-else-if="scope.row.status == 0" class="red">已经撤销</span>
+            <span
+              v-else-if="
+                scope.row.tutorCheckStatus == 1 &&
+                scope.row.managerCheckStatus == -1
+              "
+              class="green"
+              >导师审核通过</span
+            >
+            <span
+              v-else-if="
+                scope.row.tutorCheckStatus == 0 &&
+                scope.row.managerCheckStatus == -1
+              "
+              class="red"
+              >导师审核未通过</span
+            >
+            <span v-else-if="scope.row.managerCheckStatus == 1" class="green"
+              >管理员审核通过</span
+            >
+            <span v-else-if="scope.row.managerCheckStatus == 0" class="red"
+              >管理员审核未通过</span
+            >
+          </template>
+        </el-table-column>
         <el-table-column label="详情" type="expand">
           <template #default="props">
             <div
               v-loading="tableExpandRowInfo[props.row.id].loading"
               class="table-expand-area"
             >
+              <el-divider content-position="left">申请详情: </el-divider>
               <div><strong>申请人信息:</strong></div>
               <div class="info">
                 <p>
@@ -323,6 +408,170 @@ const handlerTableExpand = async (row: NodeApplyInfo) => {
                 </p>
               </div>
             </div>
+            <div class="check-area">
+              <el-divider content-position="left">审核详情: </el-divider>
+              <el-timeline>
+                <el-timeline-item
+                  placement="top"
+                  :timestamp="timeOrBlank(props.row.tutorCheckTime)"
+                >
+                  <el-card class="check-card">
+                    <p class="box-title"><strong>审核情况</strong></p>
+                    <p>
+                      <span
+                        ><strong>审核人姓名: </strong>
+                        {{ zeroWithDefault(props.row.tutorName, '无') }}</span
+                      >
+                    </p>
+                    <p>
+                      <span
+                        ><strong>审核人工号: </strong>
+                        {{ props.row.tutorUsername }}
+                      </span>
+                    </p>
+                    <p>
+                      <span
+                        ><strong>审核状态: </strong>
+                        <span v-if="props.row.tutorCheckStatus == -1"
+                          >未审核
+                        </span>
+
+                        <span
+                          v-else-if="props.row.tutorCheckStatus == 1"
+                          class="green"
+                          >审核通过</span
+                        >
+                        <span v-else class="red">审核未通过</span>
+                      </span>
+                    </p>
+                    <p>
+                      <span>
+                        <strong>审批意见: </strong>
+                        {{ zeroWithDefault(props.row.messageTutor, '无') }}
+                      </span>
+                    </p>
+                    <p
+                      v-if="isTutor() && props.row.tutorCheckStatus == -1"
+                      class="box-title"
+                    >
+                      <strong>操作</strong>
+                    </p>
+                    <p v-if="isTutor() && props.row.tutorCheckStatus == -1">
+                      <el-form class="form">
+                        <el-form-item label="审核">
+                          <el-button
+                            type="success"
+                            size="small"
+                            class="check-pass-button"
+                            @click="checkButtonHandler(props.row.id, true)"
+                            >通过</el-button
+                          >
+                          <el-button
+                            type="danger"
+                            size="small"
+                            @click="checkButtonHandler(props.row.id, false)"
+                            >不通过</el-button
+                          >
+                        </el-form-item>
+                        <el-form-item label="审核意见">
+                          <el-input
+                            v-model="checkMessageInput.tutor"
+                            autosize
+                            type="textarea"
+                            placeholder="请输入审核意见(0~280字)"
+                          />
+                        </el-form-item>
+                      </el-form>
+                    </p>
+                  </el-card>
+                </el-timeline-item>
+                <el-timeline-item
+                  v-if="props.row.tutorCheckStatus == 1"
+                  placement="top"
+                  :timestamp="timeOrBlank(props.row.managerCheckTime)"
+                >
+                  <el-card class="check-card">
+                    <p class="box-title"><strong>审核情况</strong></p>
+                    <p>
+                      <span
+                        ><strong>审核人姓名: </strong>
+                        {{
+                          zeroWithDefault(props.row.managerCheckerName, '无')
+                        }}</span
+                      >
+                    </p>
+                    <p>
+                      <span
+                        ><strong>审核人工号: </strong>
+                        {{
+                          zeroWithDefault(
+                            props.row.managerCheckerUsername,
+                            '无'
+                          )
+                        }}
+                      </span>
+                    </p>
+                    <p>
+                      <span
+                        ><strong>审核状态: </strong>
+                        <span v-if="props.row.managerCheckStatus == -1"
+                          >未审核
+                        </span>
+                        <span
+                          v-else-if="props.row.managerCheckStatus == 1"
+                          class="green"
+                          >审核通过</span
+                        >
+                        <span v-else class="red">审核未通过</span>
+                      </span>
+                    </p>
+                    <p>
+                      <span>
+                        <strong>审批意见: </strong>
+                        {{ zeroWithDefault(props.row.messageManager, '无') }}
+                      </span>
+                    </p>
+                    <p
+                      v-if="isAdmin() && props.row.managerCheckStatus == -1"
+                      class="box-title"
+                    >
+                      <strong>操作</strong>
+                    </p>
+                    <p v-if="isAdmin() && props.row.managerCheckStatus == -1">
+                      <el-form class="form">
+                        <el-form-item label="审核">
+                          <el-button
+                            type="success"
+                            size="small"
+                            class="check-pass-button"
+                            @click="
+                              checkButtonHandler(props.row.id, true, false)
+                            "
+                            >通过</el-button
+                          >
+                          <el-button
+                            type="danger"
+                            size="small"
+                            @click="
+                              checkButtonHandler(props.row.id, false, false)
+                            "
+                            >不通过</el-button
+                          >
+                        </el-form-item>
+                        <el-form-item label="审核意见">
+                          <el-input
+                            v-model="checkMessageInput.manager"
+                            autosize
+                            type="textarea"
+                            placeholder="请输入审核意见(0~280字)"
+                          />
+                        </el-form-item>
+                      </el-form>
+                    </p>
+                  </el-card>
+                </el-timeline-item>
+              </el-timeline>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -366,6 +615,23 @@ const handlerTableExpand = async (row: NodeApplyInfo) => {
     span {
       margin: 8px 8px;
     }
+  }
+}
+
+.red {
+  color: red;
+}
+.green {
+  color: green;
+}
+
+.check-card {
+  p {
+    padding-left: 12px;
+  }
+  .box-title {
+    padding-left: 0px;
+    font-size: 16px;
   }
 }
 </style>

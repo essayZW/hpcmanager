@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue';
 import { ApplyInfo } from '../api/group';
 import { paginationGetApplyInfo, checkJoinGroupApply } from '../service/group';
-import { zeroWithDefault } from '../utils/obj';
+import { zeroWithDefault, timeOrBlank } from '../utils/obj';
 import dayjs from 'dayjs';
 import { isTutor, isAdmin } from '../service/user';
 
@@ -52,18 +52,6 @@ const handleCurrentChange = (pageIndex: number) => {
 const handleSizeChange = (pageSize: number) => {
   paginationInfo.pageSize = pageSize;
   refreshTableData();
-};
-
-// 返回格式化的时间或者空时间
-const timeOrBlank = (time: number): string => {
-  const date = dayjs(time * 1000);
-  if (time < 0) {
-    return '';
-  }
-  if (!date.isValid()) {
-    return '';
-  }
-  return date.format('YYYY-MM-DD HH:mm:ss');
 };
 
 // 审核意见输入框数据
@@ -151,7 +139,7 @@ const checkButtonHandler = async (
               "
               >未审核</span
             >
-            <span v-if="scope.row.status == 0" class="red">已经撤销</span>
+            <span v-else-if="scope.row.status == 0" class="red">已经撤销</span>
             <span
               v-else-if="
                 scope.row.tutorCheckStatus == 1 &&

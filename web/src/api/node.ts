@@ -1,3 +1,4 @@
+import { undefinedWithDefault } from '../utils/obj';
 import { ApiRequest, PaginationQueryResponse } from './api';
 
 /**
@@ -52,6 +53,10 @@ export async function paginationQueryNodeApplyInfo(
   if (!resp.status) {
     throw new Error(resp.message);
   }
+  for (const item of resp.data.Data) {
+    undefinedWithDefault(item, 'tutorCheckStatus', 0);
+    undefinedWithDefault(item, 'managerCheckStatus', 0);
+  }
   return resp.data;
 }
 
@@ -84,4 +89,35 @@ export async function createNodeApply(
     throw new Error(resp.message);
   }
   return resp.data.id;
+}
+
+/**
+ * 审核机器节点申请的请求消息
+ */
+export type CheckNodeApplyParam = {
+  applyID: number;
+  checkStatus: boolean;
+  checkMessage: string;
+  tutorCheck: boolean;
+};
+
+/**
+ * 审核机器节点申请
+ */
+export async function checkNodeApply(
+  param: CheckNodeApplyParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/node/apply',
+    'PATCH',
+    {},
+    {
+      ...param,
+    }
+  );
+
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
 }

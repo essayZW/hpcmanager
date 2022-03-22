@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 /**
  * 如果某个对象的某个值是undefined则将该值设定为传递的值
  */
@@ -22,4 +24,18 @@ export function zeroWithDefault(
     return newValue;
   }
   return value;
+}
+
+/**
+ * 格式化日期或者直接返回空
+ */
+export function timeOrBlank(time: number): string {
+  const date = dayjs(time * 1000);
+  if (time < 0) {
+    return '';
+  }
+  if (!date.isValid()) {
+    return '';
+  }
+  return date.format('YYYY-MM-DD HH:mm:ss');
 }

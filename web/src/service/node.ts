@@ -3,6 +3,7 @@ import {
   NodeApplyInfo,
   paginationQueryNodeApplyInfo,
   createNodeApply as createNodeApplyAPI,
+  checkNodeApply as checkNodeApplyAPI,
 } from '../api/node';
 
 /**
@@ -48,4 +49,18 @@ export function nodeTypeToName(nodeType: string): string {
     default:
       return 'unknown';
   }
+}
+
+export function checkNodeApply(
+  applyID: number,
+  checkStatus: boolean,
+  checkMessage: string,
+  tutorCheck: boolean
+): Promise<boolean> {
+  return checkNodeApplyAPI({
+    applyID,
+    checkStatus,
+    checkMessage,
+    tutorCheck,
+  });
 }
