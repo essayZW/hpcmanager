@@ -139,8 +139,8 @@ func (node *NodeApplyDB) QueryCountWithTutorChecked(ctx context.Context) (int, e
 
 // UpdateTutorCheckStatus 更新导师审核的状态
 func (node *NodeApplyDB) UpdateTutorCheckStatus(ctx context.Context, newStatus *NodeApply) (bool, error) {
-	res, err := node.conn.Exec(ctx, "UPDATE `node_apply` SET `tutor_check_status`=?, `tutor_check_time`=?, `message_tutor`=? WHERE `tutor_check_status`==-1 "+
-		"AND `id`=? AND `status`==1", newStatus.TutorCheckStatus, newStatus.TutorCheckTime, newStatus.MessageTutor, newStatus.ID)
+	res, err := node.conn.Exec(ctx, "UPDATE `node_apply` SET `tutor_check_status`=?, `tutor_check_time`=?, `message_tutor`=? WHERE `tutor_check_status`=-1 "+
+		"AND `id`=? AND `status`=1", newStatus.TutorCheckStatus, newStatus.TutorCheckTime, newStatus.MessageTutor, newStatus.ID)
 	if err != nil {
 		logger.Warn("UpdateTutorCheckStatus error: ", err)
 		return false, errors.New("UpdateTutorCheckStatus error")
@@ -156,7 +156,7 @@ func (node *NodeApplyDB) UpdateTutorCheckStatus(ctx context.Context, newStatus *
 // UpdateAdminCheckStatus 更新管理员审核的状态
 func (node *NodeApplyDB) UpdateAdminCheckStatus(ctx context.Context, newStatus *NodeApply) (bool, error) {
 	res, err := node.conn.Exec(ctx, "UPDATE `node_apply` SET `manager_check_status`=?, `manager_check_time`=?, `message_manager`=?, "+
-		"`manager_checker_id`=?, `manager_checker_name`=?, `manager_checker_username`=? "+
+		"`manager_checker_id`=?, `manager_checker_name`=?, `manager_checker_username`=? WHERE "+
 		"`id`=? AND `tutor_check_status`=1 AND `status`=1", newStatus.ManagerCheckStatus, newStatus.ManagerCheckTime, newStatus.MessageManager,
 		newStatus.ManagerCheckerID, newStatus.ManagerCheckerName, newStatus.ManagerCheckerUsername, newStatus.ID)
 	if err != nil {
