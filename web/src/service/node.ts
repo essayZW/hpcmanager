@@ -33,3 +33,19 @@ export async function createNodeApply(
     endTime,
   });
 }
+
+/**
+ * 节点类型转换为对应的名称
+ */
+export function nodeTypeToName(nodeType: string): string {
+  switch (nodeType) {
+    case 'cpuc36':
+      return '36核心节点';
+    case 'gpuc4':
+      return '4 GPU卡节点';
+    case 'gpuc8':
+      return '8 GPU卡节点';
+    default:
+      return 'unknown';
+  }
+}
