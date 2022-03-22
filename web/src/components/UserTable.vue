@@ -113,7 +113,10 @@ const expandChangeHandler = async (row: UserInfo) => {
 };
 </script>
 <template>
-  <el-row justify="end" class="refresh-button-row">
+  <el-row justify="space-between" class="refresh-button-row">
+    <div>
+      <slot name="tool"></slot>
+    </div>
     <el-button type="primary" @click="refreshTable">
       <el-icon class="el-icon--left">
         <i-ic-round-refresh />
@@ -126,6 +129,7 @@ const expandChangeHandler = async (row: UserInfo) => {
       <el-table
         v-loading="tableData.loading"
         border
+        table-layout="auto"
         :data="tableData.data"
         @expand-change="expandChangeHandler"
       >
@@ -150,6 +154,11 @@ const expandChangeHandler = async (row: UserInfo) => {
         <el-table-column label="创建时间">
           <template #default="props">
             {{ dayjs(props.row.createTime * 1000).format('YYYY-MM-DD HH:mm') }}
+          </template>
+        </el-table-column>
+        <el-table-column label="用户组ID">
+          <template #default="props">
+            {{ zeroWithDefault(props.row.groupId, '无') }}
           </template>
         </el-table-column>
         <el-table-column label="更多" type="expand">

@@ -11,6 +11,8 @@ import {
   QueryUserIDResponse,
   paginationQueryUserInfo,
   updateUserInfo,
+  CreateUserByAdminParam,
+  addUserWithGroup,
 } from '../api/user';
 import { getCasConfig } from '../service/sys';
 
@@ -158,4 +160,13 @@ export async function updateUserInfoByID(
     college,
     email,
   });
+}
+
+/**
+ *  管理员创建新用户并添加到用户组
+ */
+export async function createUserByAdmin(
+  param: CreateUserByAdminParam
+): Promise<number> {
+  return addUserWithGroup(param);
 }

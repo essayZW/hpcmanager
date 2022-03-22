@@ -195,3 +195,32 @@ export async function updateUserInfo(newInfo: UpdateUserInfoRequest) {
     throw new Error(resp.message);
   }
 }
+
+/**
+ * 通过管理员添加用户请求参数
+ */
+export interface CreateUserByAdminParam extends CreateUserRequest {
+  groupID: number;
+}
+
+/**
+ * 添加用户并添加到用户组
+ */
+export async function addUserWithGroup(
+  param: CreateUserByAdminParam
+): Promise<number> {
+  const resp = await ApiRequest.request<{
+    userID: number;
+  }>(
+    '/user',
+    'POST',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.data) {
+    throw new Error(resp.message);
+  }
+  return resp.data.userID;
+}
