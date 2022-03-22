@@ -195,7 +195,14 @@ func (s *UserService) GetUserInfo(ctx context.Context, req *userpb.GetUserInfoRe
 	if !isAdmin && !isTutor {
 		// 普通用户，判断是否是本人
 		if req.BaseRequest.UserInfo.UserId != req.Userid {
-			return errors.New("you can only query your own user information")
+			// 普通用户可以查询导师的详细信息,判断查询的用户是不是其导师
+			groupInfo, err := s.groupLogic.GetGroupInfoByID(ctx, int(req.BaseRequest.UserInfo.GroupId))
+			if err != nil {
+				return errors.New("you can only query your own user information")
+			}
+			if groupInfo.TutorID != int(req.Userid) {
+				return errors.New("you can only query your own user information")
+			}
 		}
 	}
 	userInfo, err := s.userLogic.GetUserInfoByID(ctx, int(req.Userid))
