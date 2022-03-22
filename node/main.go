@@ -2,9 +2,11 @@ package main
 
 import (
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
+	hpcbroker "github.com/essayZW/hpcmanager/broker"
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
+	nodebroker "github.com/essayZW/hpcmanager/node/broker"
 	nodedb "github.com/essayZW/hpcmanager/node/db"
 	"github.com/essayZW/hpcmanager/node/logic"
 	nodepb "github.com/essayZW/hpcmanager/node/proto"
@@ -38,9 +40,16 @@ func main() {
 		logger.Fatal("MySQL conn error: ", err)
 	}
 
+	rabbitmqBroker, err := hpcbroker.NewRabbitmq()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	go nodebroker.RegistryCustomer(rabbitmqBroker, serviceClient)
+
 	nodeApplyDB := nodedb.NewNodeApply(sqldb)
 
-	nodeService := service.NewNode(serviceClient, logic.NewNodeApply(nodeApplyDB))
+	nodeService := service.NewNode(serviceClient, logic.NewNodeApply(nodeApplyDB), rabbitmqBroker)
 	nodepb.RegisterNodeHandler(srv.Server(), nodeService)
 
 	srv.Init()

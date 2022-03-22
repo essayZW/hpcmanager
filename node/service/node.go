@@ -7,11 +7,13 @@ import (
 	"time"
 
 	"github.com/essayZW/hpcmanager/logger"
+	nodebroker "github.com/essayZW/hpcmanager/node/broker"
 	"github.com/essayZW/hpcmanager/node/logic"
 	nodepb "github.com/essayZW/hpcmanager/node/proto"
 	publicproto "github.com/essayZW/hpcmanager/proto"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
+	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/client"
 )
 
@@ -19,6 +21,8 @@ import (
 type NodeService struct {
 	nodeApplyLogic   *logic.NodeApply
 	userGroupService userpb.GroupService
+
+	rabbitmqBroker broker.Broker
 }
 
 // Ping ping测试
@@ -172,17 +176,27 @@ func (ns *NodeService) CheckNodeApply(ctx context.Context, req *nodepb.CheckNode
 	}
 	resp.Success = true
 
-	// TODO: 发送MQ消息
+	// 发送MQ消息
+	message := &nodebroker.CheckApplyMessage{
+		CheckStatus:  req.CheckStatus,
+		ApplyID:      int(req.ApplyID),
+		CheckMessage: req.CheckMessage,
+		TutorCheck:   req.TutorCheck,
+	}
+	if err := message.Public(ns.rabbitmqBroker, req.BaseRequest); err != nil {
+		logger.Warn("Message public error: ", err)
+	}
 	return nil
 }
 
 var _ nodepb.NodeHandler = (*NodeService)(nil)
 
 // NewNode 创建新的机器节点管理服务
-func NewNode(client client.Client, nodeApplyLogic *logic.NodeApply) *NodeService {
+func NewNode(client client.Client, nodeApplyLogic *logic.NodeApply, rabbitmqBroker broker.Broker) *NodeService {
 	userGroupService := userpb.NewGroupService("user", client)
 	return &NodeService{
 		nodeApplyLogic:   nodeApplyLogic,
 		userGroupService: userGroupService,
+		rabbitmqBroker:   rabbitmqBroker,
 	}
 }
