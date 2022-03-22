@@ -68,7 +68,7 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           component: NodeApplyManager,
         },
         item: {
-          name: '机器节点申请管理',
+          name: '机器节点申请',
           to: '/main/node_apply_manager',
         },
       },
@@ -177,7 +177,7 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           component: NodeApplyManager,
         },
         item: {
-          name: '机器节点申请管理',
+          name: '机器节点申请审核',
           to: '/main/node_apply_manager',
         },
       },
@@ -239,7 +239,7 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           component: NodeApplyManager,
         },
         item: {
-          name: '机器节点申请管理',
+          name: '机器节点申请审核',
           to: '/main/node_apply_manager',
         },
       },

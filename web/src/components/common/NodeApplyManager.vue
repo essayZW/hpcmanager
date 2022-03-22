@@ -3,6 +3,7 @@ import { reactive, ref } from 'vue';
 import { getProjectInfoByID } from '../../service/project';
 import { zeroWithDefault } from '../../utils/obj';
 import { createNodeApply } from '../../service/node';
+import { getUserInfoFromStorage } from '../../service/user';
 import dayjs from 'dayjs';
 
 import PageTitle from '../PageTitle.vue';
@@ -120,6 +121,16 @@ const createNodeApplyFormSubmit = async () => {
   }
   createNodeFormLoading.value = false;
 };
+
+// 如果当前用户没有用户组则不显示申请机器节点按钮
+const hasGroup = ref<boolean>(true);
+const userInfo = getUserInfoFromStorage();
+
+if (userInfo) {
+  if (!userInfo.GroupId) {
+    hasGroup.value = false;
+  }
+}
 </script>
 <template>
   <page-title
@@ -128,7 +139,7 @@ const createNodeApplyFormSubmit = async () => {
   ></page-title>
   <node-apply-table ref="tableElem">
     <template #tool>
-      <el-button type="primary" @click="showNodeApplyDrawer"
+      <el-button v-if="hasGroup" type="primary" @click="showNodeApplyDrawer"
         >申请计算节点</el-button
       >
     </template>
