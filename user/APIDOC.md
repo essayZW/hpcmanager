@@ -399,7 +399,7 @@ message CreateGroupResponse {
 
 ## JoinGroup
 
-描述：添加现有的没有组的用户到一个组中
+描述：添加现有的没有组的用户到一个组中,同时创建其对应的计算节点用户并添加到计算节点用户组中
 
 需求权限：`CommonAdmin`及以上
 

@@ -118,6 +118,29 @@ type UpdateUserInfoParam struct {
 
 响应: 是否修改成功
 
+### /user
+
+Method: POST
+
+描述: 管理员手动添加用户并添加到用户组中
+
+参数:
+
+```go
+// CreateUserWithGroup 创建用户并添加到对应的组请求参数
+type CreateUserWithGroup struct {
+    Tel         string `form:"tel" json:"tel"`
+    Email       string `form:"email" json:"email"`
+    Name        string `form:"name" json:"name" binding:"required"`
+    CollegeName string `form:"collegeName" json:"collegeName"`
+    GroupID int `form:"groupID" json:"groupID"`
+    Username string `form:"username" json:"username" binding:"required"`
+    Password string `form:"password" json:"password" binding:"required"`
+}
+```
+
+响应: 新用户的用户 ID
+
 ## hpc 控制器
 
 ### /hpc/ping

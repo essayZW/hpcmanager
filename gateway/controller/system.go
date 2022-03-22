@@ -48,7 +48,7 @@ func (sys *System) install(ctx *gin.Context) {
 	// 2. 初始化系统权限等级表
 	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()
-	if !sys.initPermision(c, baseRequest) {
+	if !sys.initPermission(c, baseRequest) {
 		resp := response.New(500, nil, false, "系统权限安装失败")
 		resp.Send(ctx)
 		return
@@ -94,7 +94,7 @@ func (sys *System) install(ctx *gin.Context) {
 	response.Send(ctx)
 }
 
-func (sys *System) initPermision(ctx context.Context, baseReq *gatewaypb.BaseRequest) bool {
+func (sys *System) initPermission(ctx context.Context, baseReq *gatewaypb.BaseRequest) bool {
 
 	permissions := []struct {
 		Name        string

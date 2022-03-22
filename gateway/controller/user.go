@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	jsonparam "github.com/essayZW/hpcmanager/gateway/request/json"
 	"github.com/essayZW/hpcmanager/gateway/response"
 	"github.com/essayZW/hpcmanager/gateway/utils"
+	hpcpb "github.com/essayZW/hpcmanager/hpc/proto"
 	"github.com/essayZW/hpcmanager/logger"
 	"github.com/essayZW/hpcmanager/proto"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
@@ -21,7 +23,9 @@ import (
 
 // User 控制器
 type User struct {
-	userService userpb.UserService
+	userService      userpb.UserService
+	hpcService       hpcpb.HpcService
+	userGroupService userpb.GroupService
 }
 
 // ping /api/user/ping GET ping!
@@ -229,6 +233,69 @@ func (user *User) updateUserInfo(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// createUser /api/user POST 管理员添加新用户
+func (user *User) createUserByAdmin(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.CreateUserWithGroup
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	// 先创建对应的用户
+	addUserResp, err := user.userService.AddUser(c, &userpb.AddUserRequest{
+		UserInfo: &userpb.UserInfo{
+			Name:     param.Name,
+			Username: param.Username,
+			Password: param.Password,
+			Tel:      param.Tel,
+			Email:    param.Email,
+			College:  param.CollegeName,
+		},
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("添加用户失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	// 如果param.GroupID存在代表需要将其添加到对应的用户组并创建相应的hpc计算用户
+	if param.GroupID == 0 {
+		httpResp := response.New(200, map[string]interface{}{
+			"userID": addUserResp.Userid,
+		}, true, "创建Guest用户成功")
+		httpResp.Send(ctx)
+		return
+	}
+	// 添加用户组
+	joinGroupResp, err := user.userService.JoinGroup(c, &userpb.JoinGroupRequest{
+		BaseRequest: baseRequest,
+		UserID:      addUserResp.Userid,
+		GroupID:     int32(param.GroupID),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("添加用户到用户组失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	if !joinGroupResp.Success {
+		httpResp := response.New(200, nil, false, "添加用户到用户组失败")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, map[string]interface{}{
+		"userID": addUserResp.Userid,
+	}, true, "操作成功")
+	httpResp.Send(ctx)
+}
+
 // Registry 为用户控制器注册相应的处理函数
 func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller User")
@@ -246,12 +313,15 @@ func (user *User) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	userRouter.GET("/name/:username", user.getIDByUsername)
 	userRouter.GET("", user.paginationGetUserInfo)
 	userRouter.PATCH("", user.updateUserInfo)
+	userRouter.POST("", user.createUserByAdmin)
 	return userRouter
 }
 
 // NewUser 创建一个用户控制器
 func NewUser(client client.Client, configConn config.DynamicConfig) Controller {
 	return &User{
-		userService: userpb.NewUserService("user", client),
+		userService:      userpb.NewUserService("user", client),
+		hpcService:       hpcpb.NewHpcService("hpc", client),
+		userGroupService: userpb.NewGroupService("user", client),
 	}
 }
