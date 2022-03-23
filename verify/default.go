@@ -30,12 +30,12 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
-			// 普通管理员及以上
+			// 超级管理员及以上
 			AddUserPermissionAction: {
 				maxLevel: MaxLevel,
 				minLevel: SuperAdmin,
 			},
-			// 普通管理员及以上
+			// 超级管理员及以上
 			RemoveUserPermissionAction: {
 				maxLevel: MaxLevel,
 				minLevel: SuperAdmin,

@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/essayZW/hpcmanager/config"
@@ -72,6 +73,36 @@ func (permission *Permission) addAdmin(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// getUserPermission /api/permission/user/:id GET 查询某个用户的所有权限
+func (permission *Permission) getUserPermission(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	idStr := ctx.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "invalid id param")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := permission.permissionService.GetUserPermission(c, &permissionpb.GetUserPermissionRequest{
+		Id:          int32(id),
+		BaseRequest: baseRequest,
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询用户权限信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, resp.Info, true, "success")
+	httpResp.Send(ctx)
+}
+
 // Registry 注册相应的处理函数
 func (permission *Permission) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller permission")
@@ -80,6 +111,7 @@ func (permission *Permission) Registry(router *gin.RouterGroup) *gin.RouterGroup
 	middleware.RegistryExcludeAPIPath("/api/permission/ping")
 
 	permissionRouter.POST("/admin", permission.addAdmin)
+	permissionRouter.GET("/user/:id", permission.getUserPermission)
 	return permissionRouter
 }
 

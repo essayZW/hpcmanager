@@ -226,6 +226,20 @@ type CreateCommonAdminParam struct {
 
 响应: 是否添加成功
 
+### /permission/user/:id
+
+Method: GET
+
+描述: 查询某个用户的所有的权限
+
+参数:
+
+```text
+id: int
+```
+
+响应: 查询到的权限信息
+
 ## group 控制器
 
 ### /group/ping

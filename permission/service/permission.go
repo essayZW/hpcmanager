@@ -34,6 +34,7 @@ func (permission *PermissionService) Ping(ctx context.Context, req *publicpb.Emp
 // GetUserPermission 查询用户拥有的权限信息
 func (permission *PermissionService) GetUserPermission(ctx context.Context, req *permissionpb.GetUserPermissionRequest, resp *permissionpb.GetUserPermissionResponse) error {
 	logger.Infof("GetUserPermission %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	// FIXME: 只有管理员用户可以查看所有人的信息,尽心分级
 	permissionInfo, err := permission.userpLogic.GetUserPermissionByID(ctx, int(req.GetId()))
 	if err != nil {
 		return errors.New("no user permission info")
