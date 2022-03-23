@@ -36,6 +36,8 @@ const (
 	GetNodeApplyInfo = "__GET_NODE_APPLY_INFO__"
 	// CheckNodeApply 审核机器节点申请
 	CheckNodeApply = "__CHECK_NODE_APPLY__"
+	// CreateNodeDistributeWO 创建机器节点分配工单
+	CreateNodeDistributeWO = "__CREATE_NODE_DISTRIBUTE_WO__"
 )
 
 // Verify 进行操作的权限验证

@@ -105,6 +105,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: Tutor,
 			},
+			// 暂定需要普通管理员及以上的权限
+			CreateNodeDistributeWO: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
 		},
 	}
 }

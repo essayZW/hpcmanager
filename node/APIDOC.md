@@ -109,3 +109,28 @@ message CheckNodeApplyResponse {
     bool success = 1;
 }
 ```
+
+## CreateNodeDistributeWO
+
+描述: 创建机器节点分配处理工单
+
+原型定义: `rpc CreateNodeDistributeWO(CreateNodeDistributeWORequest) returns (CreateNodeDistributeWOResponse) {}`
+
+需求参数: `CommonAdmin` 及以上
+
+请求参数:
+
+```protobuf
+message CreateNodeDistributeWORequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message CreateNodeDistributeWOResponse {
+    int32 id = 1;
+}
+```

@@ -38,3 +38,16 @@ type NodeApply struct {
 	EndTime                time.Time   `db:"end_time"`
 	ExtraAttributes        *db.JSON    `db:"extraAttributes"`
 }
+
+// NodeDistribute 机器节点分配工单
+type NodeDistribute struct {
+	ID               int         `db:"id"`
+	ApplyID          int         `db:"apply_id"`
+	HandlerFlag      int8        `db:"handler_flag"`
+	HandlerUserID    null.Int    `db:"handler_userid"`
+	HandlerUsername  null.String `db:"handler_username"`
+	HandlerUserName  null.String `db:"handler_user_name"`
+	DistributeBillID int         `db:"distribute_bill_id"`
+	CreateTime       time.Time   `db:"create_time"`
+	ExtraAttributes  *db.JSON    `db:"extraAttributes"`
+}

@@ -42,6 +42,7 @@ type NodeService interface {
 	CreateNodeApply(ctx context.Context, in *CreateNodeApplyRequest, opts ...client.CallOption) (*CreateNodeApplyResponse, error)
 	PaginationGetNodeApply(ctx context.Context, in *PaginationGetNodeApplyRequest, opts ...client.CallOption) (*PaginationGetNodeApplyResponse, error)
 	CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequest, opts ...client.CallOption) (*CheckNodeApplyResponse, error)
+	CreateNodeDistributeWO(ctx context.Context, in *CreateNodeDistributeWORequest, opts ...client.CallOption) (*CreateNodeDistributeWOResponse, error)
 }
 
 type nodeService struct {
@@ -96,6 +97,16 @@ func (c *nodeService) CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequ
 	return out, nil
 }
 
+func (c *nodeService) CreateNodeDistributeWO(ctx context.Context, in *CreateNodeDistributeWORequest, opts ...client.CallOption) (*CreateNodeDistributeWOResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.CreateNodeDistributeWO", in)
+	out := new(CreateNodeDistributeWOResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Node service
 
 type NodeHandler interface {
@@ -103,6 +114,7 @@ type NodeHandler interface {
 	CreateNodeApply(context.Context, *CreateNodeApplyRequest, *CreateNodeApplyResponse) error
 	PaginationGetNodeApply(context.Context, *PaginationGetNodeApplyRequest, *PaginationGetNodeApplyResponse) error
 	CheckNodeApply(context.Context, *CheckNodeApplyRequest, *CheckNodeApplyResponse) error
+	CreateNodeDistributeWO(context.Context, *CreateNodeDistributeWORequest, *CreateNodeDistributeWOResponse) error
 }
 
 func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.HandlerOption) error {
@@ -111,6 +123,7 @@ func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.Handl
 		CreateNodeApply(ctx context.Context, in *CreateNodeApplyRequest, out *CreateNodeApplyResponse) error
 		PaginationGetNodeApply(ctx context.Context, in *PaginationGetNodeApplyRequest, out *PaginationGetNodeApplyResponse) error
 		CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequest, out *CheckNodeApplyResponse) error
+		CreateNodeDistributeWO(ctx context.Context, in *CreateNodeDistributeWORequest, out *CreateNodeDistributeWOResponse) error
 	}
 	type Node struct {
 		node
@@ -137,4 +150,8 @@ func (h *nodeHandler) PaginationGetNodeApply(ctx context.Context, in *Pagination
 
 func (h *nodeHandler) CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequest, out *CheckNodeApplyResponse) error {
 	return h.NodeHandler.CheckNodeApply(ctx, in, out)
+}
+
+func (h *nodeHandler) CreateNodeDistributeWO(ctx context.Context, in *CreateNodeDistributeWORequest, out *CreateNodeDistributeWOResponse) error {
+	return h.NodeHandler.CreateNodeDistributeWO(ctx, in, out)
 }

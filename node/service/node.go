@@ -19,7 +19,9 @@ import (
 
 // NodeService 机器管理服务
 type NodeService struct {
-	nodeApplyLogic   *logic.NodeApply
+	nodeApplyLogic *logic.NodeApply
+	nodeDistribute *logic.NodeDistribute
+
 	userGroupService userpb.GroupService
 
 	rabbitmqBroker broker.Broker
@@ -189,13 +191,30 @@ func (ns *NodeService) CheckNodeApply(ctx context.Context, req *nodepb.CheckNode
 	return nil
 }
 
+// CreateNodeDistributeWO 创建机器节点分配处理工单
+func (ns *NodeService) CreateNodeDistributeWO(ctx context.Context, req *nodepb.CreateNodeDistributeWORequest, resp *nodepb.CreateNodeDistributeWOResponse) error {
+	logger.Info("CreateNodeDistributeWO: ", req.BaseRequest)
+	if !verify.Identify(verify.CreateNodeDistributeWO, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("CreateNodeDistributeWO permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("CreateNodeDistributeWO permission forbidden")
+	}
+
+	id, err := ns.nodeDistribute.CreateNodeDistributeWO(context.Background(), int(req.ApplyID))
+	if err != nil {
+		return err
+	}
+	resp.Id = int32(id)
+	return nil
+}
+
 var _ nodepb.NodeHandler = (*NodeService)(nil)
 
 // NewNode 创建新的机器节点管理服务
-func NewNode(client client.Client, nodeApplyLogic *logic.NodeApply, rabbitmqBroker broker.Broker) *NodeService {
+func NewNode(client client.Client, nodeApplyLogic *logic.NodeApply, nodeDistribute *logic.NodeDistribute, rabbitmqBroker broker.Broker) *NodeService {
 	userGroupService := userpb.NewGroupService("user", client)
 	return &NodeService{
 		nodeApplyLogic:   nodeApplyLogic,
+		nodeDistribute:   nodeDistribute,
 		userGroupService: userGroupService,
 		rabbitmqBroker:   rabbitmqBroker,
 	}
