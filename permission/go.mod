@@ -10,6 +10,7 @@ require (
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220314060314-356448017f02
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/user v0.0.0-00010101000000-000000000000
 	github.com/go-redis/redis/v8 v8.11.4
 	go-micro.dev/v4 v4.6.0
 	google.golang.org/protobuf v1.26.0
