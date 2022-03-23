@@ -164,6 +164,28 @@ CREATE TABLE `node_distribute` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `node_distribute_bill`
+--
+
+DROP TABLE IF EXISTS `node_distribute_bill`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `node_distribute_bill` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `apply_id` int NOT NULL,
+  `node_distribute_id` int NOT NULL,
+  `fee` decimal(18,2) NOT NULL,
+  `pay_fee` decimal(18,2) NOT NULL DEFAULT '0.00',
+  `pay_time` timestamp NULL DEFAULT NULL,
+  `pay_type` tinyint DEFAULT NULL,
+  `pay_message` varchar(512) DEFAULT NULL,
+  `create_time` timestamp NOT NULL,
+  `extraAttributes` varchar(2048) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `node_distribute_log`
 --
 
@@ -428,4 +450,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-03-23 19:35:04
+-- Dump completed on 2022-03-23 19:40:04
