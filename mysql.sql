@@ -153,7 +153,11 @@ CREATE TABLE `node_distribute` (
   `id` int NOT NULL AUTO_INCREMENT,
   `apply_id` int NOT NULL,
   `handler_flag` tinyint NOT NULL DEFAULT '0',
-  `pay_flag` tinyint NOT NULL DEFAULT '0',
+  `handler_userid` int DEFAULT NULL,
+  `handler_username` varchar(32) DEFAULT NULL,
+  `handler_user_name` varchar(32) DEFAULT NULL,
+  `distribute_bill_id` int DEFAULT '0',
+  `create_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -424,4 +428,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-03-18 21:33:21
+-- Dump completed on 2022-03-23 19:35:04
