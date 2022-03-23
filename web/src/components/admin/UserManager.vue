@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createUserByAdmin, isAdmin } from '../../service/user';
+import { createUserByAdmin, isSuperAdmin } from '../../service/user';
 import { FormInstance, requiredWithLength } from '../../utils/validateRule';
 import { reactive, ref } from 'vue';
 
@@ -111,13 +111,16 @@ const createUserFormSubmitHandler = (elem: FormInstance | undefined) => {
   <page-title title="用户管理" des="查看所有的用户信息"></page-title>
   <user-table ref="tableElem">
     <template #tool>
-      <el-button v-if="isAdmin()" type="primary" @click="showCreateUserDialog"
+      <el-button
+        v-if="isSuperAdmin()"
+        type="primary"
+        @click="showCreateUserDialog"
         >新建用户</el-button
       >
     </template>
   </user-table>
   <el-dialog
-    v-if="isAdmin()"
+    v-if="isSuperAdmin()"
     v-model="createUserDialogShowFlag"
     title="新建用户"
   >

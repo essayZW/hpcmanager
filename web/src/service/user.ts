@@ -134,6 +134,21 @@ export function isAdmin(): boolean {
   }
   return false;
 }
+/**
+ * 判断是否是超级管理员
+ */
+export function isSuperAdmin(): boolean {
+  const info = getUserInfoFromStorage();
+  if (!info) {
+    return false;
+  }
+  for (const level of info.Levels) {
+    if (level == UserLevels.SuperAdmin) {
+      return true;
+    }
+  }
+  return false;
+}
 
 /**
  * 分页查询用户信息

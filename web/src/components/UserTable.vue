@@ -3,11 +3,22 @@ import { reactive } from 'vue';
 import { UserInfo } from '../api/user';
 import { GroupInfo } from '../api/group';
 import { getGroupInfoByID } from '../service/group';
-import { paginationGetUserInfo } from '../service/user';
+import {
+  paginationGetUserInfo,
+  isSuperAdmin,
+  UserLevels,
+} from '../service/user';
 import dayjs from 'dayjs';
 import { HpcUser } from '../api/hpc';
 import { getHpcUserInfoByID } from '../service/hpc';
 import { zeroWithDefault } from '../utils/obj';
+import { PermissionInfo } from '../api/permission';
+import {
+  getUserPermissionInfoByID,
+  nameTransform,
+  setAdminByUserID,
+  delAdminByUserID,
+} from '../service/permission';
 
 // 表格数据
 const tableData = reactive<{
@@ -74,9 +85,37 @@ const tableRowExtraInfo = reactive<{
   [id: number]: {
     group?: GroupInfo;
     hpcUser?: HpcUser;
+    permission?: PermissionInfo[];
     loading: boolean;
   };
 }>({});
+
+const canSetCommonAdmin = (id: number): boolean => {
+  if (!id || !tableRowExtraInfo[id] || !tableRowExtraInfo[id].permission) {
+    return false;
+  }
+  for (const item of tableRowExtraInfo[id].permission as PermissionInfo[]) {
+    if (
+      item.level == UserLevels.CommonAdmin ||
+      item.level == UserLevels.SuperAdmin
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+const canCancelCommonAdmin = (id: number): boolean => {
+  if (!id || !tableRowExtraInfo[id] || !tableRowExtraInfo[id].permission) {
+    return false;
+  }
+  for (const item of tableRowExtraInfo[id].permission as PermissionInfo[]) {
+    if (item.level == UserLevels.SuperAdmin) {
+      return false;
+    }
+  }
+  return true;
+};
+
 // table columnt expand事件处理
 const expandChangeHandler = async (row: UserInfo) => {
   if (!tableRowExtraInfo[row.id]) {
@@ -109,7 +148,59 @@ const expandChangeHandler = async (row: UserInfo) => {
       });
     }
   }
+  if (!tableRowExtraInfo[row.id].permission) {
+    try {
+      const permissionInfo = await getUserPermissionInfoByID(row.id);
+      tableRowExtraInfo[row.id].permission = permissionInfo;
+    } catch (error) {
+      ElMessage({
+        type: 'error',
+        message: `${error}`,
+      });
+    }
+  }
   tableRowExtraInfo[row.id].loading = false;
+};
+
+const setAdminHandler = async (id: number) => {
+  if (!confirm('确认设置该用户为管理员吗?')) {
+    return;
+  }
+  try {
+    await setAdminByUserID(id);
+    ElMessage({
+      type: 'success',
+      message: '设置成功',
+    });
+    refreshTable();
+    // 让缓存失效
+    tableRowExtraInfo[id].permission = undefined;
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+};
+const delAdminHandler = async (id: number) => {
+  if (!confirm('确定删除该用户的管理员权限吗?')) {
+    return;
+  }
+  try {
+    await delAdminByUserID(id);
+    ElMessage({
+      type: 'success',
+      message: '删除成功',
+    });
+    refreshTable();
+    // 让缓存失效
+    tableRowExtraInfo[id].permission = undefined;
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
 };
 </script>
 <template>
@@ -182,8 +273,6 @@ const expandChangeHandler = async (row: UserInfo) => {
                 >
               </p>
               <p v-else class="info">未加入用户组</p>
-            </div>
-            <div>
               <p><strong>计算节点用户信息</strong></p>
               <p v-if="props.row.hpcUserID" class="info">
                 <span>
@@ -198,6 +287,39 @@ const expandChangeHandler = async (row: UserInfo) => {
                 >
               </p>
               <p v-else class="info">未创建计算节点账户</p>
+              <p><strong>用户权限信息: </strong></p>
+              <p class="info">
+                <span
+                  ><strong>拥有权限: </strong
+                  ><span
+                    v-for="item in tableRowExtraInfo[props.row.id].permission"
+                    :key="item.id"
+                    :title="item.description"
+                    >{{ nameTransform(item.name) }}</span
+                  >
+                </span>
+              </p>
+              <p v-if="isSuperAdmin()" class="info">
+                <span
+                  ><strong>操作: </strong
+                  ><el-button
+                    v-if="canSetCommonAdmin(props.row.id)"
+                    type="primary"
+                    size="small"
+                    class="permission-admin-button"
+                    @click="setAdminHandler(props.row.id)"
+                    >设置为管理员</el-button
+                  >
+                  <el-button
+                    v-else-if="canCancelCommonAdmin(props.row.id)"
+                    type="warning"
+                    size="small"
+                    @click="delAdminHandler(props.row.id)"
+                    >取消管理员</el-button
+                  >
+                  <span v-else>无</span>
+                </span>
+              </p>
             </div>
           </template>
         </el-table-column>
@@ -238,5 +360,9 @@ p.info {
 }
 .refresh-button-row {
   margin: 16px 0px;
+}
+
+.permission-admin-button {
+  margin-left: 8px;
 }
 </style>
