@@ -119,12 +119,28 @@ func (permission *PermissionService) RemoveUserPermission(ctx context.Context, r
 	if req.Level == int32(verify.SuperAdmin) {
 		return errors.New("SuperAdmin user permission can't remove")
 	}
-	err := permission.userpLogic.RemoveUserPermission(ctx, int(req.GetUserid()), verify.Level(req.GetLevel()))
-	if err != nil {
-		return errors.New("Remove user permission error")
-	}
-	resp.Success = true
-	return nil
+	_, err := hpcdb.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+
+		err := permission.userpLogic.RemoveUserPermission(c, int(req.GetUserid()), verify.Level(req.GetLevel()))
+		if err != nil {
+			return nil, errors.New("Remove user permission error")
+		}
+		permissions, err := permission.userpLogic.GetUserPermissionByID(c, int(req.Userid))
+		if err != nil {
+			return nil, errors.New("remove user permission error")
+		}
+		if len(permissions) == 0 {
+			// 删除权限之后若没有了任何的权限则添加Guest权限
+			if err := permission.userpLogic.AddUserPermission(c, &db.UserPermission{
+				UserID: int(req.Userid),
+			}, verify.Guest); err != nil {
+				return nil, errors.New("remove user permission error")
+			}
+		}
+		resp.Success = true
+		return nil, nil
+	})
+	return err
 }
 
 // AddPermission 添加新的权限等级
