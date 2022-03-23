@@ -85,10 +85,13 @@ func (s *UserService) CheckLogin(ctx context.Context, req *userpb.CheckLoginRequ
 		GroupId:  int32(info.GroupID),
 	}
 	// 查询用户的权限信息
+	// 由于用户权限信息的查询对于不同的用户能查询的范围不同,因此需要临时赋予管理员权限
+	req.BaseRequest.UserInfo.Levels = append(req.BaseRequest.UserInfo.Levels, int32(verify.CommonAdmin))
 	permissionInfo, err := s.permissionService.GetUserPermission(ctx, &permissionpb.GetUserPermissionRequest{
 		BaseRequest: req.BaseRequest,
 		Id:          int32(info.ID),
 	})
+	req.BaseRequest.UserInfo.Levels = req.BaseRequest.UserInfo.Levels[:len(req.BaseRequest.UserInfo.Levels)-1]
 	if err != nil {
 		logger.Error(err)
 		return errors.New("Permission info query error")
