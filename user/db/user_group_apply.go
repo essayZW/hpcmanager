@@ -34,8 +34,9 @@ func (ugadb *UserGroupApplyDB) Insert(ctx context.Context, apply *UserGroupApply
 func (ugadb *UserGroupApplyDB) ExistsApply(ctx context.Context, userID int, applyGroupID int) bool {
 	// 查询通过userID发起的applyGroupID的申请，且status状态正常即未撤销以及管理员还未审核的记录
 	// 管理员是审核的最后一环，因此管理员未审核代表该记录还在处理中
+	// 但是管理员未审核可能是由于导师审核未通过,因此需要排除这个情况
 	row, err := ugadb.db.QueryRow(ctx, "SELECT COUNT(*) FROM `user_group_apply`"+
-		"WHERE `user_id`=? AND `apply_group_id`=? AND `status`=1 AND `manager_check_status`=-1", userID, applyGroupID)
+		"WHERE `user_id`=? AND `apply_group_id`=? AND `status`=1 AND `tutor_check_status` != 0 AND`manager_check_status`=-1", userID, applyGroupID)
 	if err != nil {
 		logger.Warn("ExistsApply error: ", err)
 		return false
@@ -173,7 +174,7 @@ func (ugadb *UserGroupApplyDB) QueryByID(ctx context.Context, applyID int) (*Use
 
 // UpdateTutorCheckStatus 更新导师审核状态
 func (ugadb *UserGroupApplyDB) UpdateTutorCheckStatus(ctx context.Context, newStatus *UserGroupApply) (bool, error) {
-	res, err := ugadb.db.Exec(ctx, "UPDATE `user_group_apply` SET `tutor_check_status`=?, `message_tutor`=?,`tutor_check_time`=? WHERE `id`=?",
+	res, err := ugadb.db.Exec(ctx, "UPDATE `user_group_apply` SET `tutor_check_status`=?, `message_tutor`=?,`tutor_check_time`=? WHERE `id`=? AND `status`=1",
 		newStatus.TutorCheckStatus, newStatus.MessageTutor, newStatus.TutorCheckTime, newStatus.ID)
 	if err != nil {
 		logger.Warn("UpdateTutorCheckStatus error: ", err)
@@ -189,7 +190,7 @@ func (ugadb *UserGroupApplyDB) UpdateTutorCheckStatus(ctx context.Context, newSt
 // UpdateAdminCheckStatus 更新管理员审核状态
 func (ugadb *UserGroupApplyDB) UpdateAdminCheckStatus(ctx context.Context, newStatus *UserGroupApply) (bool, error) {
 	res, err := ugadb.db.Exec(ctx, "UPDATE `user_group_apply` SET `manager_check_status`=?, `message_manager`=?, `manager_check_time`=?,"+
-		"`manager_checker_id`=?, `manager_checker_username`=?, `manager_checker_name`=? WHERE `id`=? AND `tutor_check_status`!=-1",
+		"`manager_checker_id`=?, `manager_checker_username`=?, `manager_checker_name`=? WHERE `id`=? AND `tutor_check_status`!=-1 AND `status`=1",
 		newStatus.ManagerCheckStatus, newStatus.MessageManager, newStatus.ManagerCheckTime, newStatus.ManagerCheckerID, newStatus.ManagerCheckerUsername,
 		newStatus.ManagerCheckerName, newStatus.ID)
 	if err != nil {

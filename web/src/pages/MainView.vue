@@ -1,37 +1,47 @@
 <script setup lang="ts">
-import { onBeforeMount, reactive } from 'vue';
+import { reactive } from 'vue';
 import LogoImageSrc from '../assets/logo.png';
-import { isLogin } from '../service/user';
-import { loginUserInfo } from '../api/user';
+import { getUserInfoFromStorage, logout as userLogout } from '../service/user';
+import { LoginUserInfo } from '../api/user';
 import { useRouter } from 'vue-router';
+
+import AsideNavigation from '../components/AsideNavigation.vue';
 
 const router = useRouter();
 
-const loginInfo = reactive<{ userInfo: loginUserInfo }>({
+const loginInfo = reactive<{ userInfo: LoginUserInfo }>({
   userInfo: {
     Username: 'unknown',
     Name: 'unknown',
-    UserID: 0,
-    GroupID: 0,
+    UserId: 0,
+    GroupId: 0,
     Levels: [],
   },
 });
 
-onBeforeMount(async () => {
-  // 判断是否已经登录,未登录跳转到登录页面
-  const info = await isLogin();
-  if (info == null) {
+const info = getUserInfoFromStorage();
+if (info == null) {
+  router.push({
+    path: '/login',
+  });
+} else {
+  loginInfo.userInfo = info;
+}
+
+// 退出登录处理函数
+const logout = async () => {
+  let status = await userLogout();
+  if (!status) {
     ElMessage({
       type: 'error',
-      message: '未登录,请先登录',
+      message: '退出登录失败',
     });
+  } else {
     router.push({
       path: '/login',
     });
-    return;
   }
-  loginInfo.userInfo = info;
-});
+};
 </script>
 <template>
   <el-container>
@@ -43,7 +53,7 @@ onBeforeMount(async () => {
       <div class="login-user">
         <el-dropdown trigger="hover">
           <span>
-            <el-icon class="el-icon--right"> <i-ep-avatar /> </el-icon>
+            <el-icon class="el-icon--left"> <i-ep-avatar /> </el-icon>
             {{ loginInfo.userInfo.Username }}
             <el-icon class="el-icon--right">
               <i-ep-arrow-down />
@@ -51,16 +61,25 @@ onBeforeMount(async () => {
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item>退出登录</el-dropdown-item>
+              <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
+              <el-dropdown-item
+                ><router-link to="/main/update_user_info" class="link"
+                  >修改用户信息</router-link
+                ></el-dropdown-item
+              >
             </el-dropdown-menu>
           </template>
         </el-dropdown>
       </div>
     </el-header>
     <el-container>
-      <el-aside class="aside"> Aside </el-aside>
+      <el-aside class="aside">
+        <AsideNavigation></AsideNavigation>
+      </el-aside>
       <el-container class="main-content-area">
-        <el-main class="main-content"> Main </el-main>
+        <el-main class="main-content">
+          <router-view></router-view>
+        </el-main>
         <el-footer class="footer"
           >&copy; 2022 essay.AllRightsReserved
         </el-footer>
@@ -101,8 +120,7 @@ onBeforeMount(async () => {
   }
 }
 .aside {
-  width: 150px;
-  padding: 12px 8px;
+  width: 160px;
   border-right: 1px solid var(--el-border-color-base);
 }
 .main-content-area {
@@ -116,5 +134,10 @@ onBeforeMount(async () => {
     text-align: center;
     border-top: 1px solid var(--el-border-color-base);
   }
+}
+.link {
+  text-decoration: none;
+  color: inherit;
+  font-size: inherit;
 }
 </style>

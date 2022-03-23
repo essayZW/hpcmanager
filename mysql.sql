@@ -113,7 +113,8 @@ CREATE TABLE `node_apply` (
   `id` int NOT NULL AUTO_INCREMENT,
   `create_time` timestamp NOT NULL,
   `creater_id` int NOT NULL,
-  `tutor_id` int NOT NULL,
+  `creater_username` varchar(32) NOT NULL,
+  `creater_name` varchar(32) NOT NULL,
   `project_id` int NOT NULL,
   `tutor_check_status` tinyint NOT NULL DEFAULT '-1',
   `manager_check_status` tinyint NOT NULL DEFAULT '-1',
@@ -121,17 +122,21 @@ CREATE TABLE `node_apply` (
   `message_tutor` varchar(300) DEFAULT NULL,
   `message_manager` varchar(300) DEFAULT NULL,
   `tutor_check_time` timestamp NULL DEFAULT NULL,
-  `tutor_checker_id` int DEFAULT NULL,
-  `tutor_checker_name` varchar(32) DEFAULT NULL,
+  `tutor_id` int NOT NULL,
+  `tutor_name` varchar(32) NOT NULL,
+  `tutor_username` varchar(32) NOT NULL,
   `manager_check_time` timestamp NULL DEFAULT NULL,
   `manager_checker_id` int DEFAULT NULL,
+  `manager_checker_username` varchar(32) DEFAULT NULL,
   `manager_checker_name` varchar(32) DEFAULT NULL,
   `modify_time` timestamp NULL DEFAULT NULL,
   `modify_userid` int DEFAULT NULL,
-  `node_type` varchar(64) DEFAULT NULL,
-  `node_num` int DEFAULT NULL,
-  `start_time` timestamp NULL DEFAULT NULL,
-  `end_time` timestamp NULL DEFAULT NULL,
+  `modify_name` varchar(32) DEFAULT NULL,
+  `modify_username` varchar(32) DEFAULT NULL,
+  `node_type` varchar(64) NOT NULL,
+  `node_num` int NOT NULL,
+  `start_time` timestamp NOT NULL,
+  `end_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -238,9 +243,13 @@ CREATE TABLE `project` (
   `expenses` varchar(16) NOT NULL,
   `description` varchar(1024) DEFAULT NULL,
   `creater_user_id` int NOT NULL,
+  `creater_username` varchar(32) DEFAULT NULL,
+  `creater_user_name` varchar(32) DEFAULT NULL,
   `create_time` timestamp NOT NULL,
   `modify_time` timestamp NOT NULL,
   `modify_user_id` int NOT NULL,
+  `modify_username` varchar(32) DEFAULT NULL,
+  `modify_user_name` varchar(45) DEFAULT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -415,4 +424,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-28 21:21:39
+-- Dump completed on 2022-03-18 21:33:21

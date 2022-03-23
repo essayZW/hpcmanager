@@ -30,15 +30,15 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
-			// 普通管理员及以上
+			// 超级管理员及以上
 			AddUserPermissionAction: {
 				maxLevel: MaxLevel,
-				minLevel: CommonAdmin,
+				minLevel: SuperAdmin,
 			},
-			// 普通管理员及以上
+			// 超级管理员及以上
 			RemoveUserPermissionAction: {
 				maxLevel: MaxLevel,
-				minLevel: CommonAdmin,
+				minLevel: SuperAdmin,
 			},
 			// 超级管理员及以上
 			AddPermission: {
@@ -79,6 +79,31 @@ func newDefault() *hardcodeVerify {
 			JoinGroup: {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
+			},
+			// 暂定所有权限等级都可以
+			CreateProject: {
+				maxLevel: MaxLevel,
+				minLevel: Guest,
+			},
+			// 暂定所有权限等级都可以
+			GetProjectInfo: {
+				maxLevel: MaxLevel,
+				minLevel: Guest,
+			},
+			// 需要普通用户及以上权限
+			CreateNodeApply: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 需要普通用户及以上权限
+			GetNodeApplyInfo: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 需要导师及以上的权限
+			CheckNodeApply: {
+				maxLevel: MaxLevel,
+				minLevel: Tutor,
 			},
 		},
 	}

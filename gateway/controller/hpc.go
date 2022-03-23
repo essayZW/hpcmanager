@@ -2,6 +2,8 @@ package controller
 
 import (
 	"context"
+	"strconv"
+	"time"
 
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
@@ -34,12 +36,70 @@ func (hpc *Hpc) ping(ctx *gin.Context) {
 	resp.Send(ctx)
 }
 
+// getUserByID /api/hpc/user/:id GET 通过ID查询hpc_user信息
+func (hpc *Hpc) getUserByID(ctx *gin.Context) {
+	idStr := ctx.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "错误的参数id")
+		httpResp.Send(ctx)
+		return
+	}
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := hpc.hpcService.GetUserInfoByID(c, &hpcpb.GetUserInfoByIDRequest{
+		HpcUserID:   int32(id),
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, "查询hpc用户信息失败")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, resp.User, true, "success")
+	httpResp.Send(ctx)
+	return
+}
+
+func (hpc *Hpc) getGroupByID(ctx *gin.Context) {
+	idStr := ctx.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "错误的参数id")
+		httpResp.Send(ctx)
+		return
+	}
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := hpc.hpcService.GetGroupInfoByID(c, &hpcpb.GetGroupInfoByIDRequest{
+		HpcGroupID:  int32(id),
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, "查询hpc用户组信息失败")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, resp.Group, true, "success")
+	httpResp.Send(ctx)
+	return
+}
+
 // Registry 注册相应的处理函数
 func (hpc *Hpc) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller hpc")
 	hpcRouter := router.Group("/hpc")
 	hpcRouter.GET("/ping", hpc.ping)
 	middleware.RegistryExcludeAPIPath("/api/hpc/ping")
+
+	hpcRouter.GET("/user/:id", hpc.getUserByID)
+	hpcRouter.GET("/group/:id", hpc.getGroupByID)
 	return hpcRouter
 }
 

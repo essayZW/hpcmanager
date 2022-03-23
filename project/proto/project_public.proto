@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option go_package="github.com/essayZW/hpcmanager/project/proto;project";
+
+package project;
+
+message ProjectInfo {
+    int32 id = 1;
+    string name = 2;
+    string from = 3;
+    string numbering = 4;
+    string expenses = 5;
+    string description = 6;
+    int32 createrUserID = 7;
+    string createrUsername = 8;
+    string createrName = 9;
+    int64 createTime = 10;
+    int32 modifyUserID = 11;
+    string modifyUsername = 12;
+    string modifyName = 13;
+    int64 modifyTime = 14;
+    string extraAttributes = 15;
+}

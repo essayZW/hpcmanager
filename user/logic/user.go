@@ -170,6 +170,24 @@ func (u *User) SetHpcUserID(ctx context.Context, userID, hpcUserID int) error {
 	return u.userDB.UpdateHpcUserID(ctx, userID, hpcUserID)
 }
 
+// GetUserInfoByHpcID 通过hpc id查询用户信息
+func (u *User) GetUserInfoByHpcID(ctx context.Context, hpcID int) (*db.User, error) {
+	return u.userDB.QueryByHpcID(ctx, hpcID)
+}
+
+// UpdateUserInfo 更新用户信息
+func (u *User) UpdateUserInfo(ctx context.Context, newUserInfo *db.User) error {
+	if newUserInfo.ID == 0 {
+		return errors.New("user's id can't be zero")
+	}
+	return u.userDB.Update(ctx, newUserInfo)
+}
+
+// ListGroupUser 列出用户组的所有用户的信息
+func (u *User) ListGroupUser(ctx context.Context, groupID int) ([]int, error) {
+	return u.userDB.QueryUserByGroupID(ctx, groupID)
+}
+
 // NewUser 创建一个新的userLogic
 func NewUser(db *db.UserDB, configConn config.DynamicConfig, redisConn *redis.Client) *User {
 	user := &User{

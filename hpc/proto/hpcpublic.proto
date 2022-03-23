@@ -1,0 +1,25 @@
+syntax="proto3";
+
+option go_package="github.com/essayZW/hpcmanager/hpc/proto;hpc";
+
+package hpc;
+
+// HpcUser hpc_user表的消息映射
+message HpcUser {
+    int32 id = 1;
+    string nodeUsername = 2;
+    int32 nodeUID = 3;
+    int32 nodeMaxQuota = 4;
+    int64 quotaStartTime = 5;
+    int64 quotaEndTime = 6;
+    string extraAttributes = 7;
+}
+
+// HpcGroup hpc_group表的消息映射
+message HpcGroup {
+    int32 id = 1;
+    string name = 2;
+    string queueName = 3;
+    int32 gID = 4;
+    string extraAttributes = 5;
+}

@@ -1,15 +1,19 @@
 syntax="proto3";
 
 option go_package="github.com/essayZW/hpcmanager/hpc/proto;hpc";
+package hpc;
 
 import "proto/ping.proto";
 import "proto/common.proto";
 import "gateway/proto/baserequest.proto";
+import "proto/hpcpublic.proto";
 
 service Hpc {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc AddUserWithGroup(AddUserWithGroupRequest) returns (AddUserWithGroupResponse) {}
     rpc AddUserToGroup(AddUserToGroupRequest) returns (AddUserToGroupResponse) {}
+    rpc GetUserInfoByID(GetUserInfoByIDRequest) returns (GetUserInfoByIDResponse) {}
+    rpc GetGroupInfoByID(GetGroupInfoByIDRequest) returns (GetGroupInfoByIDResponse) {}
 }
 
 message AddUserWithGroupRequest {
@@ -38,4 +42,21 @@ message AddUserToGroupResponse {
     int32 hpcUserID = 1;
     string userName = 2;
     int32 uid = 3;
+}
+message GetUserInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcUserID = 2;
+}
+
+message GetUserInfoByIDResponse {
+    hpc.HpcUser user = 1;
+}
+
+message GetGroupInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcGroupID = 2;
+}
+
+message GetGroupInfoByIDResponse {
+    hpc.HpcGroup group = 1;
 }

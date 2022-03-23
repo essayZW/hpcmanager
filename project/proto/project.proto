@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+option go_package="github.com/essayZW/hpcmanager/project/proto;project";
+
+package project;
+
+import "proto/ping.proto";
+import "proto/common.proto";
+import "gateway/proto/baserequest.proto";
+import "proto/project_public.proto";
+
+service Project {
+    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+    rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse) {}
+    rpc GetProjectInfoByID(GetProjectInfoByIDRequest) returns (GetProjectInfoByIDResponse) {}
+    rpc PaginationGetProjectInfos(PaginationGetProjectInfosRequest) returns (PaginationGetProjectInfosResponse) {}
+}
+
+message CreateProjectRequest {
+    request.BaseRequest baseRequest = 1;
+    project.ProjectInfo projectInfo = 2;
+}
+
+message CreateProjectResponse {
+    int32 projectID = 1;
+}
+
+message GetProjectInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 id = 2;
+}
+message GetProjectInfoByIDResponse {
+    project.ProjectInfo data = 1;
+}
+
+message PaginationGetProjectInfosRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+message PaginationGetProjectInfosResponse {
+    repeated project.ProjectInfo infos = 1;
+    int32 count = 2;
+}

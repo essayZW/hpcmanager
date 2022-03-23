@@ -1,17 +1,55 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import { isInstall } from './service/sys';
-import { isLogin } from './service/user';
+import { isInstall, getCasConfig } from './service/sys';
+import { isLogin, setUserInfoToStorage } from './service/user';
+import getQuery from './utils/urlQuery';
+import { accessTokenKey } from './api/api';
 
 import MainView from './pages/MainView.vue';
 import NotFound from './pages/NotFound.vue';
 import InstallView from './pages/InstallView.vue';
 import LoginView from './pages/LoginView.vue';
+import UpdateUserInfo from './components/UpdateUserInfo.vue';
+import { registryRouter } from './service/navigation';
+
+let registerFlag = false;
 
 const Router: RouteRecordRaw[] = [
   {
     path: '/',
+    name: 'Index',
+    redirect: '/main',
+  },
+  {
+    path: '/main',
     name: 'Main',
     component: MainView,
+    beforeEnter: async () => {
+      // 检查setToken参数
+      const tokenValue = getQuery('setToken');
+      if (tokenValue != null) {
+        localStorage.setItem(accessTokenKey, tokenValue);
+        window.location.href = '/';
+      }
+
+      // 判断是否已经登录,未登录跳转到登录页面
+      const info = await isLogin();
+      if (info == null) {
+        ElMessage({
+          type: 'error',
+          message: '未登录,请先登录',
+        });
+        return '/login';
+      }
+      // 存储用户信息到storage中
+      setUserInfoToStorage(info);
+    },
+    children: [
+      {
+        path: '/main/update_user_info',
+        name: 'UpdateUserInfo',
+        component: UpdateUserInfo,
+      },
+    ],
   },
   {
     path: '/install',
@@ -41,6 +79,15 @@ const Router: RouteRecordRaw[] = [
         });
         return '/';
       }
+      // 判断是否启用cas登录
+      const config = await getCasConfig();
+      if (config == null) {
+        return;
+      }
+      if (!config.Enable) {
+        return;
+      }
+      window.location.href = `${config.AuthServer}/cas/login?service=${config.ServiceAddr}${config.ValidPath}`;
     },
   },
   {
@@ -50,7 +97,23 @@ const Router: RouteRecordRaw[] = [
   },
 ];
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes: Router,
 });
+router.beforeEach(async (to) => {
+  // 尝试加载动态路由
+  const userInfo = await isLogin();
+  if (userInfo == null) {
+    registerFlag = false;
+    return;
+  }
+  if (!registerFlag) {
+    const num = registryRouter('Main', router, userInfo.Levels);
+    registerFlag = true;
+    console.log(`register ${num} routers, redirect to ${to.fullPath}`);
+    return to.fullPath;
+  }
+});
+
+export default router;

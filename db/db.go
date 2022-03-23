@@ -25,8 +25,8 @@ type DB struct {
 	conn *sqlx.DB
 }
 
-// TransicationConn 返回给定ctx中的事务连接，没有则新建一个
-func (db *DB) TransicationConn(ctx context.Context) (*sqlx.Tx, error) {
+// TransactionConn 返回给定ctx中的事务连接，没有则新建一个
+func (db *DB) TransactionConn(ctx context.Context) (*sqlx.Tx, error) {
 	conn := ctx.Value(transactionConnCtxKey)
 	if conn == nil {
 		// 说明不在事务当中
@@ -38,12 +38,12 @@ func (db *DB) TransicationConn(ctx context.Context) (*sqlx.Tx, error) {
 	return nil, errors.New("No transaction conn")
 }
 
-// TransicationHandler 事务处理的函数定义
-type TransicationHandler func(context.Context, ...interface{}) (interface{}, error)
+// TransactionHandler 事务处理的函数定义
+type TransactionHandler func(context.Context, ...interface{}) (interface{}, error)
 
-// Transication 在事务中进行函数的执行，如果执行的函数出现panic或者返回error，则进行回滚，否则自动进行提交
+// Transaction 在事务中进行函数的执行，如果执行的函数出现panic或者返回error，则进行回滚，否则自动进行提交
 // 该函数会返回do函数的返回值，因此do函数必须为第一个返回值为data，第二个返回值为error
-func (db *DB) Transication(ctx context.Context, do TransicationHandler, param ...interface{}) (doReturnValue interface{}, doError error) {
+func (db *DB) Transaction(ctx context.Context, do TransactionHandler, param ...interface{}) (doReturnValue interface{}, doError error) {
 	tx, err := db.conn.BeginTxx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -53,20 +53,20 @@ func (db *DB) Transication(ctx context.Context, do TransicationHandler, param ..
 	defer func() {
 		if err := recover(); err != nil {
 			tx.Rollback()
-			logger.Debug("Transication rollback because panic error: ", err)
+			logger.Debug("Transaction rollback because panic error: ", err)
 			panic(err)
 		}
 		if doError != nil {
 			tx.Rollback()
-			logger.Debug("Transication rollback because do func error: ", doError)
+			logger.Debug("Transaction rollback because do func error: ", doError)
 			return
 		}
 		if err := tx.Commit(); err != nil {
-			logger.Debug("Transication commit error: ", err)
+			logger.Debug("Transaction commit error: ", err)
 			tx.Rollback()
 			return
 		}
-		logger.Debug("Transication commit")
+		logger.Debug("Transaction commit")
 	}()
 	doReturnValue, doError = do(ctx, param...)
 	return doReturnValue, doError
@@ -74,7 +74,7 @@ func (db *DB) Transication(ctx context.Context, do TransicationHandler, param ..
 
 // QueryRow 执行单行查询
 func (db *DB) QueryRow(ctx context.Context, query string, params ...interface{}) (*sqlx.Row, error) {
-	tx, err := db.TransicationConn(ctx)
+	tx, err := db.TransactionConn(ctx)
 	if err != nil {
 		// 说明不在事务当中，应该直接使用conn执行
 		return db.conn.QueryRowxContext(ctx, query, params...), nil
@@ -84,7 +84,7 @@ func (db *DB) QueryRow(ctx context.Context, query string, params ...interface{})
 
 // Query 执行查询语句
 func (db *DB) Query(ctx context.Context, query string, params ...interface{}) (*sqlx.Rows, error) {
-	tx, err := db.TransicationConn(ctx)
+	tx, err := db.TransactionConn(ctx)
 	if err != nil {
 		return db.conn.QueryxContext(ctx, query, params...)
 	}
@@ -93,7 +93,7 @@ func (db *DB) Query(ctx context.Context, query string, params ...interface{}) (*
 
 // Exec 执行某个SQL语句
 func (db *DB) Exec(ctx context.Context, query string, params ...interface{}) (sql.Result, error) {
-	tx, err := db.TransicationConn(ctx)
+	tx, err := db.TransactionConn(ctx)
 	if err != nil {
 		return db.conn.ExecContext(ctx, query, params...)
 	}
@@ -126,10 +126,10 @@ func NewDB() (*DB, error) {
 	return defaultDB, nil
 }
 
-// Transication 使用默认DB初始化进行事务操作
-func Transication(ctx context.Context, do TransicationHandler, params ...interface{}) (interface{}, error) {
+// Transaction 使用默认DB初始化进行事务操作
+func Transaction(ctx context.Context, do TransactionHandler, params ...interface{}) (interface{}, error) {
 	if defaultDB == nil {
-		return nil, errors.New("Must call NewDB before use Transication")
+		return nil, errors.New("Must call NewDB before use Transaction")
 	}
-	return defaultDB.Transication(ctx, do, params...)
+	return defaultDB.Transaction(ctx, do, params...)
 }

@@ -23,3 +23,9 @@ func (resp *Response) Send(ctx *gin.Context) {
 func New(code int, data interface{}, status bool, message string) *Response {
 	return &Response{code, data, status, message}
 }
+
+// PaginationQueryResponse 分页查询的统一返回结果格式
+type PaginationQueryResponse struct {
+	Count int
+	Data  interface{}
+}

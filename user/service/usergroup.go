@@ -9,10 +9,12 @@ import (
 	"github.com/essayZW/hpcmanager/logger"
 	permissionpb "github.com/essayZW/hpcmanager/permission/proto"
 	publicpb "github.com/essayZW/hpcmanager/proto"
+	userbroker "github.com/essayZW/hpcmanager/user/broker"
 	userdb "github.com/essayZW/hpcmanager/user/db"
 	"github.com/essayZW/hpcmanager/user/logic"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
+	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/client"
 )
 
@@ -23,6 +25,8 @@ type UserGroupService struct {
 
 	permissionService permissionpb.PermissionService
 	hpcService        hpcpb.HpcService
+
+	rabbitmqBroker broker.Broker
 }
 
 // Ping 用户组服务ping测试
@@ -36,7 +40,8 @@ func (group *UserGroupService) Ping(ctx context.Context, req *publicpb.Empty, re
 
 // GetGroupInfoByID 查询用户组信息
 func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb.GetGroupInfoByIDRequest, resp *userpb.GetGroupInfoByIDResponse) error {
-	logger.Infof("GetGrouoInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	logger.Infof("GetGroupInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+	// 鉴权,只有导师及以上用户可以查看组信息
 	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
 		logger.Info("GetGroupInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("GetGroupInfo permission forbidden")
@@ -44,7 +49,9 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 	// 只有组管理员或者系统管理员才可以查看组信息
 	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
 	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	// NOTE:由于前面鉴权已经确认其不是普通用户，因此这里只用判断导师用户即可
 	if isTutor && !isAdmin && req.GroupID != req.BaseRequest.UserInfo.GroupId {
+		// 是导师用户,但是不是管理员,因此只可以查看自己组的用户组信息
 		return errors.New("Tutor can only view group information for his managed group")
 	}
 	info, err := group.userGroupLogic.GetGroupInfoByID(ctx, int(req.GetGroupID()))
@@ -125,7 +132,7 @@ func (group *UserGroupService) CreateJoinGroupApply(ctx context.Context, req *us
 	if userInfo.GroupID != 0 {
 		return errors.New("apply fail: user have a group")
 	}
-	id, err := db.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+	id, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
 		return group.userGroupLogic.CreateUserJoinGroupApply(c, userInfo, int(req.ApplyGroupID))
 	})
 	if err != nil {
@@ -134,7 +141,7 @@ func (group *UserGroupService) CreateJoinGroupApply(ctx context.Context, req *us
 	resp.ApplyID = int32(id.(int64))
 	logger.Info("Create new user join group apply: ", id)
 	resp.Success = true
-	// TODO 发送异步消息，表明申请已经创建
+	// TODO: 发送异步消息，表明申请已经创建
 	return nil
 }
 
@@ -147,7 +154,7 @@ func (group *UserGroupService) SearchTutorInfo(ctx context.Context, req *userpb.
 	}
 	info, err := group.userGroupLogic.GetByTutorUsername(ctx, req.Username)
 	if err != nil {
-		return errors.New("tutor dones not exists")
+		return errors.New("tutor does not exists")
 	}
 	resp.GroupID = int32(info.ID)
 	resp.TutorID = int32(info.TutorID)
@@ -182,7 +189,7 @@ func (group *UserGroupService) PageGetApplyGroupInfo(ctx context.Context, req *u
 	for index := range result.Applies {
 		resp.Applies[index] = &userpb.UserGroupApply{
 			Id:                     int32(result.Applies[index].ID),
-			UserID:                 int32(result.Applies[index].ApplyGroupID),
+			UserID:                 int32(result.Applies[index].UserID),
 			UserUsername:           result.Applies[index].UserUsername,
 			UserName:               result.Applies[index].UserName,
 			ApplyGroupID:           int32(result.Applies[index].ApplyGroupID),
@@ -220,16 +227,36 @@ func (group *UserGroupService) CheckApply(ctx context.Context, req *userpb.Check
 	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
 	var status bool
 	var err error
-	if isAdmin {
-		status, err = group.userGroupLogic.AdminCheckApply(ctx, int(req.ApplyID), int(req.BaseRequest.UserInfo.UserId),
-			req.BaseRequest.UserInfo.Username, req.BaseRequest.UserInfo.Name, req.CheckStatus, req.CheckMessage)
-	} else if isTutor {
-		status, err = group.userGroupLogic.TutorCheckApply(ctx, int(req.BaseRequest.UserInfo.UserId), int(req.ApplyID), req.CheckStatus, req.CheckMessage)
+	// 需要考虑身份同时是导师以及是管理员的情况下审核的冲突情况
+	if req.TutorCheck {
+		if isTutor {
+			status, err = group.userGroupLogic.TutorCheckApply(ctx, int(req.BaseRequest.UserInfo.UserId), int(req.ApplyID), req.CheckStatus, req.CheckMessage)
+		} else {
+			return errors.New("must be tutor user")
+		}
+	} else {
+		if isAdmin {
+			status, err = group.userGroupLogic.AdminCheckApply(ctx, int(req.ApplyID), int(req.BaseRequest.UserInfo.UserId),
+				req.BaseRequest.UserInfo.Username, req.BaseRequest.UserInfo.Name, req.CheckStatus, req.CheckMessage)
+		} else {
+			return errors.New("must be admin")
+		}
 	}
 	if err != nil {
 		return err
 	}
 	resp.Success = status
+
+	// 发送mq消息
+	message := userbroker.CheckApplyMessage{
+		ApplyID:      int(req.ApplyID),
+		CheckStatus:  req.CheckStatus,
+		CheckMessage: req.CheckMessage,
+		TutorCheck:   req.TutorCheck,
+	}
+	if err := message.Public(group.rabbitmqBroker, req.BaseRequest); err != nil {
+		logger.Warn("Message public error: ", err)
+	}
 	return nil
 }
 
@@ -240,7 +267,7 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 		logger.Info("CreateGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("CreateGroup permission forbidden")
 	}
-	idInterface, err := db.Transication(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
+	idInterface, err := db.Transaction(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
 		// 查询新组的新导师的信息
 		tutorInfo, err := group.userLogic.GetUserInfoByID(c, int(req.TutorID))
 		if err != nil {
@@ -252,8 +279,9 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 		}
 		// 调用hpc服务添加对应的计算节点组
 		hpcResp, err := group.hpcService.AddUserWithGroup(c, &hpcpb.AddUserWithGroupRequest{
-			TutorUsername: tutorInfo.Username,
-			GroupName:     req.Name,
+			// 使用导师的英语姓名作为计算节点上的用户组名
+			TutorUsername: tutorInfo.PinyinName,
+			GroupName:     tutorInfo.PinyinName,
 			QueueName:     req.QueueName,
 			BaseRequest:   req.BaseRequest,
 		})
@@ -280,7 +308,7 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 			return nil, err
 		}
 		// 删除该用户原来的Guest权限
-		// NOTE 删除不管是否删除成功,若存在则会删除成功,不存在则忽略删除失败的错误消息
+		// NOTE: 删除不管是否删除成功,若存在则会删除成功,不存在则忽略删除失败的错误消息
 		group.permissionService.RemoveUserPermission(ctx, &permissionpb.RemoveUserPermissionRequest{
 			Userid:      int32(tutorInfo.ID),
 			Level:       int32(verify.Guest),
@@ -312,14 +340,49 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 	return nil
 }
 
+// GetApplyInfoByID 通过ID查询用户申请加入组信息
+func (group *UserGroupService) GetApplyInfoByID(ctx context.Context, req *userpb.GetApplyInfoByIDRequest, resp *userpb.GetApplyInfoByIDResponse) error {
+	logger.Info("GetApplyInfoByID: %s", req.BaseRequest)
+	apply, err := group.userGroupLogic.GetApplyInfoByID(context.Background(), int(req.ApplyID))
+	if err != nil {
+		return errors.New("Apply info query error")
+	}
+	resp.Apply = &userpb.UserGroupApply{
+		Id:                     int32(apply.ID),
+		UserID:                 int32(apply.UserID),
+		UserUsername:           apply.UserUsername,
+		UserName:               apply.UserName,
+		ApplyGroupID:           int32(apply.ApplyGroupID),
+		TutorID:                int32(apply.TutorID),
+		TutorUsername:          apply.TutorUsername,
+		TutorName:              apply.TutorName,
+		TutorCheckStatus:       int32(apply.TutorCheckStatus),
+		ManagerCheckStatus:     int32(apply.ManagerCheckStatus),
+		Status:                 int32(apply.Status),
+		MessageTutor:           apply.MessageTutor.String,
+		MessageManager:         apply.MessageManager.String,
+		TutorCheckTime:         apply.TutorCheckTime.Time.Unix(),
+		ManagerCheckTime:       apply.ManagerCheckTime.Time.Unix(),
+		ManagerCheckerID:       int32(apply.ManagerCheckerID.Int64),
+		ManagerCheckerUsername: apply.ManagerCheckerUsername.String,
+		ManagerCheckerName:     apply.ManagerCheckerName.String,
+		CreateTime:             apply.CreateTime.Time.Unix(),
+	}
+	if apply.ExtraAttributes != nil {
+		resp.Apply.ExtraAttributes = apply.ExtraAttributes.String()
+	}
+	return nil
+}
+
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务
-func NewGroup(client client.Client, userGroupLogic *logic.UserGroup, userLogic *logic.User) *UserGroupService {
+func NewGroup(client client.Client, userGroupLogic *logic.UserGroup, userLogic *logic.User, mqBroker broker.Broker) *UserGroupService {
 	return &UserGroupService{
 		userGroupLogic:    userGroupLogic,
 		userLogic:         userLogic,
 		permissionService: permissionpb.NewPermissionService("permission", client),
 		hpcService:        hpcpb.NewHpcService("hpc", client),
+		rabbitmqBroker:    mqBroker,
 	}
 }

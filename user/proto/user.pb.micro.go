@@ -48,6 +48,9 @@ type UserService interface {
 	GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...client.CallOption) (*GetUserInfoResponse, error)
 	PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, opts ...client.CallOption) (*PaginationGetUserInfoResponse, error)
 	JoinGroup(ctx context.Context, in *JoinGroupRequest, opts ...client.CallOption) (*JoinGroupResponse, error)
+	GetUserInfoByHpcID(ctx context.Context, in *GetUserInfoByHpcIDRequest, opts ...client.CallOption) (*GetUserInfoByHpcIDResponse, error)
+	UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, opts ...client.CallOption) (*UpdateUserInfoResponse, error)
+	ListGroupUser(ctx context.Context, in *ListGroupUserRequest, opts ...client.CallOption) (*ListGroupUserResponse, error)
 }
 
 type userService struct {
@@ -162,6 +165,36 @@ func (c *userService) JoinGroup(ctx context.Context, in *JoinGroupRequest, opts 
 	return out, nil
 }
 
+func (c *userService) GetUserInfoByHpcID(ctx context.Context, in *GetUserInfoByHpcIDRequest, opts ...client.CallOption) (*GetUserInfoByHpcIDResponse, error) {
+	req := c.c.NewRequest(c.name, "User.GetUserInfoByHpcID", in)
+	out := new(GetUserInfoByHpcIDResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, opts ...client.CallOption) (*UpdateUserInfoResponse, error) {
+	req := c.c.NewRequest(c.name, "User.UpdateUserInfo", in)
+	out := new(UpdateUserInfoResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) ListGroupUser(ctx context.Context, in *ListGroupUserRequest, opts ...client.CallOption) (*ListGroupUserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.ListGroupUser", in)
+	out := new(ListGroupUserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for User service
 
 type UserHandler interface {
@@ -175,6 +208,9 @@ type UserHandler interface {
 	GetUserInfo(context.Context, *GetUserInfoRequest, *GetUserInfoResponse) error
 	PaginationGetUserInfo(context.Context, *PaginationGetUserInfoRequest, *PaginationGetUserInfoResponse) error
 	JoinGroup(context.Context, *JoinGroupRequest, *JoinGroupResponse) error
+	GetUserInfoByHpcID(context.Context, *GetUserInfoByHpcIDRequest, *GetUserInfoByHpcIDResponse) error
+	UpdateUserInfo(context.Context, *UpdateUserInfoRequest, *UpdateUserInfoResponse) error
+	ListGroupUser(context.Context, *ListGroupUserRequest, *ListGroupUserResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
@@ -189,6 +225,9 @@ func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.Handl
 		GetUserInfo(ctx context.Context, in *GetUserInfoRequest, out *GetUserInfoResponse) error
 		PaginationGetUserInfo(ctx context.Context, in *PaginationGetUserInfoRequest, out *PaginationGetUserInfoResponse) error
 		JoinGroup(ctx context.Context, in *JoinGroupRequest, out *JoinGroupResponse) error
+		GetUserInfoByHpcID(ctx context.Context, in *GetUserInfoByHpcIDRequest, out *GetUserInfoByHpcIDResponse) error
+		UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, out *UpdateUserInfoResponse) error
+		ListGroupUser(ctx context.Context, in *ListGroupUserRequest, out *ListGroupUserResponse) error
 	}
 	type User struct {
 		user
@@ -239,4 +278,16 @@ func (h *userHandler) PaginationGetUserInfo(ctx context.Context, in *PaginationG
 
 func (h *userHandler) JoinGroup(ctx context.Context, in *JoinGroupRequest, out *JoinGroupResponse) error {
 	return h.UserHandler.JoinGroup(ctx, in, out)
+}
+
+func (h *userHandler) GetUserInfoByHpcID(ctx context.Context, in *GetUserInfoByHpcIDRequest, out *GetUserInfoByHpcIDResponse) error {
+	return h.UserHandler.GetUserInfoByHpcID(ctx, in, out)
+}
+
+func (h *userHandler) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, out *UpdateUserInfoResponse) error {
+	return h.UserHandler.UpdateUserInfo(ctx, in, out)
+}
+
+func (h *userHandler) ListGroupUser(ctx context.Context, in *ListGroupUserRequest, out *ListGroupUserResponse) error {
+	return h.UserHandler.ListGroupUser(ctx, in, out)
 }

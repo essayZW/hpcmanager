@@ -5,10 +5,12 @@ go 1.17
 require github.com/gin-gonic/gin v1.7.7
 
 require (
-	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220118152736-9e0be6c85d75
+	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220314060314-356448017f02
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/hpc v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/node v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/permission v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/project v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/user v0.0.0-00010101000000-000000000000
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/go-redis/redis/v8 v8.11.4
@@ -68,13 +70,13 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.20.0 // indirect
-	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
-	golang.org/x/net v0.0.0-20210510120150-4163338589ed // indirect
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
+	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20210603081109-ebe580a85c40 // indirect
-	golang.org/x/text v0.3.6 // indirect
+	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
+	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c // indirect
-	google.golang.org/grpc v1.38.0 // indirect
+	google.golang.org/grpc v1.45.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -89,3 +91,7 @@ replace github.com/essayZW/hpcmanager/gateway => ./
 replace github.com/essayZW/hpcmanager/hpc => ../hpc
 
 replace github.com/essayZW/hpcmanager/permission => ../permission
+
+replace github.com/essayZW/hpcmanager/project => ../project
+
+replace github.com/essayZW/hpcmanager/node => ../node

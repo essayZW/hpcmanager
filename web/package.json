@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "axios": "^0.26.0",
+    "dayjs": "^1.10.8",
     "element-plus": "^2.0.4",
     "normalize.css": "^8.0.1",
     "vue": "^3.2.25",

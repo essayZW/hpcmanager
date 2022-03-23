@@ -30,6 +30,22 @@ func (hpcdb *HpcUserDB) Insert(ctx context.Context, data *HpcUser) (int64, error
 	return id, nil
 }
 
+// QueryByID 通过ID查询hpc用户表的记录
+func (hpcdb *HpcUserDB) QueryByID(ctx context.Context, id int) (*HpcUser, error) {
+	res, err := hpcdb.conn.QueryRow(ctx, "SELECT * FROM `hpc_user` WHERE `id`=?", id)
+	if err != nil {
+		logger.Warn("HpcUserDB query by id error: ", err, " with id: ", id)
+		return nil, errors.New("Query error")
+	}
+	var info HpcUser
+	err = res.StructScan(&info)
+	if err != nil {
+		logger.Warn("HpcUserDB query by id structscan error: ", err)
+		return nil, errors.New("Query error")
+	}
+	return &info, nil
+}
+
 // NewHpcUser 创建新的NewHpcUser结构体并返回指针
 func NewHpcUser(db *db.DB) *HpcUserDB {
 	return &HpcUserDB{

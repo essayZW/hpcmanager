@@ -14,7 +14,9 @@ func NewBaseRequest(ctx *gin.Context) *proto.BaseRequest {
 			RemoteIP: ctx.ClientIP(),
 			Id:       v4.String(),
 		},
-		UserInfo: &proto.UserInfo{},
+		UserInfo: &proto.UserInfo{
+			Levels: make([]int32, 0),
+		},
 	}
 	return res
 }

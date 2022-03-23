@@ -52,7 +52,7 @@ func (db *UserDB) InsertUser(ctx context.Context, userinfo *User) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	if res, err := result.RowsAffected(); err == nil {
+	if res, err := result.LastInsertId(); err == nil {
 		return int(res), nil
 	}
 	return 0, err
@@ -146,6 +146,57 @@ func (db *UserDB) UpdateHpcUserID(ctx context.Context, userID, hpcUserID int) er
 		return errors.New("UpdateHpcUserID: update error")
 	}
 	return nil
+}
+
+// QueryByHpcID 通过hpc_user_id查询用户信息
+func (db *UserDB) QueryByHpcID(ctx context.Context, hpcID int) (*User, error) {
+	res, err := db.conn.QueryRow(ctx, "SELECT * FROM `user` WHERE `hpc_user_id`=?", hpcID)
+	if err != nil {
+		logger.Warn("QueryByHpcID error: ", err, " with hpc id: ", hpcID)
+		return nil, errors.New("QueryByHpcID error")
+	}
+	var info User
+	err = res.StructScan(&info)
+	if err != nil {
+		logger.Warn("QueryByHpcID struct scan error: ", err, " with hpc id: ", hpcID)
+		return nil, errors.New("QueryByHpcID struct scan error")
+	}
+	return &info, nil
+}
+
+// Update 更新用户信息
+func (db *UserDB) Update(ctx context.Context, newInfo *User) error {
+	res, err := db.conn.Exec(ctx, "UPDATE `user` SET `tel`=?, `email`=?, `college_name`=?, `extraAttributes`=? "+
+		"WHERE `id`=?", newInfo.Tel, newInfo.Email, newInfo.CollegeName, newInfo.ExtraAttributes, newInfo.ID)
+	if err != nil {
+		logger.Warn("Update user info error: ", err)
+		return errors.New("update user info error")
+	}
+	_, err = res.RowsAffected()
+	if err != nil {
+		logger.Warn("Update user info error: ", err)
+		return errors.New("update user info error")
+	}
+	return nil
+}
+
+// QueryUserByGroupID 通过用户组ID查询用户
+func (db *UserDB) QueryUserByGroupID(ctx context.Context, groupID int) ([]int, error) {
+	row, err := db.conn.Query(ctx, "SELECT `id` FROM `user` WHERE `group_id`=?", groupID)
+	if err != nil {
+		logger.Warn("QueryUserByGroupID error: ", err)
+		return nil, errors.New("QueryUserByGroupID error")
+	}
+	ids := make([]int, 0)
+	for row.Next() {
+		var id int
+		if err := row.Scan(&id); err != nil {
+			logger.Warn("QueryUserByGroupID struct scan error: ", err)
+			return nil, errors.New("QueryUserByGroupID struct scan error")
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
 }
 
 // NewUser 创建一个新的操作用户数据库结构体

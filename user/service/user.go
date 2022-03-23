@@ -85,10 +85,13 @@ func (s *UserService) CheckLogin(ctx context.Context, req *userpb.CheckLoginRequ
 		GroupId:  int32(info.GroupID),
 	}
 	// 查询用户的权限信息
+	// 由于用户权限信息的查询对于不同的用户能查询的范围不同,因此需要临时赋予管理员权限
+	req.BaseRequest.UserInfo.Levels = append(req.BaseRequest.UserInfo.Levels, int32(verify.CommonAdmin))
 	permissionInfo, err := s.permissionService.GetUserPermission(ctx, &permissionpb.GetUserPermissionRequest{
 		BaseRequest: req.BaseRequest,
 		Id:          int32(info.ID),
 	})
+	req.BaseRequest.UserInfo.Levels = req.BaseRequest.UserInfo.Levels[:len(req.BaseRequest.UserInfo.Levels)-1]
 	if err != nil {
 		logger.Error(err)
 		return errors.New("Permission info query error")
@@ -105,9 +108,16 @@ func (s *UserService) ExistUsername(ctx context.Context, req *userpb.ExistUserna
 	logger.Infof("ExistUsername: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
 	thisCtx := context.Background()
 	// 直接通过用户名查询用户信息
+	info, err := s.userLogic.GetByUsername(thisCtx, req.GetUsername())
+	if err != nil {
+		return nil
+	}
 	resp.Exist = true
-	if _, err := s.userLogic.GetByUsername(thisCtx, req.GetUsername()); err != nil {
-		resp.Exist = false
+	resp.UserInfo = &userpb.UserInfo{
+		Id:       int32(info.ID),
+		GroupId:  int32(info.GroupID),
+		Username: info.Username,
+		Name:     info.Name,
 	}
 	return nil
 }
@@ -119,7 +129,7 @@ func (s *UserService) AddUser(ctx context.Context, req *userpb.AddUserRequest, r
 		logger.Info("Adduser permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("Adduser permission forbidden")
 	}
-	_, err := hpcDB.Transication(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+	_, err := hpcDB.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
 		extraAttributes, err := hpcDB.NewJSON(req.UserInfo.GetExtraAttributes())
 		if err != nil {
 			return nil, fmt.Errorf("Parse extraAttributes error: %v", err)
@@ -188,7 +198,14 @@ func (s *UserService) GetUserInfo(ctx context.Context, req *userpb.GetUserInfoRe
 	if !isAdmin && !isTutor {
 		// 普通用户，判断是否是本人
 		if req.BaseRequest.UserInfo.UserId != req.Userid {
-			return errors.New("you can only query your own user information")
+			// 普通用户可以查询导师的详细信息,判断查询的用户是不是其导师
+			groupInfo, err := s.groupLogic.GetGroupInfoByID(ctx, int(req.BaseRequest.UserInfo.GroupId))
+			if err != nil {
+				return errors.New("you can only query your own user information")
+			}
+			if groupInfo.TutorID != int(req.Userid) {
+				return errors.New("you can only query your own user information")
+			}
 		}
 	}
 	userInfo, err := s.userLogic.GetUserInfoByID(ctx, int(req.Userid))
@@ -269,11 +286,11 @@ func (s *UserService) PaginationGetUserInfo(ctx context.Context, req *userpb.Pag
 // JoinGroup 将一个没有组的用户加入到一个已经存在的组中,并提升其权限为Common
 func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupRequest, resp *userpb.JoinGroupResponse) error {
 	logger.Infof("JoinGroup: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
-	if !verify.Identify(verify.GetUserInfo, req.GetBaseRequest().GetUserInfo().GetLevels()) {
+	if !verify.Identify(verify.JoinGroup, req.GetBaseRequest().GetUserInfo().GetLevels()) {
 		logger.Info("JoinGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("JoinGroup permission forbidden")
 	}
-	_, err := hpcDB.Transication(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
+	_, err := hpcDB.Transaction(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
 		// 验证用户不属于任何一个组
 		userInfo, err := s.userLogic.GetUserInfoByID(ctx, int(req.UserID))
 		if err != nil {
@@ -289,8 +306,9 @@ func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupReques
 		}
 
 		hpcResp, err := s.hpcService.AddUserToGroup(ctx, &hpcpb.AddUserToGroupRequest{
-			UserName:   userInfo.Username,
-			HpcGroupID: int32(groupInfo.HpcGroupID),
+			UserName:    userInfo.PinyinName,
+			HpcGroupID:  int32(groupInfo.HpcGroupID),
+			BaseRequest: req.BaseRequest,
 		})
 		if err != nil {
 			return nil, err
@@ -306,13 +324,15 @@ func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupReques
 
 		// 删除原来的Guest权限
 		s.permissionService.RemoveUserPermission(ctx, &permissionpb.RemoveUserPermissionRequest{
-			Userid: int32(userInfo.ID),
-			Level:  int32(verify.Guest),
+			Userid:      int32(userInfo.ID),
+			Level:       int32(verify.Guest),
+			BaseRequest: req.BaseRequest,
 		})
 		// 添加Common权限
 		addResp, err := s.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
-			Userid: int32(userInfo.ID),
-			Level:  int32(verify.Common),
+			Userid:      int32(userInfo.ID),
+			Level:       int32(verify.Common),
+			BaseRequest: req.BaseRequest,
 		})
 		if err != nil {
 			return nil, err
@@ -333,6 +353,92 @@ func (s *UserService) Logout(ctx context.Context, req *userpb.LogoutRequest, res
 	return nil
 }
 
+// GetUserInfoByHpcID 通过hpc_user_id查询用户信息
+func (s *UserService) GetUserInfoByHpcID(ctx context.Context, req *userpb.GetUserInfoByHpcIDRequest, resp *userpb.GetUserInfoByHpcIDResponse) error {
+	logger.Info("GetUserInfoByHpcID: ", req.BaseRequest)
+	if !verify.Identify(verify.GetUserInfo, req.GetBaseRequest().GetUserInfo().GetLevels()) {
+		logger.Info("GetUserInfoByHpcID permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("GetUserInfoByHpcID permission forbidden")
+	}
+	info, err := s.userLogic.GetUserInfoByHpcID(context.Background(), int(req.HpcUserID))
+	if err != nil {
+		return errors.New("user info query fail")
+	}
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	if !isTutor && !isAdmin {
+		// 普通用户,需判断自己是不是该hpc_user的记录对应者
+		if int32(info.HpcUserID) != req.HpcUserID {
+			return errors.New("user only can query self hpc user info")
+		}
+	} else if !isAdmin && isTutor {
+		// 导师用户,需判断该hpc_user对应的用户是否属于自己的组
+		if info.GroupID != int(req.BaseRequest.UserInfo.GroupId) {
+			return errors.New("tutor can only query self group's user info")
+		}
+	}
+	resp.Info = &userpb.UserInfo{
+		Id:         int32(info.ID),
+		GroupId:    int32(info.GroupID),
+		Username:   info.Username,
+		Name:       info.Name,
+		Tel:        info.Tel,
+		Email:      info.Email,
+		PyName:     info.PinyinName,
+		College:    info.CollegeName,
+		CreateTime: info.CreateTime.Unix(),
+		HpcUserID:  int32(info.HpcUserID),
+	}
+	if info.ExtraAttributes != nil {
+		resp.Info.ExtraAttributes = info.ExtraAttributes.String()
+	}
+	return nil
+}
+
+// UpdateUserInfo 更新用户信息
+func (s *UserService) UpdateUserInfo(ctx context.Context, req *userpb.UpdateUserInfoRequest, resp *userpb.UpdateUserInfoResponse) error {
+	logger.Info("UpdateUserInfo: ", req.BaseRequest)
+	if req.BaseRequest.UserInfo.UserId != req.NewInfos.Id {
+		return errors.New("permission forbidden for update other user's info")
+	}
+
+	var extraAttributes *hpcDB.JSON
+	var err error
+	if req.NewInfos.ExtraAttributes != "" {
+		extraAttributes, err = hpcDB.NewJSON(req.NewInfos.ExtraAttributes)
+		if err != nil {
+			return errors.New("extraAttributes json parse error")
+		}
+	}
+	err = s.userLogic.UpdateUserInfo(ctx, &db.User{
+		Password:        req.NewInfos.Password,
+		Tel:             req.NewInfos.Tel,
+		Email:           req.NewInfos.Email,
+		CollegeName:     req.NewInfos.College,
+		ID:              int(req.NewInfos.Id),
+		ExtraAttributes: extraAttributes,
+	})
+	if err != nil {
+		return err
+	}
+	resp.Success = true
+	return nil
+}
+
+// ListGroupUser 列出用户组的所有用户的基础信息,目前默认为所有的用户ID
+func (s *UserService) ListGroupUser(ctx context.Context, req *userpb.ListGroupUserRequest, resp *userpb.ListGroupUserResponse) error {
+	logger.Info("ListGroupUser: ", req.BaseRequest)
+	ids, err := s.userLogic.ListGroupUser(ctx, int(req.GroupID))
+	if err != nil {
+		return err
+	}
+	resp.Ids = make([]int32, len(ids))
+	for _, id := range ids {
+		resp.Ids = append(resp.Ids, int32(id))
+	}
+	return nil
+}
+
 var _ userpb.UserHandler = (*UserService)(nil)
 
 // NewUser 创建一个新的用户服务实例
@@ -341,6 +447,7 @@ func NewUser(client client.Client, userLogic *logic.User, groupLogic *logic.User
 	hpcService := hpcpb.NewHpcService("hpc", client)
 	return &UserService{
 		userLogic:         userLogic,
+		groupLogic:        groupLogic,
 		permissionService: permissionService,
 		hpcService:        hpcService,
 	}

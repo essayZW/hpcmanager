@@ -63,3 +63,52 @@ func (user *CreateUserParam) Validator() validator.StructLevelFunc {
 		}
 	}
 }
+
+// UpdateUserInfoParam 用户信息更新参数
+type UpdateUserInfoParam struct {
+	ID      int    `form:"id" json:"id" binding:"required"`
+	Tel     string `form:"tel" json:"tel"`
+	Email   string `form:"email" json:"email"`
+	College string `form:"college" json:"college"`
+}
+
+// Validator 验证器
+func (param *UpdateUserInfoParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(UpdateUserInfoParam)
+		if data.ID == 0 {
+			sl.ReportError(reflect.ValueOf(data.ID), "id", "id", "binding", "invalid id")
+		}
+
+		pattern := `\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*` //匹配电子邮箱
+		reg := regexp.MustCompile(pattern)
+		if data.Email != "" && !reg.MatchString(data.Email) {
+			sl.ReportError(reflect.ValueOf(data.Email), "email", "email", "binding", "invalid email")
+		}
+	}
+}
+
+// CreateUserWithGroup 创建用户并添加到对应的组请求参数
+type CreateUserWithGroup struct {
+	CreateUserParam
+	GroupID int `form:"groupID" json:"groupID"`
+}
+
+// Validator 验证器
+func (param *CreateUserWithGroup) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(CreateUserWithGroup)
+		if len(data.Username) < 6 || len(data.Username) > 32 {
+			sl.ReportError(reflect.ValueOf(data.Username), "username", "username", "binding", "username length error")
+		}
+		if len(data.Password) <= 0 || len(data.Password) > 16 {
+			sl.ReportError(reflect.ValueOf(data.Password), "password", "password", "binding", "username length error")
+		}
+		pattern := `\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*` //匹配电子邮箱
+		reg := regexp.MustCompile(pattern)
+		if data.Email != "" && !reg.MatchString(data.Email) {
+			sl.ReportError(reflect.ValueOf(data.Email), "email", "email", "binding", "invalid email")
+		}
+
+	}
+}

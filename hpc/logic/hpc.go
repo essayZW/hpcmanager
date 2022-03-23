@@ -106,6 +106,11 @@ func (hpc *HpcLogic) GetGroupInfoByID(ctx context.Context, groupID int) (*db.Hpc
 	return hpc.hpcGroupDB.QueryByID(ctx, groupID)
 }
 
+// GetUserInfoByID 查询hpc用户信息
+func (hpc *HpcLogic) GetUserInfoByID(ctx context.Context, userID int) (*db.HpcUser, error) {
+	return hpc.hpcUserDB.QueryByID(ctx, userID)
+}
+
 // NewHpc 创建一个HPC作业调度系统逻辑操作
 func NewHpc(hpcSource source.HpcSource, hpcUserDB *db.HpcUserDB, hpcGroupDB *hpcdb.HpcGroupDB) *HpcLogic {
 	return &HpcLogic{

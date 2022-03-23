@@ -3,13 +3,13 @@ import { reactive, ref } from 'vue';
 import { install } from '../service/sys';
 import { useRouter } from 'vue-router';
 import { requiredWithLength, FormInstance } from '../utils/validateRule';
-import { installRequest } from '../api/sys';
+import { InstallRequest } from '../api/sys';
 
 const router = useRouter();
 
 const formElem = ref<FormInstance>();
 // 提交登录表单
-let adminFormData = reactive<installRequest>({
+let adminFormData = reactive<InstallRequest>({
   username: '',
   password: '',
   name: '',
@@ -30,7 +30,7 @@ function submit(elem: FormInstance | undefined) {
   }
   elem.validate(async (valid) => {
     if (valid) {
-      let { status, message } = await install(adminFormData as installRequest);
+      let { status, message } = await install(adminFormData as InstallRequest);
       if (!status) {
         ElMessage({
           type: 'error',
@@ -122,7 +122,7 @@ function submit(elem: FormInstance | undefined) {
     </el-col>
   </el-row>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .title {
   text-align: center;
 }

@@ -20,6 +20,9 @@ service User {
     rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse) {}
     rpc PaginationGetUserInfo(PaginationGetUserInfoRequest) returns (PaginationGetUserInfoResponse) {}
     rpc JoinGroup(JoinGroupRequest) returns (JoinGroupResponse) {}
+    rpc GetUserInfoByHpcID(GetUserInfoByHpcIDRequest) returns (GetUserInfoByHpcIDResponse) {}
+    rpc UpdateUserInfo(UpdateUserInfoRequest) returns (UpdateUserInfoResponse) {}
+    rpc ListGroupUser(ListGroupUserRequest) returns (ListGroupUserResponse) {}
 }
 
 message LoginRequest {
@@ -54,6 +57,7 @@ message ExistUsernameRequest {
 
 message ExistUsernameResponse {
     bool exist = 1;
+    user.UserInfo userInfo = 2;
 }
 
 message AddUserRequest {
@@ -112,4 +116,31 @@ message LogoutRequest {
 
 message LogoutResponse {
     bool success = 1;
+}
+
+message GetUserInfoByHpcIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcUserID = 2;
+}
+
+message GetUserInfoByHpcIDResponse {
+    user.UserInfo info = 1;
+}
+
+message UpdateUserInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    user.UserInfo newInfos = 2;
+}
+
+message UpdateUserInfoResponse {
+    bool success = 1;
+}
+
+message ListGroupUserRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+}
+
+message ListGroupUserResponse {
+    repeated int32 ids = 1;
 }

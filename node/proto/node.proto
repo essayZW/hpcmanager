@@ -1,0 +1,53 @@
+syntax="proto3";
+
+option go_package="github.com/essayZW/hpcmanager/node/proto;node";
+
+package node;
+
+import "proto/ping.proto";
+import "proto/common.proto";
+import "gateway/proto/baserequest.proto";
+import "proto/node_public.proto";
+
+service Node {
+    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+    rpc CreateNodeApply(CreateNodeApplyRequest) returns (CreateNodeApplyResponse) {}
+    rpc PaginationGetNodeApply(PaginationGetNodeApplyRequest) returns (PaginationGetNodeApplyResponse) {}
+    rpc CheckNodeApply(CheckNodeApplyRequest) returns (CheckNodeApplyResponse) {}
+}
+
+message CreateNodeApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 projectID = 2;
+    string nodeType = 3;
+    int32 nodeNum = 4;
+    int64 startTime = 5;
+    int64 endTime = 6;
+}
+
+message CreateNodeApplyResponse {
+   int32 id = 1;
+}
+
+message PaginationGetNodeApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+
+message PaginationGetNodeApplyResponse {
+    repeated node.NodeApply applies = 1;
+    int32 count = 2;
+}
+
+message CheckNodeApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    bool checkStatus = 3;
+    string checkMessage = 4;
+    bool tutorCheck = 5;
+}
+
+message CheckNodeApplyResponse {
+    bool success = 1;
+}

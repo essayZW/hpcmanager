@@ -1,0 +1,37 @@
+syntax="proto3";
+
+option go_package="github.com/essayZW/hpcmanager/node/proto;node";
+
+package node;
+
+// NodeApply 数据库node_appl对应的消息映射
+message NodeApply {
+    int32 id = 1;
+    int64 createTime = 2;
+    int32 createrID = 3;
+    string createrUsername = 4;
+    string createrName = 5;
+    int32 projectID = 6;
+    int32 tutorCheckStatus = 7;
+    int32 managerCheckStatus = 8;
+    int32 status = 9;
+    string messageTutor = 10;
+    string messageManager = 11;
+    int64 tutorCheckTime = 12;
+    int32 tutorID = 13;
+    string tutorUsername = 14;
+    string tutorName = 15;
+    int64 managerCheckTime = 16;
+    int32 managerCheckerID = 17;
+    string managerCheckerUsername = 18;
+    string managerCheckerName = 19;
+    int64 modifyTime = 20;
+    int32 modifyUserID = 21;
+    string modifyName = 22;
+    string modifyUsername = 23;
+    string nodeType = 24;
+    int32 nodeNum = 25;
+    int64 startTime = 26;
+    int64 endTime = 27;
+    string extraAttributes = 28;
+}

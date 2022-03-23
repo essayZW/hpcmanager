@@ -1,8 +1,8 @@
-# hpc服务接口文档
+# hpc 服务接口文档
 
 ## Ping
 
-描述：ping测试，返回请求ID等基本信息
+描述：ping 测试，返回请求 ID 等基本信息
 
 原型定义：`rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}`
 
@@ -25,6 +25,7 @@ message PingResponse {
     string RequestId = 3;
 }
 ```
+
 ## AddUserWithGroup
 
 描述：创建用户组并添加用户到这个组中,一般用于新建用户组的时候顺便添加导师用户到组中
@@ -78,5 +79,85 @@ message AddUserToGroupResponse {
     int32 hpcUserID = 1;
     string userName = 2;
     int32 uid = 3;
+}
+```
+
+## GetUserInfoByID
+
+描述: 通过 ID 查询一个 hpc_user 的信息
+
+原型定于: `rpc GetUserInfoByID(GetUserInfoByIDRequest) returns (GetUserInfoByIDResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetUserInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcUserID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetUserInfoByIDResponse {
+    hpc.HpcUser user = 1;
+}
+```
+
+## GetGroupInfoByID
+
+描述: 通过 ID 查询 hpc_group 的信息
+
+原型定义: `rpc GetGroupInfoByID(GetGroupInfoByIDRequest) returns (GetGroupInfoByIDResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetGroupInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcGroupID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetGroupInfoByIDResponse {
+    hpc.HpcGroup group = 1;
+}
+```
+
+# 附录
+
+## HpcUser
+
+描述: hpc_user 表的消息
+
+```protobuf
+// HpcUser hpc_user表的消息映射
+message HpcUser {
+    int32 id = 1;
+    string nodeUsername = 2;
+    int32 nodeUID = 3;
+    int32 nodeMaxQuota = 4;
+    int64 quotaStartTime = 5;
+    int64 quotaEndTime = 6;
+    string extraAttributes = 7;
+}
+```
+
+## HpcGroup
+
+描述: hpc_group 表的消息映射
+
+```protobuf
+// HpcGroup hpc_group表的消息映射
+message HpcGroup {
+    int32 id = 1;
+    string name = 2;
+    string queueName = 3;
+    int32 gID = 4;
+    string extraAttributes = 5;
 }
 ```

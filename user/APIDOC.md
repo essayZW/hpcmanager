@@ -158,7 +158,7 @@ message CreateTokenResponse {
 
 ## GetUserInfo
 
-描述：传入目标用户 ID，查询用户的详细个人信息，对于不同权限的查询者其能查询的范围不同
+描述：传入目标用户 ID，查询用户的详细个人信息，对于不同权限的查询者其能查询的范围不同,其中普通用户可以查询自己的信息以及导师的信息,导师用户可以查询自己组内的所有成员的信息,管理员可以查看你所有用户的信息
 
 需求权限：`Common`及以上
 
@@ -357,6 +357,7 @@ message CheckApplyRequest {
     int32 applyID = 2;
     bool checkStatus = 3;
     string checkMessage = 4;
+    bool tutorCheck = 5;
 }
 ```
 
@@ -398,7 +399,7 @@ message CreateGroupResponse {
 
 ## JoinGroup
 
-描述：添加现有的没有 i 组的用户到一个组中
+描述：添加现有的没有组的用户到一个组中,同时创建其对应的计算节点用户并添加到计算节点用户组中
 
 需求权限：`CommonAdmin`及以上
 
@@ -444,6 +445,106 @@ message LogoutRequest {
 ```protobuf
 message LogoutResponse {
     bool success = 1;
+}
+```
+
+## GetUserInfoByHpcID
+
+描述: 通过 hpc_user 的 id 查询对应的用户的信息
+
+原型定义: `rpc GetUserInfoByHpcID(GetUserInfoByHpcIDRequest) returns (GetUserInfoByHpcIDResponse) {}`
+
+需求权限: `Common`及以上
+
+请求参数:
+
+```protobuf
+message GetUserInfoByHpcIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcUserID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetUserInfoByHpcIDResponse {
+    user.UserInfo info = 1;
+}
+```
+
+## GetApplyInfoByID
+
+描述: 通过 ID 查询用户申请加入组信息
+
+原型定义: `rpc GetApplyInfoByID(GetApplyInfoByIDRequest) returns (GetApplyInfoByIDResponse) {}`
+
+需求权限: 无
+
+请求参数:
+
+```protobuf
+message GetApplyInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetApplyInfoByIDResponse {
+    user.UserGroupApply apply = 1;
+}
+```
+
+## UpdateUserInfo
+
+描述: 更新用户信息
+
+原型定义: `rpc UpdateUserInfo(UpdateUserInfoRequest) returns (UpdateUserInfoResponse) {}`
+
+需求权限: 无
+
+请求参数:
+
+```protobuf
+message UpdateUserInfoRequest {
+    request.BaseRequest baseRequest = 1;
+    user.UserInfo newInfos = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message UpdateUserInfoResponse {
+    bool success = 1;
+}
+```
+
+## ListGroupUser
+
+描述: 查询某个用户组下的所有用户的 ID
+
+原型定义: `rpc ListGroupUser(ListGroupUserRequest) returns (ListGroupUserResponse) {}`
+
+需求权限: 无
+
+请求参数:
+
+```protobuf
+message ListGroupUserRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message ListGroupUserResponse {
+    repeated int32 ids = 1;
 }
 ```
 

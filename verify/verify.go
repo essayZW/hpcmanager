@@ -26,6 +26,16 @@ const (
 	CreateGroup = "__CREATE_GROUP__"
 	// JoinGroup 用户加入某个组
 	JoinGroup = "__JOIN_GROUP__"
+	// CreateProject 创建新的项目记录
+	CreateProject = "__CREATE_PROJECT__"
+	// GetProjectInfo 查询项目信息
+	GetProjectInfo = "__GET_PROJECT_INFO__"
+	// CreateNodeApply 创建计算节点申请
+	CreateNodeApply = "__CREATE_NODE_APPLY__"
+	// GetNodeApplyInfo 查询个计算节点包机申请
+	GetNodeApplyInfo = "__GET_NODE_APPLY_INFO__"
+	// CheckNodeApply 审核机器节点申请
+	CheckNodeApply = "__CHECK_NODE_APPLY__"
 )
 
 // Verify 进行操作的权限验证
