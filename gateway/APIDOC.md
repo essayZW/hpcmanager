@@ -218,13 +218,30 @@ Method: POST
 参数:
 
 ```go
-// CreateCommonAdminParam 创建新的普通管理员用户请求参数
-type CreateCommonAdminParam struct {
-    gUserID int `form:"userID" json:"userID" binding:"required"`
+// ChangeUserPermissionParam 修改普通管理员用户请求参数
+type ChangeUserPermissionParam struct {
+    UserID int `form:"userID" json:"userID" binding:"required"`
 }
 ```
 
 响应: 是否添加成功
+
+### /permission/admin
+
+Method: DELETE
+
+描述: 取消某个用户的管理员权限
+
+参数:
+
+```go
+// ChangeUserPermissionParam 修改普通管理员用户请求参数
+type ChangeUserPermissionParam struct {
+    UserID int `form:"userID" json:"userID" binding:"required"`
+}
+```
+
+响应: 是否删除成功
 
 ### /permission/user/:id
 

@@ -44,7 +44,7 @@ func (permission *Permission) addAdmin(ctx *gin.Context) {
 	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
 	baseRequest := baseReq.(*gatewaypb.BaseRequest)
 
-	var param json.CreateCommonAdminParam
+	var param json.ChangeUserPermissionParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
 		httpResp := response.New(200, nil, false, err.Error())
 		httpResp.Send(ctx)
@@ -103,6 +103,42 @@ func (permission *Permission) getUserPermission(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+func (permission *Permission) removeAdmin(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.ChangeUserPermissionParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := permission.permissionService.RemoveUserPermission(c, &permissionpb.RemoveUserPermissionRequest{
+		BaseRequest: baseRequest,
+		Userid:      int32(param.UserID),
+		Level:       int32(verify.CommonAdmin),
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("删除用户权限失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "删除用户权限失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
 // Registry 注册相应的处理函数
 func (permission *Permission) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller permission")
@@ -111,6 +147,7 @@ func (permission *Permission) Registry(router *gin.RouterGroup) *gin.RouterGroup
 	middleware.RegistryExcludeAPIPath("/api/permission/ping")
 
 	permissionRouter.POST("/admin", permission.addAdmin)
+	permissionRouter.DELETE("/admin", permission.removeAdmin)
 	permissionRouter.GET("/user/:id", permission.getUserPermission)
 	return permissionRouter
 }
