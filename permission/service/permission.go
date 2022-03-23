@@ -57,10 +57,14 @@ func (permission *PermissionService) GetUserPermission(ctx context.Context, req 
 // AddUserPermission 添加用户权限
 func (permission *PermissionService) AddUserPermission(ctx context.Context, req *permissionpb.AddUserPermissionRequest, resp *permissionpb.AddUserPermissionResponse) error {
 	logger.Infof("AddUserPermission %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
-	// 鉴权，只有管理员才可以进行此操作
+	// 鉴权，只有超级管理员才可以进行此操作
 	if !verify.Identify(verify.AddUserPermissionAction, req.BaseRequest.UserInfo.Levels) {
 		logger.Info("AdduserPermission permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("AdduserPermission permission forbidden")
+	}
+	// 由于SuperAdmin权限只能有一个用户拥有,因此需要进行判断
+	if req.Level == int32(verify.SuperAdmin) {
+		return errors.New("SuperAdmin user has exists")
 	}
 	err := permission.userpLogic.AddUserPermission(ctx, &db.UserPermission{
 		UserID: int(req.GetUserid()),
@@ -77,10 +81,14 @@ func (permission *PermissionService) AddUserPermission(ctx context.Context, req 
 // RemoveUserPermission 删除用户的某个权限
 func (permission *PermissionService) RemoveUserPermission(ctx context.Context, req *permissionpb.RemoveUserPermissionRequest, resp *permissionpb.RemoveUserPermissionResponse) error {
 	logger.Infof("RemoveUserPermission %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
-	// 鉴权，只有管理员才可以进行此项操作
+	// 鉴权，只有超级管理员才可以进行此操作
 	if !verify.Identify(verify.RemoveUserPermissionAction, req.BaseRequest.UserInfo.Levels) {
 		logger.Info("RemoveUserPermission permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
 		return errors.New("RemoveUserPermission permission forbidden")
+	}
+	// 由于SuperAdmin权限只能有一个用户拥有,因此需要进行判断
+	if req.Level == int32(verify.SuperAdmin) {
+		return errors.New("SuperAdmin user permission can't remove")
 	}
 	err := permission.userpLogic.RemoveUserPermission(ctx, int(req.GetUserid()), verify.Level(req.GetLevel()))
 	if err != nil {

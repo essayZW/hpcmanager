@@ -76,7 +76,7 @@ func checkApplyCustomer(client client.Client) func(broker.Event) error {
 		}
 		logger.Debug(queryResp)
 		// 赋予临时权限
-		baseRequest.UserInfo.Levels = append(baseRequest.UserInfo.Levels, int32(verify.CommonAdmin))
+		baseRequest.UserInfo.Levels = append(baseRequest.UserInfo.Levels, int32(verify.SuperAdmin))
 		// 添加用户到组
 		resp, err := userService.JoinGroup(c, &userpb.JoinGroupRequest{
 			UserID:      queryResp.Apply.UserID,

@@ -193,9 +193,9 @@ func (sys *System) casAuthValid(ctx *gin.Context) {
 	}
 	if !resp.Exist {
 		// 用户不存在,创建用户
-		// 临时赋予此次操作CommonAdmin权限
+		// 临时赋予此次操作SuperAdmin权限
 		logger.Debug(info)
-		baseRequest.UserInfo.Levels = append(baseRequest.UserInfo.Levels, int32(verify.CommonAdmin))
+		baseRequest.UserInfo.Levels = append(baseRequest.UserInfo.Levels, int32(verify.SuperAdmin))
 		_, err := sys.userService.AddUser(c, &userpb.AddUserRequest{
 			UserInfo: &userpb.UserInfo{
 				Username: info.User,
