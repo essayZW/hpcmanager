@@ -12,6 +12,7 @@ import (
 	"github.com/essayZW/hpcmanager/permission/logic"
 	permissionpb "github.com/essayZW/hpcmanager/permission/proto"
 	publicpb "github.com/essayZW/hpcmanager/proto"
+	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
 	"go-micro.dev/v4/client"
 )
@@ -20,6 +21,8 @@ import (
 type PermissionService struct {
 	userpLogic      *logic.UserPermission
 	permissionLogic *logic.Permission
+
+	userService userpb.UserService
 }
 
 // Ping ping测试
@@ -34,7 +37,32 @@ func (permission *PermissionService) Ping(ctx context.Context, req *publicpb.Emp
 // GetUserPermission 查询用户拥有的权限信息
 func (permission *PermissionService) GetUserPermission(ctx context.Context, req *permissionpb.GetUserPermissionRequest, resp *permissionpb.GetUserPermissionResponse) error {
 	logger.Infof("GetUserPermission %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
-	// FIXME: 只有管理员用户可以查看所有人的信息,尽心分级
+
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+
+	if !isAdmin && !isTutor {
+		// 是学生用户
+		if req.BaseRequest.UserInfo.UserId != req.Id {
+			return errors.New("common user only can query self permission info")
+		}
+	}
+
+	if !isAdmin && isTutor {
+		// 是导师用户
+		rpcResp, err := permission.userService.GetUserInfo(ctx, &userpb.GetUserInfoRequest{
+			BaseRequest: req.BaseRequest,
+			Userid:      req.Id,
+		})
+		if err != nil {
+			// 说明目标用户的信息自己没有权限进行查询,或者目标用户信息有误
+			return errors.New("user permission info query permission forbidden")
+		}
+
+		if rpcResp.UserInfo.GroupId != req.BaseRequest.UserInfo.GroupId {
+			return errors.New("user permission info query permission forbidden")
+		}
+	}
 	permissionInfo, err := permission.userpLogic.GetUserPermissionByID(ctx, int(req.GetId()))
 	if err != nil {
 		return errors.New("no user permission info")
@@ -129,8 +157,10 @@ var _ permissionpb.PermissionHandler = (*PermissionService)(nil)
 
 // NewPermission 创建一个新的Permission服务
 func NewPermission(client client.Client, userpermissionLogic *logic.UserPermission, permissionLogic *logic.Permission) *PermissionService {
+	userService := userpb.NewUserService("user", client)
 	return &PermissionService{
 		userpLogic:      userpermissionLogic,
 		permissionLogic: permissionLogic,
+		userService:     userService,
 	}
 }
