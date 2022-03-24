@@ -200,7 +200,7 @@ func (n *node) getNodeApplyByID(ctx *gin.Context) {
 		return
 	}
 
-	httpResp := response.New(200, info, true, "success")
+	httpResp := response.New(200, info.Apply, true, "success")
 	httpResp.Send(ctx)
 }
 func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
