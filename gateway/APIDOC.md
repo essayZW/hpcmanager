@@ -636,3 +636,17 @@ type param = {
 ```
 
 响应参数: 分页的信息
+
+### /node/apply/:id
+
+Method: GET
+
+描述: 通过 ID 查询机器节点申请信息
+
+请求参数:
+
+```text
+id: number
+```
+
+响应参数: 申请信息

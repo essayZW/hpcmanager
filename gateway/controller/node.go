@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/essayZW/hpcmanager/gateway/middleware"
@@ -172,6 +173,36 @@ func (n *node) paginationGetNodeDistributeWOS(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// getNodeApplyByID /api/node/apply/:id GET 通过ID查询机器节点申请信息
+func (n *node) getNodeApplyByID(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	idStr := ctx.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "invalid id")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	info, err := n.nodeService.GetNodeApplyByID(c, &nodepb.GetNodeApplyByIDRequest{
+		ApplyID:     int32(id),
+		BaseRequest: baseRequest,
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询机器节点申请信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, info, true, "success")
+	httpResp.Send(ctx)
+}
 func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter := router.Group("/node")
 
@@ -181,6 +212,7 @@ func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter.POST("/apply", n.createNodeApply)
 	nodeRouter.GET("/apply", n.paginationGet)
 	nodeRouter.PATCH("/apply", n.checkNodeApply)
+	nodeRouter.GET("/apply/:id", n.getNodeApplyByID)
 
 	nodeRouter.GET("/distribute", n.paginationGetNodeDistributeWOS)
 	return nodeRouter
