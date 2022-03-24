@@ -121,3 +121,49 @@ export async function checkNodeApply(
   }
   return true;
 }
+
+/**
+ * 节点分配工单信息
+ */
+export type NodeDistribute = {
+  id: number;
+  applyID: number;
+  handlerFlag: number;
+  handlerUserID: number;
+  handlerUsername: string;
+  handlerUserName: string;
+  distributeBillID: number;
+  createTime: number;
+  extraAttributes: string;
+};
+
+/**
+ * 分页查询节点分配工单信息
+ */
+export async function paginationQueryNodeDistributeInfo(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<NodeDistribute>> {
+  const resp = await ApiRequest.request<
+    PaginationQueryResponse<NodeDistribute>
+  >('/node/distribute', 'GET', { pageIndex, pageSize });
+
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}
+
+/**
+ * 通过ID查询机器节点申请信息
+ */
+export async function queryNodeApplyByID(id: number): Promise<NodeApplyInfo> {
+  const resp = await ApiRequest.request<NodeApplyInfo>(
+    `/node/apply/${id}`,
+    'GET'
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}

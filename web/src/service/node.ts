@@ -4,6 +4,9 @@ import {
   paginationQueryNodeApplyInfo,
   createNodeApply as createNodeApplyAPI,
   checkNodeApply as checkNodeApplyAPI,
+  NodeDistribute,
+  paginationQueryNodeDistributeInfo,
+  queryNodeApplyByID,
 } from '../api/node';
 
 /**
@@ -51,6 +54,9 @@ export function nodeTypeToName(nodeType: string): string {
   }
 }
 
+/**
+ * 审核机器节点申请
+ */
 export function checkNodeApply(
   applyID: number,
   checkStatus: boolean,
@@ -63,4 +69,21 @@ export function checkNodeApply(
     checkMessage,
     tutorCheck,
   });
+}
+
+/**
+ * 分页查询机器节点分配工单信息
+ */
+export async function paginationGetNodeDistributeInfo(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<NodeDistribute>> {
+  return paginationQueryNodeDistributeInfo(pageIndex, pageSize);
+}
+
+/**
+ * 通过ID获取机器节点申请信息
+ */
+export async function getNodeApplyByID(id: number): Promise<NodeApplyInfo> {
+  return queryNodeApplyByID(id);
 }

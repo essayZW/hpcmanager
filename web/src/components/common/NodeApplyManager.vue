@@ -241,7 +241,7 @@ if (userInfo) {
     </template>
   </el-drawer>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .project-info {
   span {
     margin: 8px 8px;

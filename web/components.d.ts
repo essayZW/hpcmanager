@@ -50,6 +50,7 @@ declare module 'vue' {
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     NodeApplyManager: typeof import('./src/components/common/NodeApplyManager.vue')['default']
     NodeApplyTable: typeof import('./src/components/NodeApplyTable.vue')['default']
+    NodeDistributeManager: typeof import('./src/components/admin/NodeDistributeManager.vue')['default']
     NodeTypeSelect: typeof import('./src/components/form/NodeTypeSelect.vue')['default']
     PageTitle: typeof import('./src/components/PageTitle.vue')['default']
     ProjectManager: typeof import('./src/components/ProjectManager.vue')['default']

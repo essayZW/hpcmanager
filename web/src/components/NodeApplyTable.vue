@@ -595,7 +595,7 @@ const checkButtonHandler = async (
     </el-col>
   </el-row>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .button-row {
   margin-top: 16px;
   margin-bottom: 16px;

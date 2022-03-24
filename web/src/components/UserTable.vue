@@ -59,6 +59,7 @@ const loadTableData = async (pageIndex: number, pageSize: number) => {
 
 // 刷新表格数据
 const refreshTable = () => {
+  // TODO: 清除缓存的表的扩展字段的属性
   loadTableData(paginationInfo.pageIndex, paginationInfo.pageSize);
 };
 

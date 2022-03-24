@@ -7,6 +7,7 @@ import CheckGroupApply from '../components/tutor/CheckGroupApply.vue';
 import UserManager from '../components/admin/UserManager.vue';
 import ProjectManager from '../components/ProjectManager.vue';
 import NodeApplyManager from '../components/common/NodeApplyManager.vue';
+import NodeDistributeManager from '../components/admin/NodeDistributeManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -181,6 +182,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/node_apply_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_manager',
+          name: 'NodeDistributeManager',
+          component: NodeDistributeManager,
+        },
+        item: {
+          name: '节点分配工单管理',
+          to: '/main/node_distribute_manager',
+        },
+      },
     ],
   ],
   // 超级管理员和普通管理员都这项操作
@@ -241,6 +253,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器节点申请审核',
           to: '/main/node_apply_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_manager',
+          name: 'NodeDistributeManager',
+          component: NodeDistributeManager,
+        },
+        item: {
+          name: '节点分配工单管理',
+          to: '/main/node_distribute_manager',
         },
       },
     ],
