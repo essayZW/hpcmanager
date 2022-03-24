@@ -52,9 +52,23 @@ const paginationInfo = reactive<{
   pageSize: 5,
 });
 
+// 表格展开行中的数据
+const tableExpandRowInfo = reactive<{
+  [id: number]: {
+    projectInfo?: ProjectInfo;
+    applierInfo?: UserInfo;
+    tutorInfo?: UserInfo;
+    loading?: boolean;
+  };
+}>({});
+
 // 刷新表格当前页面的信息
 const refreshTableData = () => {
   loadTableData(paginationInfo.pageIndex, paginationInfo.pageSize);
+  // 清除缓存的表的扩展字段的属性
+  for (const key in tableExpandRowInfo) {
+    tableExpandRowInfo[key] = {};
+  }
 };
 
 refreshTableData();
@@ -70,16 +84,6 @@ const handleCurrentChange = (pageIndex: number) => {
 const handleSizeChange = (pageSize: number) => {
   paginationInfo.pageSize = pageSize;
 };
-
-// 表格展开行中的数据
-const tableExpandRowInfo = reactive<{
-  [id: number]: {
-    projectInfo?: ProjectInfo;
-    applierInfo?: UserInfo;
-    tutorInfo?: UserInfo;
-    loading: boolean;
-  };
-}>({});
 
 // 表格行展开时候的回调事件
 const handlerTableExpand = async (row: NodeApplyInfo) => {

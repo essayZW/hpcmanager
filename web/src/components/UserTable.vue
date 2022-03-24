@@ -56,11 +56,23 @@ const loadTableData = async (pageIndex: number, pageSize: number) => {
     tableData.loading = false;
   }
 };
+// 表的扩展字段属性
+const tableRowExtraInfo = reactive<{
+  [id: number]: {
+    group?: GroupInfo;
+    hpcUser?: HpcUser;
+    permission?: PermissionInfo[];
+    loading?: boolean;
+  };
+}>({});
 
 // 刷新表格数据
 const refreshTable = () => {
-  // TODO: 清除缓存的表的扩展字段的属性
   loadTableData(paginationInfo.pageIndex, paginationInfo.pageSize);
+  // 清除缓存的表的扩展字段的属性
+  for (const key in tableRowExtraInfo) {
+    tableRowExtraInfo[key] = {};
+  }
 };
 
 defineExpose({
@@ -80,16 +92,6 @@ const handleSizeChange = (pageSize: number) => {
   paginationInfo.pageSize = pageSize;
   refreshTable();
 };
-
-// 表的扩展字段属性
-const tableRowExtraInfo = reactive<{
-  [id: number]: {
-    group?: GroupInfo;
-    hpcUser?: HpcUser;
-    permission?: PermissionInfo[];
-    loading: boolean;
-  };
-}>({});
 
 const canSetCommonAdmin = (id: number): boolean => {
   if (!id || !tableRowExtraInfo[id] || !tableRowExtraInfo[id].permission) {

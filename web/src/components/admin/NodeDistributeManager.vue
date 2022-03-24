@@ -47,8 +47,18 @@ const paginationInfo = reactive<{
   pageSize: 5,
 });
 
+const tableRowExpandData = reactive<{
+  [id: number]: {
+    applyInfo?: NodeApplyInfo;
+  };
+}>({});
+
 const refreshTable = () => {
   loadTableData(paginationInfo.pageIndex, paginationInfo.pageSize);
+  // 清除缓存的表的扩展字段的属性
+  for (const key in tableRowExpandData) {
+    tableRowExpandData[key] = {};
+  }
 };
 
 refreshTable();
@@ -64,11 +74,6 @@ const handleSizeChange = (pageSize: number) => {
 };
 
 // 表格扩展字段的数据
-const tableRowExpandData = reactive<{
-  [id: number]: {
-    applyInfo?: NodeApplyInfo;
-  };
-}>({});
 const tableRowExpandHandler = async (row: NodeDistribute) => {
   if (!tableRowExpandData[row.id]) {
     tableRowExpandData[row.id] = {};
