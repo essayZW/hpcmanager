@@ -229,7 +229,7 @@ func (ns *NodeService) PaginationGetNodeDistributeWO(ctx context.Context, req *n
 			ApplyID:          int32(infos.Data[i].ApplyID),
 			HandlerFlag:      int32(infos.Data[i].HandlerFlag),
 			HandlerUserID:    int32(infos.Data[i].HandlerUserID.Int64),
-			HandlerUsername:  infos.Data[i].HandlerUserName.String,
+			HandlerUsername:  infos.Data[i].HandlerUsername.String,
 			HandlerName:      infos.Data[i].HandlerUserName.String,
 			DistributeBillID: int32(infos.Data[i].DistributeBillID),
 			CreateTime:       infos.Data[i].CreateTime.Unix(),
