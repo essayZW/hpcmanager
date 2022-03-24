@@ -17,6 +17,7 @@ service Node {
     rpc CreateNodeDistributeWO(CreateNodeDistributeWORequest) returns (CreateNodeDistributeWOResponse) {}
     rpc PaginationGetNodeDistributeWO(PaginationGetNodeDistributeWORequest) returns (PaginationGetNodeDistributeWOResponse) {}
     rpc GetNodeApplyByID(GetNodeApplyByIDRequest) returns (GetNodeApplyByIDResponse) {}
+    rpc FinishNodeDistributeWO(FinishNodeDistributeWORequest) returns (FinishNodeDistributeWOResponse) {}
 }
 
 message CreateNodeApplyRequest {
@@ -82,4 +83,13 @@ message GetNodeApplyByIDRequest {
 
 message GetNodeApplyByIDResponse {
     node.NodeApply apply = 1;
+}
+
+message FinishNodeDistributeWORequest {
+    request.BaseRequest baseRequest = 1;
+    int32 distributeID = 2;
+}
+
+message FinishNodeDistributeWOResponse {
+    bool success = 1;
 }

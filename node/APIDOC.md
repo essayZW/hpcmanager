@@ -187,6 +187,31 @@ message GetNodeApplyByIDResponse {
 }
 ```
 
+## FinishNodeDistributeWO
+
+描述: 处理某个机器节点分配工单
+
+原型定义: `rpc FinishNodeDistributeWO(FinishNodeDistributeWORequest) returns (FinishNodeDistributeWOResponse) {}`
+
+需求权限: `CommonAdmin` 及以上
+
+请求参数:
+
+```protobuf
+message FinishNodeDistributeWORequest {
+    request.BaseRequest baseRequest = 1;
+    int32 distributeID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message FinishNodeDistributeWOResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ### NodeApply

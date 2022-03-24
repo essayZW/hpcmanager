@@ -94,6 +94,24 @@ func (ndb *NodeDistributeDB) QueryCount(ctx context.Context) (int, error) {
 	return count, nil
 }
 
+// UpdateHandlerFlag 更新处理标记,包括处理人的相关信息
+func (ndb *NodeDistributeDB) UpdateHandlerFlag(ctx context.Context, newInfo *NodeDistribute) (bool, error) {
+	res, err := ndb.conn.Exec(ctx, "UPDATE `node_distribute` SET "+
+		"`handler_flag`=1, `handler_userid`=?, `handler_username`=?, `handler_user_name`=? WHERE `id`=?",
+		newInfo.HandlerUserID, newInfo.HandlerUsername, newInfo.HandlerUserName, newInfo.ID)
+	if err != nil {
+		logger.Warn("UpdateHandlerFlag error: ", err)
+		return false, errors.New("UpdateHandlerFlag error")
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateHandlerFlag error: ", err)
+		return false, errors.New("UpdateHandlerFlag error")
+	}
+	return count > 0, nil
+}
+
 // NewNodeDistribute 创建新的机器节点分配处理工单表
 func NewNodeDistribute(conn *hpcdb.DB) *NodeDistributeDB {
 	return &NodeDistributeDB{

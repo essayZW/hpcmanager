@@ -11,6 +11,7 @@ import (
 	"github.com/essayZW/hpcmanager/db"
 	hpcdb "github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
+	"gopkg.in/guregu/null.v4"
 )
 
 func init() {
@@ -339,6 +340,74 @@ func TestNodeDistributeDB_QueryCount(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("NodeDistributeDB.QueryCount() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNodeDistributeDB_UpdateHandlerFlag(t *testing.T) {
+	type fields struct {
+		conn *hpcdb.DB
+	}
+	type args struct {
+		ctx     context.Context
+		newInfo *NodeDistribute
+	}
+	conn := getDBConn()
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "test success",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx: context.Background(),
+				newInfo: &NodeDistribute{
+					ID:              1,
+					HandlerUserID:   null.IntFrom(1),
+					HandlerUserName: null.StringFrom("testing"),
+					HandlerUsername: null.StringFrom("testing"),
+				},
+			},
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name: "test success",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx: context.Background(),
+				newInfo: &NodeDistribute{
+					ID:              0,
+					HandlerUserID:   null.IntFrom(1),
+					HandlerUserName: null.StringFrom("testing"),
+					HandlerUsername: null.StringFrom("testing"),
+				},
+			},
+			want:    false,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ndb := &NodeDistributeDB{
+				conn: tt.fields.conn,
+			}
+			got, err := ndb.UpdateHandlerFlag(tt.args.ctx, tt.args.newInfo)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NodeDistributeDB.UpdateHandlerFlag() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("NodeDistributeDB.UpdateHandlerFlag() = %v, want %v", got, tt.want)
 			}
 		})
 	}

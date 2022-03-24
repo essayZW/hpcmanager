@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/essayZW/hpcmanager/node/db"
+	"gopkg.in/guregu/null.v4"
 )
 
 // NodeDistribute 机器节点分配处理工单的操作逻辑
@@ -65,6 +66,23 @@ func (nodeDistribute *NodeDistribute) PaginationGet(ctx context.Context, pageInd
 		Data:  data,
 	}, nil
 
+}
+
+// SimpleUserInfo 简单的用户信息
+type SimpleUserInfo struct {
+	ID       int
+	Username string
+	Name     string
+}
+
+// FinishByID 通过ID处理机器节点分配工单
+func (nodeDistribute *NodeDistribute) FinishByID(ctx context.Context, id int, userInfo *SimpleUserInfo) (bool, error) {
+	return nodeDistribute.nodeDistributeDB.UpdateHandlerFlag(ctx, &db.NodeDistribute{
+		ID:              id,
+		HandlerUserID:   null.IntFrom(int64(userInfo.ID)),
+		HandlerUsername: null.StringFrom(userInfo.Username),
+		HandlerUserName: null.StringFrom(userInfo.Name),
+	})
 }
 
 // NewNodeDistribute 创建新的机器节点分配处理工单的操作逻辑

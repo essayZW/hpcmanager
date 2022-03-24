@@ -305,6 +305,26 @@ func (ns *NodeService) GetNodeApplyByID(ctx context.Context, req *nodepb.GetNode
 	return nil
 }
 
+// FinishNodeDistributeWO 处理机器节点分配工单
+func (ns *NodeService) FinishNodeDistributeWO(ctx context.Context, req *nodepb.FinishNodeDistributeWORequest, resp *nodepb.FinishNodeDistributeWOResponse) error {
+	logger.Info("FinishNodeDistributeWO: ", req.BaseRequest)
+	if !verify.Identify(verify.FinishNodeDistributeWO, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("FinishNodeDistributeWO PaginationGetNodeApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("FinishNodeDistributeWO permission forbidden")
+	}
+
+	status, err := ns.nodeDistribute.FinishByID(ctx, int(req.DistributeID), &logic.SimpleUserInfo{
+		ID:       int(req.BaseRequest.UserInfo.UserId),
+		Username: req.BaseRequest.UserInfo.Username,
+		Name:     req.BaseRequest.UserInfo.Name,
+	})
+	if err != nil {
+		return err
+	}
+	resp.Success = status
+	return nil
+}
+
 var _ nodepb.NodeHandler = (*NodeService)(nil)
 
 // NewNode 创建新的机器节点管理服务

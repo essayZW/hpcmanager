@@ -45,6 +45,7 @@ type NodeService interface {
 	CreateNodeDistributeWO(ctx context.Context, in *CreateNodeDistributeWORequest, opts ...client.CallOption) (*CreateNodeDistributeWOResponse, error)
 	PaginationGetNodeDistributeWO(ctx context.Context, in *PaginationGetNodeDistributeWORequest, opts ...client.CallOption) (*PaginationGetNodeDistributeWOResponse, error)
 	GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByIDRequest, opts ...client.CallOption) (*GetNodeApplyByIDResponse, error)
+	FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, opts ...client.CallOption) (*FinishNodeDistributeWOResponse, error)
 }
 
 type nodeService struct {
@@ -129,6 +130,16 @@ func (c *nodeService) GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByID
 	return out, nil
 }
 
+func (c *nodeService) FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, opts ...client.CallOption) (*FinishNodeDistributeWOResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.FinishNodeDistributeWO", in)
+	out := new(FinishNodeDistributeWOResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Node service
 
 type NodeHandler interface {
@@ -139,6 +150,7 @@ type NodeHandler interface {
 	CreateNodeDistributeWO(context.Context, *CreateNodeDistributeWORequest, *CreateNodeDistributeWOResponse) error
 	PaginationGetNodeDistributeWO(context.Context, *PaginationGetNodeDistributeWORequest, *PaginationGetNodeDistributeWOResponse) error
 	GetNodeApplyByID(context.Context, *GetNodeApplyByIDRequest, *GetNodeApplyByIDResponse) error
+	FinishNodeDistributeWO(context.Context, *FinishNodeDistributeWORequest, *FinishNodeDistributeWOResponse) error
 }
 
 func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.HandlerOption) error {
@@ -150,6 +162,7 @@ func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.Handl
 		CreateNodeDistributeWO(ctx context.Context, in *CreateNodeDistributeWORequest, out *CreateNodeDistributeWOResponse) error
 		PaginationGetNodeDistributeWO(ctx context.Context, in *PaginationGetNodeDistributeWORequest, out *PaginationGetNodeDistributeWOResponse) error
 		GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByIDRequest, out *GetNodeApplyByIDResponse) error
+		FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, out *FinishNodeDistributeWOResponse) error
 	}
 	type Node struct {
 		node
@@ -188,4 +201,8 @@ func (h *nodeHandler) PaginationGetNodeDistributeWO(ctx context.Context, in *Pag
 
 func (h *nodeHandler) GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByIDRequest, out *GetNodeApplyByIDResponse) error {
 	return h.NodeHandler.GetNodeApplyByID(ctx, in, out)
+}
+
+func (h *nodeHandler) FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, out *FinishNodeDistributeWOResponse) error {
+	return h.NodeHandler.FinishNodeDistributeWO(ctx, in, out)
 }
