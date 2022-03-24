@@ -203,6 +203,41 @@ func (n *node) getNodeApplyByID(ctx *gin.Context) {
 	httpResp := response.New(200, info.Apply, true, "success")
 	httpResp.Send(ctx)
 }
+
+// finishNodeDistributeByID /api/node/distribute PATCH 处理机器处理分配工单
+func (n *node) finishNodeDistributeByID(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.FinishNodeDistributeParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := n.nodeService.FinishNodeDistributeWO(c, &nodepb.FinishNodeDistributeWORequest{
+		BaseRequest:  baseRequest,
+		DistributeID: int32(param.ID),
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("处理工单失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "处理工单失败,可能已经被处理")
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter := router.Group("/node")
 
@@ -215,6 +250,7 @@ func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter.GET("/apply/:id", n.getNodeApplyByID)
 
 	nodeRouter.GET("/distribute", n.paginationGetNodeDistributeWOS)
+	nodeRouter.PATCH("/distribute", n.finishNodeDistributeByID)
 	return nodeRouter
 }
 

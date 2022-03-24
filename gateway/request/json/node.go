@@ -59,3 +59,19 @@ func (c *CheckNodeApplyParam) Validator() validator.StructLevelFunc {
 		}
 	}
 }
+
+// FinishNodeDistributeParam 处理机器节点分配工单参数
+type FinishNodeDistributeParam struct {
+	ID int `form:"id" json:"id" binding:"required"`
+}
+
+// Validator 验证器
+func (param *FinishNodeDistributeParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(FinishNodeDistributeParam)
+
+		if data.ID <= 0 {
+			sl.ReportError(reflect.ValueOf(data.ID), "id", "id", "binding", "id error")
+		}
+	}
+}

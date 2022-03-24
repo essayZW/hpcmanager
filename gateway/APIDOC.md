@@ -637,6 +637,23 @@ type param = {
 
 响应参数: 分页的信息
 
+### /node/distribute
+
+Method: PATCH
+
+描述: 处理机器处理分配工单
+
+请求参数:
+
+```go
+// FinishNodeDistributeParam 处理机器节点分配工单参数
+type FinishNodeDistributeParam struct {
+    ID int `form:"id" json:"id" binding:"required"`
+}
+```
+
+响应参数: 是否成功
+
 ### /node/apply/:id
 
 Method: GET
