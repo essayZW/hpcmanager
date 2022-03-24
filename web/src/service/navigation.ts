@@ -79,24 +79,24 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
     [
       {
         routerRaw: {
-          path: '/main/tutor_check_group_apply',
-          name: 'TutorCheckGroupApply',
+          path: '/main/check_group_apply',
+          name: 'CheckGroupApply',
           component: CheckGroupApply,
         },
         item: {
           name: '审核用户组申请',
-          to: '/main/tutor_check_group_apply',
+          to: '/main/check_group_apply',
         },
       },
       {
         routerRaw: {
-          path: '/main/tutor_manager_user',
-          name: 'TutorManagerUser',
+          path: '/main/manager_user',
+          name: 'ManagerUser',
           component: UserManager,
         },
         item: {
           name: '用户管理',
-          to: '/main/tutor_manager_user',
+          to: '/main/manager_user',
         },
       },
       {
@@ -139,24 +139,24 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
       },
       {
         routerRaw: {
-          path: '/main/admin_check_group_apply',
-          name: 'AdminCheckGroupApply',
+          path: '/main/check_group_apply',
+          name: 'CheckGroupApply',
           component: CheckGroupApply,
         },
         item: {
           name: '审核用户组申请',
-          to: '/main/admin_check_group_apply',
+          to: '/main/check_group_apply',
         },
       },
       {
         routerRaw: {
-          path: '/main/admin_manager_user',
-          name: 'AdminManagerUser',
+          path: '/main/manager_user',
+          name: 'ManagerUser',
           component: UserManager,
         },
         item: {
           name: '用户管理',
-          to: '/main/admin_manager_user',
+          to: '/main/manager_user',
         },
       },
       {
@@ -201,24 +201,24 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
       },
       {
         routerRaw: {
-          path: '/main/admin_check_group_apply',
-          name: 'AdminCheckGroupApply',
+          path: '/main/check_group_apply',
+          name: 'CheckGroupApply',
           component: CheckGroupApply,
         },
         item: {
           name: '审核用户组申请',
-          to: '/main/admin_check_group_apply',
+          to: '/main/check_group_apply',
         },
       },
       {
         routerRaw: {
-          path: '/main/admin_manager_user',
-          name: 'AdminManagerUser',
+          path: '/main/manager_user',
+          name: 'ManagerUser',
           component: UserManager,
         },
         item: {
           name: '用户管理',
-          to: '/main/admin_manager_user',
+          to: '/main/manager_user',
         },
       },
       {
