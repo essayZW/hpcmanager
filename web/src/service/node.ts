@@ -7,6 +7,7 @@ import {
   NodeDistribute,
   paginationQueryNodeDistributeInfo,
   queryNodeApplyByID,
+  finishNodeDistributeByID,
 } from '../api/node';
 
 /**
@@ -86,4 +87,11 @@ export async function paginationGetNodeDistributeInfo(
  */
 export async function getNodeApplyByID(id: number): Promise<NodeApplyInfo> {
   return queryNodeApplyByID(id);
+}
+
+/**
+ * 处理机器节点申请工单
+ */
+export async function handlerNodeDistributeByID(id: number): Promise<boolean> {
+  return finishNodeDistributeByID(id);
 }

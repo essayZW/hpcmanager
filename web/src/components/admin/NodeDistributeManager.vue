@@ -5,6 +5,7 @@ import {
   paginationGetNodeDistributeInfo,
   getNodeApplyByID,
   nodeTypeToName,
+  handlerNodeDistributeByID,
 } from '../../service/node';
 import dayjs from 'dayjs';
 import { zeroWithDefault } from '../../utils/obj';
@@ -84,6 +85,19 @@ const tableRowExpandHandler = async (row: NodeDistribute) => {
     }
   }
 };
+
+const handlerFinishWorkOrder = async (id: number) => {
+  if (!confirm(`确认标记ID为${id}的工单为已经处理?`))
+    try {
+      await handlerNodeDistributeByID(id);
+      refreshTable();
+    } catch (error) {
+      ElMessage({
+        type: 'error',
+        message: `${error}`,
+      });
+    }
+};
 </script>
 <template>
   <page-title
@@ -127,7 +141,7 @@ const tableRowExpandHandler = async (row: NodeDistribute) => {
         </el-table-column>
         <el-table-column label="处理人姓名" prop="handlerUserName">
           <template #default="props">
-            {{ zeroWithDefault(props.row.handlerUserName, '无') }}
+            {{ zeroWithDefault(props.row.handlerName, '无') }}
           </template>
         </el-table-column>
         <el-table-column label="创建时间">
@@ -217,10 +231,15 @@ const tableRowExpandHandler = async (row: NodeDistribute) => {
                   }}
                 </span>
               </p>
-              <p v-if="props.row.handlerFlag"><strong>操作面板: </strong></p>
-              <p>
+              <p v-if="!props.row.handlerFlag"><strong>操作面板: </strong></p>
+              <p v-if="!props.row.handlerFlag">
                 <span>
-                  <el-button type="primary" size="small">处理工单</el-button>
+                  <el-button
+                    type="primary"
+                    size="small"
+                    @click="handlerFinishWorkOrder(props.row.id)"
+                    >处理工单</el-button
+                  >
                 </span>
               </p>
             </div>

@@ -167,3 +167,23 @@ export async function queryNodeApplyByID(id: number): Promise<NodeApplyInfo> {
   }
   return resp.data;
 }
+
+/**
+ * 完成节点分配处理工单
+ */
+export async function finishNodeDistributeByID(id: number): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/node/distribute',
+    'PATCH',
+    {},
+    {
+      id,
+    }
+  );
+
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+
+  return true;
+}
