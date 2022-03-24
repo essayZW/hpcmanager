@@ -322,6 +322,8 @@ func (ns *NodeService) FinishNodeDistributeWO(ctx context.Context, req *nodepb.F
 		return err
 	}
 	resp.Success = status
+
+	// TODO: 发送mq消息
 	return nil
 }
 
