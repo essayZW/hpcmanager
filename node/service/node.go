@@ -241,6 +241,70 @@ func (ns *NodeService) PaginationGetNodeDistributeWO(ctx context.Context, req *n
 	return nil
 }
 
+// GetNodeApplyInfoByID 通过申请ID查询申请的具体信息
+func (ns *NodeService) GetNodeApplyByID(ctx context.Context, req *nodepb.GetNodeApplyByIDRequest, resp *nodepb.GetNodeApplyByIDResponse) error {
+	logger.Info("GetNodeApplyByID: ", req.BaseRequest)
+	if !verify.Identify(verify.GetNodeApplyInfo, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("GetNodeApplyByID PaginationGetNodeApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("GetNodeApplyByID permission forbidden")
+	}
+
+	info, err := ns.nodeApplyLogic.GetNodeApplyByID(ctx, int(req.ApplyID))
+	if err != nil {
+		return err
+	}
+	// 进行不同权限的角色查询权限的校验
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	if !isAdmin && !isTutor {
+		// 普通用户
+		if info.CreaterID != int(req.BaseRequest.UserInfo.UserId) {
+			return errors.New("common user permission forbidden")
+		}
+	}
+
+	if !isAdmin && isTutor {
+		// 导师用户
+		if info.TutorID != int(req.BaseRequest.UserInfo.UserId) {
+			return errors.New("tutor permission forbidden")
+		}
+	}
+
+	resp.Apply = &nodepb.NodeApply{
+		Id:                     int32(info.ID),
+		CreateTime:             info.CreateTime.Unix(),
+		CreaterID:              int32(info.CreaterID),
+		CreaterUsername:        info.CreaterUsername,
+		CreaterName:            info.CreaterName,
+		ProjectID:              int32(info.ProjectID),
+		TutorCheckStatus:       int32(info.TutorCheckStatus),
+		ManagerCheckStatus:     int32(info.ManagerCheckStatus),
+		Status:                 int32(info.Status),
+		MessageTutor:           info.MessageTutor.String,
+		MessageManager:         info.MessageManager.String,
+		TutorCheckTime:         info.TutorCheckTime.Time.Unix(),
+		TutorID:                int32(info.TutorID),
+		TutorUsername:          info.TutorUsername,
+		TutorName:              info.TutorName,
+		ManagerCheckTime:       info.ManagerCheckTime.Time.Unix(),
+		ManagerCheckerID:       int32(info.ManagerCheckerID.Int64),
+		ManagerCheckerUsername: info.ManagerCheckerUsername.String,
+		ManagerCheckerName:     info.ManagerCheckerName.String,
+		ModifyTime:             info.ModifyTime.Time.Unix(),
+		ModifyUserID:           int32(info.ModifyUserID),
+		ModifyName:             info.ModifyName,
+		ModifyUsername:         info.ModifyUsername,
+		NodeType:               info.NodeType,
+		NodeNum:                int32(info.NodeNum),
+		StartTime:              info.StartTime.Unix(),
+		EndTime:                info.EndTime.Unix(),
+	}
+	if info.ExtraAttributes != nil {
+		resp.Apply.ExtraAttributes = info.ExtraAttributes.String()
+	}
+	return nil
+}
+
 var _ nodepb.NodeHandler = (*NodeService)(nil)
 
 // NewNode 创建新的机器节点管理服务

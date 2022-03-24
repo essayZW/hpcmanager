@@ -620,6 +620,108 @@ func (x *PaginationGetNodeDistributeWOResponse) GetCount() int32 {
 	return 0
 }
 
+type GetNodeApplyByIDRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BaseRequest *proto.BaseRequest `protobuf:"bytes,1,opt,name=baseRequest,proto3" json:"baseRequest,omitempty"`
+	ApplyID     int32              `protobuf:"varint,2,opt,name=applyID,proto3" json:"applyID,omitempty"`
+}
+
+func (x *GetNodeApplyByIDRequest) Reset() {
+	*x = GetNodeApplyByIDRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_node_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetNodeApplyByIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNodeApplyByIDRequest) ProtoMessage() {}
+
+func (x *GetNodeApplyByIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_node_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNodeApplyByIDRequest.ProtoReflect.Descriptor instead.
+func (*GetNodeApplyByIDRequest) Descriptor() ([]byte, []int) {
+	return file_proto_node_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetNodeApplyByIDRequest) GetBaseRequest() *proto.BaseRequest {
+	if x != nil {
+		return x.BaseRequest
+	}
+	return nil
+}
+
+func (x *GetNodeApplyByIDRequest) GetApplyID() int32 {
+	if x != nil {
+		return x.ApplyID
+	}
+	return 0
+}
+
+type GetNodeApplyByIDResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Apply *NodeApply `protobuf:"bytes,1,opt,name=apply,proto3" json:"apply,omitempty"`
+}
+
+func (x *GetNodeApplyByIDResponse) Reset() {
+	*x = GetNodeApplyByIDResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_node_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetNodeApplyByIDResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNodeApplyByIDResponse) ProtoMessage() {}
+
+func (x *GetNodeApplyByIDResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_node_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNodeApplyByIDResponse.ProtoReflect.Descriptor instead.
+func (*GetNodeApplyByIDResponse) Descriptor() ([]byte, []int) {
+	return file_proto_node_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetNodeApplyByIDResponse) GetApply() *NodeApply {
+	if x != nil {
+		return x.Apply
+	}
+	return nil
+}
+
 var File_proto_node_proto protoreflect.FileDescriptor
 
 var file_proto_node_proto_rawDesc = []byte{
@@ -705,7 +807,18 @@ var file_proto_node_proto_rawDesc = []byte{
 	0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x6e, 0x6f, 0x64, 0x65, 0x2e, 0x4e, 0x6f, 0x64,
 	0x65, 0x44, 0x69, 0x73, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x52, 0x03, 0x77, 0x6f, 0x73,
 	0x12, 0x14, 0x0a, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52,
-	0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x32, 0xaa, 0x04, 0x0a, 0x04, 0x4e, 0x6f, 0x64, 0x65, 0x12,
+	0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0x6b, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64,
+	0x65, 0x41, 0x70, 0x70, 0x6c, 0x79, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x36, 0x0a, 0x0b, 0x62, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x2e, 0x42, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x0b, 0x62, 0x61,
+	0x73, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x70, 0x70,
+	0x6c, 0x79, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x07, 0x61, 0x70, 0x70, 0x6c,
+	0x79, 0x49, 0x44, 0x22, 0x41, 0x0a, 0x18, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x41, 0x70,
+	0x70, 0x6c, 0x79, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x25, 0x0a, 0x05, 0x61, 0x70, 0x70, 0x6c, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f,
+	0x2e, 0x6e, 0x6f, 0x64, 0x65, 0x2e, 0x4e, 0x6f, 0x64, 0x65, 0x41, 0x70, 0x70, 0x6c, 0x79, 0x52,
+	0x05, 0x61, 0x70, 0x70, 0x6c, 0x79, 0x32, 0xff, 0x04, 0x0a, 0x04, 0x4e, 0x6f, 0x64, 0x65, 0x12,
 	0x37, 0x0a, 0x04, 0x50, 0x69, 0x6e, 0x67, 0x12, 0x12, 0x2e, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x19, 0x2e, 0x70, 0x75,
 	0x62, 0x6c, 0x69, 0x63, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x50, 0x69, 0x6e, 0x67, 0x52, 0x65,
@@ -740,10 +853,16 @@ var file_proto_node_proto_rawDesc = []byte{
 	0x75, 0x65, 0x73, 0x74, 0x1a, 0x2b, 0x2e, 0x6e, 0x6f, 0x64, 0x65, 0x2e, 0x50, 0x61, 0x67, 0x69,
 	0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x44, 0x69, 0x73,
 	0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x57, 0x4f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x00, 0x42, 0x2f, 0x5a, 0x2d, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x65, 0x73, 0x73, 0x61, 0x79, 0x5a, 0x57, 0x2f, 0x68, 0x70, 0x63, 0x6d, 0x61, 0x6e,
-	0x61, 0x67, 0x65, 0x72, 0x2f, 0x6e, 0x6f, 0x64, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x3b,
-	0x6e, 0x6f, 0x64, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x22, 0x00, 0x12, 0x53, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x41, 0x70,
+	0x70, 0x6c, 0x79, 0x42, 0x79, 0x49, 0x44, 0x12, 0x1d, 0x2e, 0x6e, 0x6f, 0x64, 0x65, 0x2e, 0x47,
+	0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x41, 0x70, 0x70, 0x6c, 0x79, 0x42, 0x79, 0x49, 0x44, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x6e, 0x6f, 0x64, 0x65, 0x2e, 0x47, 0x65,
+	0x74, 0x4e, 0x6f, 0x64, 0x65, 0x41, 0x70, 0x70, 0x6c, 0x79, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x2f, 0x5a, 0x2d, 0x67, 0x69, 0x74, 0x68,
+	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x73, 0x73, 0x61, 0x79, 0x5a, 0x57, 0x2f, 0x68,
+	0x70, 0x63, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x2f, 0x6e, 0x6f, 0x64, 0x65, 0x2f, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x3b, 0x6e, 0x6f, 0x64, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -758,7 +877,7 @@ func file_proto_node_proto_rawDescGZIP() []byte {
 	return file_proto_node_proto_rawDescData
 }
 
-var file_proto_node_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_proto_node_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_proto_node_proto_goTypes = []interface{}{
 	(*CreateNodeApplyRequest)(nil),                // 0: node.CreateNodeApplyRequest
 	(*CreateNodeApplyResponse)(nil),               // 1: node.CreateNodeApplyResponse
@@ -770,37 +889,43 @@ var file_proto_node_proto_goTypes = []interface{}{
 	(*CreateNodeDistributeWOResponse)(nil),        // 7: node.CreateNodeDistributeWOResponse
 	(*PaginationGetNodeDistributeWORequest)(nil),  // 8: node.PaginationGetNodeDistributeWORequest
 	(*PaginationGetNodeDistributeWOResponse)(nil), // 9: node.PaginationGetNodeDistributeWOResponse
-	(*proto.BaseRequest)(nil),                     // 10: request.BaseRequest
-	(*NodeApply)(nil),                             // 11: node.NodeApply
-	(*NodeDistribute)(nil),                        // 12: node.NodeDistribute
-	(*proto1.Empty)(nil),                          // 13: publicproto.Empty
-	(*proto1.PingResponse)(nil),                   // 14: publicproto.PingResponse
+	(*GetNodeApplyByIDRequest)(nil),               // 10: node.GetNodeApplyByIDRequest
+	(*GetNodeApplyByIDResponse)(nil),              // 11: node.GetNodeApplyByIDResponse
+	(*proto.BaseRequest)(nil),                     // 12: request.BaseRequest
+	(*NodeApply)(nil),                             // 13: node.NodeApply
+	(*NodeDistribute)(nil),                        // 14: node.NodeDistribute
+	(*proto1.Empty)(nil),                          // 15: publicproto.Empty
+	(*proto1.PingResponse)(nil),                   // 16: publicproto.PingResponse
 }
 var file_proto_node_proto_depIdxs = []int32{
-	10, // 0: node.CreateNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
-	10, // 1: node.PaginationGetNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
-	11, // 2: node.PaginationGetNodeApplyResponse.applies:type_name -> node.NodeApply
-	10, // 3: node.CheckNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
-	10, // 4: node.CreateNodeDistributeWORequest.baseRequest:type_name -> request.BaseRequest
-	10, // 5: node.PaginationGetNodeDistributeWORequest.baseRequest:type_name -> request.BaseRequest
-	12, // 6: node.PaginationGetNodeDistributeWOResponse.wos:type_name -> node.NodeDistribute
-	13, // 7: node.Node.Ping:input_type -> publicproto.Empty
-	0,  // 8: node.Node.CreateNodeApply:input_type -> node.CreateNodeApplyRequest
-	2,  // 9: node.Node.PaginationGetNodeApply:input_type -> node.PaginationGetNodeApplyRequest
-	4,  // 10: node.Node.CheckNodeApply:input_type -> node.CheckNodeApplyRequest
-	6,  // 11: node.Node.CreateNodeDistributeWO:input_type -> node.CreateNodeDistributeWORequest
-	8,  // 12: node.Node.PaginationGetNodeDistributeWO:input_type -> node.PaginationGetNodeDistributeWORequest
-	14, // 13: node.Node.Ping:output_type -> publicproto.PingResponse
-	1,  // 14: node.Node.CreateNodeApply:output_type -> node.CreateNodeApplyResponse
-	3,  // 15: node.Node.PaginationGetNodeApply:output_type -> node.PaginationGetNodeApplyResponse
-	5,  // 16: node.Node.CheckNodeApply:output_type -> node.CheckNodeApplyResponse
-	7,  // 17: node.Node.CreateNodeDistributeWO:output_type -> node.CreateNodeDistributeWOResponse
-	9,  // 18: node.Node.PaginationGetNodeDistributeWO:output_type -> node.PaginationGetNodeDistributeWOResponse
-	13, // [13:19] is the sub-list for method output_type
-	7,  // [7:13] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	12, // 0: node.CreateNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
+	12, // 1: node.PaginationGetNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
+	13, // 2: node.PaginationGetNodeApplyResponse.applies:type_name -> node.NodeApply
+	12, // 3: node.CheckNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
+	12, // 4: node.CreateNodeDistributeWORequest.baseRequest:type_name -> request.BaseRequest
+	12, // 5: node.PaginationGetNodeDistributeWORequest.baseRequest:type_name -> request.BaseRequest
+	14, // 6: node.PaginationGetNodeDistributeWOResponse.wos:type_name -> node.NodeDistribute
+	12, // 7: node.GetNodeApplyByIDRequest.baseRequest:type_name -> request.BaseRequest
+	13, // 8: node.GetNodeApplyByIDResponse.apply:type_name -> node.NodeApply
+	15, // 9: node.Node.Ping:input_type -> publicproto.Empty
+	0,  // 10: node.Node.CreateNodeApply:input_type -> node.CreateNodeApplyRequest
+	2,  // 11: node.Node.PaginationGetNodeApply:input_type -> node.PaginationGetNodeApplyRequest
+	4,  // 12: node.Node.CheckNodeApply:input_type -> node.CheckNodeApplyRequest
+	6,  // 13: node.Node.CreateNodeDistributeWO:input_type -> node.CreateNodeDistributeWORequest
+	8,  // 14: node.Node.PaginationGetNodeDistributeWO:input_type -> node.PaginationGetNodeDistributeWORequest
+	10, // 15: node.Node.GetNodeApplyByID:input_type -> node.GetNodeApplyByIDRequest
+	16, // 16: node.Node.Ping:output_type -> publicproto.PingResponse
+	1,  // 17: node.Node.CreateNodeApply:output_type -> node.CreateNodeApplyResponse
+	3,  // 18: node.Node.PaginationGetNodeApply:output_type -> node.PaginationGetNodeApplyResponse
+	5,  // 19: node.Node.CheckNodeApply:output_type -> node.CheckNodeApplyResponse
+	7,  // 20: node.Node.CreateNodeDistributeWO:output_type -> node.CreateNodeDistributeWOResponse
+	9,  // 21: node.Node.PaginationGetNodeDistributeWO:output_type -> node.PaginationGetNodeDistributeWOResponse
+	11, // 22: node.Node.GetNodeApplyByID:output_type -> node.GetNodeApplyByIDResponse
+	16, // [16:23] is the sub-list for method output_type
+	9,  // [9:16] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_proto_node_proto_init() }
@@ -930,6 +1055,30 @@ func file_proto_node_proto_init() {
 				return nil
 			}
 		}
+		file_proto_node_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetNodeApplyByIDRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_node_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetNodeApplyByIDResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -937,7 +1086,7 @@ func file_proto_node_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_node_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

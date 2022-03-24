@@ -171,6 +171,20 @@ func (node *NodeApplyDB) UpdateAdminCheckStatus(ctx context.Context, newStatus *
 	return count != 0, nil
 }
 
+func (node *NodeApplyDB) QueryByID(ctx context.Context, applyID int) (*NodeApply, error) {
+	row, err := node.conn.QueryRow(ctx, "SELECT * FROM `node_apply` WHERE `id`=?", applyID)
+	if err != nil {
+		logger.Warn("QueryByID error: ", err)
+		return nil, errors.New("QueryByID error")
+	}
+	var info NodeApply
+	if err := row.StructScan(&info); err != nil {
+		logger.Warn("QueryByID struct scan error: ", err)
+		return nil, errors.New("QueryByID struct scan error")
+	}
+	return &info, nil
+}
+
 // NewNodeApply 创建新的node_apply数据库操作
 func NewNodeApply(conn *db.DB) *NodeApplyDB {
 	return &NodeApplyDB{

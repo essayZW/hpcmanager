@@ -162,11 +162,36 @@ message PaginationGetNodeDistributeWOResponse {
 }
 ```
 
+## GetNodeApplyByID
+
+描述: 通过 ID 查询机器节点申请信息
+
+原型定义: `rpc GetNodeApplyByID(GetNodeApplyByIDRequest) returns (GetNodeApplyByIDResponse) {}`
+
+需求权限: `Common` 及以上
+
+请求参数:
+
+```protobuf
+message GetNodeApplyByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetNodeApplyByIDResponse {
+    node.NodeApply apply = 1;
+}
+```
+
 # 附录
 
 ### NodeApply
 
-描述: NodeApply 数据库 node_appl 对应的消息映射
+描述: NodeApply 数据库 node_apply 对应的消息映射
 
 ```protobuf
 // NodeApply 数据库node_appl对应的消息映射

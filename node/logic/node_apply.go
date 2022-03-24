@@ -175,6 +175,11 @@ func (node *NodeApply) CheckNodeApplyByAdmin(ctx context.Context, applyID int, s
 	})
 }
 
+// GetNodeApplyByID 通过ID查询机器节点申请记录信息
+func (node *NodeApply) GetNodeApplyByID(ctx context.Context, applyID int) (*db.NodeApply, error) {
+	return node.nodeApplyDB.QueryByID(ctx, applyID)
+}
+
 // NewNodeApply 创建机器节点申请相关的逻辑操作
 func NewNodeApply(nodeApplyDB *db.NodeApplyDB) *NodeApply {
 	return &NodeApply{
