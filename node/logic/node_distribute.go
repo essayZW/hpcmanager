@@ -29,6 +29,44 @@ func (nodeDistribute *NodeDistribute) CreateNodeDistributeWO(ctx context.Context
 	})
 }
 
+// PaginationQueryNodeDistribute 分页查询的结果
+type PaginationQueryNodeDistribute struct {
+	Data  []*db.NodeDistribute
+	Count int
+}
+
+// PaginationGet 分页查询
+func (nodeDistribute *NodeDistribute) PaginationGet(ctx context.Context, pageIndex, pageSize int) (*PaginationQueryNodeDistribute, error) {
+	if pageIndex <= 0 {
+		return nil, errors.New("invalid page index")
+	}
+	if pageSize <= 0 {
+		return nil, errors.New("invalid page size")
+	}
+
+	count, err := nodeDistribute.nodeDistributeDB.QueryCount(ctx)
+	if err != nil {
+		return nil, errors.New("query count error")
+	}
+
+	if count == 0 {
+		return &PaginationQueryNodeDistribute{
+			Count: 0,
+			Data:  make([]*db.NodeDistribute, 0),
+		}, nil
+	}
+	limit := pageSize * (pageIndex - 1)
+	data, err := nodeDistribute.nodeDistributeDB.QueryLimit(ctx, limit, pageSize)
+	if err != nil {
+		return nil, errors.New("data query error")
+	}
+	return &PaginationQueryNodeDistribute{
+		Count: count,
+		Data:  data,
+	}, nil
+
+}
+
 // NewNodeDistribute 创建新的机器节点分配处理工单的操作逻辑
 func NewNodeDistribute(nodeDistributeDB *db.NodeDistributeDB) *NodeDistribute {
 	return &NodeDistribute{

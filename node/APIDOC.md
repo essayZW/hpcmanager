@@ -116,7 +116,7 @@ message CheckNodeApplyResponse {
 
 原型定义: `rpc CreateNodeDistributeWO(CreateNodeDistributeWORequest) returns (CreateNodeDistributeWOResponse) {}`
 
-需求参数: `CommonAdmin` 及以上
+需求权限: `CommonAdmin` 及以上
 
 请求参数:
 
@@ -132,5 +132,91 @@ message CreateNodeDistributeWORequest {
 ```protobuf
 message CreateNodeDistributeWOResponse {
     int32 id = 1;
+}
+```
+
+## PaginationGetNodeDistributeWO
+
+描述: 分页查询机器节点分配处理工单
+
+原型定义: `rpc PaginationGetNodeDistributeWO(PaginationGetNodeDistributeWORequest) returns (PaginationGetNodeDistributeWOResponse) {}`
+
+需求权限: `CommonAdmin` 及以上
+
+请求参数:
+
+```protobuf
+message PaginationGetNodeDistributeWORequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message PaginationGetNodeDistributeWOResponse {
+    repeated node.NodeDistribute wos = 1;
+    int32 count = 2;
+}
+```
+
+# 附录
+
+### NodeApply
+
+描述: NodeApply 数据库 node_appl 对应的消息映射
+
+```protobuf
+// NodeApply 数据库node_appl对应的消息映射
+message NodeApply {
+    int32 id = 1;
+    int64 createTime = 2;
+    int32 createrID = 3;
+    string createrUsername = 4;
+    string createrName = 5;
+    int32 projectID = 6;
+    int32 tutorCheckStatus = 7;
+    int32 managerCheckStatus = 8;
+    int32 status = 9;
+    string messageTutor = 10;
+    string messageManager = 11;
+    int64 tutorCheckTime = 12;
+    int32 tutorID = 13;
+    string tutorUsername = 14;
+    string tutorName = 15;
+    int64 managerCheckTime = 16;
+    int32 managerCheckerID = 17;
+    string managerCheckerUsername = 18;
+    string managerCheckerName = 19;
+    int64 modifyTime = 20;
+    int32 modifyUserID = 21;
+    string modifyName = 22;
+    string modifyUsername = 23;
+    string nodeType = 24;
+    int32 nodeNum = 25;
+    int64 startTime = 26;
+    int64 endTime = 27;
+    string extraAttributes = 28;
+}
+```
+
+### NodeDistribute
+
+描述: NodeDistribute 节点分配处理工单对应的消息映射
+
+```protobuf
+// NodeDistribute 节点分配处理工单对应的消息映射
+message NodeDistribute {
+    int32 id = 1;
+    int32 applyID = 2;
+    int32 handlerFlag = 3;
+    int32 handlerUserID = 4;
+    string handlerUsername = 5;
+    string handlerName = 6;
+    int32 distributeBillID = 7;
+    int64 createTime = 8;
+    string extraAttributes = 9;
 }
 ```

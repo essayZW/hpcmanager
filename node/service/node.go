@@ -207,6 +207,40 @@ func (ns *NodeService) CreateNodeDistributeWO(ctx context.Context, req *nodepb.C
 	return nil
 }
 
+// PaginationGetNodeDistributeWO 分页查询包机处理工单信息
+func (ns *NodeService) PaginationGetNodeDistributeWO(ctx context.Context, req *nodepb.PaginationGetNodeDistributeWORequest, resp *nodepb.PaginationGetNodeDistributeWOResponse) error {
+	logger.Info("PaginationGetNodeDistributeWO: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeDistributeWO, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("PaginationGetNodeDistributeWO permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("PaginationGetNodeDistributeWO permission forbidden")
+	}
+
+	infos, err := ns.nodeDistribute.PaginationGet(ctx, int(req.PageIndex), int(req.PageSize))
+	if err != nil {
+		return err
+	}
+
+	resp.Count = int32(infos.Count)
+	resp.Wos = make([]*nodepb.NodeDistribute, len(infos.Data))
+
+	for i := range infos.Data {
+		resp.Wos[i] = &nodepb.NodeDistribute{
+			Id:               int32(infos.Data[i].ID),
+			ApplyID:          int32(infos.Data[i].ApplyID),
+			HandlerFlag:      int32(infos.Data[i].HandlerFlag),
+			HandlerUserID:    int32(infos.Data[i].HandlerUserID.Int64),
+			HandlerUsername:  infos.Data[i].HandlerUserName.String,
+			HandlerName:      infos.Data[i].HandlerUserName.String,
+			DistributeBillID: int32(infos.Data[i].DistributeBillID),
+			CreateTime:       infos.Data[i].CreateTime.Unix(),
+		}
+		if infos.Data[i].ExtraAttributes != nil {
+			resp.Wos[i].ExtraAttributes = infos.Data[i].ExtraAttributes.String()
+		}
+	}
+	return nil
+}
+
 var _ nodepb.NodeHandler = (*NodeService)(nil)
 
 // NewNode 创建新的机器节点管理服务

@@ -238,3 +238,108 @@ func TestNodeDistributeDB_QueryCountByApply(t *testing.T) {
 		})
 	}
 }
+
+func TestNodeDistributeDB_QueryLimit(t *testing.T) {
+	type fields struct {
+		conn *hpcdb.DB
+	}
+	type args struct {
+		ctx    context.Context
+		limit  int
+		offset int
+	}
+	conn := getDBConn()
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantLen int
+		wantErr bool
+	}{
+		{
+			name: "limit 0, 2",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx:    context.Background(),
+				limit:  0,
+				offset: 2,
+			},
+			wantLen: 2,
+			wantErr: false,
+		},
+		{
+			name: "limit 0, 3",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx:    context.Background(),
+				limit:  0,
+				offset: 3,
+			},
+			wantLen: 2,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ndb := &NodeDistributeDB{
+				conn: tt.fields.conn,
+			}
+			got, err := ndb.QueryLimit(tt.args.ctx, tt.args.limit, tt.args.offset)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NodeDistributeDB.QueryLimit() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if tt.wantLen != len(got) {
+				t.Errorf("NodeDistributeDB.QueryLimit() len = %v, want %v", len(got), tt.wantLen)
+			}
+		})
+	}
+}
+
+func TestNodeDistributeDB_QueryCount(t *testing.T) {
+	type fields struct {
+		conn *hpcdb.DB
+	}
+	type args struct {
+		ctx context.Context
+	}
+	conn := getDBConn()
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    int
+		wantErr bool
+	}{
+		{
+			name: "test success",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			want:    2,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ndb := &NodeDistributeDB{
+				conn: tt.fields.conn,
+			}
+			got, err := ndb.QueryCount(tt.args.ctx)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NodeDistributeDB.QueryCount() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("NodeDistributeDB.QueryCount() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

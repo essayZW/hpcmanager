@@ -60,6 +60,40 @@ func (ndb *NodeDistributeDB) QueryCountByApply(ctx context.Context, applyID int)
 	return info, nil
 }
 
+// QueryLimit 分页查询记录
+func (ndb *NodeDistributeDB) QueryLimit(ctx context.Context, limit, offset int) ([]*NodeDistribute, error) {
+	row, err := ndb.conn.Query(ctx, "SELECT * FROM `node_distribute` LIMIT ?,?", limit, offset)
+	if err != nil {
+		logger.Warn("QueryLimit error: ", err)
+		return nil, errors.New("QueryLimit error")
+	}
+	infos := make([]*NodeDistribute, 0)
+	for row.Next() {
+		var info NodeDistribute
+		if err := row.StructScan(&info); err != nil {
+			logger.Warn("QueryLimit struct scan error: ", err)
+			return nil, errors.New("QueryLimit struct scan error")
+		}
+		infos = append(infos, &info)
+	}
+	return infos, nil
+}
+
+// QueryCount 查询总的记录数量
+func (ndb *NodeDistributeDB) QueryCount(ctx context.Context) (int, error) {
+	row, err := ndb.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `node_distribute`")
+	if err != nil {
+		logger.Warn("QueryCount error: ", err)
+		return 0, errors.New("QueryCount error")
+	}
+	var count int
+	if err := row.Scan(&count); err != nil {
+		logger.Warn("QueryCount scan error: ", err)
+		return 0, errors.New("QueryCount scan error")
+	}
+	return count, nil
+}
+
 // NewNodeDistribute 创建新的机器节点分配处理工单表
 func NewNodeDistribute(conn *hpcdb.DB) *NodeDistributeDB {
 	return &NodeDistributeDB{

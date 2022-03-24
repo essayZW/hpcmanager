@@ -38,6 +38,8 @@ const (
 	CheckNodeApply = "__CHECK_NODE_APPLY__"
 	// CreateNodeDistributeWO 创建机器节点分配工单
 	CreateNodeDistributeWO = "__CREATE_NODE_DISTRIBUTE_WO__"
+	// QueryNodeDistributeWO 查询机器节点分配工单
+	QueryNodeDistributeWO = "__QUERY_NODE_DISTRIBUTE_WO__"
 )
 
 // Verify 进行操作的权限验证
