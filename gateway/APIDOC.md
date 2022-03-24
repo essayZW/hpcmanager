@@ -619,3 +619,20 @@ type CreateNodeApplyParam struct {
 ```
 
 响应: 是否审核成功
+
+### /node/distribute
+
+Method: GET
+
+描述: 分页查询用户节点分配工单信息
+
+请求参数:
+
+```typescript
+type param = {
+  pageIndex: number;
+  pageSize: number;
+};
+```
+
+响应参数: 分页的信息

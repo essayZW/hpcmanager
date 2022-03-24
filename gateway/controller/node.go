@@ -137,6 +137,41 @@ func (n *node) checkNodeApply(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// paginationGetNodeDistributeWOS /api/node/distribute GET 分页查询机器节点分配处理工单信息
+func (n *node) paginationGetNodeDistributeWOS(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	dataResp, err := n.nodeService.PaginationGetNodeDistributeWO(c, &nodepb.PaginationGetNodeDistributeWORequest{
+		BaseRequest: baseRequest,
+		PageIndex:   int32(pageIndex),
+		PageSize:    int32(pageSize),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询用户信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	responseData := &response.PaginationQueryResponse{
+		Count: int(dataResp.Count),
+		Data:  dataResp.Wos,
+	}
+	if dataResp.Wos == nil {
+		responseData.Data = make([]*nodepb.NodeDistribute, 0)
+	}
+	httpResp := response.New(200, responseData, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter := router.Group("/node")
 
@@ -146,6 +181,8 @@ func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter.POST("/apply", n.createNodeApply)
 	nodeRouter.GET("/apply", n.paginationGet)
 	nodeRouter.PATCH("/apply", n.checkNodeApply)
+
+	nodeRouter.GET("/distribute", n.paginationGetNodeDistributeWOS)
 	return nodeRouter
 }
 
