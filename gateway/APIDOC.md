@@ -632,7 +632,21 @@ type CreateNodeApplyParam struct {
 }
 ```
 
-响应: 是否审核成功
+### /node/apply/:id
+
+Method: DELETE
+
+描述: 撤销某一个机器节点申请记录
+
+参数:
+
+```text
+id: number
+```
+
+响应: 是否成功
+
+响应: 是否撤销成功
 
 ### /node/distribute
 

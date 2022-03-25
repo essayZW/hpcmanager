@@ -238,6 +238,42 @@ func (n *node) finishNodeDistributeByID(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// revokeNodeApply /api/node/apply/:id DELETE 撤销某一个机器节点申请记录
+func (n *node) revokeNodeApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	idStr := ctx.Param("id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "invalid id")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := n.nodeService.RevokeNodeApply(c, &nodepb.RevokeNodeApplyRequest{
+		BaseRequest: baseRequest,
+		ApplyID:     int32(id),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("撤销申请失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "撤销申请失败,可能已经被处理")
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter := router.Group("/node")
 
@@ -248,6 +284,7 @@ func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter.GET("/apply", n.paginationGet)
 	nodeRouter.PATCH("/apply", n.checkNodeApply)
 	nodeRouter.GET("/apply/:id", n.getNodeApplyByID)
+	nodeRouter.DELETE("/apply/:id", n.revokeNodeApply)
 
 	nodeRouter.GET("/distribute", n.paginationGetNodeDistributeWOS)
 	nodeRouter.PATCH("/distribute", n.finishNodeDistributeByID)
