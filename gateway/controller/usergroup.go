@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -257,6 +258,40 @@ func (ug *UserGroup) checkApply(ctx *gin.Context) {
 	return
 }
 
+// revokeUserApplyGroup /api/group/apply/:id DELETE 撤销某个申请
+func (ug *UserGroup) revokeUserApplyGroup(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	idStr := ctx.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "invalid id")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := ug.userGroupService.RevokeUserApplyGroup(c, &userpb.RevokeUserApplyGroupRequest{
+		BaseRequest: baseRequest,
+		ApplyID:     int32(id),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("撤销申请失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "撤销申请失败,可能是已经被撤销")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
 // Registry 为用户组控制器注册相应的接口
 func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller UserGroup")
@@ -274,6 +309,7 @@ func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	userGroup.GET("/tutor/:username", ug.searchTutorInfo)
 	userGroup.POST("/apply", ug.createJoinGroupApply)
 	userGroup.PATCH("/apply", ug.checkApply)
+	userGroup.DELETE("/apply", ug.revokeUserApplyGroup)
 	return userGroup
 }
 

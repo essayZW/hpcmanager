@@ -405,6 +405,20 @@ map[string]interface{}{
 }
 ```
 
+### /group/apply/:id
+
+Method: DELETE
+
+描述: 撤销某个申请
+
+参数:
+
+```text
+id: number
+```
+
+响应: 是否成功
+
 ## system 控制器
 
 ### /sys/install
