@@ -548,6 +548,31 @@ message ListGroupUserResponse {
 }
 ```
 
+## RevokeUserApplyGroup
+
+描述: 撤销某一个用户加入组的申请
+
+原型定义: `rpc RevokeUserApplyGroup(RevokeUserApplyGroupRequest) returns (RevokeUserApplyGroupResponse) {}`
+
+需求权限: `Guest` 及以上
+
+请求参数:
+
+```protobuf
+message RevokeUserApplyGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message RevokeUserApplyGroupResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## UserInfo

@@ -61,6 +61,11 @@ func newDefault() *hardcodeVerify {
 				minLevel: Guest,
 			},
 			// 游客权限
+			RevokeUserApplyGroup: {
+				maxLevel: Guest,
+				minLevel: Guest,
+			},
+			// 游客权限
 			SearchTutorInfo: {
 				maxLevel: Guest,
 				minLevel: Guest,

@@ -204,6 +204,22 @@ func (ugadb *UserGroupApplyDB) UpdateAdminCheckStatus(ctx context.Context, newSt
 	return affectedRows > 0, nil
 }
 
+// UpdateStatus 更新申请记录的状态
+func (ugadb *UserGroupApplyDB) UpdateStatus(ctx context.Context, applyID int, status int) (bool, error) {
+	res, err := ugadb.db.Exec(ctx, "UPDATE `user_group_apply` SET `status`=? WHERE `id`=?", status, applyID)
+	if err != nil {
+		logger.Warn("UserGroupApplyDB error: ", err)
+		return false, errors.New("UserGroupApplyDB error")
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UserGroupApplyDB error: ", err)
+		return false, errors.New("UserGroupApplyDB error")
+	}
+	return count > 0, nil
+}
+
 // NewUserGroupApply 创建新用户申请表数据库操作结构体
 func NewUserGroupApply(db *db.DB) *UserGroupApplyDB {
 	return &UserGroupApplyDB{

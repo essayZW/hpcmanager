@@ -374,6 +374,30 @@ func (group *UserGroupService) GetApplyInfoByID(ctx context.Context, req *userpb
 	return nil
 }
 
+// RevokeUserApplyGroup 撤销某一个用户加入组的申请
+func (group *UserGroupService) RevokeUserApplyGroup(ctx context.Context, req *userpb.RevokeUserApplyGroupRequest, resp *userpb.RevokeUserApplyGroupResponse) error {
+	logger.Info("RevokeUserApplyGroup: ", req.BaseRequest)
+	if !verify.Identify(verify.RevokeUserApplyGroup, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("RevokeUserApplyGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("RevokeUserApplyGroup permission forbidden")
+	}
+	// 先查询申请信息,保证是本人创建的申请信息
+	info, err := group.userGroupLogic.GetApplyInfoByID(ctx, int(req.ApplyID))
+	if err != nil {
+		return errors.New("query apply info error, invalid apply id")
+	}
+
+	if info.UserID != int(req.BaseRequest.UserInfo.UserId) {
+		return errors.New("permission forbidden")
+	}
+	status, err := group.userGroupLogic.RevokeUserApplyGroup(ctx, int(req.ApplyID))
+	if err != nil {
+		return err
+	}
+	resp.Success = status
+	return nil
+}
+
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务

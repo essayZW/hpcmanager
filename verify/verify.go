@@ -18,6 +18,8 @@ const (
 	GetGroupInfo = "__GET_GROUP_INFO__"
 	// ApplyJoinGroup 申请加入组操作
 	ApplyJoinGroup = "__ADD_APPLY_GROUP__"
+	// RevokeUserApplyGroup 撤销加入组的申请
+	RevokeUserApplyGroup = "__REVOKE_USER_APPLY_GROUP__"
 	// SearchTutorInfo 搜索导师以及组基本信息
 	SearchTutorInfo = "__SEARCH_TUTOR_INFO__"
 	// CheckJoinGroupApply 审核加入组申请

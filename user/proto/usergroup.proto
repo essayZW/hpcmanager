@@ -19,6 +19,7 @@ service GroupService {
     rpc CheckApply(CheckApplyRequest) returns (CheckApplyResponse) {}
     rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {}
     rpc GetApplyInfoByID(GetApplyInfoByIDRequest) returns (GetApplyInfoByIDResponse) {}
+    rpc RevokeUserApplyGroup(RevokeUserApplyGroupRequest) returns (RevokeUserApplyGroupResponse) {}
 }
 
 
@@ -108,3 +109,13 @@ message GetApplyInfoByIDRequest {
 message GetApplyInfoByIDResponse {
     user.UserGroupApply apply = 1;
 }
+
+message RevokeUserApplyGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+}
+
+message RevokeUserApplyGroupResponse {
+    bool success = 1;
+}
+

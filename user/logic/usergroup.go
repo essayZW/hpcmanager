@@ -271,6 +271,11 @@ func (group *UserGroup) CreateGroup(ctx context.Context, createrInfo, tutorInfo 
 
 }
 
+// RevokeUserApplyGroup 撤销某一个用户加入组的申请
+func (group *UserGroup) RevokeUserApplyGroup(ctx context.Context, applyID int) (bool, error) {
+	return group.userGroupApplyDB.UpdateStatus(ctx, applyID, 0)
+}
+
 // NewUserGroup 创建一个新的用户组的操作逻辑
 func NewUserGroup(userGroupDB *db.UserGroupDB, userGroupApplyDB *db.UserGroupApplyDB) *UserGroup {
 	return &UserGroup{

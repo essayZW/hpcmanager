@@ -47,6 +47,7 @@ type GroupService interface {
 	CheckApply(ctx context.Context, in *CheckApplyRequest, opts ...client.CallOption) (*CheckApplyResponse, error)
 	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*CreateGroupResponse, error)
 	GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByIDRequest, opts ...client.CallOption) (*GetApplyInfoByIDResponse, error)
+	RevokeUserApplyGroup(ctx context.Context, in *RevokeUserApplyGroupRequest, opts ...client.CallOption) (*RevokeUserApplyGroupResponse, error)
 }
 
 type groupService struct {
@@ -151,6 +152,16 @@ func (c *groupService) GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByI
 	return out, nil
 }
 
+func (c *groupService) RevokeUserApplyGroup(ctx context.Context, in *RevokeUserApplyGroupRequest, opts ...client.CallOption) (*RevokeUserApplyGroupResponse, error) {
+	req := c.c.NewRequest(c.name, "GroupService.RevokeUserApplyGroup", in)
+	out := new(RevokeUserApplyGroupResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for GroupService service
 
 type GroupServiceHandler interface {
@@ -163,6 +174,7 @@ type GroupServiceHandler interface {
 	CheckApply(context.Context, *CheckApplyRequest, *CheckApplyResponse) error
 	CreateGroup(context.Context, *CreateGroupRequest, *CreateGroupResponse) error
 	GetApplyInfoByID(context.Context, *GetApplyInfoByIDRequest, *GetApplyInfoByIDResponse) error
+	RevokeUserApplyGroup(context.Context, *RevokeUserApplyGroupRequest, *RevokeUserApplyGroupResponse) error
 }
 
 func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts ...server.HandlerOption) error {
@@ -176,6 +188,7 @@ func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts
 		CheckApply(ctx context.Context, in *CheckApplyRequest, out *CheckApplyResponse) error
 		CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error
 		GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByIDRequest, out *GetApplyInfoByIDResponse) error
+		RevokeUserApplyGroup(ctx context.Context, in *RevokeUserApplyGroupRequest, out *RevokeUserApplyGroupResponse) error
 	}
 	type GroupService struct {
 		groupService
@@ -222,4 +235,8 @@ func (h *groupServiceHandler) CreateGroup(ctx context.Context, in *CreateGroupRe
 
 func (h *groupServiceHandler) GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByIDRequest, out *GetApplyInfoByIDResponse) error {
 	return h.GroupServiceHandler.GetApplyInfoByID(ctx, in, out)
+}
+
+func (h *groupServiceHandler) RevokeUserApplyGroup(ctx context.Context, in *RevokeUserApplyGroupRequest, out *RevokeUserApplyGroupResponse) error {
+	return h.GroupServiceHandler.RevokeUserApplyGroup(ctx, in, out)
 }
