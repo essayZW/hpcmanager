@@ -390,6 +390,10 @@ func (group *UserGroupService) RevokeUserApplyGroup(ctx context.Context, req *us
 	if info.UserID != int(req.BaseRequest.UserInfo.UserId) {
 		return errors.New("permission forbidden")
 	}
+
+	if info.ManagerCheckStatus != -1 || info.Status == 0 {
+		return errors.New("can't revoke this apply")
+	}
 	status, err := group.userGroupLogic.RevokeUserApplyGroup(ctx, int(req.ApplyID))
 	if err != nil {
 		return err
