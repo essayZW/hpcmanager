@@ -327,6 +327,33 @@ func (ns *NodeService) FinishNodeDistributeWO(ctx context.Context, req *nodepb.F
 	return nil
 }
 
+// RevokeNodeApply 撤销机器节点申请
+func (ns *NodeService) RevokeNodeApply(ctx context.Context, req *nodepb.RevokeNodeApplyRequest, resp *nodepb.RevokeNodeApplyResponse) error {
+	logger.Info("RevokeNodeApply: ", req.BaseRequest)
+	if !verify.Identify(verify.RevokeNodeApply, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("RevokeNodeApply PaginationGetNodeApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("RevokeNodeApply permission forbidden")
+	}
+	info, err := ns.nodeApplyLogic.GetNodeApplyByID(ctx, int(req.ApplyID))
+	if err != nil {
+		return errors.New("apply info query error, invalid apply id")
+	}
+
+	if info.CreaterID != int(req.BaseRequest.UserInfo.UserId) {
+		return errors.New("permission forbidden")
+	}
+
+	if info.ManagerCheckStatus != -1 || info.Status != 1 {
+		return errors.New("can't revoke this apply")
+	}
+	status, err := ns.nodeApplyLogic.RevokeNodeApply(ctx, int(req.ApplyID))
+	if err != nil {
+		return err
+	}
+	resp.Success = status
+	return nil
+}
+
 var _ nodepb.NodeHandler = (*NodeService)(nil)
 
 // NewNode 创建新的机器节点管理服务

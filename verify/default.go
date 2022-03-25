@@ -101,6 +101,11 @@ func newDefault() *hardcodeVerify {
 				minLevel: Common,
 			},
 			// 需要普通用户及以上权限
+			RevokeNodeApply: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 需要普通用户及以上权限
 			GetNodeApplyInfo: {
 				maxLevel: MaxLevel,
 				minLevel: Common,

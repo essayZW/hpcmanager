@@ -212,6 +212,31 @@ message FinishNodeDistributeWOResponse {
 }
 ```
 
+## RevokeNodeApply
+
+描述: 撤销机器节点申请
+
+原型定义: `rpc RevokeNodeApply(RevokeNodeApplyRequest) returns (RevokeNodeApplyResponse) {}`
+
+需求权限: `Common` 及以上
+
+请求参数:
+
+```protobuf
+message RevokeNodeApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message RevokeNodeApplyResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ### NodeApply

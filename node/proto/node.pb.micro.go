@@ -46,6 +46,7 @@ type NodeService interface {
 	PaginationGetNodeDistributeWO(ctx context.Context, in *PaginationGetNodeDistributeWORequest, opts ...client.CallOption) (*PaginationGetNodeDistributeWOResponse, error)
 	GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByIDRequest, opts ...client.CallOption) (*GetNodeApplyByIDResponse, error)
 	FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, opts ...client.CallOption) (*FinishNodeDistributeWOResponse, error)
+	RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, opts ...client.CallOption) (*RevokeNodeApplyResponse, error)
 }
 
 type nodeService struct {
@@ -140,6 +141,16 @@ func (c *nodeService) FinishNodeDistributeWO(ctx context.Context, in *FinishNode
 	return out, nil
 }
 
+func (c *nodeService) RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, opts ...client.CallOption) (*RevokeNodeApplyResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.RevokeNodeApply", in)
+	out := new(RevokeNodeApplyResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Node service
 
 type NodeHandler interface {
@@ -151,6 +162,7 @@ type NodeHandler interface {
 	PaginationGetNodeDistributeWO(context.Context, *PaginationGetNodeDistributeWORequest, *PaginationGetNodeDistributeWOResponse) error
 	GetNodeApplyByID(context.Context, *GetNodeApplyByIDRequest, *GetNodeApplyByIDResponse) error
 	FinishNodeDistributeWO(context.Context, *FinishNodeDistributeWORequest, *FinishNodeDistributeWOResponse) error
+	RevokeNodeApply(context.Context, *RevokeNodeApplyRequest, *RevokeNodeApplyResponse) error
 }
 
 func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.HandlerOption) error {
@@ -163,6 +175,7 @@ func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.Handl
 		PaginationGetNodeDistributeWO(ctx context.Context, in *PaginationGetNodeDistributeWORequest, out *PaginationGetNodeDistributeWOResponse) error
 		GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByIDRequest, out *GetNodeApplyByIDResponse) error
 		FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, out *FinishNodeDistributeWOResponse) error
+		RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, out *RevokeNodeApplyResponse) error
 	}
 	type Node struct {
 		node
@@ -205,4 +218,8 @@ func (h *nodeHandler) GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByID
 
 func (h *nodeHandler) FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, out *FinishNodeDistributeWOResponse) error {
 	return h.NodeHandler.FinishNodeDistributeWO(ctx, in, out)
+}
+
+func (h *nodeHandler) RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, out *RevokeNodeApplyResponse) error {
+	return h.NodeHandler.RevokeNodeApply(ctx, in, out)
 }

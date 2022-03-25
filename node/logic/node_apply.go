@@ -175,6 +175,10 @@ func (node *NodeApply) CheckNodeApplyByAdmin(ctx context.Context, applyID int, s
 	})
 }
 
+func (node *NodeApply) RevokeNodeApply(ctx context.Context, applyID int) (bool, error) {
+	return node.nodeApplyDB.UpdateStatus(ctx, applyID, 0)
+}
+
 // GetNodeApplyByID 通过ID查询机器节点申请记录信息
 func (node *NodeApply) GetNodeApplyByID(ctx context.Context, applyID int) (*db.NodeApply, error) {
 	return node.nodeApplyDB.QueryByID(ctx, applyID)

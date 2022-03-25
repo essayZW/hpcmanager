@@ -34,6 +34,8 @@ const (
 	GetProjectInfo = "__GET_PROJECT_INFO__"
 	// CreateNodeApply 创建计算节点申请
 	CreateNodeApply = "__CREATE_NODE_APPLY__"
+	// RevokeNodeApply 撤销机器节点申请
+	RevokeNodeApply = "__REVOKE_NODE_APPLY__"
 	// GetNodeApplyInfo 查询个计算节点包机申请
 	GetNodeApplyInfo = "__GET_NODE_APPLY_INFO__"
 	// CheckNodeApply 审核机器节点申请

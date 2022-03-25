@@ -171,6 +171,7 @@ func (node *NodeApplyDB) UpdateAdminCheckStatus(ctx context.Context, newStatus *
 	return count != 0, nil
 }
 
+// QueryByID 通过ID查询申请记录
 func (node *NodeApplyDB) QueryByID(ctx context.Context, applyID int) (*NodeApply, error) {
 	row, err := node.conn.QueryRow(ctx, "SELECT * FROM `node_apply` WHERE `id`=?", applyID)
 	if err != nil {
@@ -183,6 +184,22 @@ func (node *NodeApplyDB) QueryByID(ctx context.Context, applyID int) (*NodeApply
 		return nil, errors.New("QueryByID struct scan error")
 	}
 	return &info, nil
+}
+
+// UpdateStatus 更新申请的状态
+func (node *NodeApplyDB) UpdateStatus(ctx context.Context, applyID int, status int) (bool, error) {
+	res, err := node.conn.Exec(ctx, "UPDATE `node_apply` SET `status`=? WHERE `id`=?", status, applyID)
+	if err != nil {
+		logger.Warn("UpdateStatus: ", err)
+		return false, errors.New("UpdateStatus error")
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateStatus: ", err)
+		return false, errors.New("UpdateStatus error")
+	}
+	return count > 0, nil
 }
 
 // NewNodeApply 创建新的node_apply数据库操作
