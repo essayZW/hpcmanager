@@ -8,11 +8,15 @@ import (
 	"path"
 	"strconv"
 	"time"
+
+	"github.com/essayZW/hpcmanager/db"
+	"github.com/essayZW/hpcmanager/logger"
 )
 
 // defaultSource 默认的作业调度系统源,主要通过执行脚本命令实现
 type defaultSource struct {
 	baseDir string
+	conn    *db.DB
 }
 
 func (source *defaultSource) AddUserToGroup(userName, groupName string, gid int) (map[string]interface{}, error) {
@@ -21,6 +25,31 @@ func (source *defaultSource) AddUserToGroup(userName, groupName string, gid int)
 
 func (source *defaultSource) AddUserWithGroup(userName, groupName string) (map[string]interface{}, error) {
 	return source.timeoutExec("php", "useradd_withgroup.php", "--user", userName, "--group", groupName)
+}
+
+func (source *defaultSource) GetNodeUsageWithDate(ctx context.Context, startTime, endTime time.Time) ([]*HpcNodeUsage, error) {
+	return source.selectWithDate(ctx, startTime, endTime)
+}
+
+func (source *defaultSource) selectWithDate(ctx context.Context, startDate, endDate time.Time) ([]*HpcNodeUsage, error) {
+	rows, err := source.conn.Query(ctx, "SELECT `username`, `groupname`, `queuename`, `walltime`, `gwalltime` "+
+		// NOTE: CPUDefq 以及 GPUDefq 在老的平台写在配置文件中,这里硬编码,应该注意相关的变化的更新
+		" FROM `hpc_account` WHERE `startdate`>=? AND `enddate`<=? AND `queuename` IN ('CPUDefq', 'GPUDefq')",
+		startDate, endDate)
+	if err != nil {
+		logger.Warn("select usage data error: ", err)
+		return nil, errors.New("select usage data error")
+	}
+	infos := make([]*HpcNodeUsage, 0)
+	for rows.Next() {
+		var info HpcNodeUsage
+		if err := rows.StructScan(&info); err != nil {
+			logger.Warn("select usage data error (struct scan): ", err)
+			return nil, errors.New("select usage data error (struct scan)")
+		}
+		infos = append(infos, &info)
+	}
+	return infos, nil
 }
 
 // exec 执行指定的命令
@@ -47,8 +76,16 @@ func (source *defaultSource) timeoutExec(executor, file string, args ...string) 
 	return source.exec(ctx, executor, file, args...)
 }
 
-func newSource(options *Options) HpcSource {
+func newSource(options *Options) (HpcSource, error) {
 	source := defaultSource{}
 	source.baseDir = options.CmdBaseDir
-	return &source
+	var err error
+	if options.dbConf == nil {
+		return nil, errors.New("need db conf")
+	}
+	source.conn, err = db.NewDBWithConfig(options.dbConf)
+	if err != nil {
+		return nil, err
+	}
+	return &source, nil
 }

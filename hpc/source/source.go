@@ -1,6 +1,11 @@
 package source
 
-import "go-micro.dev/v4/logger"
+import (
+	"context"
+	"time"
+
+	"go-micro.dev/v4/logger"
+)
 
 // HpcSource hpc调度系统的操作接口定义
 // 当前子项目用于hpc作业调度系统集成到微服务系统中的一个包装
@@ -10,17 +15,27 @@ type HpcSource interface {
 	AddUserWithGroup(userName string, groupName string) (map[string]interface{}, error)
 	// AddUserToGroup 添加用户到现有的用户组
 	AddUserToGroup(userName string, groupName string, gid int) (map[string]interface{}, error)
+	GetNodeUsageWithDate(ctx context.Context, startTime, endTime time.Time) ([]*HpcNodeUsage, error)
 }
 
 // New 创建默认的作业调度源
-func New(options ...Option) HpcSource {
+func New(options ...Option) (HpcSource, error) {
 	opts := Options{}
 	for _, opt := range options {
 		opt(&opts)
 	}
 	if opts.DevMode {
 		logger.Info("Use devMode source")
-		return newDev(&opts)
+		return newDev(&opts), nil
 	}
 	return newSource(&opts)
+}
+
+// HpcNodeUsage 计算节点的使用情况记录的映射
+type HpcNodeUsage struct {
+	Username  string
+	GroupName string
+	QueueName string
+	WallTime  float64
+	GWallTime float64
 }

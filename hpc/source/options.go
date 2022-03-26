@@ -1,5 +1,7 @@
 package source
 
+import "github.com/essayZW/hpcmanager/config"
+
 // Options source配置的options
 type Options struct {
 	// CmdLocation 脚本文件的根目录
@@ -7,6 +9,9 @@ type Options struct {
 
 	// DevMode 是否是开发模式下
 	DevMode bool
+
+	// dbConf 数据库配置
+	dbConf *config.Database
 }
 
 // Option 选项
@@ -23,5 +28,11 @@ func WithCmdBaseDir(dir string) Option {
 func WithDevSource(dev bool) Option {
 	return func(o *Options) {
 		o.DevMode = dev
+	}
+}
+
+func WithDBSource(dbConf *config.Database) Option {
+	return func(o *Options) {
+		o.dbConf = dbConf
 	}
 }

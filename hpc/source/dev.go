@@ -1,6 +1,10 @@
 package source
 
-import "math/rand"
+import (
+	"context"
+	"math/rand"
+	"time"
+)
 
 type hpcDev struct {
 }
@@ -25,6 +29,10 @@ func (dev *hpcDev) AddUserToGroup(userName string, groupName string, gid int) (m
 			"uid":   rand.Intn(1000) + 1000,
 		},
 	}, nil
+}
+
+func (dev *hpcDev) GetNodeUsageWithDate(ctx context.Context, startTime, endTime time.Time) ([]*HpcNodeUsage, error) {
+	return nil, nil
 }
 
 func newDev(options *Options) HpcSource {

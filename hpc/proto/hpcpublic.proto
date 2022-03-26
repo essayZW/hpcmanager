@@ -23,3 +23,12 @@ message HpcGroup {
     int32 gID = 4;
     string extraAttributes = 5;
 }
+
+// HpcNodeUsage 机器节点机器时间使用情况
+message HpcNodeUsage {
+    string username = 1;
+    string groupName = 2;
+    string queueName = 3;
+    double wallTime = 4;
+    double gwallTime = 5;
+}

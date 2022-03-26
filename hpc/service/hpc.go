@@ -223,6 +223,32 @@ func (h *HpcService) GetGroupInfoByID(ctx context.Context, req *hpcproto.GetGrou
 	return nil
 }
 
+// GetNodeUsage 获取某一段时间内的机器节点使用情况
+func (h *HpcService) GetNodeUsage(ctx context.Context, req *hpcproto.GetNodeUsageRequest, resp *hpcproto.GetNodeUsageResponse) error {
+	logger.Info("GetNodeUsage: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeUsage, req.BaseRequest.UserInfo.Levels) {
+		logger.Info("QueryNodeUsage permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		return errors.New("QueryNodeUsage permission forbidden")
+	}
+
+	infos, err := h.hpcLogic.GetNodeUsage(ctx, req.StartTimeUnix, req.EndTimeUnix)
+	if err != nil {
+		return err
+	}
+
+	resp.Usages = make([]*hpcproto.HpcNodeUsage, 0)
+	for index := range infos {
+		resp.Usages[index] = &hpcproto.HpcNodeUsage{
+			Username:  infos[index].Username,
+			GroupName: infos[index].GroupName,
+			QueueName: infos[index].QueueName,
+			WallTime:  infos[index].WallTime,
+			GwallTime: infos[index].GWallTime,
+		}
+	}
+	return nil
+}
+
 var _ hpcproto.HpcHandler = (*HpcService)(nil)
 
 // NewHpc 新建一个Hpc服务

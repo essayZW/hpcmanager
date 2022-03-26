@@ -72,10 +72,14 @@ func main() {
 	//}
 
 	env := os.Getenv(hpcmanager.EnvName)
-	hpcSource := source.New(
+	// TODO: 添加上数据库配置的加载
+	hpcSource, err := source.New(
 		source.WithCmdBaseDir(hpcCmdBaseDir),
 		source.WithDevSource(env == "dev"),
 	)
+	if err != nil {
+		logger.Fatal("hpcSource init error: ", err)
+	}
 
 	hpcLogic := logic.NewHpc(hpcSource, hpcdb.NewHpcUser(sqlConn), hpcdb.NewHpcGroup(sqlConn))
 

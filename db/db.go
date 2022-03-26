@@ -112,7 +112,12 @@ func NewDB() (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	db, err := sqlx.Open("mysql", dbConfig.Dsn())
+	return NewDBWithConfig(dbConfig)
+}
+
+// NewDBWithConfig 创建新的自定义配置的数据库连接
+func NewDBWithConfig(conf *config.Database) (*DB, error) {
+	db, err := sqlx.Open("mysql", conf.Dsn())
 	if err != nil {
 		return nil, err
 	}

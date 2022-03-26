@@ -46,6 +46,8 @@ const (
 	QueryNodeDistributeWO = "__QUERY_NODE_DISTRIBUTE_WO__"
 	// FinishNodeDistributeWO 处理某个机器节点分配工单
 	FinishNodeDistributeWO = "__FINISH_NODE_DISTRIBUTE_WO__"
+	// QueryNodeUsage 查询机器节点使用详情记录
+	QueryNodeUsage = "__QUERY_NODE_USAGE__"
 )
 
 // Verify 进行操作的权限验证

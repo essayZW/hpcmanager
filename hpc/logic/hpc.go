@@ -2,7 +2,9 @@ package logic
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/essayZW/hpcmanager/hpc/db"
 	hpcdb "github.com/essayZW/hpcmanager/hpc/db"
@@ -109,6 +111,15 @@ func (hpc *HpcLogic) GetGroupInfoByID(ctx context.Context, groupID int) (*db.Hpc
 // GetUserInfoByID 查询hpc用户信息
 func (hpc *HpcLogic) GetUserInfoByID(ctx context.Context, userID int) (*db.HpcUser, error) {
 	return hpc.hpcUserDB.QueryByID(ctx, userID)
+}
+
+func (hpc *HpcLogic) GetNodeUsage(ctx context.Context, startTimeUnix, endTimeUnix int64) ([]*source.HpcNodeUsage, error) {
+	startDate := time.UnixMicro(startTimeUnix * 1000)
+	endDate := time.UnixMicro(endTimeUnix * 1000)
+	if startDate.IsZero() || endDate.IsZero() {
+		return nil, errors.New("invalid time")
+	}
+	return hpc.hpcSource.GetNodeUsageWithDate(ctx, startDate, endDate)
 }
 
 // NewHpc 创建一个HPC作业调度系统逻辑操作
