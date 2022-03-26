@@ -146,7 +146,7 @@ const revokeButtonHandler = async (id: number) => {
   <el-row justify="center">
     <el-col :span="24">
       <el-table table-layout="auto" :data="tableData">
-        <el-table-column label="ID" prop="id"> </el-table-column>
+        <el-table-column label="ID" prop="id" sortable> </el-table-column>
         <el-table-column label="申请人姓名" prop="userName"></el-table-column>
         <el-table-column
           label="申请人学号"

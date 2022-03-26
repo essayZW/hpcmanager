@@ -36,7 +36,7 @@ func (node *NodeApplyDB) Insert(ctx context.Context, nodeApplyInfo *NodeApply) (
 
 // LimitQueryByCreaterUserID 通过创建者的ID分页查询机器节点申请信息
 func (node *NodeApplyDB) LimitQueryByCreaterUserID(ctx context.Context, userID, limit, offset int) ([]*NodeApply, error) {
-	row, err := node.conn.Query(ctx, "SELECT * FROM `node_apply` WHERE `creater_id`=? LIMIT ?, ?", userID, limit, offset)
+	row, err := node.conn.Query(ctx, "SELECT * FROM `node_apply` WHERE `creater_id`=? ORDER BY id DESC LIMIT ?, ?", userID, limit, offset)
 	if err != nil {
 		logger.Warn("LimitQueryByCreaterUserID error: ", err)
 		return nil, errors.New("LimitQueryByCreaterUserID error")
@@ -70,7 +70,7 @@ func (node *NodeApplyDB) QueryCountByCreaterID(ctx context.Context, userID int) 
 
 // LimitQueryByTutorID 通过导师ID分页查询申请信息
 func (node *NodeApplyDB) LimitQueryByTutorID(ctx context.Context, tutorID, limit, offset int) ([]*NodeApply, error) {
-	row, err := node.conn.Query(ctx, "SELECT * FROM `node_apply` WHERE `tutor_id`=? LIMIT ?, ?", tutorID, limit, offset)
+	row, err := node.conn.Query(ctx, "SELECT * FROM `node_apply` WHERE `tutor_id`=? ORDER BY id DESC LIMIT ?, ?", tutorID, limit, offset)
 	if err != nil {
 		logger.Warn("LimitQueryByTutorID error: ", err)
 		return nil, errors.New("LimitQueryByTutorID error")
@@ -105,7 +105,7 @@ func (node *NodeApplyDB) QueryCountByTutorID(ctx context.Context, tutorID int) (
 // LimitQueryWithTutorChecked 分页查询所有的申请记录信息
 func (node *NodeApplyDB) LimitQueryWithTutorChecked(ctx context.Context, limit, offset int) ([]*NodeApply, error) {
 	// 查询被导师审核通过的所有申请
-	row, err := node.conn.Query(ctx, "SELECT * FROM `node_apply` WHERE `tutor_check_status`=1 LIMIT ?, ?", limit, offset)
+	row, err := node.conn.Query(ctx, "SELECT * FROM `node_apply` WHERE `tutor_check_status`=1 ORDER BY id DESC LIMIT ?, ?", limit, offset)
 	if err != nil {
 		logger.Warn("LimitQuery error: ", err)
 		return nil, errors.New("LimitQuery error")

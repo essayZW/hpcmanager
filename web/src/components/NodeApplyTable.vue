@@ -236,7 +236,7 @@ const checkButtonHandler = async (
         :data="tableData.data"
         @expand-change="handlerTableExpand"
       >
-        <el-table-column label="ID" prop="id"></el-table-column>
+        <el-table-column label="ID" prop="id" sortable></el-table-column>
         <el-table-column
           label="申请人学号"
           prop="createrUsername"

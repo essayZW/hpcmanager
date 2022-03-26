@@ -69,7 +69,7 @@ func (ugadb *UserGroupApplyDB) AdminLimitQueryApplyCount(ctx context.Context) (i
 func (ugadb *UserGroupApplyDB) AdminLimitQueryApplyInfo(ctx context.Context, offset, size int) ([]*UserGroupApply, error) {
 	// 查询所有tutor_check_status等于1的记录，代表已经被导师审核通过
 	// 只有导师已经审核通过的申请管理员才可以看到
-	rows, err := ugadb.db.Query(ctx, "SELECT * FROM `user_group_apply` WHERE `tutor_check_status`=1 LIMIT ?,?", offset, size)
+	rows, err := ugadb.db.Query(ctx, "SELECT * FROM `user_group_apply` WHERE `tutor_check_status`=1 ORDER BY id DESC LIMIT ?,?", offset, size)
 	if err != nil {
 		logger.Warn("AdminLimitQueryApplyInfo error: ", err)
 		return nil, errors.New("AdminLimitQueryApplyInfo query fail")
@@ -89,7 +89,7 @@ func (ugadb *UserGroupApplyDB) AdminLimitQueryApplyInfo(ctx context.Context, off
 
 // TutorLimitQueryApplyInfo 导师分页查询所有的申请信息
 func (ugadb *UserGroupApplyDB) TutorLimitQueryApplyInfo(ctx context.Context, offset, size, groupID int) ([]*UserGroupApply, error) {
-	rows, err := ugadb.db.Query(ctx, "SELECT * FROM `user_group_apply` WHERE `apply_group_id`=? LIMIT ?,?", groupID, offset, size)
+	rows, err := ugadb.db.Query(ctx, "SELECT * FROM `user_group_apply` WHERE `apply_group_id`=? ORDER BY id DESC LIMIT ?,?", groupID, offset, size)
 	if err != nil {
 		logger.Warn("TutorLimitQueryApplyInfo error: ", err)
 		return nil, errors.New("TutorLimitQueryApplyInfo query fail")
@@ -124,7 +124,7 @@ func (ugadb *UserGroupApplyDB) TutorLimitQueryApplyCount(ctx context.Context, gr
 
 // CommonLimitQueryApplyInfo 普通用户分页查询自己的所有申请的信息
 func (ugadb *UserGroupApplyDB) CommonLimitQueryApplyInfo(ctx context.Context, offset, size, userID int) ([]*UserGroupApply, error) {
-	rows, err := ugadb.db.Query(ctx, "SELECT * FROM `user_group_apply` WHERE `user_id`=? LIMIT ?,?", userID, offset, size)
+	rows, err := ugadb.db.Query(ctx, "SELECT * FROM `user_group_apply` WHERE `user_id`=? ORDER BY id DESC LIMIT ?,?", userID, offset, size)
 	if err != nil {
 		logger.Warn("CommonLimitQueryApplyInfo error: ", err)
 		return nil, errors.New("CommonLimitQueryApplyInfo query fail")
