@@ -231,3 +231,14 @@ export async function checkApply(
   }
   return true;
 }
+
+/**
+ * 撤销用户加入组申请
+ */
+export async function revokeGroupApply(id: number): Promise<boolean> {
+  const resp = await ApiRequest.request(`/group/apply/${id}`, 'DELETE');
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}

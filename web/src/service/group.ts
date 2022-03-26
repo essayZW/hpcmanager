@@ -9,6 +9,7 @@ import {
   paginationQueryApplyInfo,
   checkApply,
   queryGroupByID,
+  revokeGroupApply,
 } from '../api/group';
 import { PaginationQueryResponse } from '../api/api';
 import { getUserIdByUsername } from './user';
@@ -107,4 +108,11 @@ export async function checkJoinGroupApply(
  */
 export async function getGroupInfoByID(id: number): Promise<GroupInfo> {
   return queryGroupByID(id);
+}
+
+/**
+ * 通过ID撤销用户组申请
+ */
+export async function revokeGroupApplyByID(id: number): Promise<boolean> {
+  return revokeGroupApply(id);
 }

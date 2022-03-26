@@ -309,7 +309,7 @@ func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	userGroup.GET("/tutor/:username", ug.searchTutorInfo)
 	userGroup.POST("/apply", ug.createJoinGroupApply)
 	userGroup.PATCH("/apply", ug.checkApply)
-	userGroup.DELETE("/apply", ug.revokeUserApplyGroup)
+	userGroup.DELETE("/apply/:id", ug.revokeUserApplyGroup)
 	return userGroup
 }
 

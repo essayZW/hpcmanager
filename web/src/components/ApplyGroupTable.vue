@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { ApplyInfo } from '../api/group';
-import { paginationGetApplyInfo, checkJoinGroupApply } from '../service/group';
+import {
+  paginationGetApplyInfo,
+  checkJoinGroupApply,
+  revokeGroupApplyByID,
+} from '../service/group';
 import { zeroWithDefault, timeOrBlank } from '../utils/obj';
 import dayjs from 'dayjs';
-import { isTutor, isAdmin } from '../service/user';
+import { isTutor, isAdmin, getUserInfoFromStorage } from '../service/user';
 
 // 表格数据
 const tableData = ref<ApplyInfo[]>([]);
@@ -98,6 +102,37 @@ const checkButtonHandler = async (
     }
   }
 };
+
+const userInfo = getUserInfoFromStorage();
+const canRevokeApply = (row: ApplyInfo): boolean => {
+  if (!userInfo) {
+    return false;
+  }
+  return (
+    row.managerCheckStatus == -1 &&
+    row.status == 1 &&
+    row.userID == userInfo.UserId
+  );
+};
+
+const revokeButtonHandler = async (id: number) => {
+  if (!confirm('确认需要撤销该申请吗?')) {
+    return;
+  }
+  try {
+    await revokeGroupApplyByID(id);
+    ElMessage({
+      type: 'success',
+      message: '撤销成功',
+    });
+    refreshTableData();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+};
 </script>
 <template>
   <el-row justify="end">
@@ -164,6 +199,17 @@ const checkButtonHandler = async (
             >
           </template>
         </el-table-column>
+        <el-table-column label="操作">
+          <template #default="props">
+            <el-button
+              v-if="canRevokeApply(props.row)"
+              type="warning"
+              @click="revokeButtonHandler(props.row.id)"
+              >撤销</el-button
+            >
+            <span v-else>无</span>
+          </template>
+        </el-table-column>
         <el-table-column label="更多" type="expand">
           <template #default="props">
             <div>
@@ -210,12 +256,22 @@ const checkButtonHandler = async (
                         </span>
                       </p>
                       <p
-                        v-if="isTutor() && props.row.tutorCheckStatus == -1"
+                        v-if="
+                          isTutor() &&
+                          props.row.tutorCheckStatus == -1 &&
+                          props.row.status == 1
+                        "
                         class="box-title"
                       >
                         <strong>操作</strong>
                       </p>
-                      <p v-if="isTutor() && props.row.tutorCheckStatus == -1">
+                      <p
+                        v-if="
+                          isTutor() &&
+                          props.row.tutorCheckStatus == -1 &&
+                          props.row.status == 1
+                        "
+                      >
                         <el-form class="form">
                           <el-form-item label="审核">
                             <el-button
@@ -291,12 +347,22 @@ const checkButtonHandler = async (
                         </span>
                       </p>
                       <p
-                        v-if="isAdmin() && props.row.managerCheckStatus == -1"
+                        v-if="
+                          isAdmin() &&
+                          props.row.managerCheckStatus == -1 &&
+                          props.row.status == 1
+                        "
                         class="box-title"
                       >
                         <strong>操作</strong>
                       </p>
-                      <p v-if="isAdmin() && props.row.managerCheckStatus == -1">
+                      <p
+                        v-if="
+                          isAdmin() &&
+                          props.row.managerCheckStatus == -1 &&
+                          props.row.status == 1
+                        "
+                      >
                         <el-form class="form">
                           <el-form-item label="审核">
                             <el-button
