@@ -32,7 +32,15 @@ func (dev *hpcDev) AddUserToGroup(userName string, groupName string, gid int) (m
 }
 
 func (dev *hpcDev) GetNodeUsageWithDate(ctx context.Context, startTime, endTime time.Time) ([]*HpcNodeUsage, error) {
-	return nil, nil
+	infos := make([]*HpcNodeUsage, rand.Intn(64))
+	for i := range infos {
+		infos[i] = &HpcNodeUsage{
+			// TODO: 字段需要补全
+			WallTime:  rand.Float64() * float64(rand.Intn(64)),
+			GWallTime: rand.Float64() * float64(rand.Intn(64)),
+		}
+	}
+	return infos, nil
 }
 
 func newDev(options *Options) HpcSource {
