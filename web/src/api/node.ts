@@ -56,6 +56,7 @@ export async function paginationQueryNodeApplyInfo(
   for (const item of resp.data.Data) {
     undefinedWithDefault(item, 'tutorCheckStatus', 0);
     undefinedWithDefault(item, 'managerCheckStatus', 0);
+    undefinedWithDefault(item, 'status', 0);
   }
   return resp.data;
 }
@@ -185,5 +186,16 @@ export async function finishNodeDistributeByID(id: number): Promise<boolean> {
     throw new Error(resp.message);
   }
 
+  return true;
+}
+
+/**
+ * 撤销机器节点申请
+ */
+export async function revokeNodeApply(id: number): Promise<boolean> {
+  const resp = await ApiRequest.request(`/node/apply/${id}`, 'DELETE');
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
   return true;
 }

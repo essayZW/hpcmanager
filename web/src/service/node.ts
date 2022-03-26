@@ -8,6 +8,7 @@ import {
   paginationQueryNodeDistributeInfo,
   queryNodeApplyByID,
   finishNodeDistributeByID,
+  revokeNodeApply,
 } from '../api/node';
 
 /**
@@ -94,4 +95,11 @@ export async function getNodeApplyByID(id: number): Promise<NodeApplyInfo> {
  */
 export async function handlerNodeDistributeByID(id: number): Promise<boolean> {
   return finishNodeDistributeByID(id);
+}
+
+/**
+ * 通过ID撤销机器节点申请
+ */
+export async function revokeNodeApplyByID(id: number): Promise<boolean> {
+  return revokeNodeApply(id);
 }

@@ -5,11 +5,17 @@ import {
   paginationGetNodeApplyInfo,
   nodeTypeToName,
   checkNodeApply,
+  revokeNodeApplyByID,
 } from '../service/node';
 import dayjs from 'dayjs';
 import { ProjectInfo } from '../api/project';
 import { UserInfo } from '../api/user';
-import { getUserInfoById, isAdmin, isTutor } from '../service/user';
+import {
+  getUserInfoById,
+  getUserInfoFromStorage,
+  isAdmin,
+  isTutor,
+} from '../service/user';
 import { getProjectInfoByID } from '../service/project';
 import { zeroWithDefault, timeOrBlank } from '../utils/obj';
 
@@ -23,6 +29,8 @@ const tableData = reactive<{
   data: [],
   loading: false,
 });
+
+const userInfo = getUserInfoFromStorage();
 
 // 加载表格数据
 const loadTableData = async (pageIndex: number, pageSize: number) => {
@@ -41,6 +49,37 @@ const loadTableData = async (pageIndex: number, pageSize: number) => {
     });
   }
   tableData.loading = false;
+};
+
+const canRevokeApply = (row: NodeApplyInfo): boolean => {
+  // 只有没有被管理员最终审核以及还没有撤销的以及是自己创建的申请才可以撤销
+  if (!userInfo) {
+    return false;
+  }
+  return (
+    row.managerCheckStatus == -1 &&
+    row.status == 1 &&
+    row.createrID == userInfo.UserId
+  );
+};
+
+const revokeButtonHandler = async (id: number) => {
+  if (!confirm('确认需要撤销该申请吗?')) {
+    return;
+  }
+  try {
+    await revokeNodeApplyByID(id);
+    ElMessage({
+      type: 'success',
+      message: '撤销成功',
+    });
+    refreshTableData();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
 };
 
 // 分页信息
@@ -259,6 +298,17 @@ const checkButtonHandler = async (
             >
           </template>
         </el-table-column>
+        <el-table-column label="操作" prop="status">
+          <template #default="props">
+            <el-button
+              v-if="canRevokeApply(props.row)"
+              type="warning"
+              @click="revokeButtonHandler(props.row.id)"
+              >撤销</el-button
+            >
+            <span v-else>无</span>
+          </template>
+        </el-table-column>
         <el-table-column label="详情" type="expand">
           <template #default="props">
             <div
@@ -455,12 +505,22 @@ const checkButtonHandler = async (
                       </span>
                     </p>
                     <p
-                      v-if="isTutor() && props.row.tutorCheckStatus == -1"
+                      v-if="
+                        isTutor() &&
+                        props.row.tutorCheckStatus == -1 &&
+                        props.row.status == 1
+                      "
                       class="box-title"
                     >
                       <strong>操作</strong>
                     </p>
-                    <p v-if="isTutor() && props.row.tutorCheckStatus == -1">
+                    <p
+                      v-if="
+                        isTutor() &&
+                        props.row.tutorCheckStatus == -1 &&
+                        props.row.status == 1
+                      "
+                    >
                       <el-form class="form">
                         <el-form-item label="审核">
                           <el-button
@@ -536,12 +596,22 @@ const checkButtonHandler = async (
                       </span>
                     </p>
                     <p
-                      v-if="isAdmin() && props.row.managerCheckStatus == -1"
+                      v-if="
+                        isAdmin() &&
+                        props.row.managerCheckStatus == -1 &&
+                        props.row.status == 1
+                      "
                       class="box-title"
                     >
                       <strong>操作</strong>
                     </p>
-                    <p v-if="isAdmin() && props.row.managerCheckStatus == -1">
+                    <p
+                      v-if="
+                        isAdmin() &&
+                        props.row.managerCheckStatus == -1 &&
+                        props.row.status == 1
+                      "
+                    >
                       <el-form class="form">
                         <el-form-item label="审核">
                           <el-button
