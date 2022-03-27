@@ -92,16 +92,18 @@ const tableRowExpandHandler = async (row: NodeDistribute) => {
 };
 
 const handlerFinishWorkOrder = async (id: number) => {
-  if (!confirm(`确认标记ID为${id}的工单为已经处理?`))
-    try {
-      await handlerNodeDistributeByID(id);
-      refreshTable();
-    } catch (error) {
-      ElMessage({
-        type: 'error',
-        message: `${error}`,
-      });
-    }
+  if (!confirm(`确认标记ID为${id}的工单为已经处理?`)) {
+    return;
+  }
+  try {
+    await handlerNodeDistributeByID(id);
+    refreshTable();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
 };
 </script>
 <template>
