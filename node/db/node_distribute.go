@@ -62,7 +62,7 @@ func (ndb *NodeDistributeDB) QueryCountByApply(ctx context.Context, applyID int)
 
 // QueryLimit 分页查询记录
 func (ndb *NodeDistributeDB) QueryLimit(ctx context.Context, limit, offset int) ([]*NodeDistribute, error) {
-	row, err := ndb.conn.Query(ctx, "SELECT * FROM `node_distribute` LIMIT ?,?", limit, offset)
+	row, err := ndb.conn.Query(ctx, "SELECT * FROM `node_distribute` ORDER BY `id` DESC LIMIT ?,?", limit, offset)
 	if err != nil {
 		logger.Warn("QueryLimit error: ", err)
 		return nil, errors.New("QueryLimit error")
