@@ -199,6 +199,21 @@ func (db *UserDB) QueryUserByGroupID(ctx context.Context, groupID int) ([]int, e
 	return ids, nil
 }
 
+// QueryCountWithPYNamePrefix 通过拼音名称的前缀查询记录的数量
+func (db *UserDB) QueryCountWithPYNamePrefix(ctx context.Context, prefix string) (int, error) {
+	row, err := db.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `user` WHERE `pinyin_name` LIKE ?", prefix+"%")
+	if err != nil {
+		logger.Warn("QueryCountWithPYNamePrefix error: ", err)
+		return 0, errors.New("QueryCountWithPYNamePrefix error")
+	}
+	var count int
+	if err = row.Scan(&count); err != nil {
+		logger.Warn("QueryCountWithPYNamePrefix error: ", err)
+		return 0, errors.New("QueryCountWithPYNamePrefix error")
+	}
+	return count, nil
+}
+
 // NewUser 创建一个新的操作用户数据库结构体
 func NewUser(db *db.DB) *UserDB {
 	return &UserDB{

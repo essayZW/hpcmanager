@@ -53,6 +53,15 @@ func init() {
 	userLogic = NewUser(userdb.NewUser(sqlConn), etcdConfig, redisConn)
 }
 
+func getUserDB() *userdb.UserDB {
+	// 创建数据库连接
+	sqlConn, err := db.NewDB()
+	if err != nil {
+		logger.Fatal("MySQL conn error: ", err)
+	}
+	return userdb.NewUser(sqlConn)
+}
+
 func TestLoginCheck(t *testing.T) {
 	tests := []struct {
 		Name     string
@@ -344,6 +353,64 @@ func TestPinyinLib(t *testing.T) {
 			got := pinyin.LazyPinyin(tt.args.name, pinyin.NewArgs())
 			if strings.Join(got, "") != tt.want {
 				t.Errorf("Want=%s, Got=%s", tt.want, got)
+			}
+		})
+	}
+}
+
+func TestUser_addSuffixForPYName(t *testing.T) {
+	type fields struct {
+		userDB *userdb.UserDB
+	}
+	type args struct {
+		ctx    context.Context
+		pyName string
+	}
+	userDB := getUserDB()
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "test dalao",
+			fields: fields{
+				userDB: userDB,
+			},
+			args: args{
+				ctx:    context.Background(),
+				pyName: "dalao",
+			},
+			want:    "dalao3",
+			wantErr: false,
+		},
+		{
+			name: "test none",
+			fields: fields{
+				userDB: userDB,
+			},
+			args: args{
+				ctx:    context.Background(),
+				pyName: "none",
+			},
+			want:    "none",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := &User{
+				userDB: tt.fields.userDB,
+			}
+			got, err := u.addSuffixForPYName(tt.args.ctx, tt.args.pyName)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("User.addSuffixForPYName() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("User.addSuffixForPYName() = %v, want %v", got, tt.want)
 			}
 		})
 	}

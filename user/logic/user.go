@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -111,6 +112,12 @@ func (u *User) AddUser(ctx context.Context, userInfo *db.User) (int, error) {
 		pinyinDict := pinyin.LazyPinyin(userInfo.Name, pinyin.NewArgs())
 		userInfo.PinyinName = strings.Join(pinyinDict, "")
 	}
+	// 判断该拼音的名称是否重复,如果重复的话,添加相应的后缀确保其不重复
+	newPYName, err := u.addSuffixForPYName(ctx, userInfo.PinyinName)
+	if err != nil {
+		return 0, errors.New("invalid name with pinyin name")
+	}
+	userInfo.PinyinName = newPYName
 	if userInfo.CreateTime.IsZero() {
 		userInfo.CreateTime = time.Now()
 	}
@@ -122,6 +129,19 @@ func (u *User) AddUser(ctx context.Context, userInfo *db.User) (int, error) {
 		return 0, err
 	}
 	return id, nil
+}
+
+// addSuffixForPYName 为拼音姓名添加唯一的后缀标志
+func (u *User) addSuffixForPYName(ctx context.Context, pyName string) (string, error) {
+	count, err := u.userDB.QueryCountWithPYNamePrefix(ctx, pyName)
+	if err != nil {
+		return "", err
+	}
+	if count == 0 {
+		return pyName, nil
+	}
+	suffix := strconv.Itoa(count)
+	return pyName + suffix, nil
 }
 
 // GetUserInfoByID 通过ID查询用户信息

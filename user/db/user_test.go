@@ -28,6 +28,14 @@ func init() {
 	userDb = NewUser(dbConn)
 }
 
+func getDBConn() *db.DB {
+	dbConn, err := db.NewDB()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	return dbConn
+}
+
 func TestLoginQuery(t *testing.T) {
 
 	md5Pass := fmt.Sprintf("%x", md5.Sum([]byte("essay")))
@@ -106,6 +114,88 @@ func TestQueryByGroupID(t *testing.T) {
 			}
 			if len(ids) != test.ExceptCount {
 				t.Errorf("Get: %v, Except: %v", ids, test.ExceptCount)
+			}
+		})
+	}
+}
+
+func TestUserDB_QueryCountWithPYNamePrefix(t *testing.T) {
+	type fields struct {
+		conn *db.DB
+	}
+	type args struct {
+		ctx    context.Context
+		prefix string
+	}
+	conn := getDBConn()
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    int
+		wantErr bool
+	}{
+		{
+			name: "test shenqingzhe",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx:    context.Background(),
+				prefix: "shenqingzhe",
+			},
+			want:    3,
+			wantErr: false,
+		},
+		{
+			name: "test dalao",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx:    context.Background(),
+				prefix: "dalao",
+			},
+			want:    3,
+			wantErr: false,
+		},
+		{
+			name: "test shenqingzu",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx:    context.Background(),
+				prefix: "shenqingzu",
+			},
+			want:    1,
+			wantErr: false,
+		},
+		{
+			name: "test none",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx:    context.Background(),
+				prefix: "none",
+			},
+			want:    0,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := &UserDB{
+				conn: tt.fields.conn,
+			}
+			got, err := db.QueryCountWithPYNamePrefix(tt.args.ctx, tt.args.prefix)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UserDB.QueryCountWithPYNamePrefix() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("UserDB.QueryCountWithPYNamePrefix() = %v, want %v", got, tt.want)
 			}
 		})
 	}
