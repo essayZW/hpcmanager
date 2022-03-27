@@ -33,9 +33,9 @@ func New(options ...Option) (HpcSource, error) {
 
 // HpcNodeUsage 计算节点的使用情况记录的映射
 type HpcNodeUsage struct {
-	Username  string
-	GroupName string
-	QueueName string
-	WallTime  float64
-	GWallTime float64
+	Username  string  `db:"UserName"`
+	GroupName string  `db:"GroupName"`
+	QueueName string  `db:"Queue"`
+	WallTime  float64 `db:"WallTime"`
+	GWallTime float64 `db:"GpusWallTime"`
 }

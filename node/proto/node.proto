@@ -19,6 +19,7 @@ service Node {
     rpc GetNodeApplyByID(GetNodeApplyByIDRequest) returns (GetNodeApplyByIDResponse) {}
     rpc FinishNodeDistributeWO(FinishNodeDistributeWORequest) returns (FinishNodeDistributeWOResponse) {}
     rpc RevokeNodeApply(RevokeNodeApplyRequest) returns (RevokeNodeApplyResponse) {}
+    rpc AddNodeUsageTimeRecord(AddNodeUsageTimeRecordRequest) returns (AddNodeUsageTimeRecordResponse) {}
 }
 
 message CreateNodeApplyRequest {
@@ -102,4 +103,12 @@ message RevokeNodeApplyRequest {
 
 message RevokeNodeApplyResponse {
     bool success = 1;
+}
+
+message AddNodeUsageTimeRecordRequest {
+    request.BaseRequest baseRequest = 1;
+}
+
+message AddNodeUsageTimeRecordResponse {
+    int32 id = 1;
 }

@@ -32,20 +32,20 @@ func (source *defaultSource) GetNodeUsageWithDate(ctx context.Context, startTime
 }
 
 func (source *defaultSource) selectWithDate(ctx context.Context, startDate, endDate time.Time) ([]*HpcNodeUsage, error) {
-	rows, err := source.conn.Query(ctx, "SELECT `username`, `groupname`, `queuename`, `walltime`, `gwalltime` "+
-		// NOTE: CPUDefq 以及 GPUDefq 在老的平台写在配置文件中,这里硬编码,应该注意相关的变化的更新
-		" FROM `hpc_account` WHERE `startdate`>=? AND `enddate`<=? AND `queuename` IN ('CPUDefq', 'GPUDefq')",
-		startDate, endDate)
+	// 从jobDW数据库中获取原始的作业调度信息并计算之后返回
+	rows, err := source.conn.Query(ctx, "SELECT `UserName`,`GroupName`,`Queue`, SUM(`WallDurationSeconds`) AS `WallTime`, SUM(`GpusWallTime`) as `GWallTime` "+
+		" FROM `account` WHERE `EventDate` >= ? AND `EventDate`<=? GROUP BY `GroupName`, `UserName`, `Queue`", startDate, endDate)
 	if err != nil {
-		logger.Warn("select usage data error: ", err)
-		return nil, errors.New("select usage data error")
+		logger.Warn("selectWithDate error: ", err)
+		return nil, errors.New("selectWithDate error")
 	}
+
 	infos := make([]*HpcNodeUsage, 0)
 	for rows.Next() {
 		var info HpcNodeUsage
 		if err := rows.StructScan(&info); err != nil {
-			logger.Warn("select usage data error (struct scan): ", err)
-			return nil, errors.New("select usage data error (struct scan)")
+			logger.Warn("selectWithDate error: ", err)
+			return nil, errors.New("selectWithDate error")
 		}
 		infos = append(infos, &info)
 	}

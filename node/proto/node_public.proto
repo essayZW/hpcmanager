@@ -49,3 +49,7 @@ message NodeDistribute {
     string extraAttributes = 9;
 }
 
+// NodeUsageTiem 机器节点机时记录
+message NodeUsageTiem {
+
+}
