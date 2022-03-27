@@ -164,39 +164,28 @@ const revokeButtonHandler = async (id: number) => {
             }}
           </template>
         </el-table-column>
+        <el-table-column label="导师审核状态">
+          <template #default="props">
+            <span v-if="props.row.tutorCheckStatus == -1">未审核</span>
+            <span v-else-if="props.row.tutorCheckStatus == 1" class="green"
+              >审核通过</span
+            >
+            <span v-else class="red">审核未通过</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="管理员审核状态">
+          <template #default="props">
+            <span v-if="props.row.managerCheckStatus == -1">未审核</span>
+            <span v-else-if="props.row.managerCheckStatus == 1" class="green"
+              >审核通过</span
+            >
+            <span v-else class="red">审核未通过</span>
+          </template>
+        </el-table-column>
         <el-table-column label="状态">
-          <template #default="scope">
-            <span
-              v-if="
-                scope.row.status == 1 &&
-                scope.row.tutorCheckStatus == -1 &&
-                scope.row.managerCheckStatus == -1
-              "
-              >未审核</span
-            >
-            <span v-else-if="scope.row.status == 0" class="red">已经撤销</span>
-            <span
-              v-else-if="
-                scope.row.tutorCheckStatus == 1 &&
-                scope.row.managerCheckStatus == -1
-              "
-              class="green"
-              >导师审核通过</span
-            >
-            <span
-              v-else-if="
-                scope.row.tutorCheckStatus == 0 &&
-                scope.row.managerCheckStatus == -1
-              "
-              class="red"
-              >导师审核未通过</span
-            >
-            <span v-else-if="scope.row.managerCheckStatus == 1" class="green"
-              >管理员审核通过</span
-            >
-            <span v-else-if="scope.row.managerCheckStatus == 0" class="red"
-              >管理员审核未通过</span
-            >
+          <template #default="props">
+            <span v-if="props.row.status == 1">正常</span>
+            <span v-else class="red">已经撤销</span>
           </template>
         </el-table-column>
         <el-table-column label="操作">
