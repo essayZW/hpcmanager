@@ -111,7 +111,8 @@ const canRevokeApply = (row: ApplyInfo): boolean => {
   return (
     row.managerCheckStatus == -1 &&
     row.status == 1 &&
-    row.userID == userInfo.UserId
+    row.userID == userInfo.UserId &&
+    row.tutorCheckStatus != 0
   );
 };
 

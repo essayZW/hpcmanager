@@ -59,7 +59,8 @@ const canRevokeApply = (row: NodeApplyInfo): boolean => {
   return (
     row.managerCheckStatus == -1 &&
     row.status == 1 &&
-    row.createrID == userInfo.UserId
+    row.createrID == userInfo.UserId &&
+    row.tutorCheckStatus != 0
   );
 };
 
