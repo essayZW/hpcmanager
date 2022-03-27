@@ -16,6 +16,12 @@ import (
 	"github.com/mozillazg/go-pinyin"
 )
 
+func init() {
+	pinyin.Fallback = func(r rune, a pinyin.Args) []string {
+		return []string{string(r)}
+	}
+}
+
 // 对于已经登录的用户来说，会在redis中存储两个值
 // 其中一个是TokenPrefix+token,用来快速判断某个token的归属者,其值为用户帐号
 // 另外一个是LoginUserTokenPrefix+username,用来判断某个用户是否已经登录以及其登录的token是多少,其值是对应的token值

@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/essayZW/hpcmanager/logger"
 	userdb "github.com/essayZW/hpcmanager/user/db"
 	"github.com/go-redis/redis/v8"
+	"github.com/mozillazg/go-pinyin"
 )
 
 var userLogic *User
@@ -289,6 +291,59 @@ func TestChangeUserGroup(t *testing.T) {
 			}
 			if test.Error {
 				t.Errorf("Get: %v, Except: %v", err, test.Error)
+			}
+		})
+	}
+}
+
+func TestPinyinLib(t *testing.T) {
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name string
+
+		args args
+		want string
+	}{
+		{
+			name: "success1",
+			args: args{
+				name: "测试",
+			},
+			want: "ceshi",
+		},
+		{
+			name: "success1",
+			args: args{
+				name: "大佬",
+			},
+			want: "dalao",
+		},
+		{
+			name: "success1",
+			args: args{
+				name: "大佬1",
+			},
+			want: "dalao1",
+		},
+		{
+			name: "success1",
+			args: args{
+				name: "1大佬",
+			},
+			want: "1dalao",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pinyin.Fallback = func(r rune, a pinyin.Args) []string {
+				return []string{string(r)}
+			}
+			got := pinyin.LazyPinyin(tt.args.name, pinyin.NewArgs())
+			if strings.Join(got, "") != tt.want {
+				t.Errorf("Want=%s, Got=%s", tt.want, got)
 			}
 		})
 	}
