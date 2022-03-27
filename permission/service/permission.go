@@ -131,6 +131,7 @@ func (permission *PermissionService) RemoveUserPermission(ctx context.Context, r
 		}
 		if len(permissions) == 0 {
 			// 删除权限之后若没有了任何的权限则添加Guest权限
+			logger.Info("no user permission, add guest permission")
 			if err := permission.userpLogic.AddUserPermission(c, &db.UserPermission{
 				UserID: int(req.Userid),
 			}, verify.Guest); err != nil {

@@ -322,15 +322,6 @@ func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupReques
 			return nil, err
 		}
 
-		// 删除原来的Guest权限
-		_, err = s.permissionService.RemoveUserPermission(ctx, &permissionpb.RemoveUserPermissionRequest{
-			Userid:      int32(userInfo.ID),
-			Level:       int32(verify.Guest),
-			BaseRequest: req.BaseRequest,
-		})
-		if err != nil {
-			logger.Warn("remove guest permission error: ", err)
-		}
 		// 添加Common权限
 		addResp, err := s.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
 			Userid:      int32(userInfo.ID),
@@ -342,6 +333,15 @@ func (s *UserService) JoinGroup(ctx context.Context, req *userpb.JoinGroupReques
 		}
 		if !addResp.Success {
 			return nil, errors.New("add user permission error")
+		}
+		// 删除原来的Guest权限
+		_, err = s.permissionService.RemoveUserPermission(ctx, &permissionpb.RemoveUserPermissionRequest{
+			Userid:      int32(userInfo.ID),
+			Level:       int32(verify.Guest),
+			BaseRequest: req.BaseRequest,
+		})
+		if err != nil {
+			logger.Warn("remove guest permission error: ", err)
 		}
 		resp.Success = true
 		return nil, nil
