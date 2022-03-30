@@ -8,6 +8,7 @@ import (
 
 	"github.com/essayZW/hpcmanager/logger"
 	nodebroker "github.com/essayZW/hpcmanager/node/broker"
+	"github.com/essayZW/hpcmanager/node/db"
 	"github.com/essayZW/hpcmanager/node/logic"
 	nodepb "github.com/essayZW/hpcmanager/node/proto"
 	publicproto "github.com/essayZW/hpcmanager/proto"
@@ -21,6 +22,7 @@ import (
 type NodeService struct {
 	nodeApplyLogic *logic.NodeApply
 	nodeDistribute *logic.NodeDistribute
+	nodeUsageTime  *logic.NodeUsageTime
 
 	userGroupService userpb.GroupService
 
@@ -28,7 +30,11 @@ type NodeService struct {
 }
 
 // Ping ping测试
-func (ns *NodeService) Ping(ctx context.Context, req *publicproto.Empty, resp *publicproto.PingResponse) error {
+func (ns *NodeService) Ping(
+	ctx context.Context,
+	req *publicproto.Empty,
+	resp *publicproto.PingResponse,
+) error {
 	logger.Info("NodeService PING ", req)
 	resp.Msg = "PONG"
 	resp.Ip = req.BaseRequest.RequestInfo.RemoteIP
@@ -37,15 +43,29 @@ func (ns *NodeService) Ping(ctx context.Context, req *publicproto.Empty, resp *p
 }
 
 // CreateNodeApply 创建一个新的申请计算节点记录
-func (ns *NodeService) CreateNodeApply(ctx context.Context, req *nodepb.CreateNodeApplyRequest, resp *nodepb.CreateNodeApplyResponse) error {
+func (ns *NodeService) CreateNodeApply(
+	ctx context.Context,
+	req *nodepb.CreateNodeApplyRequest,
+	resp *nodepb.CreateNodeApplyResponse,
+) error {
 	logger.Info("CreateNodeApply: ", req.BaseRequest)
 	if !verify.Identify(verify.CreateNodeApply, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("CreateNodeApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"CreateNodeApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("CreateNodeApply permission forbidden")
 	}
 	// 查询用户所属组的相关信息
 	// 临时赋予其admin权限
-	req.BaseRequest.UserInfo.Levels = append(req.BaseRequest.UserInfo.Levels, int32(verify.SuperAdmin))
+	req.BaseRequest.UserInfo.Levels = append(
+		req.BaseRequest.UserInfo.Levels,
+		int32(verify.SuperAdmin),
+	)
 	groupResp, err := ns.userGroupService.GetGroupInfoByID(ctx, &userpb.GetGroupInfoByIDRequest{
 		BaseRequest: req.BaseRequest,
 		GroupID:     req.BaseRequest.UserInfo.GroupId,
@@ -77,10 +97,21 @@ func (ns *NodeService) CreateNodeApply(ctx context.Context, req *nodepb.CreateNo
 }
 
 // PaginationGetNodeApply 分页查询用户申请机器节点包机申请表
-func (ns *NodeService) PaginationGetNodeApply(ctx context.Context, req *nodepb.PaginationGetNodeApplyRequest, resp *nodepb.PaginationGetNodeApplyResponse) error {
+func (ns *NodeService) PaginationGetNodeApply(
+	ctx context.Context,
+	req *nodepb.PaginationGetNodeApplyRequest,
+	resp *nodepb.PaginationGetNodeApplyResponse,
+) error {
 	logger.Info("PaginationGetNodeApply: ", req.BaseRequest)
 	if !verify.Identify(verify.GetNodeApplyInfo, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("PaginationGetNodeApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"PaginationGetNodeApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("PaginationGetNodeApply permission forbidden")
 	}
 	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
@@ -89,7 +120,12 @@ func (ns *NodeService) PaginationGetNodeApply(ctx context.Context, req *nodepb.P
 	var err error
 	if !isAdmin && !isTutor {
 		// 普通用户,只可以查看自己的包机申请记录
-		paginationRes, err = ns.nodeApplyLogic.PaginationGetByCreaterID(ctx, int(req.BaseRequest.UserInfo.UserId), int(req.PageIndex), int(req.PageSize))
+		paginationRes, err = ns.nodeApplyLogic.PaginationGetByCreaterID(
+			ctx,
+			int(req.BaseRequest.UserInfo.UserId),
+			int(req.PageIndex),
+			int(req.PageSize),
+		)
 	} else if !isAdmin && isTutor {
 		// 导师用户,可以查看自己组的所有的包机申请记录
 		paginationRes, err = ns.nodeApplyLogic.PaginationGetByTutorID(ctx, int(req.BaseRequest.UserInfo.UserId), int(req.PageIndex), int(req.PageSize))
@@ -141,10 +177,21 @@ func (ns *NodeService) PaginationGetNodeApply(ctx context.Context, req *nodepb.P
 }
 
 // CheckNodeApply 审核机器节点申请
-func (ns *NodeService) CheckNodeApply(ctx context.Context, req *nodepb.CheckNodeApplyRequest, resp *nodepb.CheckNodeApplyResponse) error {
+func (ns *NodeService) CheckNodeApply(
+	ctx context.Context,
+	req *nodepb.CheckNodeApplyRequest,
+	resp *nodepb.CheckNodeApplyResponse,
+) error {
 	logger.Info("CheckNodeApply: ", req.BaseRequest)
 	if !verify.Identify(verify.CheckNodeApply, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("CheckNodeApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"CheckNodeApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("CheckNodeApply permission forbidden")
 	}
 
@@ -155,7 +202,12 @@ func (ns *NodeService) CheckNodeApply(ctx context.Context, req *nodepb.CheckNode
 	var err error
 	if req.TutorCheck {
 		if isTutor {
-			status, err = ns.nodeApplyLogic.CheckNodeApplyByTutor(ctx, int(req.ApplyID), req.CheckStatus, req.CheckMessage)
+			status, err = ns.nodeApplyLogic.CheckNodeApplyByTutor(
+				ctx,
+				int(req.ApplyID),
+				req.CheckStatus,
+				req.CheckMessage,
+			)
 		} else {
 			err = errors.New("must be tutor")
 		}
@@ -192,10 +244,21 @@ func (ns *NodeService) CheckNodeApply(ctx context.Context, req *nodepb.CheckNode
 }
 
 // CreateNodeDistributeWO 创建机器节点分配处理工单
-func (ns *NodeService) CreateNodeDistributeWO(ctx context.Context, req *nodepb.CreateNodeDistributeWORequest, resp *nodepb.CreateNodeDistributeWOResponse) error {
+func (ns *NodeService) CreateNodeDistributeWO(
+	ctx context.Context,
+	req *nodepb.CreateNodeDistributeWORequest,
+	resp *nodepb.CreateNodeDistributeWOResponse,
+) error {
 	logger.Info("CreateNodeDistributeWO: ", req.BaseRequest)
 	if !verify.Identify(verify.CreateNodeDistributeWO, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("CreateNodeDistributeWO permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"CreateNodeDistributeWO permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("CreateNodeDistributeWO permission forbidden")
 	}
 
@@ -208,10 +271,21 @@ func (ns *NodeService) CreateNodeDistributeWO(ctx context.Context, req *nodepb.C
 }
 
 // PaginationGetNodeDistributeWO 分页查询包机处理工单信息
-func (ns *NodeService) PaginationGetNodeDistributeWO(ctx context.Context, req *nodepb.PaginationGetNodeDistributeWORequest, resp *nodepb.PaginationGetNodeDistributeWOResponse) error {
+func (ns *NodeService) PaginationGetNodeDistributeWO(
+	ctx context.Context,
+	req *nodepb.PaginationGetNodeDistributeWORequest,
+	resp *nodepb.PaginationGetNodeDistributeWOResponse,
+) error {
 	logger.Info("PaginationGetNodeDistributeWO: ", req.BaseRequest)
 	if !verify.Identify(verify.QueryNodeDistributeWO, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("PaginationGetNodeDistributeWO permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"PaginationGetNodeDistributeWO permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("PaginationGetNodeDistributeWO permission forbidden")
 	}
 
@@ -242,10 +316,21 @@ func (ns *NodeService) PaginationGetNodeDistributeWO(ctx context.Context, req *n
 }
 
 // GetNodeApplyInfoByID 通过申请ID查询申请的具体信息
-func (ns *NodeService) GetNodeApplyByID(ctx context.Context, req *nodepb.GetNodeApplyByIDRequest, resp *nodepb.GetNodeApplyByIDResponse) error {
+func (ns *NodeService) GetNodeApplyByID(
+	ctx context.Context,
+	req *nodepb.GetNodeApplyByIDRequest,
+	resp *nodepb.GetNodeApplyByIDResponse,
+) error {
 	logger.Info("GetNodeApplyByID: ", req.BaseRequest)
 	if !verify.Identify(verify.GetNodeApplyInfo, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("GetNodeApplyByID PaginationGetNodeApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"GetNodeApplyByID PaginationGetNodeApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("GetNodeApplyByID permission forbidden")
 	}
 
@@ -306,10 +391,21 @@ func (ns *NodeService) GetNodeApplyByID(ctx context.Context, req *nodepb.GetNode
 }
 
 // FinishNodeDistributeWO 处理机器节点分配工单
-func (ns *NodeService) FinishNodeDistributeWO(ctx context.Context, req *nodepb.FinishNodeDistributeWORequest, resp *nodepb.FinishNodeDistributeWOResponse) error {
+func (ns *NodeService) FinishNodeDistributeWO(
+	ctx context.Context,
+	req *nodepb.FinishNodeDistributeWORequest,
+	resp *nodepb.FinishNodeDistributeWOResponse,
+) error {
 	logger.Info("FinishNodeDistributeWO: ", req.BaseRequest)
 	if !verify.Identify(verify.FinishNodeDistributeWO, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("FinishNodeDistributeWO PaginationGetNodeApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"FinishNodeDistributeWO PaginationGetNodeApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("FinishNodeDistributeWO permission forbidden")
 	}
 
@@ -328,10 +424,21 @@ func (ns *NodeService) FinishNodeDistributeWO(ctx context.Context, req *nodepb.F
 }
 
 // RevokeNodeApply 撤销机器节点申请
-func (ns *NodeService) RevokeNodeApply(ctx context.Context, req *nodepb.RevokeNodeApplyRequest, resp *nodepb.RevokeNodeApplyResponse) error {
+func (ns *NodeService) RevokeNodeApply(
+	ctx context.Context,
+	req *nodepb.RevokeNodeApplyRequest,
+	resp *nodepb.RevokeNodeApplyResponse,
+) error {
 	logger.Info("RevokeNodeApply: ", req.BaseRequest)
 	if !verify.Identify(verify.RevokeNodeApply, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("RevokeNodeApply PaginationGetNodeApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"RevokeNodeApply PaginationGetNodeApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("RevokeNodeApply permission forbidden")
 	}
 	info, err := ns.nodeApplyLogic.GetNodeApplyByID(ctx, int(req.ApplyID))
@@ -354,15 +461,56 @@ func (ns *NodeService) RevokeNodeApply(ctx context.Context, req *nodepb.RevokeNo
 	return nil
 }
 
+// AddNodeUsageTimeRecord 添加机器节点使用时间记录
+func (ns *NodeService) AddNodeUsageTimeRecord(
+	ctx context.Context,
+	req *nodepb.AddNodeUsageTimeRecordRequest,
+	resp *nodepb.AddNodeUsageTimeRecordResponse,
+) error {
+	logger.Info("AddNodeUsageTimeRecord: ", req.BaseRequest)
+	if !verify.Identify(verify.AddNodeUsage, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"AddNodeUsageTimeRecord PaginationGetNodeApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("AddNodeUsageTimeRecord permission forbidden")
+	}
+
+	id, err := ns.nodeUsageTime.AddRecord(ctx, &db.HpcUsageTime{
+		QueueName: req.Info.QueueName,
+		UserID:    int(req.Info.UserID),
+		WallTime:  req.Info.WallTime,
+		GWallTime: req.Info.GwallTime,
+		StartTime: time.Unix(req.Info.StartTime, 0),
+		EndTime:   time.Unix(req.Info.EndTime, 0),
+	})
+	if err != nil {
+		return err
+	}
+	resp.Id = int32(id)
+	return nil
+}
+
 var _ nodepb.NodeHandler = (*NodeService)(nil)
 
 // NewNode 创建新的机器节点管理服务
-func NewNode(client client.Client, nodeApplyLogic *logic.NodeApply, nodeDistribute *logic.NodeDistribute, rabbitmqBroker broker.Broker) *NodeService {
+func NewNode(
+	client client.Client,
+	nodeApplyLogic *logic.NodeApply,
+	nodeDistribute *logic.NodeDistribute,
+	nodeUsageTime *logic.NodeUsageTime,
+	rabbitmqBroker broker.Broker,
+) *NodeService {
 	userGroupService := userpb.NewGroupService("user", client)
 	return &NodeService{
 		nodeApplyLogic:   nodeApplyLogic,
 		nodeDistribute:   nodeDistribute,
 		userGroupService: userGroupService,
 		rabbitmqBroker:   rabbitmqBroker,
+		nodeUsageTime:    nodeUsageTime,
 	}
 }

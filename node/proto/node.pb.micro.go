@@ -47,6 +47,7 @@ type NodeService interface {
 	GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByIDRequest, opts ...client.CallOption) (*GetNodeApplyByIDResponse, error)
 	FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, opts ...client.CallOption) (*FinishNodeDistributeWOResponse, error)
 	RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, opts ...client.CallOption) (*RevokeNodeApplyResponse, error)
+	AddNodeUsageTimeRecord(ctx context.Context, in *AddNodeUsageTimeRecordRequest, opts ...client.CallOption) (*AddNodeUsageTimeRecordResponse, error)
 }
 
 type nodeService struct {
@@ -151,6 +152,16 @@ func (c *nodeService) RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRe
 	return out, nil
 }
 
+func (c *nodeService) AddNodeUsageTimeRecord(ctx context.Context, in *AddNodeUsageTimeRecordRequest, opts ...client.CallOption) (*AddNodeUsageTimeRecordResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.AddNodeUsageTimeRecord", in)
+	out := new(AddNodeUsageTimeRecordResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Node service
 
 type NodeHandler interface {
@@ -163,6 +174,7 @@ type NodeHandler interface {
 	GetNodeApplyByID(context.Context, *GetNodeApplyByIDRequest, *GetNodeApplyByIDResponse) error
 	FinishNodeDistributeWO(context.Context, *FinishNodeDistributeWORequest, *FinishNodeDistributeWOResponse) error
 	RevokeNodeApply(context.Context, *RevokeNodeApplyRequest, *RevokeNodeApplyResponse) error
+	AddNodeUsageTimeRecord(context.Context, *AddNodeUsageTimeRecordRequest, *AddNodeUsageTimeRecordResponse) error
 }
 
 func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.HandlerOption) error {
@@ -176,6 +188,7 @@ func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.Handl
 		GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByIDRequest, out *GetNodeApplyByIDResponse) error
 		FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, out *FinishNodeDistributeWOResponse) error
 		RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, out *RevokeNodeApplyResponse) error
+		AddNodeUsageTimeRecord(ctx context.Context, in *AddNodeUsageTimeRecordRequest, out *AddNodeUsageTimeRecordResponse) error
 	}
 	type Node struct {
 		node
@@ -222,4 +235,8 @@ func (h *nodeHandler) FinishNodeDistributeWO(ctx context.Context, in *FinishNode
 
 func (h *nodeHandler) RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, out *RevokeNodeApplyResponse) error {
 	return h.NodeHandler.RevokeNodeApply(ctx, in, out)
+}
+
+func (h *nodeHandler) AddNodeUsageTimeRecord(ctx context.Context, in *AddNodeUsageTimeRecordRequest, out *AddNodeUsageTimeRecordResponse) error {
+	return h.NodeHandler.AddNodeUsageTimeRecord(ctx, in, out)
 }

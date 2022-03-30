@@ -107,6 +107,7 @@ message RevokeNodeApplyResponse {
 
 message AddNodeUsageTimeRecordRequest {
     request.BaseRequest baseRequest = 1;
+    node.NodeUsageTime info = 2;
 }
 
 message AddNodeUsageTimeRecordResponse {

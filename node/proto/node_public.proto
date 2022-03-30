@@ -50,6 +50,14 @@ message NodeDistribute {
 }
 
 // NodeUsageTiem 机器节点机时记录
-message NodeUsageTiem {
-
+message NodeUsageTime {
+    int32 id = 1;
+    int32 userID = 2;
+    string queueName = 3;
+    double wallTime = 4;
+    double gwallTime = 5;
+    int64 startTime = 6;
+    int64 endTime = 7;
+    int64 createTime = 8;
+    string extraAttributes = 9;
 }

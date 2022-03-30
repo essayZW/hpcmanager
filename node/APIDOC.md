@@ -237,6 +237,31 @@ message RevokeNodeApplyResponse {
 }
 ```
 
+# AddNodeUsageTimeRecord
+
+描述: 添加机器节点使用时间记录
+
+原型定义: `rpc AddNodeUsageTimeRecord(AddNodeUsageTimeRecordRequest) returns (AddNodeUsageTimeRecordResponse) {}`
+
+需求权限: `SuperAdmin` 及以上
+
+请求参数:
+
+```protobuf
+message AddNodeUsageTimeRecordRequest {
+    request.BaseRequest baseRequest = 1;
+    node.NodeUsageTime info = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message AddNodeUsageTimeRecordResponse {
+    int32 id = 1;
+}
+```
+
 # 附录
 
 ### NodeApply

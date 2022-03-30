@@ -135,6 +135,10 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: SuperAdmin,
 			},
+			AddNodeUsage: {
+				maxLevel: MaxLevel,
+				minLevel: SuperAdmin,
+			},
 		},
 	}
 }

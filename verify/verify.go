@@ -48,6 +48,8 @@ const (
 	FinishNodeDistributeWO = "__FINISH_NODE_DISTRIBUTE_WO__"
 	// QueryNodeUsage 查询机器节点使用详情记录
 	QueryNodeUsage = "__QUERY_NODE_USAGE__"
+	// AddNodeUsage 添加机器节点使用时间记录
+	AddNodeUsage = "__ADD_NODE_USAGE__"
 )
 
 // Verify 进行操作的权限验证

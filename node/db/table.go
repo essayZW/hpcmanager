@@ -51,3 +51,16 @@ type NodeDistribute struct {
 	CreateTime       time.Time   `db:"create_time"`
 	ExtraAttributes  *db.JSON    `db:"extraAttributes"`
 }
+
+// HpcUsageTime 机器节点使用时间记录表
+type HpcUsageTime struct {
+	ID              int       `db:"id"`
+	UserID          int       `db:"user_id"`
+	QueueName       string    `db:"queue_name"`
+	WallTime        float64   `db:"wall_time"`
+	GWallTime       float64   `db:"gwall_time"`
+	StartTime       time.Time `db:"start_time"`
+	EndTime         time.Time `db:"end_time"`
+	CreateTime      time.Time `db:"create_time"`
+	ExtraAttributes *db.JSON  `db:"extraAttributes"`
+}

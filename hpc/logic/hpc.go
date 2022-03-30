@@ -20,7 +20,10 @@ type HpcLogic struct {
 }
 
 // AddUserWithGroup 创建组并添加用户到组
-func (hpc *HpcLogic) AddUserWithGroup(ctx context.Context, username, groupname string) (map[string]interface{}, error) {
+func (hpc *HpcLogic) AddUserWithGroup(
+	ctx context.Context,
+	username, groupname string,
+) (map[string]interface{}, error) {
 	res, err := hpc.hpcSource.AddUserWithGroup(username, groupname)
 	if err != nil {
 		return nil, err
@@ -55,7 +58,11 @@ func (hpc *HpcLogic) AddUserWithGroup(ctx context.Context, username, groupname s
 }
 
 // AddUserToGroup 添加用户到现有的用户组中
-func (hpc *HpcLogic) AddUserToGroup(ctx context.Context, username, groupname string, gid int) (map[string]interface{}, error) {
+func (hpc *HpcLogic) AddUserToGroup(
+	ctx context.Context,
+	username, groupname string,
+	gid int,
+) (map[string]interface{}, error) {
 	res, err := hpc.hpcSource.AddUserToGroup(username, groupname, gid)
 	if err != nil {
 		return nil, err
@@ -87,7 +94,11 @@ func (hpc *HpcLogic) AddUserToGroup(ctx context.Context, username, groupname str
 }
 
 // CreateGroup 创建新的hpc节点上的用户组记录
-func (hpc *HpcLogic) CreateGroup(ctx context.Context, groupName, queueName string, gid int) (int64, error) {
+func (hpc *HpcLogic) CreateGroup(
+	ctx context.Context,
+	groupName, queueName string,
+	gid int,
+) (int64, error) {
 	return hpc.hpcGroupDB.Insert(ctx, &hpcdb.HpcGroup{
 		Name:      groupName,
 		GID:       gid,
@@ -113,9 +124,13 @@ func (hpc *HpcLogic) GetUserInfoByID(ctx context.Context, userID int) (*db.HpcUs
 	return hpc.hpcUserDB.QueryByID(ctx, userID)
 }
 
-func (hpc *HpcLogic) GetNodeUsage(ctx context.Context, startTimeUnix, endTimeUnix int64) ([]*source.HpcNodeUsage, error) {
-	startDate := time.UnixMicro(startTimeUnix * 1000)
-	endDate := time.UnixMicro(endTimeUnix * 1000)
+// GetNodeUsage 查询用户节点使用详情信息
+func (hpc *HpcLogic) GetNodeUsage(
+	ctx context.Context,
+	startTimeUnix, endTimeUnix int64,
+) ([]*source.HpcNodeUsage, error) {
+	startDate := time.Unix(startTimeUnix, 0)
+	endDate := time.Unix(endTimeUnix, 0)
 	if startDate.IsZero() || endDate.IsZero() {
 		return nil, errors.New("invalid time")
 	}
@@ -123,7 +138,11 @@ func (hpc *HpcLogic) GetNodeUsage(ctx context.Context, startTimeUnix, endTimeUni
 }
 
 // NewHpc 创建一个HPC作业调度系统逻辑操作
-func NewHpc(hpcSource source.HpcSource, hpcUserDB *db.HpcUserDB, hpcGroupDB *hpcdb.HpcGroupDB) *HpcLogic {
+func NewHpc(
+	hpcSource source.HpcSource,
+	hpcUserDB *db.HpcUserDB,
+	hpcGroupDB *hpcdb.HpcGroupDB,
+) *HpcLogic {
 	return &HpcLogic{
 		hpcSource:  hpcSource,
 		hpcUserDB:  hpcUserDB,
