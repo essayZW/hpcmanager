@@ -72,6 +72,13 @@ DROP TABLE IF EXISTS `hpc_usagetime`;
 CREATE TABLE `hpc_usagetime` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
+  `username` varchar(32) NOT NULL,
+  `user_name` varchar(32) NOT NULL,
+  `hpc_username` varchar(32) NOT NULL,
+  `tutor_id` int NOT NULL,
+  `tutor_username` varchar(32) NOT NULL,
+  `tutor_user_name` varchar(32) NOT NULL,
+  `hpc_group_name` varchar(32) NOT NULL,
   `queue_name` varchar(64) NOT NULL,
   `wall_time` int NOT NULL DEFAULT '0',
   `gwall_time` int NOT NULL DEFAULT '0',
@@ -450,4 +457,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-03-23 19:40:04
+-- Dump completed on 2022-03-30 20:20:26
