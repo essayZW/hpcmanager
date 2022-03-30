@@ -376,6 +376,57 @@ func (h *HpcService) GetUserInfoByUsername(
 	return nil
 }
 
+func (h *HpcService) GetGroupInfoByGroupName(
+	ctx context.Context,
+	req *hpcproto.GetGroupInfoByGroupNameRequest,
+	resp *hpcproto.GetGroupInfoByGroupNameResponse,
+) error {
+	logger.Infof("GetGroupInfoByGroupName: %v", req.BaseRequest)
+	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"GetGroupInfoByGroupName permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("GetGroupInfoByGroupName permission forbidden")
+	}
+
+	info, err := h.hpcLogic.GetGroupInfoByName(context.Background(), req.Name)
+	if err != nil {
+		return errors.New("hpc group info query error")
+	}
+
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	if !isAdmin && isTutor {
+		// 是导师用户,需要查询导师用户所属组是不是当前查询的组
+		groupResp, err := h.userGroupService.GetGroupInfoByID(ctx, &userpb.GetGroupInfoByIDRequest{
+			GroupID:     req.BaseRequest.UserInfo.GroupId,
+			BaseRequest: req.BaseRequest,
+		})
+		if err != nil {
+			return errors.New("get group info error")
+		}
+		if groupResp.GroupInfo.HpcGroupID != int32(info.ID) {
+			return errors.New("get group info error: permission forbiden")
+		}
+	}
+
+	resp.Group = &hpcproto.HpcGroup{
+		Id:        int32(info.ID),
+		Name:      info.Name,
+		QueueName: info.QueueName,
+		GID:       int32(info.GID),
+	}
+	if info.ExtraAttributes != nil {
+		resp.Group.ExtraAttributes = info.ExtraAttributes.String()
+	}
+	return nil
+}
+
 var _ hpcproto.HpcHandler = (*HpcService)(nil)
 
 // NewHpc 新建一个Hpc服务

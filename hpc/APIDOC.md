@@ -128,7 +128,7 @@ message GetGroupInfoByIDResponse {
 }
 ```
 
-# GetUserInfoByUsername
+## GetUserInfoByUsername
 
 描述: 通过计算节点用户名查询计算节点信息
 
@@ -148,6 +148,29 @@ message GetUserInfoByUsernameRequest {
 ```protobuf
 message GetUserInfoByUsernameResponse {
     hpc.HpcUser user = 1;
+}
+```
+
+## GetGroupInfoByGroupName
+
+描述: 通过计算节点用户组的组名查询计算节点信息
+
+原型定义: `rpc GetGroupInfoByGroupName(GetGroupInfoByGroupNameRequest) returns (GetGroupInfoByGroupNameResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetGroupInfoByGroupNameRequest {
+    request.BaseRequest baseRequest = 1;
+    string name = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetGroupInfoByGroupNameResponse {
+    hpc.HpcGroup group = 1;
 }
 ```
 

@@ -7,15 +7,14 @@ import "proto/ping.proto";
 import "proto/common.proto";
 import "gateway/proto/baserequest.proto";
 import "proto/hpcpublic.proto";
-
-service Hpc {
-    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+service Hpc { rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc AddUserWithGroup(AddUserWithGroupRequest) returns (AddUserWithGroupResponse) {}
     rpc AddUserToGroup(AddUserToGroupRequest) returns (AddUserToGroupResponse) {}
     rpc GetUserInfoByID(GetUserInfoByIDRequest) returns (GetUserInfoByIDResponse) {}
     rpc GetGroupInfoByID(GetGroupInfoByIDRequest) returns (GetGroupInfoByIDResponse) {}
     rpc GetNodeUsage(GetNodeUsageRequest) returns (GetNodeUsageResponse) {}
     rpc GetUserInfoByUsername(GetUserInfoByUsernameRequest) returns (GetUserInfoByUsernameResponse) {}
+    rpc GetGroupInfoByGroupName(GetGroupInfoByGroupNameRequest) returns (GetGroupInfoByGroupNameResponse) {}
 }
 
 message AddUserWithGroupRequest {
@@ -80,4 +79,13 @@ message GetUserInfoByUsernameRequest {
 
 message GetUserInfoByUsernameResponse {
     hpc.HpcUser user = 1;
+}
+
+message GetGroupInfoByGroupNameRequest {
+    request.BaseRequest baseRequest = 1;
+    string name = 2;
+}
+
+message GetGroupInfoByGroupNameResponse {
+    hpc.HpcGroup group = 1;
 }
