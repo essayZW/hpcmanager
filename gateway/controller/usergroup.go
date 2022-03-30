@@ -51,11 +51,14 @@ func (ug *UserGroup) paginationGetGroupInfo(ctx *gin.Context) {
 
 	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()
-	resp, err := ug.userGroupService.PaginationGetGroupInfo(c, &userpb.PaginationGetGroupInfoRequest{
-		PageSize:    int32(pageSize),
-		PageIndex:   int32(pageIndex),
-		BaseRequest: baseRequest,
-	})
+	resp, err := ug.userGroupService.PaginationGetGroupInfo(
+		c,
+		&userpb.PaginationGetGroupInfoRequest{
+			PageSize:    int32(pageSize),
+			PageIndex:   int32(pageIndex),
+			BaseRequest: baseRequest,
+		},
+	)
 	if err != nil {
 		res := response.New(200, nil, false, "信息查询失败")
 		res.Send(ctx)
@@ -115,11 +118,14 @@ func (ug *UserGroup) paginationGetApplyJoinGroup(ctx *gin.Context) {
 
 	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()
-	groupResp, err := ug.userGroupService.PageGetApplyGroupInfo(c, &userpb.PageGetApplyGroupInfoRequest{
-		PageIndex:   int32(pageIndex),
-		PageSize:    int32(pageSize),
-		BaseRequest: baseRequest,
-	})
+	groupResp, err := ug.userGroupService.PageGetApplyGroupInfo(
+		c,
+		&userpb.PageGetApplyGroupInfoRequest{
+			PageIndex:   int32(pageIndex),
+			PageSize:    int32(pageSize),
+			BaseRequest: baseRequest,
+		},
+	)
 	if err != nil {
 		httpResp := response.New(200, nil, false, "用户组申请信息查询失败")
 		httpResp.Send(ctx)

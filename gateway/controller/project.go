@@ -85,11 +85,14 @@ func (p *Project) paginationGet(ctx *gin.Context) {
 
 	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()
-	resp, err := p.projectService.PaginationGetProjectInfos(c, &projectpb.PaginationGetProjectInfosRequest{
-		PageIndex:   int32(pageIndex),
-		PageSize:    int32(pageSize),
-		BaseRequest: baseRequest,
-	})
+	resp, err := p.projectService.PaginationGetProjectInfos(
+		c,
+		&projectpb.PaginationGetProjectInfosRequest{
+			PageIndex:   int32(pageIndex),
+			PageSize:    int32(pageSize),
+			BaseRequest: baseRequest,
+		},
+	)
 	if err != nil {
 		httpResp := response.New(200, nil, false, fmt.Sprintf("查询项目信息失败: %s", err.Error()))
 		httpResp.Send(ctx)

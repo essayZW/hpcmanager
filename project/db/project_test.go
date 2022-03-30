@@ -193,7 +193,12 @@ func TestLimitQueryByCreaterUserID(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			infos, err := projectDB.LimitQueryByCreaterUserID(context.Background(), test.Limit, test.Offset, test.UserID)
+			infos, err := projectDB.LimitQueryByCreaterUserID(
+				context.Background(),
+				test.Limit,
+				test.Offset,
+				test.UserID,
+			)
 			if err != nil {
 				if !test.Error {
 					t.Errorf("Get: %v, Except: %v", err, test.Error)

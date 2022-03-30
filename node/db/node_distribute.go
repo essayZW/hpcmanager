@@ -15,8 +15,13 @@ type NodeDistributeDB struct {
 
 // Insert 插入新的记录
 func (ndb *NodeDistributeDB) Insert(ctx context.Context, info *NodeDistribute) (int64, error) {
-	res, err := ndb.conn.Exec(ctx, "INSERT INTO `node_distribute` (`apply_id`, `create_time`, `extraAttributes`) VALUES (?,?,?)",
-		info.ApplyID, info.CreateTime, info.ExtraAttributes)
+	res, err := ndb.conn.Exec(
+		ctx,
+		"INSERT INTO `node_distribute` (`apply_id`, `create_time`, `extraAttributes`) VALUES (?,?,?)",
+		info.ApplyID,
+		info.CreateTime,
+		info.ExtraAttributes,
+	)
 	if err != nil {
 		logger.Warn("Insert error: ", err)
 		return 0, errors.New("insert node_distribute info error")
@@ -31,8 +36,15 @@ func (ndb *NodeDistributeDB) Insert(ctx context.Context, info *NodeDistribute) (
 }
 
 // QueryByApplyID 通过申请ID查询工单信息
-func (ndb *NodeDistributeDB) QueryByApplyID(ctx context.Context, applyID int) (*NodeDistribute, error) {
-	row, err := ndb.conn.QueryRow(ctx, "SELECT * FROM `node_distribute` WHERE `apply_id`=?", applyID)
+func (ndb *NodeDistributeDB) QueryByApplyID(
+	ctx context.Context,
+	applyID int,
+) (*NodeDistribute, error) {
+	row, err := ndb.conn.QueryRow(
+		ctx,
+		"SELECT * FROM `node_distribute` WHERE `apply_id`=?",
+		applyID,
+	)
 	if err != nil {
 		logger.Warn("QueryByApplyID error: ", err)
 		return nil, errors.New("QueryByApplyID error")
@@ -47,7 +59,11 @@ func (ndb *NodeDistributeDB) QueryByApplyID(ctx context.Context, applyID int) (*
 
 // QueryCountByApply 通过申请ID查询工单数量信息
 func (ndb *NodeDistributeDB) QueryCountByApply(ctx context.Context, applyID int) (int, error) {
-	row, err := ndb.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `node_distribute` WHERE `apply_id`=?", applyID)
+	row, err := ndb.conn.QueryRow(
+		ctx,
+		"SELECT COUNT(*) FROM `node_distribute` WHERE `apply_id`=?",
+		applyID,
+	)
 	if err != nil {
 		logger.Warn("QueryCountByApply error: ", err)
 		return 0, errors.New("QueryCountByApply error")
@@ -61,8 +77,16 @@ func (ndb *NodeDistributeDB) QueryCountByApply(ctx context.Context, applyID int)
 }
 
 // QueryLimit 分页查询记录
-func (ndb *NodeDistributeDB) QueryLimit(ctx context.Context, limit, offset int) ([]*NodeDistribute, error) {
-	row, err := ndb.conn.Query(ctx, "SELECT * FROM `node_distribute` ORDER BY `id` DESC LIMIT ?,?", limit, offset)
+func (ndb *NodeDistributeDB) QueryLimit(
+	ctx context.Context,
+	limit, offset int,
+) ([]*NodeDistribute, error) {
+	row, err := ndb.conn.Query(
+		ctx,
+		"SELECT * FROM `node_distribute` ORDER BY `id` DESC LIMIT ?,?",
+		limit,
+		offset,
+	)
 	if err != nil {
 		logger.Warn("QueryLimit error: ", err)
 		return nil, errors.New("QueryLimit error")
@@ -95,7 +119,10 @@ func (ndb *NodeDistributeDB) QueryCount(ctx context.Context) (int, error) {
 }
 
 // UpdateHandlerFlag 更新处理标记,包括处理人的相关信息
-func (ndb *NodeDistributeDB) UpdateHandlerFlag(ctx context.Context, newInfo *NodeDistribute) (bool, error) {
+func (ndb *NodeDistributeDB) UpdateHandlerFlag(
+	ctx context.Context,
+	newInfo *NodeDistribute,
+) (bool, error) {
 	res, err := ndb.conn.Exec(ctx, "UPDATE `node_distribute` SET "+
 		"`handler_flag`=1, `handler_userid`=?, `handler_username`=?, `handler_user_name`=? WHERE `id`=?",
 		newInfo.HandlerUserID, newInfo.HandlerUsername, newInfo.HandlerUserName, newInfo.ID)

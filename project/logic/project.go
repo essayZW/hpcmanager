@@ -14,7 +14,13 @@ type Project struct {
 }
 
 // Create 创建新的project记录
-func (p *Project) Create(ctx context.Context, createrUserID int, createrUserName string, createrUsername string, projectInfo *projectdb.Project) (int64, error) {
+func (p *Project) Create(
+	ctx context.Context,
+	createrUserID int,
+	createrUserName string,
+	createrUsername string,
+	projectInfo *projectdb.Project,
+) (int64, error) {
 	if createrUserID == 0 {
 		return 0, errors.New("user id can't be zero")
 	}
@@ -50,7 +56,10 @@ type PaginationProjectResult struct {
 }
 
 // PaginationGet 分页查询项目信息
-func (p *Project) PaginationGet(ctx context.Context, pageIndex, pageSize int) (*PaginationProjectResult, error) {
+func (p *Project) PaginationGet(
+	ctx context.Context,
+	pageIndex, pageSize int,
+) (*PaginationProjectResult, error) {
 	if pageIndex == 0 {
 		return nil, errors.New("invalid pageIndex")
 	}
@@ -73,7 +82,11 @@ func (p *Project) PaginationGet(ctx context.Context, pageIndex, pageSize int) (*
 }
 
 // PaginationGetByCreaterUserID 分页查询某个用户创建的所有项目信息
-func (p *Project) PaginationGetByCreaterUserID(ctx context.Context, pageIndex, pageSize int, userID ...int) (*PaginationProjectResult, error) {
+func (p *Project) PaginationGetByCreaterUserID(
+	ctx context.Context,
+	pageIndex, pageSize int,
+	userID ...int,
+) (*PaginationProjectResult, error) {
 	if pageIndex == 0 {
 		return nil, errors.New("invalid pageIndex")
 	}

@@ -40,7 +40,13 @@ func LoadConfigSource() (config.Config, error) {
 			),
 		),
 	)
-	filePath := fmt.Sprintf("%s/%s-%s.%s", configFileDir, configFileBaseName, getEnvValue(), configFileSuffix)
+	filePath := fmt.Sprintf(
+		"%s/%s-%s.%s",
+		configFileDir,
+		configFileBaseName,
+		getEnvValue(),
+		configFileSuffix,
+	)
 	logger.Info("load config file from path ", filePath)
 	// load the config from a file source
 	if err := c.Load(file.NewSource(

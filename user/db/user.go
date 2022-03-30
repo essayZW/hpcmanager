@@ -16,7 +16,12 @@ type UserDB struct {
 
 // LoginQuery 用于登录的查询,需要用户名和密码，返回用户的ID
 func (db *UserDB) LoginQuery(ctx context.Context, username, md5password string) (bool, error) {
-	row, err := db.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `user` WHERE `username`=? AND `password`=?", username, md5password)
+	row, err := db.conn.QueryRow(
+		ctx,
+		"SELECT COUNT(*) FROM `user` WHERE `username`=? AND `password`=?",
+		username,
+		md5password,
+	)
 	if err != nil {
 		return false, err
 	}
@@ -44,11 +49,23 @@ func (db *UserDB) QueryByUsername(ctx context.Context, username string) (*User, 
 
 // InsertUser 插入新的用户
 func (db *UserDB) InsertUser(ctx context.Context, userinfo *User) (int, error) {
-	result, err := db.conn.Exec(ctx, "INSERT INTO `user`"+
-		"(`username`, `password`, `tel`, `email`, `name`, `pinyin_name`, `college_name`, `group_id`, `hpc_user_id`, `create_time`, `extraAttributes`)"+
-		"VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-		userinfo.Username, userinfo.Password, userinfo.Tel, userinfo.Email, userinfo.Name, userinfo.PinyinName,
-		userinfo.CollegeName, userinfo.GroupID, userinfo.HpcUserID, userinfo.CreateTime, userinfo.ExtraAttributes)
+	result, err := db.conn.Exec(
+		ctx,
+		"INSERT INTO `user`"+
+			"(`username`, `password`, `tel`, `email`, `name`, `pinyin_name`, `college_name`, `group_id`, `hpc_user_id`, `create_time`, `extraAttributes`)"+
+			"VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+		userinfo.Username,
+		userinfo.Password,
+		userinfo.Tel,
+		userinfo.Email,
+		userinfo.Name,
+		userinfo.PinyinName,
+		userinfo.CollegeName,
+		userinfo.GroupID,
+		userinfo.HpcUserID,
+		userinfo.CreateTime,
+		userinfo.ExtraAttributes,
+	)
 	if err != nil {
 		return 0, err
 	}
@@ -136,7 +153,12 @@ func (db *UserDB) UpdateUserGroup(ctx context.Context, userID, groupID int) erro
 
 // UpdateHpcUserID 更新用户关联的hpc_user的ID
 func (db *UserDB) UpdateHpcUserID(ctx context.Context, userID, hpcUserID int) error {
-	res, err := db.conn.Exec(ctx, "UPDATE `user` SET `hpc_user_id`=? WHERE `id`=?", hpcUserID, userID)
+	res, err := db.conn.Exec(
+		ctx,
+		"UPDATE `user` SET `hpc_user_id`=? WHERE `id`=?",
+		hpcUserID,
+		userID,
+	)
 	if err != nil {
 		logger.Warn("UpdateHpcUserID error: ", err)
 		return errors.New("UpdateHpcUserID: update error")
@@ -166,8 +188,16 @@ func (db *UserDB) QueryByHpcID(ctx context.Context, hpcID int) (*User, error) {
 
 // Update 更新用户信息
 func (db *UserDB) Update(ctx context.Context, newInfo *User) error {
-	res, err := db.conn.Exec(ctx, "UPDATE `user` SET `tel`=?, `email`=?, `college_name`=?, `extraAttributes`=? "+
-		"WHERE `id`=?", newInfo.Tel, newInfo.Email, newInfo.CollegeName, newInfo.ExtraAttributes, newInfo.ID)
+	res, err := db.conn.Exec(
+		ctx,
+		"UPDATE `user` SET `tel`=?, `email`=?, `college_name`=?, `extraAttributes`=? "+
+			"WHERE `id`=?",
+		newInfo.Tel,
+		newInfo.Email,
+		newInfo.CollegeName,
+		newInfo.ExtraAttributes,
+		newInfo.ID,
+	)
 	if err != nil {
 		logger.Warn("Update user info error: ", err)
 		return errors.New("update user info error")
@@ -201,7 +231,11 @@ func (db *UserDB) QueryUserByGroupID(ctx context.Context, groupID int) ([]int, e
 
 // QueryCountWithPYNamePrefix 通过拼音名称的前缀查询记录的数量
 func (db *UserDB) QueryCountWithPYNamePrefix(ctx context.Context, prefix string) (int, error) {
-	row, err := db.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `user` WHERE `pinyin_name` LIKE ?", prefix+"%")
+	row, err := db.conn.QueryRow(
+		ctx,
+		"SELECT COUNT(*) FROM `user` WHERE `pinyin_name` LIKE ?",
+		prefix+"%",
+	)
 	if err != nil {
 		logger.Warn("QueryCountWithPYNamePrefix error: ", err)
 		return 0, errors.New("QueryCountWithPYNamePrefix error")

@@ -15,7 +15,10 @@ type NodeDistribute struct {
 }
 
 // CreateNodeDistributeWO 创建节点分配处理工单
-func (nodeDistribute *NodeDistribute) CreateNodeDistributeWO(ctx context.Context, applyID int) (int64, error) {
+func (nodeDistribute *NodeDistribute) CreateNodeDistributeWO(
+	ctx context.Context,
+	applyID int,
+) (int64, error) {
 	// 检查是否已经存在同一条applyID对应的工单
 	count, err := nodeDistribute.nodeDistributeDB.QueryCountByApply(ctx, applyID)
 	if err != nil {
@@ -37,7 +40,10 @@ type PaginationQueryNodeDistribute struct {
 }
 
 // PaginationGet 分页查询
-func (nodeDistribute *NodeDistribute) PaginationGet(ctx context.Context, pageIndex, pageSize int) (*PaginationQueryNodeDistribute, error) {
+func (nodeDistribute *NodeDistribute) PaginationGet(
+	ctx context.Context,
+	pageIndex, pageSize int,
+) (*PaginationQueryNodeDistribute, error) {
 	if pageIndex <= 0 {
 		return nil, errors.New("invalid page index")
 	}
@@ -76,7 +82,11 @@ type SimpleUserInfo struct {
 }
 
 // FinishByID 通过ID处理机器节点分配工单
-func (nodeDistribute *NodeDistribute) FinishByID(ctx context.Context, id int, userInfo *SimpleUserInfo) (bool, error) {
+func (nodeDistribute *NodeDistribute) FinishByID(
+	ctx context.Context,
+	id int,
+	userInfo *SimpleUserInfo,
+) (bool, error) {
 	return nodeDistribute.nodeDistributeDB.UpdateHandlerFlag(ctx, &db.NodeDistribute{
 		ID:              id,
 		HandlerUserID:   null.IntFrom(int64(userInfo.ID)),

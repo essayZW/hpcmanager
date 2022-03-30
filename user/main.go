@@ -75,7 +75,10 @@ func main() {
 	go userbroker.RegistryCustomer(rabbitmqBroker, serviceClient)
 
 	userLogic := logic.NewUser(userdb.NewUser(sqldb), etcdConfig, redisConn)
-	userGroupLogic := logic.NewUserGroup(userdb.NewUserGroup(sqldb), userdb.NewUserGroupApply(sqldb))
+	userGroupLogic := logic.NewUserGroup(
+		userdb.NewUserGroup(sqldb),
+		userdb.NewUserGroupApply(sqldb),
+	)
 
 	serviceServer := srv.Server()
 

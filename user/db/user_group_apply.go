@@ -52,7 +52,10 @@ func (ugadb *UserGroupApplyDB) ExistsApply(ctx context.Context, userID int, appl
 
 // AdminLimitQueryApplyCount 管理员查询所有的申请总数
 func (ugadb *UserGroupApplyDB) AdminLimitQueryApplyCount(ctx context.Context) (int, error) {
-	row, err := ugadb.db.QueryRow(ctx, "SELECT COUNT(*) FROM `user_group_apply` WHERE `tutor_check_status`=1")
+	row, err := ugadb.db.QueryRow(
+		ctx,
+		"SELECT COUNT(*) FROM `user_group_apply` WHERE `tutor_check_status`=1",
+	)
 	if err != nil {
 		logger.Warn("AdminLimitQueryApplyCount error: ", err)
 		return 0, errors.New("AdminLimitQueryApplyCount query fail")
@@ -66,10 +69,18 @@ func (ugadb *UserGroupApplyDB) AdminLimitQueryApplyCount(ctx context.Context) (i
 }
 
 // AdminLimitQueryApplyInfo 管理员分页查询所有的申请信息
-func (ugadb *UserGroupApplyDB) AdminLimitQueryApplyInfo(ctx context.Context, offset, size int) ([]*UserGroupApply, error) {
+func (ugadb *UserGroupApplyDB) AdminLimitQueryApplyInfo(
+	ctx context.Context,
+	offset, size int,
+) ([]*UserGroupApply, error) {
 	// 查询所有tutor_check_status等于1的记录，代表已经被导师审核通过
 	// 只有导师已经审核通过的申请管理员才可以看到
-	rows, err := ugadb.db.Query(ctx, "SELECT * FROM `user_group_apply` WHERE `tutor_check_status`=1 ORDER BY id DESC LIMIT ?,?", offset, size)
+	rows, err := ugadb.db.Query(
+		ctx,
+		"SELECT * FROM `user_group_apply` WHERE `tutor_check_status`=1 ORDER BY id DESC LIMIT ?,?",
+		offset,
+		size,
+	)
 	if err != nil {
 		logger.Warn("AdminLimitQueryApplyInfo error: ", err)
 		return nil, errors.New("AdminLimitQueryApplyInfo query fail")
@@ -88,8 +99,17 @@ func (ugadb *UserGroupApplyDB) AdminLimitQueryApplyInfo(ctx context.Context, off
 }
 
 // TutorLimitQueryApplyInfo 导师分页查询所有的申请信息
-func (ugadb *UserGroupApplyDB) TutorLimitQueryApplyInfo(ctx context.Context, offset, size, groupID int) ([]*UserGroupApply, error) {
-	rows, err := ugadb.db.Query(ctx, "SELECT * FROM `user_group_apply` WHERE `apply_group_id`=? ORDER BY id DESC LIMIT ?,?", groupID, offset, size)
+func (ugadb *UserGroupApplyDB) TutorLimitQueryApplyInfo(
+	ctx context.Context,
+	offset, size, groupID int,
+) ([]*UserGroupApply, error) {
+	rows, err := ugadb.db.Query(
+		ctx,
+		"SELECT * FROM `user_group_apply` WHERE `apply_group_id`=? ORDER BY id DESC LIMIT ?,?",
+		groupID,
+		offset,
+		size,
+	)
 	if err != nil {
 		logger.Warn("TutorLimitQueryApplyInfo error: ", err)
 		return nil, errors.New("TutorLimitQueryApplyInfo query fail")
@@ -108,8 +128,15 @@ func (ugadb *UserGroupApplyDB) TutorLimitQueryApplyInfo(ctx context.Context, off
 }
 
 // TutorLimitQueryApplyCount 导师分页查询某一个组所有的申请的数量
-func (ugadb *UserGroupApplyDB) TutorLimitQueryApplyCount(ctx context.Context, groupID int) (int, error) {
-	row, err := ugadb.db.QueryRow(ctx, "SELECT COUNT(*) FROM `user_group_apply` WHERE `apply_group_id`=?", groupID)
+func (ugadb *UserGroupApplyDB) TutorLimitQueryApplyCount(
+	ctx context.Context,
+	groupID int,
+) (int, error) {
+	row, err := ugadb.db.QueryRow(
+		ctx,
+		"SELECT COUNT(*) FROM `user_group_apply` WHERE `apply_group_id`=?",
+		groupID,
+	)
 	if err != nil {
 		logger.Warn("TutorLimitQueryApplyCount error: ", err)
 		return 0, errors.New("TutorLimitQueryApplyCount query fail")
@@ -123,8 +150,17 @@ func (ugadb *UserGroupApplyDB) TutorLimitQueryApplyCount(ctx context.Context, gr
 }
 
 // CommonLimitQueryApplyInfo 普通用户分页查询自己的所有申请的信息
-func (ugadb *UserGroupApplyDB) CommonLimitQueryApplyInfo(ctx context.Context, offset, size, userID int) ([]*UserGroupApply, error) {
-	rows, err := ugadb.db.Query(ctx, "SELECT * FROM `user_group_apply` WHERE `user_id`=? ORDER BY id DESC LIMIT ?,?", userID, offset, size)
+func (ugadb *UserGroupApplyDB) CommonLimitQueryApplyInfo(
+	ctx context.Context,
+	offset, size, userID int,
+) ([]*UserGroupApply, error) {
+	rows, err := ugadb.db.Query(
+		ctx,
+		"SELECT * FROM `user_group_apply` WHERE `user_id`=? ORDER BY id DESC LIMIT ?,?",
+		userID,
+		offset,
+		size,
+	)
 	if err != nil {
 		logger.Warn("CommonLimitQueryApplyInfo error: ", err)
 		return nil, errors.New("CommonLimitQueryApplyInfo query fail")
@@ -143,8 +179,15 @@ func (ugadb *UserGroupApplyDB) CommonLimitQueryApplyInfo(ctx context.Context, of
 }
 
 // CommonLimitQueryApplyCount 普通用户查询自己创建的申请的数量
-func (ugadb *UserGroupApplyDB) CommonLimitQueryApplyCount(ctx context.Context, userID int) (int, error) {
-	row, err := ugadb.db.QueryRow(ctx, "SELECT COUNT(*) FROM `user_group_apply` WHERE `user_id`=?", userID)
+func (ugadb *UserGroupApplyDB) CommonLimitQueryApplyCount(
+	ctx context.Context,
+	userID int,
+) (int, error) {
+	row, err := ugadb.db.QueryRow(
+		ctx,
+		"SELECT COUNT(*) FROM `user_group_apply` WHERE `user_id`=?",
+		userID,
+	)
 	if err != nil {
 		logger.Warn("CommonLimitQueryApplyCount error: ", err)
 		return 0, errors.New("CommonLimitQueryApplyCount query fail")
@@ -158,7 +201,10 @@ func (ugadb *UserGroupApplyDB) CommonLimitQueryApplyCount(ctx context.Context, u
 }
 
 // QueryByID 通过ID查询记录
-func (ugadb *UserGroupApplyDB) QueryByID(ctx context.Context, applyID int) (*UserGroupApply, error) {
+func (ugadb *UserGroupApplyDB) QueryByID(
+	ctx context.Context,
+	applyID int,
+) (*UserGroupApply, error) {
 	row, err := ugadb.db.QueryRow(ctx, "SELECT * FROM `user_group_apply` WHERE `id`=?", applyID)
 	if err != nil {
 		logger.Warn("QueryByID query error: ", err)
@@ -173,9 +219,18 @@ func (ugadb *UserGroupApplyDB) QueryByID(ctx context.Context, applyID int) (*Use
 }
 
 // UpdateTutorCheckStatus 更新导师审核状态
-func (ugadb *UserGroupApplyDB) UpdateTutorCheckStatus(ctx context.Context, newStatus *UserGroupApply) (bool, error) {
-	res, err := ugadb.db.Exec(ctx, "UPDATE `user_group_apply` SET `tutor_check_status`=?, `message_tutor`=?,`tutor_check_time`=? WHERE `id`=? AND `status`=1",
-		newStatus.TutorCheckStatus, newStatus.MessageTutor, newStatus.TutorCheckTime, newStatus.ID)
+func (ugadb *UserGroupApplyDB) UpdateTutorCheckStatus(
+	ctx context.Context,
+	newStatus *UserGroupApply,
+) (bool, error) {
+	res, err := ugadb.db.Exec(
+		ctx,
+		"UPDATE `user_group_apply` SET `tutor_check_status`=?, `message_tutor`=?,`tutor_check_time`=? WHERE `id`=? AND `status`=1",
+		newStatus.TutorCheckStatus,
+		newStatus.MessageTutor,
+		newStatus.TutorCheckTime,
+		newStatus.ID,
+	)
 	if err != nil {
 		logger.Warn("UpdateTutorCheckStatus error: ", err)
 		return false, errors.New("tutor check error")
@@ -188,11 +243,22 @@ func (ugadb *UserGroupApplyDB) UpdateTutorCheckStatus(ctx context.Context, newSt
 }
 
 // UpdateAdminCheckStatus 更新管理员审核状态
-func (ugadb *UserGroupApplyDB) UpdateAdminCheckStatus(ctx context.Context, newStatus *UserGroupApply) (bool, error) {
-	res, err := ugadb.db.Exec(ctx, "UPDATE `user_group_apply` SET `manager_check_status`=?, `message_manager`=?, `manager_check_time`=?,"+
-		"`manager_checker_id`=?, `manager_checker_username`=?, `manager_checker_name`=? WHERE `id`=? AND `tutor_check_status`!=-1 AND `status`=1",
-		newStatus.ManagerCheckStatus, newStatus.MessageManager, newStatus.ManagerCheckTime, newStatus.ManagerCheckerID, newStatus.ManagerCheckerUsername,
-		newStatus.ManagerCheckerName, newStatus.ID)
+func (ugadb *UserGroupApplyDB) UpdateAdminCheckStatus(
+	ctx context.Context,
+	newStatus *UserGroupApply,
+) (bool, error) {
+	res, err := ugadb.db.Exec(
+		ctx,
+		"UPDATE `user_group_apply` SET `manager_check_status`=?, `message_manager`=?, `manager_check_time`=?,"+
+			"`manager_checker_id`=?, `manager_checker_username`=?, `manager_checker_name`=? WHERE `id`=? AND `tutor_check_status`!=-1 AND `status`=1",
+		newStatus.ManagerCheckStatus,
+		newStatus.MessageManager,
+		newStatus.ManagerCheckTime,
+		newStatus.ManagerCheckerID,
+		newStatus.ManagerCheckerUsername,
+		newStatus.ManagerCheckerName,
+		newStatus.ID,
+	)
 	if err != nil {
 		logger.Warn("UpdateAdminCheckStatus error: ", err)
 		return false, errors.New("admin check error")
@@ -205,8 +271,17 @@ func (ugadb *UserGroupApplyDB) UpdateAdminCheckStatus(ctx context.Context, newSt
 }
 
 // UpdateStatus 更新申请记录的状态
-func (ugadb *UserGroupApplyDB) UpdateStatus(ctx context.Context, applyID int, status int) (bool, error) {
-	res, err := ugadb.db.Exec(ctx, "UPDATE `user_group_apply` SET `status`=? WHERE `id`=?", status, applyID)
+func (ugadb *UserGroupApplyDB) UpdateStatus(
+	ctx context.Context,
+	applyID int,
+	status int,
+) (bool, error) {
+	res, err := ugadb.db.Exec(
+		ctx,
+		"UPDATE `user_group_apply` SET `status`=? WHERE `id`=?",
+		status,
+		applyID,
+	)
 	if err != nil {
 		logger.Warn("UserGroupApplyDB error: ", err)
 		return false, errors.New("UserGroupApplyDB error")

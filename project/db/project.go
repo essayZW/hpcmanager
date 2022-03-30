@@ -17,13 +17,27 @@ type ProjectDB struct {
 
 // Insert 插入新的project记录
 func (pdb *ProjectDB) Insert(ctx context.Context, newProject *Project) (int64, error) {
-	res, err := pdb.conn.Exec(ctx, "INSERT INTO `project` "+
-		"(`name`, `from`, `numbering`, `expenses`, `description`, `creater_user_id`, `creater_username`, "+
-		"`creater_user_name`, `create_time`, `modify_user_id`, `modify_username`, `modify_user_name`, `modify_time`, `extraAttributes`) "+
-		" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-		newProject.Name, newProject.From, newProject.Numbering, newProject.Expenses, newProject.Description,
-		newProject.CreaterUserID, newProject.CreaterUserName, newProject.CreaterUsername, newProject.CreateTime,
-		newProject.ModifyUserID, newProject.ModifyUserName, newProject.ModifyUsername, newProject.ModifyTime, newProject.ExtraAttributes)
+	res, err := pdb.conn.Exec(
+		ctx,
+		"INSERT INTO `project` "+
+			"(`name`, `from`, `numbering`, `expenses`, `description`, `creater_user_id`, `creater_username`, "+
+			"`creater_user_name`, `create_time`, `modify_user_id`, `modify_username`, `modify_user_name`, `modify_time`, `extraAttributes`) "+
+			" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+		newProject.Name,
+		newProject.From,
+		newProject.Numbering,
+		newProject.Expenses,
+		newProject.Description,
+		newProject.CreaterUserID,
+		newProject.CreaterUserName,
+		newProject.CreaterUsername,
+		newProject.CreateTime,
+		newProject.ModifyUserID,
+		newProject.ModifyUserName,
+		newProject.ModifyUsername,
+		newProject.ModifyTime,
+		newProject.ExtraAttributes,
+	)
 	if err != nil {
 		logger.Warn("Insert project error: ", err)
 		return 0, errors.New("Insert project error")
@@ -104,7 +118,14 @@ func (pdb *ProjectDB) QueryCountByCreaterUserID(ctx context.Context, userID ...i
 	for i := range params {
 		params[i] = userID[i]
 	}
-	row, err := pdb.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `project` WHERE "+pdb.expandOrSQL(ctx, "creater_user_id", len(params)), params...)
+	row, err := pdb.conn.QueryRow(
+		ctx,
+		"SELECT COUNT(*) FROM `project` WHERE "+pdb.expandOrSQL(
+			ctx,
+			"creater_user_id",
+			len(params),
+		),
+		params...)
 	if err != nil {
 		logger.Warn("QueryCountByCreaterUserID error: ", err)
 		return 0, errors.New("QueryCountByCreaterUserID error")
@@ -118,14 +139,22 @@ func (pdb *ProjectDB) QueryCountByCreaterUserID(ctx context.Context, userID ...i
 }
 
 // LimitQueryByCreaterUserID 通过limit查询某个用户创建的所有项目信息
-func (pdb *ProjectDB) LimitQueryByCreaterUserID(ctx context.Context, limit, offset int, userID ...int) ([]*Project, error) {
+func (pdb *ProjectDB) LimitQueryByCreaterUserID(
+	ctx context.Context,
+	limit, offset int,
+	userID ...int,
+) ([]*Project, error) {
 	params := make([]interface{}, len(userID))
 	for i := range userID {
 		params[i] = userID[i]
 	}
 	params = append(params, limit)
 	params = append(params, offset)
-	sql := "SELECT * FROM `project` WHERE " + pdb.expandOrSQL(ctx, "creater_user_id", len(userID)) + " LIMIT ?, ?"
+	sql := "SELECT * FROM `project` WHERE " + pdb.expandOrSQL(
+		ctx,
+		"creater_user_id",
+		len(userID),
+	) + " LIMIT ?, ?"
 	res, err := pdb.conn.Query(ctx, sql, params...)
 	if err != nil {
 		logger.Warn("LimitQueryByCreaterUserID error: ", err)

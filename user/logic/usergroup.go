@@ -27,7 +27,11 @@ type PaginationGroupResult struct {
 }
 
 // PaginationGetGroupInfo 分页查询用户组信息
-func (group *UserGroup) PaginationGetGroupInfo(ctx context.Context, pageIndex int, pageSize int) (*PaginationGroupResult, error) {
+func (group *UserGroup) PaginationGetGroupInfo(
+	ctx context.Context,
+	pageIndex int,
+	pageSize int,
+) (*PaginationGroupResult, error) {
 	if pageIndex < 1 {
 		return nil, errors.New("pageIndex must large than 0")
 	}
@@ -57,7 +61,11 @@ func (group *UserGroup) PaginationGetGroupInfo(ctx context.Context, pageIndex in
 }
 
 // CreateUserJoinGroupApply 创建用户申请加入组的申请记录
-func (group *UserGroup) CreateUserJoinGroupApply(ctx context.Context, userInfo *db.User, applyGroupID int) (int64, error) {
+func (group *UserGroup) CreateUserJoinGroupApply(
+	ctx context.Context,
+	userInfo *db.User,
+	applyGroupID int,
+) (int64, error) {
 	if userInfo.GroupID != 0 {
 		return 0, errors.New("user has a group, can't apply new group")
 	}
@@ -85,7 +93,10 @@ func (group *UserGroup) CreateUserJoinGroupApply(ctx context.Context, userInfo *
 }
 
 // GetByTutorUsername 通过导师用户名查询导师的其他信息
-func (group *UserGroup) GetByTutorUsername(ctx context.Context, username string) (*db.Group, error) {
+func (group *UserGroup) GetByTutorUsername(
+	ctx context.Context,
+	username string,
+) (*db.Group, error) {
 	return group.userGroupDB.QueryByTutorUsername(ctx, username)
 }
 
@@ -96,7 +107,10 @@ type PaginationApplyResult struct {
 }
 
 // AdminPageGetApplyInfo 管理员分页查询所有的申请信息
-func (group *UserGroup) AdminPageGetApplyInfo(ctx context.Context, pageIndex, pageSize int) (*PaginationApplyResult, error) {
+func (group *UserGroup) AdminPageGetApplyInfo(
+	ctx context.Context,
+	pageIndex, pageSize int,
+) (*PaginationApplyResult, error) {
 	if pageIndex < 1 {
 		return nil, errors.New("pageIndex must large than 0")
 	}
@@ -126,7 +140,10 @@ func (group *UserGroup) AdminPageGetApplyInfo(ctx context.Context, pageIndex, pa
 }
 
 // TutorPageGetApplyInfo 导师分页查看申请本组的所有申请信息
-func (group *UserGroup) TutorPageGetApplyInfo(ctx context.Context, pageIndex, pageSize, groupID int) (*PaginationApplyResult, error) {
+func (group *UserGroup) TutorPageGetApplyInfo(
+	ctx context.Context,
+	pageIndex, pageSize, groupID int,
+) (*PaginationApplyResult, error) {
 	if pageIndex < 1 {
 		return nil, errors.New("pageIndex must large than 0")
 	}
@@ -155,7 +172,10 @@ func (group *UserGroup) TutorPageGetApplyInfo(ctx context.Context, pageIndex, pa
 }
 
 // CommonPageGetApplyInfo 普通用户分页查询自己创建的所有申请信息
-func (group *UserGroup) CommonPageGetApplyInfo(ctx context.Context, pageIndex, pageSize, userID int) (*PaginationApplyResult, error) {
+func (group *UserGroup) CommonPageGetApplyInfo(
+	ctx context.Context,
+	pageIndex, pageSize, userID int,
+) (*PaginationApplyResult, error) {
 	if pageIndex < 1 {
 		return nil, errors.New("pageIndex must large than 0")
 	}
@@ -184,12 +204,21 @@ func (group *UserGroup) CommonPageGetApplyInfo(ctx context.Context, pageIndex, p
 }
 
 // GetApplyInfoByID 通过申请ID查询申请记录信息
-func (group *UserGroup) GetApplyInfoByID(ctx context.Context, applyID int) (*db.UserGroupApply, error) {
+func (group *UserGroup) GetApplyInfoByID(
+	ctx context.Context,
+	applyID int,
+) (*db.UserGroupApply, error) {
 	return group.userGroupApplyDB.QueryByID(ctx, applyID)
 }
 
 // TutorCheckApply 导师审核申请记录
-func (group *UserGroup) TutorCheckApply(ctx context.Context, tutorID int, applyID int, checkAccept bool, checkMessage string) (bool, error) {
+func (group *UserGroup) TutorCheckApply(
+	ctx context.Context,
+	tutorID int,
+	applyID int,
+	checkAccept bool,
+	checkMessage string,
+) (bool, error) {
 	applyInfo, err := group.GetApplyInfoByID(ctx, applyID)
 	if err != nil {
 		return false, errors.New("Invalid applyid: Get apply info error")
@@ -221,7 +250,14 @@ func (group *UserGroup) TutorCheckApply(ctx context.Context, tutorID int, applyI
 }
 
 // AdminCheckApply 管理员审核申请记录
-func (group *UserGroup) AdminCheckApply(ctx context.Context, applyID int, checkerID int, checkerUsername, checkerName string, checkAccept bool, checkMessage string) (bool, error) {
+func (group *UserGroup) AdminCheckApply(
+	ctx context.Context,
+	applyID int,
+	checkerID int,
+	checkerUsername, checkerName string,
+	checkAccept bool,
+	checkMessage string,
+) (bool, error) {
 	applyInfo, err := group.GetApplyInfoByID(ctx, applyID)
 	if err != nil {
 		return false, errors.New("Invalid applyid: Get apply info error")
@@ -256,7 +292,12 @@ func (group *UserGroup) AdminCheckApply(ctx context.Context, applyID int, checke
 }
 
 // CreateGroup 创建一个新的用户组
-func (group *UserGroup) CreateGroup(ctx context.Context, createrInfo, tutorInfo *db.User, name string, hpcGroupID int) (int64, error) {
+func (group *UserGroup) CreateGroup(
+	ctx context.Context,
+	createrInfo, tutorInfo *db.User,
+	name string,
+	hpcGroupID int,
+) (int64, error) {
 	return group.userGroupDB.Insert(ctx, &db.Group{
 		HpcGroupID:      hpcGroupID,
 		Name:            name,

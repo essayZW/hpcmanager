@@ -197,7 +197,13 @@ func TestCreateApplyNode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			id, err := nodeApplyLogic.CreateNodeApply(context.Background(), test.User, test.Tutor, test.NodeInfo, test.ProjectID)
+			id, err := nodeApplyLogic.CreateNodeApply(
+				context.Background(),
+				test.User,
+				test.Tutor,
+				test.NodeInfo,
+				test.ProjectID,
+			)
 			if err != nil {
 				if !test.Error {
 					t.Errorf("Get: %v, Except: %v", err, test.Error)

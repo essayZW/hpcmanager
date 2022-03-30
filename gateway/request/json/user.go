@@ -29,10 +29,22 @@ func (login *Login) Validator() validator.StructLevelFunc {
 	return func(sl validator.StructLevel) {
 		data := sl.Current().Interface().(Login)
 		if len(data.Username) < 6 || len(data.Username) > 32 {
-			sl.ReportError(reflect.ValueOf(data.Username), "username", "username", "binding", "username length error")
+			sl.ReportError(
+				reflect.ValueOf(data.Username),
+				"username",
+				"username",
+				"binding",
+				"username length error",
+			)
 		}
 		if len(data.Password) <= 0 || len(data.Password) > 16 {
-			sl.ReportError(reflect.ValueOf(data.Password), "password", "password", "binding", "username length error")
+			sl.ReportError(
+				reflect.ValueOf(data.Password),
+				"password",
+				"password",
+				"binding",
+				"username length error",
+			)
 		}
 	}
 }
@@ -40,9 +52,9 @@ func (login *Login) Validator() validator.StructLevelFunc {
 // CreateUserParam 创建用户参数
 type CreateUserParam struct {
 	Login
-	Tel         string `form:"tel" json:"tel"`
-	Email       string `form:"email" json:"email"`
-	Name        string `form:"name" json:"name" binding:"required"`
+	Tel         string `form:"tel"         json:"tel"`
+	Email       string `form:"email"       json:"email"`
+	Name        string `form:"name"        json:"name"        binding:"required"`
 	CollegeName string `form:"collegeName" json:"collegeName"`
 }
 
@@ -51,24 +63,42 @@ func (user *CreateUserParam) Validator() validator.StructLevelFunc {
 	return func(sl validator.StructLevel) {
 		data := sl.Current().Interface().(CreateUserParam)
 		if len(data.Username) < 6 || len(data.Username) > 32 {
-			sl.ReportError(reflect.ValueOf(data.Username), "username", "username", "binding", "username length error")
+			sl.ReportError(
+				reflect.ValueOf(data.Username),
+				"username",
+				"username",
+				"binding",
+				"username length error",
+			)
 		}
 		if len(data.Password) <= 0 || len(data.Password) > 16 {
-			sl.ReportError(reflect.ValueOf(data.Password), "password", "password", "binding", "username length error")
+			sl.ReportError(
+				reflect.ValueOf(data.Password),
+				"password",
+				"password",
+				"binding",
+				"username length error",
+			)
 		}
 		pattern := `\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*` //匹配电子邮箱
 		reg := regexp.MustCompile(pattern)
 		if data.Email != "" && !reg.MatchString(data.Email) {
-			sl.ReportError(reflect.ValueOf(data.Email), "email", "email", "binding", "invalid email")
+			sl.ReportError(
+				reflect.ValueOf(data.Email),
+				"email",
+				"email",
+				"binding",
+				"invalid email",
+			)
 		}
 	}
 }
 
 // UpdateUserInfoParam 用户信息更新参数
 type UpdateUserInfoParam struct {
-	ID      int    `form:"id" json:"id" binding:"required"`
-	Tel     string `form:"tel" json:"tel"`
-	Email   string `form:"email" json:"email"`
+	ID      int    `form:"id"      json:"id"      binding:"required"`
+	Tel     string `form:"tel"     json:"tel"`
+	Email   string `form:"email"   json:"email"`
 	College string `form:"college" json:"college"`
 }
 
@@ -83,7 +113,13 @@ func (param *UpdateUserInfoParam) Validator() validator.StructLevelFunc {
 		pattern := `\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*` //匹配电子邮箱
 		reg := regexp.MustCompile(pattern)
 		if data.Email != "" && !reg.MatchString(data.Email) {
-			sl.ReportError(reflect.ValueOf(data.Email), "email", "email", "binding", "invalid email")
+			sl.ReportError(
+				reflect.ValueOf(data.Email),
+				"email",
+				"email",
+				"binding",
+				"invalid email",
+			)
 		}
 	}
 }
@@ -99,15 +135,33 @@ func (param *CreateUserWithGroup) Validator() validator.StructLevelFunc {
 	return func(sl validator.StructLevel) {
 		data := sl.Current().Interface().(CreateUserWithGroup)
 		if len(data.Username) < 6 || len(data.Username) > 32 {
-			sl.ReportError(reflect.ValueOf(data.Username), "username", "username", "binding", "username length error")
+			sl.ReportError(
+				reflect.ValueOf(data.Username),
+				"username",
+				"username",
+				"binding",
+				"username length error",
+			)
 		}
 		if len(data.Password) <= 0 || len(data.Password) > 16 {
-			sl.ReportError(reflect.ValueOf(data.Password), "password", "password", "binding", "username length error")
+			sl.ReportError(
+				reflect.ValueOf(data.Password),
+				"password",
+				"password",
+				"binding",
+				"username length error",
+			)
 		}
 		pattern := `\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*` //匹配电子邮箱
 		reg := regexp.MustCompile(pattern)
 		if data.Email != "" && !reg.MatchString(data.Email) {
-			sl.ReportError(reflect.ValueOf(data.Email), "email", "email", "binding", "invalid email")
+			sl.ReportError(
+				reflect.ValueOf(data.Email),
+				"email",
+				"email",
+				"binding",
+				"invalid email",
+			)
 		}
 
 	}

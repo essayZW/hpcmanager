@@ -25,25 +25,45 @@ var userGroupService *UserGroupService
 type PermissionServiceMock struct {
 }
 
-func (pm *PermissionServiceMock) Ping(ctx context.Context, req *publicpb.Empty, options ...client.CallOption) (*publicpb.PingResponse, error) {
+func (pm *PermissionServiceMock) Ping(
+	ctx context.Context,
+	req *publicpb.Empty,
+	options ...client.CallOption,
+) (*publicpb.PingResponse, error) {
 	return nil, nil
 }
 
-func (pm *PermissionServiceMock) GetUserPermission(ctx context.Context, req *permissionpb.GetUserPermissionRequest, options ...client.CallOption) (*permissionpb.GetUserPermissionResponse, error) {
+func (pm *PermissionServiceMock) GetUserPermission(
+	ctx context.Context,
+	req *permissionpb.GetUserPermissionRequest,
+	options ...client.CallOption,
+) (*permissionpb.GetUserPermissionResponse, error) {
 	return nil, nil
 }
 
-func (pm *PermissionServiceMock) AddUserPermission(ctx context.Context, req *permissionpb.AddUserPermissionRequest, options ...client.CallOption) (*permissionpb.AddUserPermissionResponse, error) {
+func (pm *PermissionServiceMock) AddUserPermission(
+	ctx context.Context,
+	req *permissionpb.AddUserPermissionRequest,
+	options ...client.CallOption,
+) (*permissionpb.AddUserPermissionResponse, error) {
 	return &permissionpb.AddUserPermissionResponse{
 		Success: true,
 	}, nil
 }
 
-func (pm *PermissionServiceMock) RemoveUserPermission(ctx context.Context, req *permissionpb.RemoveUserPermissionRequest, options ...client.CallOption) (*permissionpb.RemoveUserPermissionResponse, error) {
+func (pm *PermissionServiceMock) RemoveUserPermission(
+	ctx context.Context,
+	req *permissionpb.RemoveUserPermissionRequest,
+	options ...client.CallOption,
+) (*permissionpb.RemoveUserPermissionResponse, error) {
 	return nil, nil
 }
 
-func (pm *PermissionServiceMock) AddPermission(ctx context.Context, req *permissionpb.AddPermissionRequest, options ...client.CallOption) (*permissionpb.AddPermissionResponse, error) {
+func (pm *PermissionServiceMock) AddPermission(
+	ctx context.Context,
+	req *permissionpb.AddPermissionRequest,
+	options ...client.CallOption,
+) (*permissionpb.AddPermissionResponse, error) {
 	return nil, nil
 }
 
@@ -81,7 +101,10 @@ func init() {
 		logger.Fatal("Redis ping get: ", ok)
 	}
 	userLogic := logic.NewUser(userdb.NewUser(sqlConn), etcdConfig, redisConn)
-	userGroupLogic := logic.NewUserGroup(userdb.NewUserGroup(sqlConn), userdb.NewUserGroupApply(sqlConn))
+	userGroupLogic := logic.NewUserGroup(
+		userdb.NewUserGroup(sqlConn),
+		userdb.NewUserGroupApply(sqlConn),
+	)
 	userGroupService = &UserGroupService{
 		userGroupLogic:    userGroupLogic,
 		userLogic:         userLogic,

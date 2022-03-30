@@ -79,7 +79,10 @@ func (e *etcdDynamicConfig) Registry(path string, value interface{}, handler Val
 			// 保证值必须是json格式
 			changedValue, ok = v.(map[string]interface{})
 			if !ok {
-				logger.Debug("EtcdDynamicConfig changed value /path/v must be json data, but is ", changedValue)
+				logger.Debug(
+					"EtcdDynamicConfig changed value /path/v must be json data, but is ",
+					changedValue,
+				)
 				continue
 			}
 			if reallyValue, ok := changedValue["value"]; ok {
@@ -87,13 +90,20 @@ func (e *etcdDynamicConfig) Registry(path string, value interface{}, handler Val
 				go e.setValue(&reflectValue, reallyValue, handler)
 				continue
 			}
-			logger.Debug("EtcdDynamicConfig changed value /path/v must have key value, but is ", changedValue)
+			logger.Debug(
+				"EtcdDynamicConfig changed value /path/v must have key value, but is ",
+				changedValue,
+			)
 		}
 	}()
 	return nil
 }
 
-func (e *etcdDynamicConfig) setValue(oldValue *reflect.Value, newValue interface{}, handler ValueChange) {
+func (e *etcdDynamicConfig) setValue(
+	oldValue *reflect.Value,
+	newValue interface{},
+	handler ValueChange,
+) {
 	defer func() {
 		err := recover()
 		if err != nil {

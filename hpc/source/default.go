@@ -19,22 +19,54 @@ type defaultSource struct {
 	conn    *db.DB
 }
 
-func (source *defaultSource) AddUserToGroup(userName, groupName string, gid int) (map[string]interface{}, error) {
-	return source.timeoutExec("php", "useradd.php", "--user", userName, "--group", groupName, "--gid", strconv.Itoa(gid))
+func (source *defaultSource) AddUserToGroup(
+	userName, groupName string,
+	gid int,
+) (map[string]interface{}, error) {
+	return source.timeoutExec(
+		"php",
+		"useradd.php",
+		"--user",
+		userName,
+		"--group",
+		groupName,
+		"--gid",
+		strconv.Itoa(gid),
+	)
 }
 
-func (source *defaultSource) AddUserWithGroup(userName, groupName string) (map[string]interface{}, error) {
-	return source.timeoutExec("php", "useradd_withgroup.php", "--user", userName, "--group", groupName)
+func (source *defaultSource) AddUserWithGroup(
+	userName, groupName string,
+) (map[string]interface{}, error) {
+	return source.timeoutExec(
+		"php",
+		"useradd_withgroup.php",
+		"--user",
+		userName,
+		"--group",
+		groupName,
+	)
 }
 
-func (source *defaultSource) GetNodeUsageWithDate(ctx context.Context, startTime, endTime time.Time) ([]*HpcNodeUsage, error) {
+func (source *defaultSource) GetNodeUsageWithDate(
+	ctx context.Context,
+	startTime, endTime time.Time,
+) ([]*HpcNodeUsage, error) {
 	return source.selectWithDate(ctx, startTime, endTime)
 }
 
-func (source *defaultSource) selectWithDate(ctx context.Context, startDate, endDate time.Time) ([]*HpcNodeUsage, error) {
+func (source *defaultSource) selectWithDate(
+	ctx context.Context,
+	startDate, endDate time.Time,
+) ([]*HpcNodeUsage, error) {
 	// 从jobDW数据库中获取原始的作业调度信息并计算之后返回
-	rows, err := source.conn.Query(ctx, "SELECT `UserName`,`GroupName`,`Queue`, SUM(`WallDurationSeconds`) AS `WallTime`, SUM(`GpusWallTime`) as `GWallTime` "+
-		" FROM `account` WHERE `EventDate` >= ? AND `EventDate`<=? GROUP BY `GroupName`, `UserName`, `Queue`", startDate, endDate)
+	rows, err := source.conn.Query(
+		ctx,
+		"SELECT `UserName`,`GroupName`,`Queue`, SUM(`WallDurationSeconds`) AS `WallTime`, SUM(`GpusWallTime`) as `GWallTime` "+
+			" FROM `account` WHERE `EventDate` >= ? AND `EventDate`<=? GROUP BY `GroupName`, `UserName`, `Queue`",
+		startDate,
+		endDate,
+	)
 	if err != nil {
 		logger.Warn("selectWithDate error: ", err)
 		return nil, errors.New("selectWithDate error")
@@ -53,7 +85,11 @@ func (source *defaultSource) selectWithDate(ctx context.Context, startDate, endD
 }
 
 // exec 执行指定的命令
-func (source *defaultSource) exec(ctx context.Context, executor, file string, args ...string) (map[string]interface{}, error) {
+func (source *defaultSource) exec(
+	ctx context.Context,
+	executor, file string,
+	args ...string,
+) (map[string]interface{}, error) {
 	cmdArgs := make([]string, len(args)+1)
 	cmdArgs = append(cmdArgs, path.Join(source.baseDir))
 	cmdArgs = append(cmdArgs, args...)
@@ -69,7 +105,10 @@ func (source *defaultSource) exec(ctx context.Context, executor, file string, ar
 	return res, nil
 }
 
-func (source *defaultSource) timeoutExec(executor, file string, args ...string) (map[string]interface{}, error) {
+func (source *defaultSource) timeoutExec(
+	executor, file string,
+	args ...string,
+) (map[string]interface{}, error) {
 	// 最大的超时时间为4秒
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(4))
 	defer cancel()

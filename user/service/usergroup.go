@@ -30,7 +30,11 @@ type UserGroupService struct {
 }
 
 // Ping 用户组服务ping测试
-func (group *UserGroupService) Ping(ctx context.Context, req *publicpb.Empty, resp *publicpb.PingResponse) error {
+func (group *UserGroupService) Ping(
+	ctx context.Context,
+	req *publicpb.Empty,
+	resp *publicpb.PingResponse,
+) error {
 	logger.Info("UserGroup PING ", req)
 	resp.Msg = "PONG"
 	resp.Ip = req.BaseRequest.RequestInfo.RemoteIP
@@ -39,11 +43,26 @@ func (group *UserGroupService) Ping(ctx context.Context, req *publicpb.Empty, re
 }
 
 // GetGroupInfoByID 查询用户组信息
-func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb.GetGroupInfoByIDRequest, resp *userpb.GetGroupInfoByIDResponse) error {
-	logger.Infof("GetGroupInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+func (group *UserGroupService) GetGroupInfoByID(
+	ctx context.Context,
+	req *userpb.GetGroupInfoByIDRequest,
+	resp *userpb.GetGroupInfoByIDResponse,
+) error {
+	logger.Infof(
+		"GetGroupInfo: %s||%v",
+		req.BaseRequest.RequestInfo.Id,
+		req.BaseRequest.UserInfo.UserId,
+	)
 	// 鉴权,只有导师及以上用户可以查看组信息
 	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("GetGroupInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"GetGroupInfo permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("GetGroupInfo permission forbidden")
 	}
 	// 只有组管理员或者系统管理员才可以查看组信息
@@ -78,19 +97,41 @@ func (group *UserGroupService) GetGroupInfoByID(ctx context.Context, req *userpb
 }
 
 // PaginationGetGroupInfo 分页查询用户组基本信息
-func (group *UserGroupService) PaginationGetGroupInfo(ctx context.Context, req *userpb.PaginationGetGroupInfoRequest, resp *userpb.PaginationGetGroupInfoResponse) error {
-	logger.Infof("PaginationGetGroupInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+func (group *UserGroupService) PaginationGetGroupInfo(
+	ctx context.Context,
+	req *userpb.PaginationGetGroupInfoRequest,
+	resp *userpb.PaginationGetGroupInfoResponse,
+) error {
+	logger.Infof(
+		"PaginationGetGroupInfo: %s||%v",
+		req.BaseRequest.RequestInfo.Id,
+		req.BaseRequest.UserInfo.UserId,
+	)
 	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("PaginationGetGroupInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"PaginationGetGroupInfo permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("PaginationGetGroupInfo permission forbidden")
 	}
 	// 只有管理员才可以分页查询组信息
 	if !verify.IsAdmin(req.BaseRequest.UserInfo.Levels) {
-		logger.Info("PaginationGetGroupInfo permission forbidden: not admin BaseRequest: ", req.BaseRequest)
+		logger.Info(
+			"PaginationGetGroupInfo permission forbidden: not admin BaseRequest: ",
+			req.BaseRequest,
+		)
 		return errors.New("Only admin can query all group's info")
 	}
 
-	infos, err := group.userGroupLogic.PaginationGetGroupInfo(ctx, int(req.PageIndex), int(req.PageSize))
+	infos, err := group.userGroupLogic.PaginationGetGroupInfo(
+		ctx,
+		int(req.PageIndex),
+		int(req.PageSize),
+	)
 	if err != nil {
 		return errors.New("Pagination query group info error")
 	}
@@ -118,10 +159,25 @@ func (group *UserGroupService) PaginationGetGroupInfo(ctx context.Context, req *
 }
 
 // CreateJoinGroupApply 创建用户加入组申请单
-func (group *UserGroupService) CreateJoinGroupApply(ctx context.Context, req *userpb.CreateJoinGroupApplyRequest, resp *userpb.CreateJoinGroupApplyResponse) error {
-	logger.Infof("CreateJoinGroupApply: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+func (group *UserGroupService) CreateJoinGroupApply(
+	ctx context.Context,
+	req *userpb.CreateJoinGroupApplyRequest,
+	resp *userpb.CreateJoinGroupApplyResponse,
+) error {
+	logger.Infof(
+		"CreateJoinGroupApply: %s||%v",
+		req.BaseRequest.RequestInfo.Id,
+		req.BaseRequest.UserInfo.UserId,
+	)
 	if !verify.Identify(verify.ApplyJoinGroup, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("CreateJoinGroupApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"CreateJoinGroupApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("CreateJoinGroupApply permission forbidden")
 	}
 	// 查询申请人的信息
@@ -132,9 +188,12 @@ func (group *UserGroupService) CreateJoinGroupApply(ctx context.Context, req *us
 	if userInfo.GroupID != 0 {
 		return errors.New("apply fail: user have a group")
 	}
-	id, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
-		return group.userGroupLogic.CreateUserJoinGroupApply(c, userInfo, int(req.ApplyGroupID))
-	})
+	id, err := db.Transaction(
+		context.Background(),
+		func(c context.Context, i ...interface{}) (interface{}, error) {
+			return group.userGroupLogic.CreateUserJoinGroupApply(c, userInfo, int(req.ApplyGroupID))
+		},
+	)
 	if err != nil {
 		return err
 	}
@@ -146,10 +205,25 @@ func (group *UserGroupService) CreateJoinGroupApply(ctx context.Context, req *us
 }
 
 // SearchTutorInfo 通过用户名查询导师信息
-func (group *UserGroupService) SearchTutorInfo(ctx context.Context, req *userpb.SearchTutorInfoRequest, resp *userpb.SearchTutorInfoResponse) error {
-	logger.Infof("SearchTutorInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+func (group *UserGroupService) SearchTutorInfo(
+	ctx context.Context,
+	req *userpb.SearchTutorInfoRequest,
+	resp *userpb.SearchTutorInfoResponse,
+) error {
+	logger.Infof(
+		"SearchTutorInfo: %s||%v",
+		req.BaseRequest.RequestInfo.Id,
+		req.BaseRequest.UserInfo.UserId,
+	)
 	if !verify.Identify(verify.SearchTutorInfo, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("SearchTutorInfo permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"SearchTutorInfo permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("SearchTutorInfo permission forbidden")
 	}
 	info, err := group.userGroupLogic.GetByTutorUsername(ctx, req.Username)
@@ -165,8 +239,16 @@ func (group *UserGroupService) SearchTutorInfo(ctx context.Context, req *userpb.
 }
 
 // PageGetApplyGroupInfo 分页查询用户加入组申请记录,对于不同的权限的角色，所查询的范围不同,根据用户的最高权限来进行查询范围判断
-func (group *UserGroupService) PageGetApplyGroupInfo(ctx context.Context, req *userpb.PageGetApplyGroupInfoRequest, resp *userpb.PageGetApplyGroupInfoResponse) error {
-	logger.Infof("PageGetApplyGroupInfo: %s||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+func (group *UserGroupService) PageGetApplyGroupInfo(
+	ctx context.Context,
+	req *userpb.PageGetApplyGroupInfoRequest,
+	resp *userpb.PageGetApplyGroupInfoResponse,
+) error {
+	logger.Infof(
+		"PageGetApplyGroupInfo: %s||%v",
+		req.BaseRequest.RequestInfo.Id,
+		req.BaseRequest.UserInfo.UserId,
+	)
 	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
 	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
 
@@ -174,7 +256,11 @@ func (group *UserGroupService) PageGetApplyGroupInfo(ctx context.Context, req *u
 	var err error
 	if isAdmin {
 		// 管理员只可以查看已经经过导师审核的所有的申请信息
-		result, err = group.userGroupLogic.AdminPageGetApplyInfo(ctx, int(req.PageIndex), int(req.PageSize))
+		result, err = group.userGroupLogic.AdminPageGetApplyInfo(
+			ctx,
+			int(req.PageIndex),
+			int(req.PageSize),
+		)
 	} else if isTutor {
 		// 导师可以查看自己组的所有申请信息
 		result, err = group.userGroupLogic.TutorPageGetApplyInfo(ctx, int(req.PageIndex), int(req.PageSize), int(req.BaseRequest.UserInfo.GroupId))
@@ -217,10 +303,25 @@ func (group *UserGroupService) PageGetApplyGroupInfo(ctx context.Context, req *u
 }
 
 // CheckApply 审核用户加入组申请
-func (group *UserGroupService) CheckApply(ctx context.Context, req *userpb.CheckApplyRequest, resp *userpb.CheckApplyResponse) error {
-	logger.Infof("CheckApply: %v||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+func (group *UserGroupService) CheckApply(
+	ctx context.Context,
+	req *userpb.CheckApplyRequest,
+	resp *userpb.CheckApplyResponse,
+) error {
+	logger.Infof(
+		"CheckApply: %v||%v",
+		req.BaseRequest.RequestInfo.Id,
+		req.BaseRequest.UserInfo.UserId,
+	)
 	if !verify.Identify(verify.CheckJoinGroupApply, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("CheckJoinGroupApply permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"CheckJoinGroupApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("CheckJoinGroupApply permission forbidden")
 	}
 	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
@@ -230,7 +331,13 @@ func (group *UserGroupService) CheckApply(ctx context.Context, req *userpb.Check
 	// 需要考虑身份同时是导师以及是管理员的情况下审核的冲突情况
 	if req.TutorCheck {
 		if isTutor {
-			status, err = group.userGroupLogic.TutorCheckApply(ctx, int(req.BaseRequest.UserInfo.UserId), int(req.ApplyID), req.CheckStatus, req.CheckMessage)
+			status, err = group.userGroupLogic.TutorCheckApply(
+				ctx,
+				int(req.BaseRequest.UserInfo.UserId),
+				int(req.ApplyID),
+				req.CheckStatus,
+				req.CheckMessage,
+			)
 		} else {
 			return errors.New("must be tutor user")
 		}
@@ -261,73 +368,97 @@ func (group *UserGroupService) CheckApply(ctx context.Context, req *userpb.Check
 }
 
 // CreateGroup 创建新的用户组并将用户设置为新组的导师
-func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.CreateGroupRequest, resp *userpb.CreateGroupResponse) error {
-	logger.Infof("CreateGroup: %v||%v", req.BaseRequest.RequestInfo.Id, req.BaseRequest.UserInfo.UserId)
+func (group *UserGroupService) CreateGroup(
+	ctx context.Context,
+	req *userpb.CreateGroupRequest,
+	resp *userpb.CreateGroupResponse,
+) error {
+	logger.Infof(
+		"CreateGroup: %v||%v",
+		req.BaseRequest.RequestInfo.Id,
+		req.BaseRequest.UserInfo.UserId,
+	)
 	if !verify.Identify(verify.CreateGroup, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("CreateGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"CreateGroup permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("CreateGroup permission forbidden")
 	}
-	idInterface, err := db.Transaction(ctx, func(c context.Context, i ...interface{}) (interface{}, error) {
-		// 查询新组的新导师的信息
-		tutorInfo, err := group.userLogic.GetUserInfoByID(c, int(req.TutorID))
-		if err != nil {
-			return nil, err
-		}
-		// 新的导师必须是不属于任何组的一个新用户
-		if tutorInfo.GroupID != 0 {
-			return nil, errors.New("this user has in a group")
-		}
-		// 调用hpc服务添加对应的计算节点组
-		hpcResp, err := group.hpcService.AddUserWithGroup(c, &hpcpb.AddUserWithGroupRequest{
-			// 使用导师的英语姓名作为计算节点上的用户组名
-			TutorUsername: tutorInfo.PinyinName,
-			GroupName:     tutorInfo.PinyinName,
-			QueueName:     req.QueueName,
-			BaseRequest:   req.BaseRequest,
-		})
-		if err != nil {
-			return nil, err
-		}
-		// 创建组信息
-		id, err := group.userGroupLogic.CreateGroup(c, &userdb.User{
-			ID:       int(req.BaseRequest.UserInfo.UserId),
-			Username: req.BaseRequest.UserInfo.Username,
-			Name:     req.BaseRequest.UserInfo.Name,
-		}, tutorInfo, req.Name, int(hpcResp.HpcGroupID))
-		if err != nil {
-			return nil, err
-		}
-		// 修改导师用户关联的hpc_user表ID
-		err = group.userLogic.SetHpcUserID(c, tutorInfo.ID, int(hpcResp.HpcUserID))
-		if err != nil {
-			return nil, err
-		}
-		// 修改导师所属的组ID
-		err = group.userLogic.ChangeUserGroup(c, tutorInfo.ID, int(id))
-		if err != nil {
-			return nil, err
-		}
-		// 删除该用户原来的Guest权限
-		// NOTE: 删除不管是否删除成功,若存在则会删除成功,不存在则忽略删除失败的错误消息
-		group.permissionService.RemoveUserPermission(ctx, &permissionpb.RemoveUserPermissionRequest{
-			Userid:      int32(tutorInfo.ID),
-			Level:       int32(verify.Guest),
-			BaseRequest: req.BaseRequest,
-		})
-		// 添加权限记录
-		addresp, err := group.permissionService.AddUserPermission(ctx, &permissionpb.AddUserPermissionRequest{
-			Userid:      int32(tutorInfo.ID),
-			Level:       int32(verify.Tutor),
-			BaseRequest: req.BaseRequest,
-		})
-		if err != nil {
-			return nil, err
-		}
-		if !addresp.Success {
-			return nil, errors.New("user permission create error")
-		}
-		return id, nil
-	})
+	idInterface, err := db.Transaction(
+		ctx,
+		func(c context.Context, i ...interface{}) (interface{}, error) {
+			// 查询新组的新导师的信息
+			tutorInfo, err := group.userLogic.GetUserInfoByID(c, int(req.TutorID))
+			if err != nil {
+				return nil, err
+			}
+			// 新的导师必须是不属于任何组的一个新用户
+			if tutorInfo.GroupID != 0 {
+				return nil, errors.New("this user has in a group")
+			}
+			// 调用hpc服务添加对应的计算节点组
+			hpcResp, err := group.hpcService.AddUserWithGroup(c, &hpcpb.AddUserWithGroupRequest{
+				// 使用导师的英语姓名作为计算节点上的用户组名
+				TutorUsername: tutorInfo.PinyinName,
+				GroupName:     tutorInfo.PinyinName,
+				QueueName:     req.QueueName,
+				BaseRequest:   req.BaseRequest,
+			})
+			if err != nil {
+				return nil, err
+			}
+			// 创建组信息
+			id, err := group.userGroupLogic.CreateGroup(c, &userdb.User{
+				ID:       int(req.BaseRequest.UserInfo.UserId),
+				Username: req.BaseRequest.UserInfo.Username,
+				Name:     req.BaseRequest.UserInfo.Name,
+			}, tutorInfo, req.Name, int(hpcResp.HpcGroupID))
+			if err != nil {
+				return nil, err
+			}
+			// 修改导师用户关联的hpc_user表ID
+			err = group.userLogic.SetHpcUserID(c, tutorInfo.ID, int(hpcResp.HpcUserID))
+			if err != nil {
+				return nil, err
+			}
+			// 修改导师所属的组ID
+			err = group.userLogic.ChangeUserGroup(c, tutorInfo.ID, int(id))
+			if err != nil {
+				return nil, err
+			}
+			// 删除该用户原来的Guest权限
+			// NOTE: 删除不管是否删除成功,若存在则会删除成功,不存在则忽略删除失败的错误消息
+			group.permissionService.RemoveUserPermission(
+				ctx,
+				&permissionpb.RemoveUserPermissionRequest{
+					Userid:      int32(tutorInfo.ID),
+					Level:       int32(verify.Guest),
+					BaseRequest: req.BaseRequest,
+				},
+			)
+			// 添加权限记录
+			addresp, err := group.permissionService.AddUserPermission(
+				ctx,
+				&permissionpb.AddUserPermissionRequest{
+					Userid:      int32(tutorInfo.ID),
+					Level:       int32(verify.Tutor),
+					BaseRequest: req.BaseRequest,
+				},
+			)
+			if err != nil {
+				return nil, err
+			}
+			if !addresp.Success {
+				return nil, errors.New("user permission create error")
+			}
+			return id, nil
+		},
+	)
 	if err != nil {
 		return err
 	}
@@ -341,7 +472,11 @@ func (group *UserGroupService) CreateGroup(ctx context.Context, req *userpb.Crea
 }
 
 // GetApplyInfoByID 通过ID查询用户申请加入组信息
-func (group *UserGroupService) GetApplyInfoByID(ctx context.Context, req *userpb.GetApplyInfoByIDRequest, resp *userpb.GetApplyInfoByIDResponse) error {
+func (group *UserGroupService) GetApplyInfoByID(
+	ctx context.Context,
+	req *userpb.GetApplyInfoByIDRequest,
+	resp *userpb.GetApplyInfoByIDResponse,
+) error {
 	logger.Info("GetApplyInfoByID: %s", req.BaseRequest)
 	apply, err := group.userGroupLogic.GetApplyInfoByID(context.Background(), int(req.ApplyID))
 	if err != nil {
@@ -375,10 +510,21 @@ func (group *UserGroupService) GetApplyInfoByID(ctx context.Context, req *userpb
 }
 
 // RevokeUserApplyGroup 撤销某一个用户加入组的申请
-func (group *UserGroupService) RevokeUserApplyGroup(ctx context.Context, req *userpb.RevokeUserApplyGroupRequest, resp *userpb.RevokeUserApplyGroupResponse) error {
+func (group *UserGroupService) RevokeUserApplyGroup(
+	ctx context.Context,
+	req *userpb.RevokeUserApplyGroupRequest,
+	resp *userpb.RevokeUserApplyGroupResponse,
+) error {
 	logger.Info("RevokeUserApplyGroup: ", req.BaseRequest)
 	if !verify.Identify(verify.RevokeUserApplyGroup, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("RevokeUserApplyGroup permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"RevokeUserApplyGroup permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("RevokeUserApplyGroup permission forbidden")
 	}
 	// 先查询申请信息,保证是本人创建的申请信息
@@ -405,7 +551,12 @@ func (group *UserGroupService) RevokeUserApplyGroup(ctx context.Context, req *us
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务
-func NewGroup(client client.Client, userGroupLogic *logic.UserGroup, userLogic *logic.User, mqBroker broker.Broker) *UserGroupService {
+func NewGroup(
+	client client.Client,
+	userGroupLogic *logic.UserGroup,
+	userLogic *logic.User,
+	mqBroker broker.Broker,
+) *UserGroupService {
 	return &UserGroupService{
 		userGroupLogic:    userGroupLogic,
 		userLogic:         userLogic,

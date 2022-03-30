@@ -151,11 +151,14 @@ func (n *node) paginationGetNodeDistributeWOS(ctx *gin.Context) {
 
 	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()
-	dataResp, err := n.nodeService.PaginationGetNodeDistributeWO(c, &nodepb.PaginationGetNodeDistributeWORequest{
-		BaseRequest: baseRequest,
-		PageIndex:   int32(pageIndex),
-		PageSize:    int32(pageSize),
-	})
+	dataResp, err := n.nodeService.PaginationGetNodeDistributeWO(
+		c,
+		&nodepb.PaginationGetNodeDistributeWORequest{
+			BaseRequest: baseRequest,
+			PageIndex:   int32(pageIndex),
+			PageSize:    int32(pageSize),
+		},
+	)
 	if err != nil {
 		httpResp := response.New(200, nil, false, fmt.Sprintf("查询用户信息失败: %s", err.Error()))
 		httpResp.Send(ctx)

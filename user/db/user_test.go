@@ -191,7 +191,11 @@ func TestUserDB_QueryCountWithPYNamePrefix(t *testing.T) {
 			}
 			got, err := db.QueryCountWithPYNamePrefix(tt.args.ctx, tt.args.prefix)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("UserDB.QueryCountWithPYNamePrefix() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"UserDB.QueryCountWithPYNamePrefix() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if got != tt.want {

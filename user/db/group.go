@@ -30,7 +30,11 @@ func (group *UserGroupDB) QueryGroupByID(ctx context.Context, groupID int) (*Gro
 }
 
 // PaginationQuery 分页查询用户组信息记录
-func (group *UserGroupDB) PaginationQuery(ctx context.Context, offset int, size int) ([]*Group, error) {
+func (group *UserGroupDB) PaginationQuery(
+	ctx context.Context,
+	offset int,
+	size int,
+) ([]*Group, error) {
 	rows, err := group.db.Query(ctx, "SELECT * FROM `group` LIMIT ?, ?", offset, size)
 	if err != nil {
 		return nil, errors.New("group infos query error")
@@ -65,7 +69,10 @@ func (group *UserGroupDB) GetGroupCount(ctx context.Context) (int, error) {
 }
 
 // QueryByTutorUsername 通过导师用户名精准查询信息
-func (group *UserGroupDB) QueryByTutorUsername(ctx context.Context, username string) (*Group, error) {
+func (group *UserGroupDB) QueryByTutorUsername(
+	ctx context.Context,
+	username string,
+) (*Group, error) {
 	row, err := group.db.QueryRow(ctx, "SELECT * FROM `group` WHERE `tutor_username`=?", username)
 	if err != nil {
 		logger.Warn("QueryByTutorUsername error: ", err)

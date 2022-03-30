@@ -97,7 +97,11 @@ func TestNodeDistribute_PaginationGet(t *testing.T) {
 			nodeDistribute := &NodeDistribute{
 				nodeDistributeDB: tt.fields.nodeDistributeDB,
 			}
-			got, err := nodeDistribute.PaginationGet(tt.args.ctx, tt.args.pageIndex, tt.args.pageSize)
+			got, err := nodeDistribute.PaginationGet(
+				tt.args.ctx,
+				tt.args.pageIndex,
+				tt.args.pageSize,
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NodeDistribute.PaginationGet() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -106,10 +110,18 @@ func TestNodeDistribute_PaginationGet(t *testing.T) {
 				return
 			}
 			if tt.want.Count != got.Count {
-				t.Errorf("NodeDistribute.PaginationGet() Count = %v, want %v", got.Count, tt.want.Count)
+				t.Errorf(
+					"NodeDistribute.PaginationGet() Count = %v, want %v",
+					got.Count,
+					tt.want.Count,
+				)
 			}
 			if tt.wantLen != len(got.Data) {
-				t.Errorf("NodeDistribute.PaginationGet() Len = %v, want %v", len(got.Data), tt.wantLen)
+				t.Errorf(
+					"NodeDistribute.PaginationGet() Len = %v, want %v",
+					len(got.Data),
+					tt.wantLen,
+				)
 			}
 		})
 	}

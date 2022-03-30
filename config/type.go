@@ -18,7 +18,14 @@ type Database struct {
 
 // Dsn 返回对应的Dsn
 func (db *Database) Dsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=utf8mb4,utf8&parseTime=true&loc=Asia%%2fShanghai", db.Username, db.Password, db.Host, db.Port, db.Database)
+	return fmt.Sprintf(
+		"%s:%s@tcp(%s:%v)/%s?charset=utf8mb4,utf8&parseTime=true&loc=Asia%%2fShanghai",
+		db.Username,
+		db.Password,
+		db.Host,
+		db.Port,
+		db.Database,
+	)
 }
 
 // Redis 服务的相关连接配置

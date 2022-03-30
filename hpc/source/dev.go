@@ -9,7 +9,10 @@ import (
 type hpcDev struct {
 }
 
-func (dev *hpcDev) AddUserWithGroup(userName string, groupName string) (map[string]interface{}, error) {
+func (dev *hpcDev) AddUserWithGroup(
+	userName string,
+	groupName string,
+) (map[string]interface{}, error) {
 	return map[string]interface{}{
 		"success": "true",
 		"data": map[string]interface{}{
@@ -21,7 +24,11 @@ func (dev *hpcDev) AddUserWithGroup(userName string, groupName string) (map[stri
 	}, nil
 }
 
-func (dev *hpcDev) AddUserToGroup(userName string, groupName string, gid int) (map[string]interface{}, error) {
+func (dev *hpcDev) AddUserToGroup(
+	userName string,
+	groupName string,
+	gid int,
+) (map[string]interface{}, error) {
 	return map[string]interface{}{
 		"success": "true",
 		"data": map[string]interface{}{
@@ -31,7 +38,10 @@ func (dev *hpcDev) AddUserToGroup(userName string, groupName string, gid int) (m
 	}, nil
 }
 
-func (dev *hpcDev) GetNodeUsageWithDate(ctx context.Context, startTime, endTime time.Time) ([]*HpcNodeUsage, error) {
+func (dev *hpcDev) GetNodeUsageWithDate(
+	ctx context.Context,
+	startTime, endTime time.Time,
+) ([]*HpcNodeUsage, error) {
 	infos := make([]*HpcNodeUsage, rand.Intn(64))
 	for i := range infos {
 		infos[i] = &HpcNodeUsage{

@@ -43,7 +43,11 @@ type TransactionHandler func(context.Context, ...interface{}) (interface{}, erro
 
 // Transaction 在事务中进行函数的执行，如果执行的函数出现panic或者返回error，则进行回滚，否则自动进行提交
 // 该函数会返回do函数的返回值，因此do函数必须为第一个返回值为data，第二个返回值为error
-func (db *DB) Transaction(ctx context.Context, do TransactionHandler, param ...interface{}) (doReturnValue interface{}, doError error) {
+func (db *DB) Transaction(
+	ctx context.Context,
+	do TransactionHandler,
+	param ...interface{},
+) (doReturnValue interface{}, doError error) {
 	tx, err := db.conn.BeginTxx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -73,7 +77,11 @@ func (db *DB) Transaction(ctx context.Context, do TransactionHandler, param ...i
 }
 
 // QueryRow 执行单行查询
-func (db *DB) QueryRow(ctx context.Context, query string, params ...interface{}) (*sqlx.Row, error) {
+func (db *DB) QueryRow(
+	ctx context.Context,
+	query string,
+	params ...interface{},
+) (*sqlx.Row, error) {
 	tx, err := db.TransactionConn(ctx)
 	if err != nil {
 		// 说明不在事务当中，应该直接使用conn执行
@@ -132,7 +140,11 @@ func NewDBWithConfig(conf *config.Database) (*DB, error) {
 }
 
 // Transaction 使用默认DB初始化进行事务操作
-func Transaction(ctx context.Context, do TransactionHandler, params ...interface{}) (interface{}, error) {
+func Transaction(
+	ctx context.Context,
+	do TransactionHandler,
+	params ...interface{},
+) (interface{}, error) {
 	if defaultDB == nil {
 		return nil, errors.New("Must call NewDB before use Transaction")
 	}

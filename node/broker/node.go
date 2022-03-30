@@ -24,7 +24,10 @@ type CheckApplyMessage struct {
 }
 
 // Public 发布该消息
-func (message *CheckApplyMessage) Public(rabbitmqBroker broker.Broker, baseRequest *proto.BaseRequest) error {
+func (message *CheckApplyMessage) Public(
+	rabbitmqBroker broker.Broker,
+	baseRequest *proto.BaseRequest,
+) error {
 	m, err := hpcbroker.NewMessage(message, baseRequest)
 	if err != nil {
 		return err
@@ -40,7 +43,11 @@ func checkApplyCustomer(client client.Client) func(broker.Event) error {
 	nodeService := nodepb.NewNodeService("node", client)
 	return func(p broker.Event) error {
 		message := p.Message()
-		logger.Infof("Received message: [%v] from ID: %s", message.Header["Time"], message.Header["ID"])
+		logger.Infof(
+			"Received message: [%v] from ID: %s",
+			message.Header["Time"],
+			message.Header["ID"],
+		)
 		// 解码消息
 		var body CheckApplyMessage
 		buff := bytes.NewBuffer(message.Body)

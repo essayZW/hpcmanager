@@ -128,7 +128,11 @@ func TestNodeDistributeDB_QueryByApplyID(t *testing.T) {
 				DistributeBillID: 0,
 				CreateTime: func() time.Time {
 					location, _ := time.LoadLocation("Asia/Shanghai")
-					t, _ := time.ParseInLocation("2006-01-02 15:04:05", "2022-03-23 20:04:07", location)
+					t, _ := time.ParseInLocation(
+						"2006-01-02 15:04:05",
+						"2022-03-23 20:04:07",
+						location,
+					)
 					return t
 				}(),
 			},
@@ -149,7 +153,11 @@ func TestNodeDistributeDB_QueryByApplyID(t *testing.T) {
 				DistributeBillID: 0,
 				CreateTime: func() time.Time {
 					location, _ := time.LoadLocation("Asia/Shanghai")
-					t, _ := time.ParseInLocation("2006-01-02 15:04:05", "2022-03-23 20:04:07", location)
+					t, _ := time.ParseInLocation(
+						"2006-01-02 15:04:05",
+						"2022-03-23 20:04:07",
+						location,
+					)
 					return t
 				}(),
 			},
@@ -162,7 +170,11 @@ func TestNodeDistributeDB_QueryByApplyID(t *testing.T) {
 			}
 			got, err := ndb.QueryByApplyID(tt.args.ctx, tt.args.applyID)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NodeDistributeDB.QueryByApplyID() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"NodeDistributeDB.QueryByApplyID() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -230,7 +242,11 @@ func TestNodeDistributeDB_QueryCountByApply(t *testing.T) {
 			}
 			got, err := ndb.QueryCountByApply(tt.args.ctx, tt.args.applyID)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NodeDistributeDB.QueryCountByApply() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"NodeDistributeDB.QueryCountByApply() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if got != tt.want {
@@ -403,7 +419,11 @@ func TestNodeDistributeDB_UpdateHandlerFlag(t *testing.T) {
 			}
 			got, err := ndb.UpdateHandlerFlag(tt.args.ctx, tt.args.newInfo)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NodeDistributeDB.UpdateHandlerFlag() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf(
+					"NodeDistributeDB.UpdateHandlerFlag() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
 				return
 			}
 			if got != tt.want {

@@ -156,7 +156,10 @@ type PaginationUserResult struct {
 }
 
 // PaginationGetUserInfo 分页查询用户信息
-func (u *User) PaginationGetUserInfo(ctx context.Context, pageIndex, pageSize, groupID int) (*PaginationUserResult, error) {
+func (u *User) PaginationGetUserInfo(
+	ctx context.Context,
+	pageIndex, pageSize, groupID int,
+) (*PaginationUserResult, error) {
 	if pageIndex < 1 {
 		return nil, errors.New("pageIndex must large than 0")
 	}

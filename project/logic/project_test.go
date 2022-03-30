@@ -77,13 +77,19 @@ func TestCreate(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			id, err := projectLogic.Create(context.Background(), test.UserID, test.UserName, test.Username, &projectdb.Project{
-				Name:        test.PName,
-				From:        test.From,
-				Numbering:   test.Numbering,
-				Expenses:    test.Expense,
-				Description: test.Description,
-			})
+			id, err := projectLogic.Create(
+				context.Background(),
+				test.UserID,
+				test.UserName,
+				test.Username,
+				&projectdb.Project{
+					Name:        test.PName,
+					From:        test.From,
+					Numbering:   test.Numbering,
+					Expenses:    test.Expense,
+					Description: test.Description,
+				},
+			)
 			if err != nil {
 				if !test.Error {
 					t.Errorf("Get: %v, Except: %v", err, test.Error)
@@ -139,7 +145,11 @@ func TestPaginationGet(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			res, err := projectLogic.PaginationGet(context.Background(), test.PageIndex, test.PageSize)
+			res, err := projectLogic.PaginationGet(
+				context.Background(),
+				test.PageIndex,
+				test.PageSize,
+			)
 			if err != nil {
 				if !test.Error {
 					t.Errorf("Get: %v, Except: %v", err, test.Error)
