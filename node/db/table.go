@@ -56,6 +56,13 @@ type NodeDistribute struct {
 type HpcUsageTime struct {
 	ID              int       `db:"id"`
 	UserID          int       `db:"user_id"`
+	Username        string    `db:"username"`
+	UserName        string    `db:"user_name"`
+	HpcUsername     string    `db:"hpc_username"`
+	TutorID         int       `db:"tutor_id"`
+	TutorUsername   string    `db:"tutor_username"`
+	TutorUserName   string    `db:"tutor_user_name"`
+	HpcGroupName    string    `db:"hpc_group_name"`
 	QueueName       string    `db:"queue_name"`
 	WallTime        float64   `db:"wall_time"`
 	GWallTime       float64   `db:"gwall_time"`

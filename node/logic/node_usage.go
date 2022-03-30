@@ -24,6 +24,15 @@ func (n *NodeUsageTime) AddRecord(ctx context.Context, info *db.HpcUsageTime) (i
 	if info.UserID == 0 {
 		return 0, errors.New("invalid userID")
 	}
+	if info.TutorID == 0 {
+		return 0, errors.New("invalid tutorID")
+	}
+	if info.HpcUsername == "" {
+		return 0, errors.New("invalid hpc user name")
+	}
+	if info.HpcGroupName == "" {
+		return 0, errors.New("invalid hpc group name")
+	}
 	if info.WallTime < 0 || info.GWallTime < 0 {
 		return 0, errors.New("wall time and gwall time must larger than 0")
 	}

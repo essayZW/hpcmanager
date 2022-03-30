@@ -16,8 +16,9 @@ type NodeUsageTimeDB struct {
 // Insert 插入新的记录
 func (n *NodeUsageTimeDB) Insert(ctx context.Context, info *HpcUsageTime) (int64, error) {
 	res, err := n.conn.Exec(ctx, "INSERT INTO `hpc_usagetime` "+
-		"(`user_id`, `queue_name`, `wall_time`, `gwall_time`, `start_time`, `end_time`, `create_time`, `extraAttributes`) "+
-		" VALUES (?,?,?,?,?,?,?,?)", info.UserID, info.QueueName, info.WallTime, info.GWallTime, info.StartTime,
+		"(`user_id`, `username`, `user_name`,`hpc_username`, `tutor_id`, `tutor_username`, `tutor_user_name`, `hpc_group_name`, `queue_name`, `wall_time`, `gwall_time`, `start_time`, `end_time`, `create_time`, `extraAttributes`) "+
+		" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", info.UserID, info.Username, info.UserName, info.HpcUsername, info.TutorID, info.TutorUsername,
+		info.TutorUserName, info.HpcGroupName, info.QueueName, info.WallTime, info.GWallTime, info.StartTime,
 		info.EndTime, info.CreateTime, info.ExtraAttributes)
 	if err != nil {
 		logger.Warn("Insert error: ", err)

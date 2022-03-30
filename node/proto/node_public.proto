@@ -53,11 +53,18 @@ message NodeDistribute {
 message NodeUsageTime {
     int32 id = 1;
     int32 userID = 2;
-    string queueName = 3;
-    double wallTime = 4;
-    double gwallTime = 5;
-    int64 startTime = 6;
-    int64 endTime = 7;
-    int64 createTime = 8;
-    string extraAttributes = 9;
+    string username = 3;
+    string name = 4;
+    string hpcUserName = 5;
+    int32 tutorID = 6;
+    string tutorUsername = 7;
+    string tutorName = 8;
+    string hpcGroupName = 9;
+    string queueName = 10;
+    double wallTime = 11;
+    double gwallTime = 12;
+    int64 startTime = 13;
+    int64 endTime = 14;
+    int64 createTime = 15;
+    string extraAttributes = 16;
 }
