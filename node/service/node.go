@@ -479,16 +479,20 @@ func (ns *NodeService) AddNodeUsageTimeRecord(
 		)
 		return errors.New("AddNodeUsageTimeRecord permission forbidden")
 	}
-	// 查询相应的信息
-
 	id, err := ns.nodeUsageTime.AddRecord(ctx, &db.HpcUsageTime{
-		QueueName:    req.QueueName,
-		HpcUsername:  req.HpcUserName,
-		HpcGroupName: req.HpcGroupName,
-		WallTime:     req.WallTime,
-		GWallTime:    req.GwallTime,
-		StartTime:    time.Unix(req.StartTimeUnix, 0),
-		EndTime:      time.Unix(req.EndTimeUnix, 0),
+		UserID:        int(req.UserID),
+		Username:      req.Username,
+		UserName:      req.Name,
+		HpcUsername:   req.HpcUserName,
+		TutorID:       int(req.TutorID),
+		TutorUsername: req.TutorUsername,
+		TutorUserName: req.TutorName,
+		HpcGroupName:  req.HpcGroupName,
+		QueueName:     req.QueueName,
+		WallTime:      req.WallTime,
+		GWallTime:     req.GwallTime,
+		StartTime:     time.Unix(req.StartTimeUnix, 0),
+		EndTime:       time.Unix(req.EndTimeUnix, 0),
 	})
 	if err != nil {
 		return err

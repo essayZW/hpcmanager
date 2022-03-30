@@ -107,13 +107,19 @@ message RevokeNodeApplyResponse {
 
 message AddNodeUsageTimeRecordRequest {
     request.BaseRequest baseRequest = 1;
-    string queueName = 2;
-    string hpcUserName = 3;
-    string hpcGroupName = 4;
-    double wallTime = 5;
-    double gwallTime = 6;
-    int64 startTimeUnix =  7;
-    int64 endTimeUnix = 8;
+    int32 userID = 2;
+    string username = 3;
+    string name = 4;
+    string hpcUserName = 5;
+    int32 tutorID = 6;
+    string tutorUsername = 7;
+    string tutorName = 8;
+    string hpcGroupName = 9;
+    string queueName = 10;
+    double wallTime = 11;
+    double gwallTime = 12;
+    int64 startTimeUnix =  13;
+    int64 endTimeUnix = 14;
 }
 
 message AddNodeUsageTimeRecordResponse {
