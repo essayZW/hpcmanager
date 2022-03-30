@@ -86,7 +86,7 @@ message AddUserToGroupResponse {
 
 描述: 通过 ID 查询一个 hpc_user 的信息
 
-原型定于: `rpc GetUserInfoByID(GetUserInfoByIDRequest) returns (GetUserInfoByIDResponse) {}`
+原型定义: `rpc GetUserInfoByID(GetUserInfoByIDRequest) returns (GetUserInfoByIDResponse) {}`
 
 请求参数:
 
@@ -125,6 +125,29 @@ message GetGroupInfoByIDRequest {
 ```protobuf
 message GetGroupInfoByIDResponse {
     hpc.HpcGroup group = 1;
+}
+```
+
+# GetUserInfoByUsername
+
+描述: 通过计算节点用户名查询计算节点信息
+
+原型定义: `rpc GetUserInfoByUsername(GetUserInfoByUsernameRequest) returns (GetUserInfoByUsernameResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetUserInfoByUsernameRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetUserInfoByUsernameResponse {
+    hpc.HpcUser user = 1;
 }
 ```
 

@@ -137,6 +137,10 @@ func (hpc *HpcLogic) GetNodeUsage(
 	return hpc.hpcSource.GetNodeUsageWithDate(ctx, startDate, endDate)
 }
 
+func (hpc *HpcLogic) GetUserInfoByUsername(ctx context.Context, username string) (*db.HpcUser, error) {
+	return hpc.hpcUserDB.QueryByUsername(ctx, username)
+}
+
 // NewHpc 创建一个HPC作业调度系统逻辑操作
 func NewHpc(
 	hpcSource source.HpcSource,

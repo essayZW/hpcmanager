@@ -27,4 +27,6 @@ func main() {
 	)
 
 	serviceClient := srv.Client()
+
+    loader := NewLoader(serviceClient)
 }

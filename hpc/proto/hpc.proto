@@ -15,6 +15,7 @@ service Hpc {
     rpc GetUserInfoByID(GetUserInfoByIDRequest) returns (GetUserInfoByIDResponse) {}
     rpc GetGroupInfoByID(GetGroupInfoByIDRequest) returns (GetGroupInfoByIDResponse) {}
     rpc GetNodeUsage(GetNodeUsageRequest) returns (GetNodeUsageResponse) {}
+    rpc GetUserInfoByUsername(GetUserInfoByUsernameRequest) returns (GetUserInfoByUsernameResponse) {}
 }
 
 message AddUserWithGroupRequest {
@@ -70,4 +71,13 @@ message GetNodeUsageRequest {
 
 message GetNodeUsageResponse {
     repeated hpc.HpcNodeUsage usages = 1;
+}
+
+message GetUserInfoByUsernameRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+
+message GetUserInfoByUsernameResponse {
+    hpc.HpcUser user = 1;
 }

@@ -46,6 +46,22 @@ func (hpcdb *HpcUserDB) QueryByID(ctx context.Context, id int) (*HpcUser, error)
 	return &info, nil
 }
 
+// QueryByUsername 通过用户名查询hpc用户表的记录
+func (hpcdb *HpcUserDB) QueryByUsername(ctx context.Context, username string) (*HpcUser, error) {
+	res, err := hpcdb.conn.QueryRow(ctx, "SELECT * FROM `hpc_user` WHERE `node_username`=?", username)
+	if err != nil {
+		logger.Warn("HpcUserDB query by username error: ", err, " with username: ", username)
+		return nil, errors.New("Query error")
+	}
+	var info HpcUser
+	err = res.StructScan(&info)
+	if err != nil {
+		logger.Warn("HpcUserDB query by username structscan error: ", err)
+		return nil, errors.New("Query error")
+	}
+	return &info, nil
+}
+
 // NewHpcUser 创建新的NewHpcUser结构体并返回指针
 func NewHpcUser(db *db.DB) *HpcUserDB {
 	return &HpcUserDB{
