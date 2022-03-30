@@ -548,6 +548,59 @@ func (group *UserGroupService) RevokeUserApplyGroup(
 	return nil
 }
 
+func (group *UserGroupService) GetGroupInfoByHpcID(
+	ctx context.Context,
+	req *userpb.GetGroupInfoByHpcIDRequest,
+	resp *userpb.GetGroupInfoByHpcIDResponse,
+) error {
+	logger.Infof(
+		"GetGroupInfoByHpcID: %s||%v",
+		req.BaseRequest.RequestInfo.Id,
+		req.BaseRequest.UserInfo.UserId,
+	)
+	// 鉴权,只有导师及以上用户可以查看组信息
+	if !verify.Identify(verify.GetGroupInfo, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"GetGroupInfo permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("GetGroupInfo permission forbidden")
+	}
+	info, err := group.userGroupLogic.GetGroupInfoByHpcID(ctx, int(req.HpcGroupID))
+	if err != nil {
+		return errors.New("group info query error")
+	}
+	// 只有组管理员或者系统管理员才可以查看组信息
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	// NOTE:由于前面鉴权已经确认其不是普通用户，因此这里只用判断导师用户即可
+	if isTutor && !isAdmin && int32(info.ID) != req.BaseRequest.UserInfo.GroupId {
+		// 是导师用户,但是不是管理员,因此只可以查看自己组的用户组信息
+		return errors.New("Tutor can only view group information for his managed group")
+	}
+	resp.GroupInfo = &userpb.GroupInfo{
+		Id:              int32(info.ID),
+		Name:            info.Name,
+		CreateTime:      info.CreateTime.Unix(),
+		CreaterID:       int32(info.CreaterID),
+		CreaterUsername: info.CreaterUsername,
+		CreaterName:     info.CreaterName,
+		TutorID:         int32(info.TutorID),
+		TutorUsername:   info.TutorUsername,
+		TutorName:       info.TutorName,
+		Balance:         info.Balance,
+		HpcGroupID:      int32(info.HpcGroupID),
+	}
+	if info.ExtraAttributes != nil {
+		resp.GroupInfo.ExtraAttributes = info.ExtraAttributes.String()
+	}
+	return nil
+}
+
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务

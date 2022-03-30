@@ -317,6 +317,11 @@ func (group *UserGroup) RevokeUserApplyGroup(ctx context.Context, applyID int) (
 	return group.userGroupApplyDB.UpdateStatus(ctx, applyID, 0)
 }
 
+// GetGroupInfoByHpcID 通过hpc id查询用户组信息
+func (group *UserGroup) GetGroupInfoByHpcID(ctx context.Context, hpcID int) (*db.Group, error) {
+	return group.userGroupDB.QueryByHpcID(ctx, hpcID)
+}
+
 // NewUserGroup 创建一个新的用户组的操作逻辑
 func NewUserGroup(userGroupDB *db.UserGroupDB, userGroupApplyDB *db.UserGroupApplyDB) *UserGroup {
 	return &UserGroup{

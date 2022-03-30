@@ -20,6 +20,7 @@ service GroupService {
     rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse) {}
     rpc GetApplyInfoByID(GetApplyInfoByIDRequest) returns (GetApplyInfoByIDResponse) {}
     rpc RevokeUserApplyGroup(RevokeUserApplyGroupRequest) returns (RevokeUserApplyGroupResponse) {}
+    rpc GetGroupInfoByHpcID(GetGroupInfoByHpcIDRequest) returns (GetGroupInfoByHpcIDResponse) {}
 }
 
 
@@ -119,3 +120,11 @@ message RevokeUserApplyGroupResponse {
     bool success = 1;
 }
 
+message GetGroupInfoByHpcIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcGroupID = 2;
+}
+
+message GetGroupInfoByHpcIDResponse {
+    user.GroupInfo groupInfo = 1;
+}

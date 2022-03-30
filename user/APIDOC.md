@@ -573,6 +573,29 @@ message RevokeUserApplyGroupResponse {
 }
 ```
 
+## GetGroupInfoByHpcID
+
+描述: 通过用户组的 HPC ID 查询用户组信息
+
+原型定义: `rpc GetGroupInfoByHpcID(GetGroupInfoByHpcIDRequest) returns (GetGroupInfoByHpcIDResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetGroupInfoByHpcIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcGroupID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetGroupInfoByHpcIDResponse {
+    user.GroupInfo groupInfo = 1;
+}
+```
+
 # 附录
 
 ## UserInfo
