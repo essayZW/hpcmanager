@@ -63,12 +63,12 @@ func (h *HpcService) AddUserWithGroup(
 			}
 			groupname, ok := data["gname"].(string)
 			if !ok {
-				logger.Warn("AddUserWithGroup error: error response data: ", err)
+				logger.Warn("AddUserWithGroup error: error response data: ", data)
 				return nil, errors.New("error response data from source")
 			}
 			gid, ok := data["gid"].(int)
 			if !ok {
-				logger.Warn("AddUserWithGroup error: error response data: ", err)
+				logger.Warn("AddUserWithGroup error: error response data: ", data)
 				return nil, errors.New("error response data from source")
 			}
 			// 同步hpc_group表中的相关信息
@@ -142,12 +142,12 @@ func (h *HpcService) AddUserToGroup(
 			}
 			username, ok := data["uname"].(string)
 			if !ok {
-				logger.Warn("AddUserToGroup error: error response data: ", err)
+				logger.Warn("AddUserToGroup error: error response data: ", data)
 				return nil, errors.New("error response data from source")
 			}
 			uid, ok := data["uid"].(int)
 			if !ok {
-				logger.Warn("AddUserToGroup error: error response data: ", err)
+				logger.Warn("AddUserToGroup error: error response data: ", data)
 				return nil, errors.New("error response data from source")
 			}
 			userID, err := h.hpcLogic.CreateUser(c, username, uid)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/essayZW/hpcmanager/hpc/service"
 	"github.com/essayZW/hpcmanager/hpc/source"
 	"github.com/essayZW/hpcmanager/logger"
+	"github.com/go-redis/redis/v8"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/registry"
 )
@@ -53,29 +55,29 @@ func main() {
 	//logger.Fatal("Etcd config create error: ", err)
 	//}
 	// 创建redis连接
-	//redisConfig, err := config.LoadRedis()
-	//if err != nil {
-	//logger.Fatal("Redis conn error: ", err)
-	//}
-	//redisConn := redis.NewClient(&redis.Options{
-	//Addr:     redisConfig.Address,
-	//Password: redisConfig.Password,
-	//DB:       redisConfig.DB,
-	//})
-	//ping := redisConn.Ping(context.Background())
-	//ok, err := ping.Result()
-	//if err != nil {
-	//logger.Fatal("Redis ping error: ", err)
-	//}
-	//if ok != "PONG" {
-	//logger.Fatal("Redis ping get: ", ok)
-	//}
+	redisConfig, err := config.LoadRedis()
+	if err != nil {
+		logger.Fatal("Redis conn error: ", err)
+	}
+	redisConn := redis.NewClient(&redis.Options{
+		Addr:     redisConfig.Address,
+		Password: redisConfig.Password,
+		DB:       redisConfig.DB,
+	})
+	ping := redisConn.Ping(context.Background())
+	ok, err := ping.Result()
+	if err != nil {
+		logger.Fatal("Redis ping error: ", err)
+	}
+	if ok != "PONG" {
+		logger.Fatal("Redis ping get: ", ok)
+	}
 
 	env := os.Getenv(hpcmanager.EnvName)
-	// TODO: 添加上数据库配置的加载
 	hpcSource, err := source.New(
 		source.WithCmdBaseDir(hpcCmdBaseDir),
 		source.WithDevSource(env == "dev"),
+		source.WithDevRedis(redisConn),
 	)
 	if err != nil {
 		logger.Fatal("hpcSource init error: ", err)
