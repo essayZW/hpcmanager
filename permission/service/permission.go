@@ -118,10 +118,7 @@ func (permission *PermissionService) AddUserPermission(
 		)
 		return errors.New("AdduserPermission permission forbidden")
 	}
-	// 由于SuperAdmin权限只能有一个用户拥有,因此需要进行判断
-	if req.Level == int32(verify.SuperAdmin) {
-		return errors.New("SuperAdmin user has exists")
-	}
+	// TODO: 由于SuperAdmin权限只能有一个用户拥有,因此需要进行判断
 	err := permission.userpLogic.AddUserPermission(ctx, &db.UserPermission{
 		UserID: int(req.GetUserid()),
 	}, verify.Level(req.Level))
