@@ -49,11 +49,6 @@ func main() {
 	if err != nil {
 		logger.Fatal("MySQL conn error: ", err)
 	}
-	// 创建动态配置源
-	//etcdConfig, err := config.NewEtcd()
-	//if err != nil {
-	//logger.Fatal("Etcd config create error: ", err)
-	//}
 	// 创建redis连接
 	redisConfig, err := config.LoadRedis()
 	if err != nil {
@@ -74,10 +69,20 @@ func main() {
 	}
 
 	env := os.Getenv(hpcmanager.EnvName)
+	// 加载作业调度系统数据库配置
+	conf, err := config.LoadConfigSource()
+	if err != nil {
+		logger.Fatal("config load error", err)
+	}
+	var jobDBConf config.Database
+	if err := conf.Get("jobDatabase").Scan(&jobDBConf); err != nil {
+		logger.Fatal("config load error", err)
+	}
 	hpcSource, err := source.New(
 		source.WithCmdBaseDir(hpcCmdBaseDir),
 		source.WithDevSource(env == "dev"),
 		source.WithDevRedis(redisConn),
+		source.WithDBSource(&jobDBConf),
 	)
 	if err != nil {
 		logger.Fatal("hpcSource init error: ", err)
