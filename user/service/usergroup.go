@@ -431,16 +431,6 @@ func (group *UserGroupService) CreateGroup(
 			if err != nil {
 				return nil, err
 			}
-			// 删除该用户原来的Guest权限
-			// NOTE: 删除不管是否删除成功,若存在则会删除成功,不存在则忽略删除失败的错误消息
-			group.permissionService.RemoveUserPermission(
-				ctx,
-				&permissionpb.RemoveUserPermissionRequest{
-					Userid:      int32(tutorInfo.ID),
-					Level:       int32(verify.Guest),
-					BaseRequest: req.BaseRequest,
-				},
-			)
 			// 添加权限记录
 			addresp, err := group.permissionService.AddUserPermission(
 				ctx,
@@ -456,6 +446,16 @@ func (group *UserGroupService) CreateGroup(
 			if !addresp.Success {
 				return nil, errors.New("user permission create error")
 			}
+			// 删除该用户原来的Guest权限
+			// NOTE: 删除不管是否删除成功,若存在则会删除成功,不存在则忽略删除失败的错误消息
+			group.permissionService.RemoveUserPermission(
+				ctx,
+				&permissionpb.RemoveUserPermissionRequest{
+					Userid:      int32(tutorInfo.ID),
+					Level:       int32(verify.Guest),
+					BaseRequest: req.BaseRequest,
+				},
+			)
 			return id, nil
 		},
 	)
