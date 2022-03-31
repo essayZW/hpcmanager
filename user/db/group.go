@@ -18,6 +18,7 @@ type UserGroupDB struct {
 func (group *UserGroupDB) QueryGroupByID(ctx context.Context, groupID int) (*Group, error) {
 	row, err := group.db.QueryRow(ctx, "SELECT * FROM `group` WHERE `id`=?", groupID)
 	if err != nil {
+		logger.Warn("Group info error: ", err)
 		return nil, errors.New("group info query error")
 	}
 	var groupInfo Group
@@ -37,6 +38,7 @@ func (group *UserGroupDB) PaginationQuery(
 ) ([]*Group, error) {
 	rows, err := group.db.Query(ctx, "SELECT * FROM `group` LIMIT ?, ?", offset, size)
 	if err != nil {
+		logger.Warn("group infos query error: ", err)
 		return nil, errors.New("group infos query error")
 	}
 	infos := make([]*Group, 0)
@@ -81,6 +83,7 @@ func (group *UserGroupDB) QueryByTutorUsername(
 	var info Group
 	err = row.StructScan(&info)
 	if err != nil {
+		logger.Warn("QueryByTutorUsername error: ", err)
 		return nil, errors.New("QueryByTutorUsername fail")
 	}
 	return &info, nil

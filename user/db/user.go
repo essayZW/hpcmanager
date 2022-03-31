@@ -23,12 +23,14 @@ func (db *UserDB) LoginQuery(ctx context.Context, username, md5password string) 
 		md5password,
 	)
 	if err != nil {
-		return false, err
+		logger.Warn("LoginQuery error: ", err)
+		return false, errors.New("LoginQuery error")
 	}
 	var res int
 	err = row.Scan(&res)
 	if err != nil {
-		return false, err
+		logger.Warn("LoginQuery scan error: ", err)
+		return false, errors.New("LoginQuery scan error")
 	}
 	return res > 0, nil
 }
@@ -37,12 +39,14 @@ func (db *UserDB) LoginQuery(ctx context.Context, username, md5password string) 
 func (db *UserDB) QueryByUsername(ctx context.Context, username string) (*User, error) {
 	row, err := db.conn.QueryRow(ctx, "SELECT * FROM `user` WHERE `username`=?", username)
 	if err != nil {
-		return nil, err
+		logger.Warn("QueryByUsername error: ", err)
+		return nil, errors.New("QueryByUsername error")
 	}
 	var info User
 	err = row.StructScan(&info)
 	if err != nil {
-		return nil, err
+		logger.Warn("QueryByUsername scan error: ", err)
+		return nil, errors.New("QueryByUsername scan error")
 	}
 	return &info, nil
 }
@@ -67,25 +71,28 @@ func (db *UserDB) InsertUser(ctx context.Context, userinfo *User) (int, error) {
 		userinfo.ExtraAttributes,
 	)
 	if err != nil {
-		return 0, err
+		logger.Warn("InsertUser error: ", err)
+		return 0, errors.New("InsertUser error")
 	}
 	if res, err := result.LastInsertId(); err == nil {
 		return int(res), nil
 	}
-	return 0, err
+	logger.Warn("InsertUser error: ", err)
+	return 0, errors.New("InsertUser error")
 }
 
 // QueryByID 通过ID查询用户表的记录
 func (db *UserDB) QueryByID(ctx context.Context, userid int) (*User, error) {
 	row, err := db.conn.QueryRow(ctx, "SELECT * FROM `user` WHERE `id`=?", userid)
 	if err != nil {
-		return nil, err
+		logger.Warn("QueryByID error: ", err)
+		return nil, errors.New("QueryByID error")
 	}
 	var userInfo User
 	err = row.StructScan(&userInfo)
 	if err != nil {
 		logger.Warn("struct scan User error: ", err)
-		return nil, err
+		return nil, errors.New("QueryByID error")
 	}
 	return &userInfo, nil
 }
@@ -100,6 +107,7 @@ func (db *UserDB) PaginationQuery(ctx context.Context, offset, size, groupID int
 		rows, err = db.conn.Query(ctx, "SELECT * FROM `user` WHERE `group_id`=? LIMIT ?, ?", groupID, offset, size)
 	}
 	if err != nil {
+		logger.Warn("user infos query error: ", err)
 		return nil, errors.New("user infos query error")
 	}
 	infos := make([]*User, 0)
@@ -165,6 +173,7 @@ func (db *UserDB) UpdateHpcUserID(ctx context.Context, userID, hpcUserID int) er
 	}
 	_, err = res.RowsAffected()
 	if err != nil {
+		logger.Warn("UpdateHpcUserID error: ", err)
 		return errors.New("UpdateHpcUserID: update error")
 	}
 	return nil
