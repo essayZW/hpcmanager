@@ -100,7 +100,9 @@ func (dev *hpcDev) GetNodeUsageWithDate(
 	ctx context.Context,
 	startTime, endTime time.Time,
 ) ([]*HpcNodeUsage, error) {
-	infos := make([]*HpcNodeUsage, rand.Intn(64))
+	rander := rand.New(rand.NewSource(time.Now().UnixMicro()))
+	infos := make([]*HpcNodeUsage, rander.Intn(64))
+	logger.Debug("random info len: ", len(infos))
 	usernames, err := dev.getAllUsernames(context.Background())
 	if err != nil {
 		logger.Debug(err)
@@ -110,19 +112,22 @@ func (dev *hpcDev) GetNodeUsageWithDate(
 		return nil, errors.New("empty user lists")
 	}
 	for i := range infos {
-		randUserNameIndex := rand.Intn(len(usernames) - 1)
+		randUserNameIndex := rander.Intn(len(usernames) - 1)
 		groupName, err := dev.getUserGroup(context.Background(), usernames[randUserNameIndex])
 		if err != nil {
 			logger.Warn(err)
 			return nil, err
 		}
+		wallTime := rander.Float64() * float64(rander.Intn(64))
+		gwallTime := rander.Float64() * float64(rander.Intn(64))
 		infos[i] = &HpcNodeUsage{
 			Username:  usernames[randUserNameIndex],
 			GroupName: groupName,
 			QueueName: "g_" + groupName,
-			WallTime:  rand.Float64() * float64(rand.Intn(64)),
-			GWallTime: rand.Float64() * float64(rand.Intn(64)),
+			WallTime:  wallTime,
+			GWallTime: gwallTime,
 		}
+		logger.Debug(infos[i])
 	}
 	return infos, nil
 }

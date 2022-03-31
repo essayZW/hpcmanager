@@ -48,5 +48,7 @@ func (n *NodeUsageTime) AddRecord(ctx context.Context, info *db.HpcUsageTime) (i
 
 // NewNodeUsageTime 创建新的计算节点使用时长记录的操作逻辑
 func NewNodeUsageTime(nodeUsageTimeDB *db.NodeUsageTimeDB) *NodeUsageTime {
-	return &NodeUsageTime{}
+	return &NodeUsageTime{
+		nodeUsageTimeDB: nodeUsageTimeDB,
+	}
 }

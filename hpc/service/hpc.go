@@ -301,7 +301,7 @@ func (h *HpcService) GetNodeUsage(
 		return err
 	}
 
-	resp.Usages = make([]*hpcproto.HpcNodeUsage, 0)
+	resp.Usages = make([]*hpcproto.HpcNodeUsage, len(infos))
 	for index := range infos {
 		resp.Usages[index] = &hpcproto.HpcNodeUsage{
 			Username:  infos[index].Username,

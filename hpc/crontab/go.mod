@@ -7,8 +7,10 @@ replace github.com/essayZW/hpcmanager => ../../
 require (
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220325022819-73eda3346d18
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/hpc v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/node v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/user v0.0.0-00010101000000-000000000000
 	go-micro.dev/v4 v4.6.0
 )
 
@@ -24,7 +26,6 @@ require (
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
