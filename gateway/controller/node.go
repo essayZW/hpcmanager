@@ -277,6 +277,50 @@ func (n *node) revokeNodeApply(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// paginationGetNodeUsageRecord /api/node/usage GET 分页查询一段时间内的机器节点使用记录
+func (n *node) paginationGetNodeUsageRecord(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	startDate, endDate, err := utils.ParseDateRange(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := n.nodeService.PaginationGetNodeUsage(c, &nodepb.PaginationGetNodeUsageRequest{
+		BaseRequest:        baseRequest,
+		PageIndex:          int32(pageIndex),
+		PageSize:           int32(pageSize),
+		StartDateMicroUnix: startDate.UnixMicro(),
+		EndDateMicroUnix:   endDate.UnixMicro(),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	respData := response.PaginationQueryResponse{
+		Data:  resp.Usages,
+		Count: int(resp.Count),
+	}
+	if resp.Usages == nil {
+		respData.Data = make([]*nodepb.NodeUsageTime, 0)
+	}
+	httpResp := response.New(200, respData, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter := router.Group("/node")
 
@@ -291,6 +335,8 @@ func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	nodeRouter.GET("/distribute", n.paginationGetNodeDistributeWOS)
 	nodeRouter.PATCH("/distribute", n.finishNodeDistributeByID)
+
+	nodeRouter.GET("/usage", n.paginationGetNodeUsageRecord)
 	return nodeRouter
 }
 

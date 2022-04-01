@@ -695,3 +695,20 @@ id: number
 ```
 
 响应参数: 申请信息
+
+### /node/usage
+
+Method: GET
+
+描述: 分页查询一段时间内的机器节点使用记录
+
+请求参数:
+
+```protobuf
+pageIndex: number
+pageSize: number
+startDateMicroUnix: number
+endDateMicroUnix: number
+```
+
+响应参数: 分页的结果以及总的数量
