@@ -117,6 +117,8 @@ func (loader *RPCLoader) Sync(ctx context.Context, startDate, endDate time.Time)
 				TutorName:     cacheInfo.tutorName,
 				HpcGroupName:  usage.GroupName,
 				QueueName:     usage.QueueName,
+				WallTime:      usage.WallTime,
+				GwallTime:     usage.GwallTime,
 				StartTimeUnix: startDate.Unix(),
 				EndTimeUnix:   endDate.Unix(),
 			})
