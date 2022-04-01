@@ -9,6 +9,8 @@ import {
   queryNodeApplyByID,
   finishNodeDistributeByID,
   revokeNodeApply,
+  HpcUsageTime,
+  paginationQueryNodeUsageTime,
 } from '../api/node';
 
 /**
@@ -102,4 +104,21 @@ export async function handlerNodeDistributeByID(id: number): Promise<boolean> {
  */
 export async function revokeNodeApplyByID(id: number): Promise<boolean> {
   return revokeNodeApply(id);
+}
+
+/**
+ * 分页查询机器节点申请信息
+ */
+export async function paginationGetNodeUsageTime(
+  pageIndex: number,
+  pageSize: number,
+  startDateMilliUnix: number,
+  endDateMilliUnix: number
+): Promise<PaginationQueryResponse<HpcUsageTime>> {
+  return await paginationQueryNodeUsageTime(
+    pageIndex,
+    pageSize,
+    startDateMilliUnix,
+    endDateMilliUnix
+  );
 }

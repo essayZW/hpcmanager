@@ -199,3 +199,50 @@ export async function revokeNodeApply(id: number): Promise<boolean> {
   }
   return true;
 }
+
+/**
+ * 计算节点使用时间记录消息
+ */
+export type HpcUsageTime = {
+  id: number;
+  userID: number;
+  username: string;
+  name: string;
+  hpcUserName: string;
+  tutorID: number;
+  tutorUsername: string;
+  tutorName: string;
+  hpcGroupName: string;
+  queueName: string;
+  wallTime: number;
+  gwallTime: number;
+  startTime: number;
+  endTime: number;
+  createTime: number;
+  extraAttributes: string;
+};
+
+/**
+ * 分页查询一段时间内的机器节点使用记录
+ */
+export async function paginationQueryNodeUsageTime(
+  pageIndex: number,
+  pageSize: number,
+  startDateMilliUnix: number,
+  endDateMilliUnix: number
+): Promise<PaginationQueryResponse<HpcUsageTime>> {
+  const resp = await ApiRequest.request<PaginationQueryResponse<HpcUsageTime>>(
+    '/node/usage',
+    'GET',
+    {
+      pageIndex,
+      pageSize,
+      startDateMilliUnix,
+      endDateMilliUnix,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}

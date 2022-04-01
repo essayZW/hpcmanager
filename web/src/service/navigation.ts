@@ -8,6 +8,7 @@ import UserManager from '../components/admin/UserManager.vue';
 import ProjectManager from '../components/ProjectManager.vue';
 import NodeApplyManager from '../components/common/NodeApplyManager.vue';
 import NodeDistributeManager from '../components/admin/NodeDistributeManager.vue';
+import NodeUsageManager from '../components/common/NodeUsageManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -73,6 +74,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/node_apply_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/node_usage_manager',
+          name: 'NodeUsageManager',
+          component: NodeUsageManager,
+        },
+        item: {
+          name: '机器时长查看',
+          to: '/main/node_usage_manager',
+        },
+      },
     ],
   ],
   [
@@ -120,6 +132,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器节点申请管理',
           to: '/main/node_apply_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_usage_manager',
+          name: 'NodeUsageManager',
+          component: NodeUsageManager,
+        },
+        item: {
+          name: '机器时长查看',
+          to: '/main/node_usage_manager',
         },
       },
     ],
@@ -193,6 +216,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/node_distribute_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/node_usage_manager',
+          name: 'NodeUsageManager',
+          component: NodeUsageManager,
+        },
+        item: {
+          name: '机器时长查看',
+          to: '/main/node_usage_manager',
+        },
+      },
     ],
   ],
   // 超级管理员和普通管理员都这项操作
@@ -264,6 +298,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '节点分配工单管理',
           to: '/main/node_distribute_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_usage_manager',
+          name: 'NodeUsageManager',
+          component: NodeUsageManager,
+        },
+        item: {
+          name: '机器时长查看',
+          to: '/main/node_usage_manager',
         },
       },
     ],

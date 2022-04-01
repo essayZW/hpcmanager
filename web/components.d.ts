@@ -52,6 +52,8 @@ declare module 'vue' {
     NodeApplyTable: typeof import('./src/components/NodeApplyTable.vue')['default']
     NodeDistributeManager: typeof import('./src/components/admin/NodeDistributeManager.vue')['default']
     NodeTypeSelect: typeof import('./src/components/form/NodeTypeSelect.vue')['default']
+    NodeUsageManager: typeof import('./src/components/common/NodeUsageManager.vue')['default']
+    NodeUsageTable: typeof import('./src/components/NodeUsageTable.vue')['default']
     PageTitle: typeof import('./src/components/PageTitle.vue')['default']
     ProjectManager: typeof import('./src/components/ProjectManager.vue')['default']
     UpdateUserInfo: typeof import('./src/components/UpdateUserInfo.vue')['default']
