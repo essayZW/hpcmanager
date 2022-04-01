@@ -237,7 +237,34 @@ message RevokeNodeApplyResponse {
 }
 ```
 
-# AddNodeUsageTimeRecord
+## PaginationGetNodeUsage
+
+描述: 分页查询机器节点使用详情记录信息
+
+原型定义: `rpc PaginationGetNodeUsage(PaginationGetNodeUsageRequest) returns (PaginationGetNodeUsageResponse) {}`
+
+请求参数:
+
+```protobuf
+message PaginationGetNodeUsageRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+    int64 startDateMicroUnix = 4;
+    int64 endDateMicroUnix = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message PaginationGetNodeUsageResponse {
+    int32 count = 1;
+    repeated node.NodeUsageTime usages = 2;
+}
+```
+
+## AddNodeUsageTimeRecord
 
 描述: 添加机器节点使用时间记录
 

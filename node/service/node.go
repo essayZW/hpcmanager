@@ -501,6 +501,89 @@ func (ns *NodeService) AddNodeUsageTimeRecord(
 	return nil
 }
 
+// PaginationGetNodeUsage 分页查询机器节点使用详情信息
+func (ns *NodeService) PaginationGetNodeUsage(
+	ctx context.Context,
+	req *nodepb.PaginationGetNodeUsageRequest,
+	resp *nodepb.PaginationGetNodeUsageResponse,
+) error {
+	logger.Info("PaginationGetNodeUsage: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeUsage, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryNodeUsage permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryNodeUsage permission forbidden")
+	}
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+
+	var paginationResult *logic.PaginationGetNodeUsageRecordResult
+	var err error
+	if !isAdmin && !isTutor {
+		// 普通用户,只能查询自己的机器时间记录
+		paginationResult, err = ns.nodeUsageTime.PaginationGetNodeUsageRecordByUserID(
+			context.Background(),
+			int(req.BaseRequest.UserInfo.UserId),
+			int(req.PageIndex),
+			int(req.PageSize),
+			req.StartDateMicroUnix,
+			req.EndDateMicroUnix,
+		)
+	} else if !isAdmin && isTutor {
+		// 导师用户,只能查看自己组的机器时间记录
+		paginationResult, err = ns.nodeUsageTime.PaginationGetNodeUsageRecordByTutorID(
+			context.Background(),
+			int(req.BaseRequest.UserInfo.UserId),
+			int(req.PageIndex),
+			int(req.PageSize),
+			req.StartDateMicroUnix,
+			req.EndDateMicroUnix,
+		)
+	} else {
+		// 管理员用户,可以查看所有的用户的机器时间记录
+		paginationResult, err = ns.nodeUsageTime.PaginationGetNodeUsageRecord(
+			context.Background(),
+			int(req.PageIndex),
+			int(req.PageSize),
+			req.StartDateMicroUnix,
+			req.EndDateMicroUnix,
+		)
+	}
+	if err != nil {
+		return err
+	}
+	resp.Count = int32(paginationResult.Count)
+	resp.Usages = make([]*nodepb.NodeUsageTime, len(paginationResult.Data))
+	for i := range resp.Usages {
+		resp.Usages[i] = &nodepb.NodeUsageTime{
+			Id:            int32(paginationResult.Data[i].ID),
+			UserID:        int32(paginationResult.Data[i].UserID),
+			Username:      paginationResult.Data[i].Username,
+			Name:          paginationResult.Data[i].UserName,
+			HpcUserName:   paginationResult.Data[i].HpcUsername,
+			TutorID:       int32(paginationResult.Data[i].TutorID),
+			TutorUsername: paginationResult.Data[i].TutorUsername,
+			TutorName:     paginationResult.Data[i].TutorUserName,
+			HpcGroupName:  paginationResult.Data[i].HpcGroupName,
+			QueueName:     paginationResult.Data[i].QueueName,
+			WallTime:      paginationResult.Data[i].WallTime,
+			GwallTime:     paginationResult.Data[i].GWallTime,
+			StartTime:     paginationResult.Data[i].StartTime.Unix(),
+			EndTime:       paginationResult.Data[i].EndTime.Unix(),
+			CreateTime:    paginationResult.Data[i].CreateTime.Unix(),
+		}
+		if paginationResult.Data[i].ExtraAttributes != nil {
+			resp.Usages[i].ExtraAttributes = paginationResult.Data[i].ExtraAttributes.String()
+		}
+	}
+	return nil
+}
+
 var _ nodepb.NodeHandler = (*NodeService)(nil)
 
 // NewNode 创建新的机器节点管理服务

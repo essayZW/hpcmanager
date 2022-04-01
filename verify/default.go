@@ -130,10 +130,10 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
-			// 需要超级管理员及以上权限
+			// 需要普通用户及以上权限
 			QueryNodeUsage: {
 				maxLevel: MaxLevel,
-				minLevel: SuperAdmin,
+				minLevel: Common,
 			},
 			AddNodeUsage: {
 				maxLevel: MaxLevel,
