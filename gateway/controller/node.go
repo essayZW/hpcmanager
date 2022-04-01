@@ -302,8 +302,8 @@ func (n *node) paginationGetNodeUsageRecord(ctx *gin.Context) {
 		BaseRequest:        baseRequest,
 		PageIndex:          int32(pageIndex),
 		PageSize:           int32(pageSize),
-		StartDateMicroUnix: startDate.UnixMicro(),
-		EndDateMicroUnix:   endDate.UnixMicro(),
+		StartDateMilliUnix: startDate.UnixMilli(),
+		EndDateMilliUnix:   endDate.UnixMilli(),
 	})
 	if err != nil {
 		httpResp := response.New(200, nil, false, fmt.Sprintf("查询失败: %s", err.Error()))

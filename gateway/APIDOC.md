@@ -707,8 +707,8 @@ Method: GET
 ```protobuf
 pageIndex: number
 pageSize: number
-startDateMicroUnix: number
-endDateMicroUnix: number
+startDateMilliUnix: number
+endDateMilliUnix: number
 ```
 
 响应参数: 分页的结果以及总的数量

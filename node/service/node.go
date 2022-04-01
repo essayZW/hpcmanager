@@ -86,8 +86,8 @@ func (ns *NodeService) CreateNodeApply(
 	}, &logic.ApplyNodeInfo{
 		NodeType:  req.NodeType,
 		NodeNum:   int(req.NodeNum),
-		StartTime: time.UnixMicro(req.StartTime),
-		EndTime:   time.UnixMicro(req.EndTime),
+		StartTime: time.UnixMilli(req.StartTime),
+		EndTime:   time.UnixMilli(req.EndTime),
 	}, int(req.ProjectID))
 	if err != nil {
 		return fmt.Errorf("create node apply info error: %s", err.Error())
@@ -498,6 +498,7 @@ func (ns *NodeService) AddNodeUsageTimeRecord(
 		return err
 	}
 	resp.Id = int32(id)
+	// TODO: 创建相应的机器独占账单
 	return nil
 }
 
@@ -531,8 +532,8 @@ func (ns *NodeService) PaginationGetNodeUsage(
 			int(req.BaseRequest.UserInfo.UserId),
 			int(req.PageIndex),
 			int(req.PageSize),
-			req.StartDateMicroUnix,
-			req.EndDateMicroUnix,
+			req.StartDateMilliUnix,
+			req.EndDateMilliUnix,
 		)
 	} else if !isAdmin && isTutor {
 		// 导师用户,只能查看自己组的机器时间记录
@@ -541,8 +542,8 @@ func (ns *NodeService) PaginationGetNodeUsage(
 			int(req.BaseRequest.UserInfo.UserId),
 			int(req.PageIndex),
 			int(req.PageSize),
-			req.StartDateMicroUnix,
-			req.EndDateMicroUnix,
+			req.StartDateMilliUnix,
+			req.EndDateMilliUnix,
 		)
 	} else {
 		// 管理员用户,可以查看所有的用户的机器时间记录
@@ -550,8 +551,8 @@ func (ns *NodeService) PaginationGetNodeUsage(
 			context.Background(),
 			int(req.PageIndex),
 			int(req.PageSize),
-			req.StartDateMicroUnix,
-			req.EndDateMicroUnix,
+			req.StartDateMilliUnix,
+			req.EndDateMilliUnix,
 		)
 	}
 	if err != nil {

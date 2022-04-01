@@ -35,31 +35,31 @@ func ParsePagination(ctx *gin.Context) (int, int, error) {
 // ParseDateRange 解析时间范围参数
 func ParseDateRange(ctx *gin.Context) (time.Time, time.Time, error) {
 	zeroTime := time.Time{}
-	startDateMicroUnixStr, ok := ctx.GetQuery("startDateMicroUnix")
+	startDateMilliUnixStr, ok := ctx.GetQuery("startDateMilliUnix")
 	if !ok {
-		return zeroTime, zeroTime, errors.New("缺少startDateMicroUnix参数")
+		return zeroTime, zeroTime, errors.New("缺少startDateMilliUnix参数")
 	}
-	endDateMicroUnixStr, ok := ctx.GetQuery("endDateMicroUnix")
+	endDateMilliUnixStr, ok := ctx.GetQuery("endDateMilliUnix")
 	if !ok {
-		return zeroTime, zeroTime, errors.New("缺少endDateMicroUnix参数")
+		return zeroTime, zeroTime, errors.New("缺少endDateMilliUnix参数")
 	}
 
-	startUnixMicro, err := strconv.Atoi(startDateMicroUnixStr)
+	startUnixMilli, err := strconv.Atoi(startDateMilliUnixStr)
 	if err != nil {
-		return zeroTime, zeroTime, errors.New("invalid startDateMicroUnix参数")
+		return zeroTime, zeroTime, errors.New("invalid startDateMilliUnix参数")
 	}
-	endUnixMicro, err := strconv.Atoi(endDateMicroUnixStr)
+	endUnixMilli, err := strconv.Atoi(endDateMilliUnixStr)
 	if err != nil {
-		return zeroTime, zeroTime, errors.New("invalid endDateMicroUnix参数")
+		return zeroTime, zeroTime, errors.New("invalid endDateMilliUnix参数")
 	}
 
-	startDate := time.UnixMicro(int64(startUnixMicro))
+	startDate := time.UnixMilli(int64(startUnixMilli))
 	if startDate.IsZero() {
-		return zeroTime, zeroTime, errors.New("invalid startDateMicroUnix参数")
+		return zeroTime, zeroTime, errors.New("invalid startDateMilliUnix参数")
 	}
-	endDate := time.UnixMicro(int64(endUnixMicro))
+	endDate := time.UnixMilli(int64(endUnixMilli))
 	if endDate.IsZero() {
-		return zeroTime, zeroTime, errors.New("invalid endDateMicroUnix参数")
+		return zeroTime, zeroTime, errors.New("invalid endDateMilliUnix参数")
 	}
 	if endDate.Before(startDate) {
 		return zeroTime, zeroTime, errors.New("错误的时间范围")

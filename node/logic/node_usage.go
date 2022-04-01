@@ -56,7 +56,7 @@ type PaginationGetNodeUsageRecordResult struct {
 func (n *NodeUsageTime) PaginationGetNodeUsageRecord(
 	ctx context.Context,
 	pageIndex, pageSize int,
-	startUnixMicro, endUnixMicro int64,
+	startUnixMilli, endUnixMilli int64,
 ) (*PaginationGetNodeUsageRecordResult, error) {
 	if pageIndex <= 0 {
 		return nil, errors.New("invalid pageIndex")
@@ -64,8 +64,8 @@ func (n *NodeUsageTime) PaginationGetNodeUsageRecord(
 	if pageSize <= 0 {
 		return nil, errors.New("invalid pageSize")
 	}
-	startDate := time.UnixMicro(startUnixMicro)
-	endDate := time.UnixMicro(endUnixMicro)
+	startDate := time.UnixMilli(startUnixMilli)
+	endDate := time.UnixMilli(endUnixMilli)
 	count, err := n.nodeUsageTimeDB.QueryAllCount(ctx, startDate, endDate)
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func (n *NodeUsageTime) PaginationGetNodeUsageRecord(
 func (n *NodeUsageTime) PaginationGetNodeUsageRecordByUserID(
 	ctx context.Context,
 	userID, pageIndex, pageSize int,
-	startUnixMicro, endUnixMicro int64,
+	startUnixMilli, endUnixMilli int64,
 ) (*PaginationGetNodeUsageRecordResult, error) {
 	if pageIndex <= 0 {
 		return nil, errors.New("invalid pageIndex")
@@ -93,8 +93,8 @@ func (n *NodeUsageTime) PaginationGetNodeUsageRecordByUserID(
 	if pageSize <= 0 {
 		return nil, errors.New("invalid pageSize")
 	}
-	startDate := time.UnixMicro(startUnixMicro)
-	endDate := time.UnixMicro(endUnixMicro)
+	startDate := time.UnixMilli(startUnixMilli)
+	endDate := time.UnixMilli(endUnixMilli)
 	count, err := n.nodeUsageTimeDB.QueryCountByUserID(ctx, userID, startDate, endDate)
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func (n *NodeUsageTime) PaginationGetNodeUsageRecordByUserID(
 func (n *NodeUsageTime) PaginationGetNodeUsageRecordByTutorID(
 	ctx context.Context,
 	tutorID, pageIndex, pageSize int,
-	startUnixMicro, endUnixMicro int64,
+	startUnixMilli, endUnixMilli int64,
 ) (*PaginationGetNodeUsageRecordResult, error) {
 	if pageIndex <= 0 {
 		return nil, errors.New("invalid pageIndex")
@@ -122,8 +122,8 @@ func (n *NodeUsageTime) PaginationGetNodeUsageRecordByTutorID(
 	if pageSize <= 0 {
 		return nil, errors.New("invalid pageSize")
 	}
-	startDate := time.UnixMicro(startUnixMicro)
-	endDate := time.UnixMicro(endUnixMicro)
+	startDate := time.UnixMilli(startUnixMilli)
+	endDate := time.UnixMilli(endUnixMilli)
 	count, err := n.nodeUsageTimeDB.QueryCountByTutorID(ctx, tutorID, startDate, endDate)
 	if err != nil {
 		return nil, err
