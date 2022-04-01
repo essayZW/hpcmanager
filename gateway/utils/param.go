@@ -36,11 +36,11 @@ func ParsePagination(ctx *gin.Context) (int, int, error) {
 func ParseDateRange(ctx *gin.Context) (time.Time, time.Time, error) {
 	zeroTime := time.Time{}
 	startDateMicroUnixStr, ok := ctx.GetQuery("startDateMicroUnix")
-	if ok {
+	if !ok {
 		return zeroTime, zeroTime, errors.New("缺少startDateMicroUnix参数")
 	}
-	endDateMicroUnixStr, ok := ctx.GetQuery("endStartMicroUnix")
-	if ok {
+	endDateMicroUnixStr, ok := ctx.GetQuery("endDateMicroUnix")
+	if !ok {
 		return zeroTime, zeroTime, errors.New("缺少endDateMicroUnix参数")
 	}
 
