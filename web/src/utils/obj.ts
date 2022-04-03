@@ -39,3 +39,17 @@ export function timeOrBlank(time: number): string {
   }
   return date.format('YYYY-MM-DD HH:mm:ss');
 }
+
+/**
+ * 将秒数转化为时分秒的形式
+ */
+export function timeSecondFormat(second: number): string {
+  if (!second) second = 0;
+  let hour = 0,
+    minute = 0;
+  hour = Math.floor(second / 3600);
+  second = second % 3600;
+  minute = Math.floor(second / 60);
+  second = second % 60;
+  return `${hour}:${minute}:${second}`;
+}

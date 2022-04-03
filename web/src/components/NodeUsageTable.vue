@@ -3,6 +3,7 @@ import { HpcUsageTime } from '../api/node';
 import { reactive } from 'vue';
 import { paginationGetNodeUsageTime } from '../service/node';
 import dayjs from 'dayjs';
+import { timeSecondFormat } from '../utils/obj';
 
 // 表格数据
 const tableData = reactive<{
@@ -91,30 +92,54 @@ const handleSizeChange = (pageSize: number) => {
   <el-row justify="center">
     <el-col :span="24">
       <el-table border table-layout="auto" :data="tableData.data">
-        <el-table-column label="用户学号" prop="username"></el-table-column>
-        <el-table-column label="用户姓名" prop="name"></el-table-column>
+        <el-table-column
+          label="用户学号"
+          prop="username"
+          align="center"
+        ></el-table-column>
+        <el-table-column
+          label="用户姓名"
+          prop="name"
+          align="center"
+        ></el-table-column>
         <el-table-column
           label="导师工号"
           prop="tutorUsername"
+          align="center"
         ></el-table-column>
-        <el-table-column label="导师姓名" prop="tutorName"></el-table-column>
-        <el-table-column label="CPU机时" prop="wallTime"></el-table-column>
-        <el-table-column label="GPU机时" prop="gwallTime"></el-table-column>
-        <el-table-column label="开始时间">
+        <el-table-column
+          label="导师姓名"
+          prop="tutorName"
+          align="center"
+        ></el-table-column>
+        <el-table-column label="CPU机时" align="center">
+          <template #default="props">
+            {{ timeSecondFormat(props.row.gwallTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="GPU机时" align="center">
+          <template #default="props">
+            {{ timeSecondFormat(props.row.gwallTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="开始时间" align="center">
           <template #default="props">
             {{ dayjs(props.row.startTime * 1000).format('YYYY-MM-DD') }}
           </template>
         </el-table-column>
-        <el-table-column label="结束时间">
+        <el-table-column label="结束时间" align="center">
           <template #default="props">
             {{ dayjs(props.row.endTime * 1000).format('YYYY-MM-DD') }}
           </template>
         </el-table-column>
-        <el-table-column label="详情" type="expand">
+        <!-- TODO: 待后端数据库变更中引入作业ID以及作业名数据之后,将数据添加到详情信息中 -->
+        <!--
+        <el-table-column label="详情" type="expand" align="center">
           <template #default="props">
             {{ dayjs(props.row.endTime * 1000).format('YYYY-MM-DD') }}
           </template>
         </el-table-column>
+        -->
       </el-table>
     </el-col>
   </el-row>
