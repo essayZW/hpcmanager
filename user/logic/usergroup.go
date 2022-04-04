@@ -87,8 +87,7 @@ func (group *UserGroup) CreateUserJoinGroupApply(
 		TutorID:       groupInfo.TutorID,
 		TutorUsername: groupInfo.TutorUsername,
 		TutorName:     groupInfo.TutorName,
-		// FIXME 使用TimeFrom函数生成,不止这一个地方需要修改
-		CreateTime: null.NewTime(time.Now(), true),
+		CreateTime:    null.TimeFrom(time.Now()),
 	})
 }
 
@@ -244,7 +243,7 @@ func (group *UserGroup) TutorCheckApply(
 	return group.userGroupApplyDB.UpdateTutorCheckStatus(ctx, &db.UserGroupApply{
 		TutorCheckStatus: checkStatus,
 		MessageTutor:     null.NewString(checkMessage, true),
-		TutorCheckTime:   null.NewTime(time.Now(), true),
+		TutorCheckTime:   null.TimeFrom(time.Now()),
 		ID:               applyID,
 	})
 }
@@ -284,7 +283,7 @@ func (group *UserGroup) AdminCheckApply(
 		ID:                     applyID,
 		ManagerCheckStatus:     checkStatus,
 		MessageManager:         null.NewString(checkMessage, true),
-		ManagerCheckTime:       null.NewTime(time.Now(), true),
+		ManagerCheckTime:       null.TimeFrom(time.Now()),
 		ManagerCheckerID:       null.NewInt(int64(checkerID), true),
 		ManagerCheckerUsername: null.NewString(checkerUsername, true),
 		ManagerCheckerName:     null.NewString(checkerName, true),
