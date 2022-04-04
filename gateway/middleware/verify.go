@@ -34,9 +34,9 @@ func (v *verify) HandlerFunc(ctx *gin.Context) {
 		}
 		resp := response.New(
 			403,
-			errors.New("forbidden! need token"),
+			errors.New("登录凭据错误,请重新登录"),
 			false,
-			"forbidden! need token",
+			"登录凭据错误,请重新登录",
 		)
 		resp.Send(ctx)
 		ctx.Abort()
@@ -64,9 +64,9 @@ func (v *verify) HandlerFunc(ctx *gin.Context) {
 		}
 		resp := response.New(
 			403,
-			errors.New("forbidden! need token"),
+			errors.New("登录凭据错误,请重新登录"),
 			false,
-			"forbidden! need token",
+			"登录凭据错误,请重新登录",
 		)
 		resp.Send(ctx)
 		ctx.Abort()
