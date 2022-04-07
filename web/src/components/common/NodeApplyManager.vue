@@ -103,8 +103,8 @@ const createNodeApplyFormSubmit = async () => {
       parseInt(createNodeApplyFormData.projectInfo.id as string),
       createNodeApplyFormData.nodeType,
       parseInt(createNodeApplyFormData.nodeNum as string),
-      createNodeApplyFormData.startTime,
-      createNodeApplyFormData.endTime
+      new Date(createNodeApplyFormData.startTime).getTime(),
+      new Date(createNodeApplyFormData.endTime).getTime()
     );
     ElMessage({
       type: 'success',
