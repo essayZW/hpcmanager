@@ -422,9 +422,27 @@ const checkButtonHandler = async (
                     ><strong>申请使用时间: </strong>
                     {{
                       dayjs(props.row.startTime * 1000).format('YYYY-MM-DD')
-                    }}至{{
+                    }}&nbsp;至&nbsp;{{
                       dayjs(props.row.endTime * 1000).format('YYYY-MM-DD')
                     }}
+                  </span>
+                </p>
+                <p>
+                  <span>
+                    <strong>修改时间: </strong>
+                    {{
+                      dayjs(props.row.modifyTime * 1000).format(
+                        'YYYY-MM-DD HH:mm:ss'
+                      )
+                    }}
+                  </span>
+                  <span>
+                    <strong>修改人姓名: </strong>
+                    {{ props.row.modifyName }}
+                  </span>
+                  <span>
+                    <strong>修改人学工号: </strong>
+                    {{ props.row.modifyUsername }}
                   </span>
                 </p>
               </div>
