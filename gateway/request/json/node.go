@@ -93,3 +93,34 @@ func (param *FinishNodeDistributeParam) Validator() validator.StructLevelFunc {
 		}
 	}
 }
+
+// UpdateNodeApplyParam 更新机器节点申请信息表单
+type UpdateNodeApplyParam struct {
+	ID        int    `form:"id"        json:"id"        binding:"required"`
+	NodeType  string `form:"nodeType"  json:"nodeType"  binding:"required"`
+	NodeNum   int    `form:"nodeNum"   json:"nodeNum"   binding:"required"`
+	StartTime int64  `form:"startTime" json:"startTime" binding:"required"`
+	EndTime   int64  `form:"endTime"   json:"endTime"   binding:"required"`
+}
+
+func (param *UpdateNodeApplyParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(UpdateNodeApplyParam)
+
+		if data.ID <= 0 {
+			sl.ReportError(reflect.ValueOf(data.ID), "id", "id", "binding", "id error")
+		}
+		if data.NodeType == "" {
+			sl.ReportError(reflect.ValueOf(data.NodeType), "nodeType", "nodeType", "binding", "nodeType error")
+		}
+		if data.NodeNum <= 0 {
+			sl.ReportError(reflect.ValueOf(data.NodeNum), "nodeNum", "nodeNum", "binding", "nodeNum error")
+		}
+		if data.StartTime <= 0 {
+			sl.ReportError(reflect.ValueOf(data.StartTime), "startTime", "startTime", "binding", "invalid startTime")
+		}
+		if data.EndTime <= 0 {
+			sl.ReportError(reflect.ValueOf(data.EndTime), "endTime", "endTime", "binding", "invalid endTime")
+		}
+	}
+}

@@ -632,6 +632,28 @@ type CreateNodeApplyParam struct {
 }
 ```
 
+### /node/apply
+
+Method: PUT
+
+描述: 修改机器节点申请信息
+
+参数:
+
+```go
+// UpdateNodeApplyParam 更新机器节点申请信息表单
+type UpdateNodeApplyParam struct {
+    ID        int    `form:"id"        json:"id"        binding:"required"`
+    NodeType  string `form:"nodeType"  json:"nodeType"  binding:"required"`
+    NodeNum   int    `form:"nodeNum"   json:"nodeNum"   binding:"required"`
+    StartTime int64  `form:"startTime" json:"startTime" binding:"required"`
+    EndTime   int64  `form:"endTime"   json:"endTime"   binding:"required"`
+}
+
+```
+
+响应: 是否修改成功
+
 ### /node/apply/:id
 
 Method: DELETE

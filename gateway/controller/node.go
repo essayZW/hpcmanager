@@ -321,6 +321,46 @@ func (n *node) paginationGetNodeUsageRecord(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// updateNodeApply /api/node/apply UPDATE 更新机器节点申请信息
+func (n *node) updateNodeApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.UpdateNodeApplyParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := n.nodeService.UpdateNodeApply(c, &nodepb.UpdateNodeApplyRequest{
+		BaseRequest: baseRequest,
+		NewInfos: &nodepb.NodeApply{
+			Id:        int32(param.ID),
+			NodeType:  param.NodeType,
+			NodeNum:   int32(param.NodeNum),
+			StartTime: param.StartTime,
+			EndTime:   param.EndTime,
+		},
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("更新机器节点申请信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "更新并没有变化")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "更新成功")
+	httpResp.Send(ctx)
+}
+
 func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter := router.Group("/node")
 
@@ -330,6 +370,7 @@ func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter.POST("/apply", n.createNodeApply)
 	nodeRouter.GET("/apply", n.paginationGet)
 	nodeRouter.PATCH("/apply", n.checkNodeApply)
+	nodeRouter.PUT("/apply", n.updateNodeApply)
 	nodeRouter.GET("/apply/:id", n.getNodeApplyByID)
 	nodeRouter.DELETE("/apply/:id", n.revokeNodeApply)
 
