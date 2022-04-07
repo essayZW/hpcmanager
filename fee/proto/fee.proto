@@ -1,0 +1,13 @@
+syntax="proto3";
+
+option go_package="github.com/essayZW/hpcmanager/fee/proto;fee";
+
+package fee;
+
+import "proto/ping.proto";
+import "proto/common.proto";
+
+
+service Fee {
+    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+}
