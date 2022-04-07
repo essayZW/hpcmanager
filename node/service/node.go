@@ -624,6 +624,9 @@ func (ns *NodeService) UpdateNodeApply(
 		int(req.NewInfos.NodeNum),
 		req.NewInfos.StartTime,
 		req.NewInfos.EndTime,
+		int(req.BaseRequest.UserInfo.UserId),
+		req.BaseRequest.UserInfo.Username,
+		req.BaseRequest.UserInfo.Name,
 	)
 	if err != nil {
 		return err

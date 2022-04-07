@@ -217,6 +217,9 @@ func (node *NodeApply) UpdateNodeApplyInfo(
 	nodeType string,
 	nodeNum int,
 	startTimeMilliUnix, endTimeMilliUnix int64,
+	modifyUserID int,
+	modifyUsername string,
+	modifyName string,
 ) (bool, error) {
 	if applyID <= 0 {
 		return false, errors.New("invalid apply id")
@@ -226,13 +229,16 @@ func (node *NodeApply) UpdateNodeApplyInfo(
 	}
 	startTime := time.UnixMilli(startTimeMilliUnix)
 	endTime := time.UnixMilli(endTimeMilliUnix)
-	// FIXME: 修改modify字段
 	return node.nodeApplyDB.UpdateByCreaterID(ctx, &db.NodeApply{
-		ID:        applyID,
-		NodeType:  nodeType,
-		NodeNum:   nodeNum,
-		StartTime: startTime,
-		EndTime:   endTime,
+		ID:             applyID,
+		NodeType:       nodeType,
+		NodeNum:        nodeNum,
+		StartTime:      startTime,
+		EndTime:        endTime,
+		ModifyTime:     null.TimeFrom(time.Now()),
+		ModifyUserID:   modifyUserID,
+		ModifyUsername: modifyUsername,
+		ModifyName:     modifyName,
 	})
 }
 
