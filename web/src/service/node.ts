@@ -11,6 +11,7 @@ import {
   revokeNodeApply,
   HpcUsageTime,
   paginationQueryNodeUsageTime,
+  updateNodeApplyInfo,
 } from '../api/node';
 
 /**
@@ -121,4 +122,23 @@ export async function paginationGetNodeUsageTime(
     startDateMilliUnix,
     endDateMilliUnix
   );
+}
+
+/**
+ * 更新机器节点申请信息
+ */
+export async function updateNodeApplyInfoByID(
+  applyID: number,
+  nodeType: string,
+  nodeNum: number,
+  startTime: number,
+  endTime: number
+): Promise<boolean> {
+  return updateNodeApplyInfo({
+    id: applyID,
+    nodeType,
+    nodeNum,
+    startTime,
+    endTime,
+  });
 }

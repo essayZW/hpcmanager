@@ -246,3 +246,34 @@ export async function paginationQueryNodeUsageTime(
   }
   return resp.data;
 }
+
+/**
+ * 更新机器节点申请信息参数
+ */
+export type UpdateNodeApplyInfoParam = {
+  id: number;
+  nodeType: string;
+  nodeNum: number;
+  startTime: number;
+  endTime: number;
+};
+
+/**
+ * 更新机器节点申请信息
+ */
+export async function updateNodeApplyInfo(
+  param: UpdateNodeApplyInfoParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/node/apply',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}
