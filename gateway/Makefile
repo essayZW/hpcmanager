@@ -7,3 +7,6 @@ clean:
 .PHONY: proto
 proto:
 	protoc -I=. -I=../ --go_out=paths=source_relative:. proto/*.proto
+.PHONY: dev
+dev:
+	env HPCMANAGER_ENV=dev go run main.go -port 8080

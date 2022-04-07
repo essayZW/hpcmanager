@@ -8,3 +8,6 @@ build:
 .PHONY: clean
 clean:
 	rm -rf ./build
+.PHONY: dev
+dev:
+	env HPCMANAGER_ENV=dev go run main.go
