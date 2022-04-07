@@ -38,6 +38,8 @@ const (
 	RevokeNodeApply = "__REVOKE_NODE_APPLY__"
 	// GetNodeApplyInfo 查询个计算节点包机申请
 	GetNodeApplyInfo = "__GET_NODE_APPLY_INFO__"
+	// UpdateNodeApply 更新节点申请信息
+	UpdateNodeApply = "__UPDATE_NODE_APPLY__"
 	// CheckNodeApply 审核机器节点申请
 	CheckNodeApply = "__CHECK_NODE_APPLY__"
 	// CreateNodeDistributeWO 创建机器节点分配工单

@@ -209,6 +209,33 @@ func (node *NodeApply) GetNodeApplyByID(ctx context.Context, applyID int) (*db.N
 	return node.nodeApplyDB.QueryByID(ctx, applyID)
 }
 
+// UpdateNodeApplyInfo 更新节点申请信息
+func (node *NodeApply) UpdateNodeApplyInfo(
+	ctx context.Context,
+	applyID int,
+	createrID int,
+	nodeType string,
+	nodeNum int,
+	startTimeMilliUnix, endTimeMilliUnix int64,
+) (bool, error) {
+	if applyID != 0 {
+		return false, errors.New("invalid apply id")
+	}
+	if nodeType == "" {
+		return false, errors.New("nodeType can't be empty")
+	}
+	startTime := time.UnixMilli(startTimeMilliUnix)
+	endTime := time.UnixMilli(endTimeMilliUnix)
+	return node.nodeApplyDB.UpdateByCreaterID(ctx, &db.NodeApply{
+		ID:        applyID,
+		CreaterID: createrID,
+		NodeType:  nodeType,
+		NodeNum:   nodeNum,
+		StartTime: startTime,
+		EndTime:   endTime,
+	})
+}
+
 // NewNodeApply 创建机器节点申请相关的逻辑操作
 func NewNodeApply(nodeApplyDB *db.NodeApplyDB) *NodeApply {
 	return &NodeApply{

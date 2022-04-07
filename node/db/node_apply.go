@@ -283,6 +283,30 @@ func (node *NodeApplyDB) UpdateStatus(ctx context.Context, applyID int, status i
 	return count > 0, nil
 }
 
+// UpdateByCreaterID 更新记录信息
+func (node *NodeApplyDB) UpdateByCreaterID(ctx context.Context, newInfo *NodeApply) (bool, error) {
+	res, err := node.conn.Exec(
+		ctx,
+		"UPDATE `node_apply` SET `node_type`=?, `node_num`=?, `start_time`=?, `end_time`=? WHERE `id`=? AND `creater_id`=?",
+		newInfo.NodeType,
+		newInfo.NodeNum,
+		newInfo.StartTime,
+		newInfo.EndTime,
+		newInfo.ID,
+		newInfo.CreaterID,
+	)
+	if err != nil {
+		logger.Warn("Update node apply error: ", err)
+		return false, errors.New("Update node apply error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("Update node apply, get rows affected error: ", err)
+		return false, errors.New("Update node apply, get rows affected error")
+	}
+	return count > 0, nil
+}
+
 // NewNodeApply 创建新的node_apply数据库操作
 func NewNodeApply(conn *db.DB) *NodeApplyDB {
 	return &NodeApplyDB{

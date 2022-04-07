@@ -289,6 +289,29 @@ message AddNodeUsageTimeRecordResponse {
 }
 ```
 
+## UpdateNodeApply
+
+描述: 修改机器节点申请记录的信息
+
+原型定义: `rpc UpdateNodeApply(UpdateNodeApplyRequest) returns (UpdateNodeApplyResponse) {}`
+
+请求参数:
+
+```protobuf
+message UpdateNodeApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    node.NodeApply newInfos = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message UpdateNodeApplyResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ### NodeApply

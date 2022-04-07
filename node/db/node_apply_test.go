@@ -170,3 +170,94 @@ func TestNodeApplyDB_QueryByID(t *testing.T) {
 		})
 	}
 }
+
+func TestNodeApplyDB_Update(t *testing.T) {
+	type fields struct {
+		conn *db.DB
+	}
+	type args struct {
+		ctx     context.Context
+		newInfo *NodeApply
+	}
+
+	conn := getDBConn()
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "test success1",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx: context.Background(),
+				newInfo: &NodeApply{
+					ID:        1,
+					CreaterID: 1,
+					NodeType:  "update by testing",
+					NodeNum:   11,
+					StartTime: time.Now(),
+					EndTime:   time.Now(),
+				},
+			},
+			wantErr: false,
+			want:    true,
+		},
+		{
+			name: "test success2",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx: context.Background(),
+				newInfo: &NodeApply{
+					ID:        2,
+					CreaterID: 2,
+					NodeType:  "update by testing",
+					NodeNum:   14,
+					StartTime: time.Now(),
+					EndTime:   time.Now(),
+				},
+			},
+			wantErr: false,
+			want:    true,
+		},
+		{
+			name: "test fail",
+			fields: fields{
+				conn: conn,
+			},
+			args: args{
+				ctx: context.Background(),
+				newInfo: &NodeApply{
+					ID:        0,
+					NodeType:  "update by testing",
+					NodeNum:   14,
+					StartTime: time.Now(),
+					EndTime:   time.Now(),
+				},
+			},
+			wantErr: false,
+			want:    false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			node := &NodeApplyDB{
+				conn: tt.fields.conn,
+			}
+			got, err := node.UpdateByCreaterID(tt.args.ctx, tt.args.newInfo)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NodeApplyDB.Update() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("NodeApplyDB.Update() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

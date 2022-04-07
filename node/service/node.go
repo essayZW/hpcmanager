@@ -585,6 +585,41 @@ func (ns *NodeService) PaginationGetNodeUsage(
 	return nil
 }
 
+// UpdateNodeApply 更新节点申请信息
+func (ns *NodeService) UpdateNodeApply(
+	ctx context.Context,
+	req *nodepb.UpdateNodeApplyRequest,
+	resp *nodepb.UpdateNodeApplyResponse,
+) error {
+	logger.Info("UpdateNodeApply: ", req.BaseRequest)
+	if !verify.Identify(verify.UpdateNodeApply, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"UpdateNodeApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("UpdateNodeApply permission forbidden")
+	}
+
+	status, err := ns.nodeApplyLogic.UpdateNodeApplyInfo(
+		ctx,
+		int(req.NewInfos.Id),
+		int(req.BaseRequest.UserInfo.UserId),
+		req.NewInfos.NodeType,
+		int(req.NewInfos.NodeNum),
+		req.NewInfos.StartTime,
+		req.NewInfos.EndTime,
+	)
+	if err != nil {
+		return err
+	}
+	resp.Success = status
+	return nil
+}
+
 var _ nodepb.NodeHandler = (*NodeService)(nil)
 
 // NewNode 创建新的机器节点管理服务

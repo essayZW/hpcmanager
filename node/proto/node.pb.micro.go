@@ -49,6 +49,7 @@ type NodeService interface {
 	RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, opts ...client.CallOption) (*RevokeNodeApplyResponse, error)
 	AddNodeUsageTimeRecord(ctx context.Context, in *AddNodeUsageTimeRecordRequest, opts ...client.CallOption) (*AddNodeUsageTimeRecordResponse, error)
 	PaginationGetNodeUsage(ctx context.Context, in *PaginationGetNodeUsageRequest, opts ...client.CallOption) (*PaginationGetNodeUsageResponse, error)
+	UpdateNodeApply(ctx context.Context, in *UpdateNodeApplyRequest, opts ...client.CallOption) (*UpdateNodeApplyResponse, error)
 }
 
 type nodeService struct {
@@ -173,6 +174,16 @@ func (c *nodeService) PaginationGetNodeUsage(ctx context.Context, in *Pagination
 	return out, nil
 }
 
+func (c *nodeService) UpdateNodeApply(ctx context.Context, in *UpdateNodeApplyRequest, opts ...client.CallOption) (*UpdateNodeApplyResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.UpdateNodeApply", in)
+	out := new(UpdateNodeApplyResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Node service
 
 type NodeHandler interface {
@@ -187,6 +198,7 @@ type NodeHandler interface {
 	RevokeNodeApply(context.Context, *RevokeNodeApplyRequest, *RevokeNodeApplyResponse) error
 	AddNodeUsageTimeRecord(context.Context, *AddNodeUsageTimeRecordRequest, *AddNodeUsageTimeRecordResponse) error
 	PaginationGetNodeUsage(context.Context, *PaginationGetNodeUsageRequest, *PaginationGetNodeUsageResponse) error
+	UpdateNodeApply(context.Context, *UpdateNodeApplyRequest, *UpdateNodeApplyResponse) error
 }
 
 func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.HandlerOption) error {
@@ -202,6 +214,7 @@ func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.Handl
 		RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, out *RevokeNodeApplyResponse) error
 		AddNodeUsageTimeRecord(ctx context.Context, in *AddNodeUsageTimeRecordRequest, out *AddNodeUsageTimeRecordResponse) error
 		PaginationGetNodeUsage(ctx context.Context, in *PaginationGetNodeUsageRequest, out *PaginationGetNodeUsageResponse) error
+		UpdateNodeApply(ctx context.Context, in *UpdateNodeApplyRequest, out *UpdateNodeApplyResponse) error
 	}
 	type Node struct {
 		node
@@ -256,4 +269,8 @@ func (h *nodeHandler) AddNodeUsageTimeRecord(ctx context.Context, in *AddNodeUsa
 
 func (h *nodeHandler) PaginationGetNodeUsage(ctx context.Context, in *PaginationGetNodeUsageRequest, out *PaginationGetNodeUsageResponse) error {
 	return h.NodeHandler.PaginationGetNodeUsage(ctx, in, out)
+}
+
+func (h *nodeHandler) UpdateNodeApply(ctx context.Context, in *UpdateNodeApplyRequest, out *UpdateNodeApplyResponse) error {
+	return h.NodeHandler.UpdateNodeApply(ctx, in, out)
 }
