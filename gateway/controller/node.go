@@ -58,7 +58,7 @@ func (n *node) createNodeApply(ctx *gin.Context) {
 		NodeType:    param.NodeType,
 		NodeNum:     int32(param.NodeNum),
 		StartTime:   param.StartTime,
-		EndTime:     param.StartTime,
+		EndTime:     param.EndTime,
 		BaseRequest: baseRequest,
 	})
 	if err != nil {

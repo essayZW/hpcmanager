@@ -285,9 +285,10 @@ func (node *NodeApplyDB) UpdateStatus(ctx context.Context, applyID int, status i
 
 // UpdateByCreaterID 更新记录信息
 func (node *NodeApplyDB) UpdateByCreaterID(ctx context.Context, newInfo *NodeApply) (bool, error) {
+	// 只能更新还未撤销且管理员还未审核的申请
 	res, err := node.conn.Exec(
 		ctx,
-		"UPDATE `node_apply` SET `node_type`=?, `node_num`=?, `start_time`=?, `end_time`=? WHERE `id`=? AND `status`=1 AND `tutor_check_status`=-1",
+		"UPDATE `node_apply` SET `node_type`=?, `node_num`=?, `start_time`=?, `end_time`=? WHERE `id`=? AND `status`=1 AND `manager_check_status`=-1",
 		newInfo.NodeType,
 		newInfo.NodeNum,
 		newInfo.StartTime,

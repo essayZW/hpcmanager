@@ -218,7 +218,7 @@ func (node *NodeApply) UpdateNodeApplyInfo(
 	nodeNum int,
 	startTimeMilliUnix, endTimeMilliUnix int64,
 ) (bool, error) {
-	if applyID != 0 {
+	if applyID <= 0 {
 		return false, errors.New("invalid apply id")
 	}
 	if nodeType == "" {
@@ -226,6 +226,7 @@ func (node *NodeApply) UpdateNodeApplyInfo(
 	}
 	startTime := time.UnixMilli(startTimeMilliUnix)
 	endTime := time.UnixMilli(endTimeMilliUnix)
+	// FIXME: 修改modify字段
 	return node.nodeApplyDB.UpdateByCreaterID(ctx, &db.NodeApply{
 		ID:        applyID,
 		NodeType:  nodeType,
