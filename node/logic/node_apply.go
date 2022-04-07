@@ -228,7 +228,6 @@ func (node *NodeApply) UpdateNodeApplyInfo(
 	endTime := time.UnixMilli(endTimeMilliUnix)
 	return node.nodeApplyDB.UpdateByCreaterID(ctx, &db.NodeApply{
 		ID:        applyID,
-		CreaterID: createrID,
 		NodeType:  nodeType,
 		NodeNum:   nodeNum,
 		StartTime: startTime,

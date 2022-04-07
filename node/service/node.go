@@ -603,6 +603,18 @@ func (ns *NodeService) UpdateNodeApply(
 		)
 		return errors.New("UpdateNodeApply permission forbidden")
 	}
+	// 如果是管理员可以修改所有的节点申请信息,否则只能修改自己创建的节点申请信息
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	if !isAdmin {
+		// 查询需要修改的机器节点申请信息
+		info, err := ns.nodeApplyLogic.GetNodeApplyByID(ctx, int(req.NewInfos.Id))
+		if err != nil {
+			return errors.New("node apply info query fail")
+		}
+		if info.CreaterID != int(req.BaseRequest.UserInfo.UserId) {
+			return errors.New("permission forbidden: not creater")
+		}
+	}
 
 	status, err := ns.nodeApplyLogic.UpdateNodeApplyInfo(
 		ctx,
