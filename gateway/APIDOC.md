@@ -734,3 +734,15 @@ endDateMilliUnix: number
 ```
 
 响应参数: 分页的结果以及总的数量
+
+## fee 控制器
+
+### /fee/ping
+
+Method: GET
+
+描述：进行 group 服务的 ping 测试
+
+参数：无
+
+响应：请求 ID、PONG
