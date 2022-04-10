@@ -238,6 +238,23 @@ const handlerFinishWorkOrder = async (id: number) => {
                   }}
                 </span>
               </p>
+              <p class="info">
+                <span>
+                  <strong>申请独占时间段: </strong>
+                  {{
+                    dayjs(
+                      tableRowExpandData[props.row.id].applyInfo?.startTime *
+                        1000
+                    ).format('YYYY-MM-DD')
+                  }}
+                  &nbsp;至&nbsp;
+                  {{
+                    dayjs(
+                      tableRowExpandData[props.row.id].applyInfo?.endTime * 1000
+                    ).format('YYYY-MM-DD')
+                  }}
+                </span>
+              </p>
               <p v-if="!props.row.handlerFlag"><strong>操作面板: </strong></p>
               <p v-if="!props.row.handlerFlag">
                 <span>
