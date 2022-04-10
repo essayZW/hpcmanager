@@ -746,3 +746,13 @@ Method: GET
 参数：无
 
 响应：请求 ID、PONG
+
+### /fee/distribute
+
+Method: GET
+
+描述: 分页查询机器节点独占账单
+
+参数: 分页参数
+
+响应: 查询的数据
