@@ -189,6 +189,7 @@ CREATE TABLE `node_distribute_bill` (
   `user_id` int NOT NULL,
   `user_username` varchar(32) NOT NULL,
   `user_name` varchar(32) NOT NULL,
+  `user_group_id` int NOT NULL,
   `create_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -460,4 +461,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-04-10 14:48:19
+-- Dump completed on 2022-04-10 19:47:02
