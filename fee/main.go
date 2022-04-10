@@ -39,7 +39,16 @@ func main() {
 		logger.Fatal("MySQL conn error: ", err)
 	}
 
-	nodeDistributeBillLogic := logic.NewNodeDistributeBill(feedb.NewNodeDistributeBill(sqldb))
+	// 创建动态配置源
+	etcdConfig, err := config.NewEtcd()
+	if err != nil {
+		logger.Fatal("Etcd config create error: ", err)
+	}
+
+	nodeDistributeBillLogic, err := logic.NewNodeDistributeBill(feedb.NewNodeDistributeBill(sqldb), etcdConfig)
+	if err != nil {
+		logger.Fatal("create logic error: ", err)
+	}
 
 	feeService := service.NewFee(serviceClient, nodeDistributeBillLogic)
 	feepb.RegisterFeeHandler(srv.Server(), feeService)

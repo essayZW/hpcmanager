@@ -225,7 +225,7 @@ func NewUser(db *db.UserDB, configConn config.DynamicConfig, redisConn *redis.Cl
 		TokenExpireTime: time.Duration(24) * time.Hour,
 	}
 	var expireTime float64
-	configConn.Registry("user/TokenExpireTime", &expireTime, func(newV interface{}) {
+	configConn.Registry("user_TokenExpireTime", &expireTime, func(newV interface{}) {
 		user.mutex.Lock()
 		defer user.mutex.Unlock()
 		user.TokenExpireTime = time.Duration(int(expireTime)) * time.Minute

@@ -62,12 +62,20 @@ func (fs *FeeService) CreateNodeDistributeBill(
 		return errors.New("can't find node apply by id")
 	}
 
+	fee, err := fs.nodeDistributeBillLogic.CalFee(
+		nodeApplyInfo.Apply.StartTime,
+		nodeApplyInfo.Apply.EndTime,
+		nodeApplyInfo.Apply.NodeType,
+	)
+	if err != nil {
+		return err
+	}
+
 	id, err := fs.nodeDistributeBillLogic.Create(
 		ctx,
 		int(nodeApplyInfo.Apply.Id),
 		int(nodeDistributeResp.Wo.Id),
-		// FIXME: 需要计算费率
-		0.0,
+		fee,
 		int(nodeApplyInfo.Apply.CreaterID),
 		nodeApplyInfo.Apply.CreaterUsername,
 		nodeApplyInfo.Apply.CreaterName,
@@ -86,5 +94,6 @@ func NewFee(client client.Client, nodeDistributeBillLogic *logic.NodeDistributeB
 	nodeService := nodepb.NewNodeService("node", client)
 	return &FeeService{
 		nodeDistributeBillLogic: nodeDistributeBillLogic,
-		nodeService:             nodeService}
+		nodeService:             nodeService,
+	}
 }
