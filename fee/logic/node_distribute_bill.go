@@ -66,6 +66,8 @@ func (ndbl *NodeDistributeBill) CalFee(startTimeUnix, endTimeUnix int64, nodeTyp
 	year := ndbl.calTimeDurationYear(startTimeUnix, endTimeUnix)
 	var res float64
 	var err error = nil
+	ndbl.mutex.Lock()
+	defer ndbl.mutex.Unlock()
 	switch nodeType {
 	case "cpuc36":
 		res = year * ndbl.rate36CPU
