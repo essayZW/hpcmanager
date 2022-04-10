@@ -9,6 +9,7 @@ import (
 	"github.com/essayZW/hpcmanager/logger"
 	nodepb "github.com/essayZW/hpcmanager/node/proto"
 	publicproto "github.com/essayZW/hpcmanager/proto"
+	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
 	"go-micro.dev/v4/client"
 )
@@ -16,6 +17,7 @@ import (
 type FeeService struct {
 	nodeDistributeBillLogic *logic.NodeDistributeBill
 	nodeService             nodepb.NodeService
+	userService             userpb.UserService
 }
 
 // Ping ping测试
@@ -71,6 +73,15 @@ func (fs *FeeService) CreateNodeDistributeBill(
 		return err
 	}
 
+	// 查询用户的组信息
+	userResp, err := fs.userService.GetUserInfo(ctx, &userpb.GetUserInfoRequest{
+		BaseRequest: req.BaseRequest,
+		Userid:      nodeApplyInfo.Apply.CreaterID,
+	})
+	if err != nil {
+		return err
+	}
+
 	id, err := fs.nodeDistributeBillLogic.Create(
 		ctx,
 		int(nodeApplyInfo.Apply.Id),
@@ -79,6 +90,7 @@ func (fs *FeeService) CreateNodeDistributeBill(
 		int(nodeApplyInfo.Apply.CreaterID),
 		nodeApplyInfo.Apply.CreaterUsername,
 		nodeApplyInfo.Apply.CreaterName,
+		int(userResp.UserInfo.GroupId),
 	)
 	if err != nil {
 		return err
@@ -92,8 +104,10 @@ var _ feepb.FeeHandler = (*FeeService)(nil)
 // NewFee 创建新的fee服务
 func NewFee(client client.Client, nodeDistributeBillLogic *logic.NodeDistributeBill) *FeeService {
 	nodeService := nodepb.NewNodeService("node", client)
+	userService := userpb.NewUserService("user", client)
 	return &FeeService{
 		nodeDistributeBillLogic: nodeDistributeBillLogic,
 		nodeService:             nodeService,
+		userService:             userService,
 	}
 }

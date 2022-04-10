@@ -32,6 +32,7 @@ func (ndbl *NodeDistributeBill) Create(
 	fee float64,
 	userID int,
 	username, userName string,
+	groupID int,
 ) (int64, error) {
 	if applyID <= 0 {
 		return 0, errors.New("invalid apply id")
@@ -45,6 +46,9 @@ func (ndbl *NodeDistributeBill) Create(
 	if userID <= 0 {
 		return 0, errors.New("invalid user id")
 	}
+	if groupID <= 0 {
+		return 0, errors.New("invalid groupID")
+	}
 	return ndbl.ndb.Insert(ctx, &db.NodeDistributeBill{
 		ApplyID:          applyID,
 		NodeDistributeID: nodeDistributeID,
@@ -52,6 +56,7 @@ func (ndbl *NodeDistributeBill) Create(
 		UserID:           userID,
 		Username:         username,
 		UserName:         userName,
+		UserGroupID:      groupID,
 		CreateTime:       time.Now(),
 	})
 }

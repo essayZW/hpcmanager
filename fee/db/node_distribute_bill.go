@@ -17,14 +17,15 @@ func (ndb *NodeDistributeBillDB) Insert(ctx context.Context, newInfo *NodeDistri
 	res, err := ndb.conn.Exec(
 		ctx,
 		"INSERT INTO `node_distribute_bill` "+
-			"(`apply_id`, `node_distribute_id`, `fee`, `user_id`, `user_username`, `user_name`, `create_time`, `extraAttributes`) "+
-			"VALUES (?,?,?,?,?,?,?,?)",
+			"(`apply_id`, `node_distribute_id`, `fee`, `user_id`, `user_username`, `user_name`, `user_group_id`, `create_time`, `extraAttributes`) "+
+			"VALUES (?,?,?,?,?,?,?,?,?)",
 		newInfo.ApplyID,
 		newInfo.NodeDistributeID,
 		newInfo.Fee,
 		newInfo.UserID,
 		newInfo.Username,
 		newInfo.UserName,
+		newInfo.UserGroupID,
 		newInfo.CreateTime,
 		newInfo.ExtraAttributes,
 	)

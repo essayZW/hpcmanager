@@ -21,6 +21,7 @@ type NodeDistributeBill struct {
 	UserID           int         `db:"user_id"`
 	Username         string      `db:"user_username"`
 	UserName         string      `db:"user_name"`
+	UserGroupID      int         `db:"user_group_id"`
 	CreateTime       time.Time   `db:"create_time"`
 	ExtraAttributes  *db.JSON    `db:"extraAttributes"`
 }

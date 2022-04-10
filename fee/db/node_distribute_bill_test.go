@@ -57,10 +57,11 @@ func TestNodeDistributeBillDB_Insert(t *testing.T) {
 					UserID:           1,
 					Username:         "testing",
 					UserName:         "testingName",
+					UserGroupID:      2,
 					CreateTime:       time.Now(),
 				},
 			},
-			want:    1,
+			want:    2,
 			wantErr: false,
 		},
 	}
