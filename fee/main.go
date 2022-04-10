@@ -3,6 +3,9 @@ package main
 import (
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
 	"github.com/essayZW/hpcmanager/config"
+	"github.com/essayZW/hpcmanager/db"
+	feedb "github.com/essayZW/hpcmanager/fee/db"
+	"github.com/essayZW/hpcmanager/fee/logic"
 	feepb "github.com/essayZW/hpcmanager/fee/proto"
 	"github.com/essayZW/hpcmanager/fee/service"
 	"github.com/essayZW/hpcmanager/logger"
@@ -31,39 +34,14 @@ func main() {
 	serviceClient := srv.Client()
 
 	// 创建数据库连接
-	// sqldb, err := db.NewDB()
-	// if err != nil {
-	// logger.Fatal("MySQL conn error: ", err)
-	// }
-	// 创建动态配置源
-	// etcdConfig, err := config.NewEtcd()
-	// if err != nil {
-	// logger.Fatal("Etcd config create error: ", err)
-	// }
-	// 创建redis连接
-	// redisConfig, err := config.LoadRedis()
-	// if err != nil {
-	// logger.Fatal("Redis conn error: ", err)
-	// }
-	// redisConn := redis.NewClient(&redis.Options{
-	// Addr:     redisConfig.Address,
-	// Password: redisConfig.Password,
-	// DB:       redisConfig.DB,
-	// })
-	// ping := redisConn.Ping(context.Background())
-	// ok, err := ping.Result()
-	// if err != nil {
-	// logger.Fatal("Redis ping error: ", err)
-	// }
-	// if ok != "PONG" {
-	// logger.Fatal("Redis ping get: ", ok)
-	// }
-	// rabbitmqBroker, err := hpcbroker.NewRabbitmq()
-	// if err != nil {
-	// logger.Fatal(err)
-	// }
+	sqldb, err := db.NewDB()
+	if err != nil {
+		logger.Fatal("MySQL conn error: ", err)
+	}
 
-	feeService := service.NewFee(serviceClient)
+	nodeDistributeBillLogic := logic.NewNodeDistributeBill(feedb.NewNodeDistributeBill(sqldb))
+
+	feeService := service.NewFee(serviceClient, nodeDistributeBillLogic)
 	feepb.RegisterFeeHandler(srv.Server(), feeService)
 
 	srv.Init()
