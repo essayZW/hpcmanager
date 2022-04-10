@@ -8,7 +8,8 @@ require github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
 
 require (
 	github.com/asim/go-micro/plugins/broker/rabbitmq/v4 v4.0.0-20220311080335-e5a35d38f931
-	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220314060314-356448017f02
+	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220407104607-62c2981baf63
+	github.com/essayZW/hpcmanager/fee v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/user v0.0.0-00010101000000-000000000000
 	go-micro.dev/v4 v4.6.0
@@ -83,3 +84,5 @@ replace github.com/essayZW/hpcmanager/permission => ../permission
 replace github.com/essayZW/hpcmanager/project => ../project
 
 replace github.com/essayZW/hpcmanager/node => ./
+
+replace github.com/essayZW/hpcmanager/fee => ../fee
