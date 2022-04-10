@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	hpcdb "github.com/essayZW/hpcmanager/db"
+	feepb "github.com/essayZW/hpcmanager/fee/proto"
 	"github.com/essayZW/hpcmanager/logger"
 	nodebroker "github.com/essayZW/hpcmanager/node/broker"
 	"github.com/essayZW/hpcmanager/node/db"
@@ -25,6 +27,7 @@ type NodeService struct {
 	nodeUsageTime  *logic.NodeUsageTime
 
 	userGroupService userpb.GroupService
+	feeService       feepb.FeeService
 
 	rabbitmqBroker broker.Broker
 }
@@ -407,18 +410,25 @@ func (ns *NodeService) FinishNodeDistributeWO(
 		return errors.New("FinishNodeDistributeWO permission forbidden")
 	}
 
-	status, err := ns.nodeDistribute.FinishByID(ctx, int(req.DistributeID), &logic.SimpleUserInfo{
-		ID:       int(req.BaseRequest.UserInfo.UserId),
-		Username: req.BaseRequest.UserInfo.Username,
-		Name:     req.BaseRequest.UserInfo.Name,
+	status, err := hpcdb.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		status, err := ns.nodeDistribute.FinishByID(c, int(req.DistributeID), &logic.SimpleUserInfo{
+			ID:       int(req.BaseRequest.UserInfo.UserId),
+			Username: req.BaseRequest.UserInfo.Username,
+			Name:     req.BaseRequest.UserInfo.Name,
+		})
+		if err != nil {
+			return status, err
+		}
+		// 创建对应的机器独占账单
+		res, err := ns.feeService.CreateNodeDistributeBill(c, &feepb.CreateNodeDistributeBillRequest{
+			BaseRequest:      req.BaseRequest,
+			NodeDistributeID: req.DistributeID,
+		})
+		logger.Info("create node distribute bill with id: ", res.Id)
+		return status, err
 	})
-	if err != nil {
-		return err
-	}
-	resp.Success = status
-
-	// TODO: 发送mq消息
-	return nil
+	resp.Success = status.(bool)
+	return err
 }
 
 // RevokeNodeApply 撤销机器节点申请
@@ -683,10 +693,12 @@ func NewNode(
 	rabbitmqBroker broker.Broker,
 ) *NodeService {
 	userGroupService := userpb.NewGroupService("user", client)
+	feeService := feepb.NewFeeService("fee", client)
 	return &NodeService{
 		nodeApplyLogic:   nodeApplyLogic,
 		nodeDistribute:   nodeDistribute,
 		userGroupService: userGroupService,
+		feeService:       feeService,
 		rabbitmqBroker:   rabbitmqBroker,
 		nodeUsageTime:    nodeUsageTime,
 	}
