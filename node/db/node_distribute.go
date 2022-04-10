@@ -139,6 +139,21 @@ func (ndb *NodeDistributeDB) UpdateHandlerFlag(
 	return count > 0, nil
 }
 
+// QueryByID 通过ID查询记录
+func (ndb *NodeDistributeDB) QueryByID(ctx context.Context, id int32) (*NodeDistribute, error) {
+	row, err := ndb.conn.QueryRow(ctx, "SELECT * FROM `node_distribute` WHERE `id`=?", id)
+	if err != nil {
+		logger.Warn("QueryByID error: ", err)
+		return nil, err
+	}
+	var res NodeDistribute
+	if err := row.StructScan(&res); err != nil {
+		logger.Warn("QueryByID error: ", err)
+		return nil, err
+	}
+	return &res, nil
+}
+
 // NewNodeDistribute 创建新的机器节点分配处理工单表
 func NewNodeDistribute(conn *hpcdb.DB) *NodeDistributeDB {
 	return &NodeDistributeDB{

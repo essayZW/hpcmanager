@@ -43,9 +43,7 @@ func (ns *NodeService) Ping(
 }
 
 // CreateNodeApply 创建一个新的申请计算节点记录
-func (ns *NodeService) CreateNodeApply(
-	ctx context.Context,
-	req *nodepb.CreateNodeApplyRequest,
+func (ns *NodeService) CreateNodeApply(ctx context.Context, req *nodepb.CreateNodeApplyRequest,
 	resp *nodepb.CreateNodeApplyResponse,
 ) error {
 	logger.Info("CreateNodeApply: ", req.BaseRequest)
@@ -632,6 +630,45 @@ func (ns *NodeService) UpdateNodeApply(
 		return err
 	}
 	resp.Success = status
+	return nil
+}
+
+// GetNodeDistributeInfoByID 通过ID查询机器节点分配工单信息
+func (ns *NodeService) GetNodeDistributeInfoByID(
+	ctx context.Context,
+	req *nodepb.GetNodeDistributeInfoByIDRequest,
+	resp *nodepb.GetNodeDistributeInfoByIDResponse,
+) error {
+	logger.Info("GetNodeDistributeInfoByID: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeDistributeWO, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryNodeDistributeWO permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryNodeDistributeWO permission forbidden")
+	}
+
+	info, err := ns.nodeDistribute.GetInfoByID(ctx, req.Id)
+	if err != nil {
+		return err
+	}
+	resp.Wo = &nodepb.NodeDistribute{
+		Id:               int32(info.ID),
+		ApplyID:          int32(info.ApplyID),
+		HandlerFlag:      int32(info.HandlerFlag),
+		HandlerUserID:    int32(info.HandlerUserID.Int64),
+		HandlerUsername:  info.HandlerUsername.String,
+		HandlerName:      info.HandlerUserName.String,
+		DistributeBillID: int32(info.DistributeBillID),
+		CreateTime:       info.CreateTime.Unix(),
+	}
+	if info.ExtraAttributes != nil {
+		resp.Wo.ExtraAttributes = info.ExtraAttributes.String()
+	}
 	return nil
 }
 

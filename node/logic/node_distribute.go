@@ -95,6 +95,11 @@ func (nodeDistribute *NodeDistribute) FinishByID(
 	})
 }
 
+// GetInfoByID 通过ID获取记录的信息
+func (nodeDistribute *NodeDistribute) GetInfoByID(ctx context.Context, id int32) (*db.NodeDistribute, error) {
+	return nodeDistribute.nodeDistributeDB.QueryByID(ctx, id)
+}
+
 // NewNodeDistribute 创建新的机器节点分配处理工单的操作逻辑
 func NewNodeDistribute(nodeDistributeDB *db.NodeDistributeDB) *NodeDistribute {
 	return &NodeDistribute{

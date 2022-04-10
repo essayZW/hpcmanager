@@ -312,6 +312,29 @@ message UpdateNodeApplyResponse {
 }
 ```
 
+## GetNodeDistributeInfoByID
+
+描述: 通过 ID 查询机器节点分配工单信息
+
+原型定义: `rpc GetNodeDistributeInfoByID(GetNodeDistributeInfoByIDRequest) returns (GetNodeDistributeInfoByIDResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetNodeDistributeInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 id = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetNodeDistributeInfoByIDResponse {
+    node.NodeDistribute wo = 1;
+}
+```
+
 # 附录
 
 ### NodeApply
