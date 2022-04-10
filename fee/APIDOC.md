@@ -48,3 +48,28 @@ message CreateNodeDistributeBillResponse {
     int32 id = 1;
 }
 ```
+
+## PaginationGetNodeDistributeBill
+
+描述: 分页查询计算节点独占账单
+
+原型定义: `rpc PaginationGetNodeDistributeBill(PaginationGetNodeDistributeBillRequest) returns (PaginationGetNodeDistributeBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message PaginationGetNodeDistributeBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message PaginationGetNodeDistributeBillResponse {
+    repeated fee.NodeDistributeBill bills = 1;
+    int32 count = 2;
+}
+```

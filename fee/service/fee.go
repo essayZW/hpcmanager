@@ -99,6 +99,83 @@ func (fs *FeeService) CreateNodeDistributeBill(
 	return nil
 }
 
+// PaginationGetNodeDistributeBill 分页查询计算节点独占账单
+func (fs *FeeService) PaginationGetNodeDistributeBill(
+	ctx context.Context,
+	req *feepb.PaginationGetNodeDistributeBillRequest,
+	resp *feepb.PaginationGetNodeDistributeBillResponse,
+) error {
+	logger.Info("PaginationGetNodeDistributeBill: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeDistributeBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryNodeDistributeBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryNodeDistributeBill permission forbidden")
+	}
+	var infos *logic.PaginationGetNodeDistributeBillResult
+	var err error
+
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	if !isAdmin && !isTutor {
+		// 普通用户,只能查询自己的账单信息
+		infos, err = fs.nodeDistributeBillLogic.PaginationGetWithUserID(
+			ctx,
+			int(req.PageIndex),
+			int(req.PageSize),
+			int(req.BaseRequest.UserInfo.UserId),
+		)
+	} else if !isAdmin && isTutor {
+		// 导师用户,只能查询自己组所有用户的账单信息
+		infos, err = fs.nodeDistributeBillLogic.PaginationGetWithGroupID(
+			ctx,
+			int(req.PageIndex),
+			int(req.PageSize),
+			int(req.BaseRequest.UserInfo.GroupId),
+		)
+	} else {
+		// 管理员用户,可以查询所有的信息
+		infos, err = fs.nodeDistributeBillLogic.PaginationGetAll(
+			ctx,
+			int(req.PageIndex),
+			int(req.PageSize),
+		)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	resp.Count = int32(infos.Count)
+	resp.Bills = make([]*feepb.NodeDistributeBill, len(infos.Data))
+	for i := range infos.Data {
+		resp.Bills[i] = &feepb.NodeDistributeBill{
+			Id:                  int32(infos.Data[i].ID),
+			ApplyID:             int32(infos.Data[i].ApplyID),
+			NodeDistributeID:    int32(infos.Data[i].NodeDistributeID),
+			Fee:                 infos.Data[i].Fee,
+			PayFee:              infos.Data[i].PayFee,
+			PayFlag:             int32(infos.Data[i].PayFlag),
+			PayType:             int32(infos.Data[i].PayType.Int64),
+			PayMessage:          infos.Data[i].PayMessage.String,
+			UserID:              int32(infos.Data[i].UserID),
+			UserUsername:        infos.Data[i].Username,
+			UserName:            infos.Data[i].UserName,
+			UserGroupID:         int32(infos.Data[i].UserGroupID),
+			CreateTimeMilliUnix: infos.Data[i].CreateTime.UnixMilli(),
+		}
+		if infos.Data[i].ExtraAttributes != nil {
+			resp.Bills[i].ExtraAttributes = infos.Data[i].ExtraAttributes.String()
+		}
+	}
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务

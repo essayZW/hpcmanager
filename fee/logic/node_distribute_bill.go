@@ -91,6 +91,93 @@ func (ndbl *NodeDistributeBill) calTimeDurationYear(startTimeUnix, endTimeUnix i
 	return year
 }
 
+// PaginationGetNodeDistributeBillResult 分页查询的结果
+type PaginationGetNodeDistributeBillResult struct {
+	Data  []*db.NodeDistributeBill
+	Count int
+}
+
+// PaginationGetAll 分页查询所有的记录
+func (ndbl *NodeDistributeBill) PaginationGetAll(
+	ctx context.Context,
+	pageIndex, pageSize int,
+) (*PaginationGetNodeDistributeBillResult, error) {
+	if pageIndex <= 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize <= 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+
+	count, err := ndbl.ndb.QueryAllCount(ctx)
+	if err != nil {
+		return nil, err
+	}
+	limit := pageSize * (pageIndex - 1)
+	data, err := ndbl.ndb.QueryAllWithLimit(ctx, limit, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	return &PaginationGetNodeDistributeBillResult{
+		Data:  data,
+		Count: count,
+	}, nil
+}
+
+// PaginationGetWithGroupID 分页查询属于某个组的记录
+func (ndbl *NodeDistributeBill) PaginationGetWithGroupID(
+	ctx context.Context,
+	pageIndex, pageSize, groupID int,
+) (*PaginationGetNodeDistributeBillResult, error) {
+	if pageIndex <= 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize <= 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+
+	count, err := ndbl.ndb.QueryCountByGroupID(ctx, groupID)
+	if err != nil {
+		return nil, err
+	}
+	limit := pageSize * (pageIndex - 1)
+	data, err := ndbl.ndb.QueryWithLimitByGroupID(ctx, limit, pageSize, groupID)
+	if err != nil {
+		return nil, err
+	}
+	return &PaginationGetNodeDistributeBillResult{
+		Data:  data,
+		Count: count,
+	}, nil
+}
+
+// PaginationGetWithUserID 分页查询某个用户的账单记录
+func (ndbl *NodeDistributeBill) PaginationGetWithUserID(
+	ctx context.Context,
+	pageIndex, pageSize, userID int,
+) (*PaginationGetNodeDistributeBillResult, error) {
+	if pageIndex <= 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize <= 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+
+	count, err := ndbl.ndb.QueryCountByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	limit := pageSize * (pageIndex - 1)
+	data, err := ndbl.ndb.QueryWithLimitByUserID(ctx, limit, pageSize, userID)
+	if err != nil {
+		return nil, err
+	}
+	return &PaginationGetNodeDistributeBillResult{
+		Data:  data,
+		Count: count,
+	}, nil
+}
+
 // NewNodeDistributeBill 创建新的机器独占账单操作逻辑结构体
 func NewNodeDistributeBill(ndb *db.NodeDistributeBillDB, dynamicConfig config.DynamicConfig) (*NodeDistributeBill, error) {
 	res := &NodeDistributeBill{

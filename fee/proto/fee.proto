@@ -7,11 +7,13 @@ package fee;
 import "proto/ping.proto";
 import "proto/common.proto";
 import "gateway/proto/baserequest.proto";
+import "proto/fee_public.proto";
 
 
 service Fee {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc CreateNodeDistributeBill(CreateNodeDistributeBillRequest) returns (CreateNodeDistributeBillResponse) {}
+    rpc PaginationGetNodeDistributeBill(PaginationGetNodeDistributeBillRequest) returns (PaginationGetNodeDistributeBillResponse) {}
 }
 
 message CreateNodeDistributeBillRequest {
@@ -21,4 +23,15 @@ message CreateNodeDistributeBillRequest {
 
 message CreateNodeDistributeBillResponse {
     int32 id = 1;
+}
+
+message PaginationGetNodeDistributeBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+
+message PaginationGetNodeDistributeBillResponse {
+    repeated fee.NodeDistributeBill bills = 1;
+    int32 count = 2;
 }

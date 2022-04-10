@@ -17,7 +17,8 @@ message NodeDistributeBill {
     int32 userID = 10;
     string userUsername = 11;
     string userName = 12;
-    int64 createTimeMilliUnix = 13;
-    string extraAttributes = 14;
+    int32 userGroupID = 13;
+    int64 createTimeMilliUnix = 14;
+    string extraAttributes = 15;
 }
 
