@@ -6,8 +6,19 @@ package fee;
 
 import "proto/ping.proto";
 import "proto/common.proto";
+import "gateway/proto/baserequest.proto";
 
 
 service Fee {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+    rpc CreateNodeDistributeBill(CreateNodeDistributeBillRequest) returns (CreateNodeDistributeBillResponse) {}
+}
+
+message CreateNodeDistributeBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 nodeDistributeID = 2;
+}
+
+message CreateNodeDistributeBillResponse {
+    int32 id = 1;
 }

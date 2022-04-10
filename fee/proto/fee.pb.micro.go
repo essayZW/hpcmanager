@@ -5,6 +5,7 @@ package fee
 
 import (
 	fmt "fmt"
+	_ "github.com/essayZW/hpcmanager/gateway/proto"
 	proto1 "github.com/essayZW/hpcmanager/proto"
 	proto "google.golang.org/protobuf/proto"
 	math "math"
@@ -38,6 +39,7 @@ func NewFeeEndpoints() []*api.Endpoint {
 
 type FeeService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
+	CreateNodeDistributeBill(ctx context.Context, in *CreateNodeDistributeBillRequest, opts ...client.CallOption) (*CreateNodeDistributeBillResponse, error)
 }
 
 type feeService struct {
@@ -62,15 +64,27 @@ func (c *feeService) Ping(ctx context.Context, in *proto1.Empty, opts ...client.
 	return out, nil
 }
 
+func (c *feeService) CreateNodeDistributeBill(ctx context.Context, in *CreateNodeDistributeBillRequest, opts ...client.CallOption) (*CreateNodeDistributeBillResponse, error) {
+	req := c.c.NewRequest(c.name, "Fee.CreateNodeDistributeBill", in)
+	out := new(CreateNodeDistributeBillResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Fee service
 
 type FeeHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
+	CreateNodeDistributeBill(context.Context, *CreateNodeDistributeBillRequest, *CreateNodeDistributeBillResponse) error
 }
 
 func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.HandlerOption) error {
 	type fee interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
+		CreateNodeDistributeBill(ctx context.Context, in *CreateNodeDistributeBillRequest, out *CreateNodeDistributeBillResponse) error
 	}
 	type Fee struct {
 		fee
@@ -85,4 +99,8 @@ type feeHandler struct {
 
 func (h *feeHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error {
 	return h.FeeHandler.Ping(ctx, in, out)
+}
+
+func (h *feeHandler) CreateNodeDistributeBill(ctx context.Context, in *CreateNodeDistributeBillRequest, out *CreateNodeDistributeBillResponse) error {
+	return h.FeeHandler.CreateNodeDistributeBill(ctx, in, out)
 }

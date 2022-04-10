@@ -139,9 +139,15 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: Common,
 			},
+			// 需要超级管理员及以上权限
 			AddNodeUsage: {
 				maxLevel: MaxLevel,
 				minLevel: SuperAdmin,
+			},
+			// 需要管理员以上权限
+			CreateNodeDistributeBill: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
 			},
 		},
 	}

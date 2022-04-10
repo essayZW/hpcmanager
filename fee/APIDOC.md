@@ -25,3 +25,26 @@ message PingResponse {
     string RequestId = 3;
 }
 ```
+
+## CreateNodeDistributeBill
+
+描述: 创建新的机器节点独占账单
+
+原型定义: `rpc CreateNodeDistributeBill(CreateNodeDistributeBillRequest) returns (CreateNodeDistributeBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message CreateNodeDistributeBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 nodeDistributeID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message CreateNodeDistributeBillResponse {
+    int32 id = 1;
+}
+```

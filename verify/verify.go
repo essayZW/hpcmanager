@@ -52,6 +52,8 @@ const (
 	QueryNodeUsage = "__QUERY_NODE_USAGE__"
 	// AddNodeUsage 添加机器节点使用时间记录
 	AddNodeUsage = "__ADD_NODE_USAGE__"
+	// CreateNodeDistributeBill 创建节点分配处理之后对应的账单
+	CreateNodeDistributeBill = "__CREATE_NODE_DISTRIBUTE_BILL__"
 )
 
 // Verify 进行操作的权限验证

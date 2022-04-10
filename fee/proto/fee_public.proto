@@ -1,0 +1,23 @@
+syntax="proto3";
+
+option go_package="github.com/essayZW/hpcmanager/fee/proto;fee";
+
+package fee;
+
+message NodeDistributeBill {
+    int32 id = 1;
+    int32 applyID = 2;
+    int32 nodeDistributeID = 3;
+    double fee = 4;
+    double payFee = 5;
+    int32 payFlag = 6;
+    int64 payTimeMilliUnix = 7;
+    int32 payType = 8;
+    string payMessage = 9;
+    int32 userID = 10;
+    string userUsername = 11;
+    string userName = 12;
+    int64 createTimeMilliUnix = 13;
+    string extraAttributes = 14;
+}
+
