@@ -45,10 +45,10 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: SuperAdmin,
 			},
-			// 普通成员权限及以上
+			// 游客权限及以上
 			GetUserInfo: {
 				maxLevel: MaxLevel,
-				minLevel: Common,
+				minLevel: Guest,
 			},
 			// 导师权限及以上
 			GetGroupInfo: {
