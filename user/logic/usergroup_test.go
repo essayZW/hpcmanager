@@ -22,7 +22,7 @@ func init() {
 	if err != nil {
 		logger.Fatal("MySQL conn error: ", err)
 	}
-	userGroupLogic = NewUserGroup(userdb.NewUserGroup(sqlConn), userdb.NewUserGroupApply(sqlConn))
+	userGroupLogic = NewUserGroup(userdb.NewUserGroup(sqlConn), userdb.NewUserGroupApply(sqlConn), nil)
 }
 
 func TestGetGroupByID(t *testing.T) {

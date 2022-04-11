@@ -596,6 +596,30 @@ message GetGroupInfoByHpcIDResponse {
 }
 ```
 
+## AddBalance
+
+描述: 修改用户组的余额
+
+原型定义: `rpc AddBalance(AddBalanceRequest) returns (AddBalanceResponse) {}`
+
+请求参数:
+
+```protobuf
+message AddBalanceRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+    double money = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message AddBalanceResponse {
+    double balance = 1;
+}
+```
+
 # 附录
 
 ## UserInfo

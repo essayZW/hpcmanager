@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
+	etcdsync "github.com/asim/go-micro/plugins/sync/etcd/v3"
 	hpcbroker "github.com/essayZW/hpcmanager/broker"
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/db"
@@ -16,6 +17,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/registry"
+	"go-micro.dev/v4/sync"
 )
 
 func init() {
@@ -66,6 +68,14 @@ func main() {
 	if ok != "PONG" {
 		logger.Fatal("Redis ping get: ", ok)
 	}
+
+	// 初始化分布式锁
+	etcdSync := etcdsync.NewSync(
+		sync.Nodes(registryConf.Etcd.Address+":2379"),
+		sync.Prefix("user"),
+	)
+	etcdSync.Init()
+
 	rabbitmqBroker, err := hpcbroker.NewRabbitmq()
 	if err != nil {
 		logger.Fatal(err)
@@ -78,6 +88,7 @@ func main() {
 	userGroupLogic := logic.NewUserGroup(
 		userdb.NewUserGroup(sqldb),
 		userdb.NewUserGroupApply(sqldb),
+		etcdSync,
 	)
 
 	serviceServer := srv.Server()

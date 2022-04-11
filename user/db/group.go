@@ -122,6 +122,21 @@ func (group *UserGroupDB) QueryByHpcID(ctx context.Context, hpcID int) (*Group, 
 	return &groupInfo, nil
 }
 
+// UpdateGroupBalance 更新用户组余额字段
+func (group *UserGroupDB) UpdateGroupBalance(ctx context.Context, groupID int, balance float64) (bool, error) {
+	res, err := group.db.Exec(ctx, "UPDATE `group` SET `balance`=? WHERE `id`=?", balance, groupID)
+	if err != nil {
+		logger.Warn("UpdateGroupBalance error: ", err)
+		return false, errors.New("UpdateGroupBalance error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateGroupBalance error: ", err)
+		return false, errors.New("UpdateGroupBalance error")
+	}
+	return count > 0, nil
+}
+
 // NewUserGroup 创建一个新的用户数据库操作实例
 func NewUserGroup(conn *db.DB) *UserGroupDB {
 	return &UserGroupDB{

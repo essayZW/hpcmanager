@@ -3,9 +3,11 @@ package logic
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/essayZW/hpcmanager/user/db"
+	"go-micro.dev/v4/sync"
 	"gopkg.in/guregu/null.v4"
 )
 
@@ -13,6 +15,8 @@ import (
 type UserGroup struct {
 	userGroupDB      *db.UserGroupDB
 	userGroupApplyDB *db.UserGroupApplyDB
+
+	dLock sync.Sync
 }
 
 // GetGroupInfoByID 通过ID查询组信息
@@ -321,10 +325,29 @@ func (group *UserGroup) GetGroupInfoByHpcID(ctx context.Context, hpcID int) (*db
 	return group.userGroupDB.QueryByHpcID(ctx, hpcID)
 }
 
+// AddBalance 设置用户组的余额
+func (group *UserGroup) AddBalance(ctx context.Context, groupID int, balance float64) (float64, bool, error) {
+	if balance == 0 {
+		return 0, true, nil
+	}
+	lockID := fmt.Sprintf("[%d]groupID", groupID)
+	group.dLock.Lock(lockID)
+	defer group.dLock.Unlock(lockID)
+	// 查询用户组信息
+	groupInfo, err := group.GetGroupInfoByID(ctx, groupID)
+	if err != nil {
+		return 0, false, err
+	}
+	newBalance := groupInfo.Balance + balance
+	status, err := group.userGroupDB.UpdateGroupBalance(ctx, groupID, newBalance)
+	return newBalance, status, err
+}
+
 // NewUserGroup 创建一个新的用户组的操作逻辑
-func NewUserGroup(userGroupDB *db.UserGroupDB, userGroupApplyDB *db.UserGroupApplyDB) *UserGroup {
+func NewUserGroup(userGroupDB *db.UserGroupDB, userGroupApplyDB *db.UserGroupApplyDB, dLock sync.Sync) *UserGroup {
 	return &UserGroup{
 		userGroupDB:      userGroupDB,
 		userGroupApplyDB: userGroupApplyDB,
+		dLock:            dLock,
 	}
 }

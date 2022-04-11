@@ -16,6 +16,8 @@ const (
 	GetUserInfo = "__GET_USER_INFO__"
 	// GetGroupInfo 查询用户组信息
 	GetGroupInfo = "__GET_GROUP_INFO__"
+	// AddGroupBalance 给用户组余额添加上一个数
+	AddGroupBalance = "__ADD_GROUP_BALANCE__"
 	// ApplyJoinGroup 申请加入组操作
 	ApplyJoinGroup = "__ADD_APPLY_GROUP__"
 	// RevokeUserApplyGroup 撤销加入组的申请

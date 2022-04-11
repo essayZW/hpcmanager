@@ -104,6 +104,7 @@ func init() {
 	userGroupLogic := logic.NewUserGroup(
 		userdb.NewUserGroup(sqlConn),
 		userdb.NewUserGroupApply(sqlConn),
+		nil,
 	)
 	userGroupService = &UserGroupService{
 		userGroupLogic:    userGroupLogic,

@@ -601,6 +601,36 @@ func (group *UserGroupService) GetGroupInfoByHpcID(
 	return nil
 }
 
+// AddBalance 变化用户组的余额
+func (group *UserGroupService) AddBalance(
+	ctx context.Context,
+	req *userpb.AddBalanceRequest,
+	resp *userpb.AddBalanceResponse,
+) error {
+	logger.Info("AddBalance: ", req.BaseRequest)
+	if !verify.Identify(verify.AddGroupBalance, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"AddGroupBalance permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("AddGroupBalance permission forbidden")
+	}
+
+	balance, status, err := group.userGroupLogic.AddBalance(ctx, int(req.GroupID), req.Money)
+	if err != nil {
+		return err
+	}
+	if !status {
+		return errors.New("no rows affected")
+	}
+	resp.Balance = balance
+	return nil
+}
+
 var _ userpb.GroupServiceHandler = (*UserGroupService)(nil)
 
 // NewGroup 创建一个新的group服务

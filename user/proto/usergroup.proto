@@ -21,6 +21,7 @@ service GroupService {
     rpc GetApplyInfoByID(GetApplyInfoByIDRequest) returns (GetApplyInfoByIDResponse) {}
     rpc RevokeUserApplyGroup(RevokeUserApplyGroupRequest) returns (RevokeUserApplyGroupResponse) {}
     rpc GetGroupInfoByHpcID(GetGroupInfoByHpcIDRequest) returns (GetGroupInfoByHpcIDResponse) {}
+    rpc AddBalance(AddBalanceRequest) returns (AddBalanceResponse) {}
 }
 
 
@@ -127,4 +128,14 @@ message GetGroupInfoByHpcIDRequest {
 
 message GetGroupInfoByHpcIDResponse {
     user.GroupInfo groupInfo = 1;
+}
+
+message AddBalanceRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+    double money = 3;
+}
+
+message AddBalanceResponse {
+    double balance = 1;
 }
