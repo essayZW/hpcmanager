@@ -96,7 +96,7 @@ func (hpc *Hpc) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller hpc")
 	hpcRouter := router.Group("/hpc")
 	hpcRouter.GET("/ping", hpc.ping)
-	middleware.RegistryExcludeAPIPath("/api/hpc/ping")
+	middleware.RegistryExcludeAPIPath("GET:/api/hpc/ping")
 
 	hpcRouter.GET("/user/:id", hpc.getUserByID)
 	hpcRouter.GET("/group/:id", hpc.getGroupByID)

@@ -153,7 +153,7 @@ func (permission *Permission) Registry(router *gin.RouterGroup) *gin.RouterGroup
 	logger.Info("registry gateway controller permission")
 	permissionRouter := router.Group("/permission")
 	permissionRouter.GET("/ping", permission.ping)
-	middleware.RegistryExcludeAPIPath("/api/permission/ping")
+	middleware.RegistryExcludeAPIPath("GET:/api/permission/ping")
 
 	permissionRouter.POST("/admin", permission.addAdmin)
 	permissionRouter.DELETE("/admin", permission.removeAdmin)
