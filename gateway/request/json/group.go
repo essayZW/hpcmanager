@@ -19,6 +19,9 @@ func init() {
 		)
 		checkJoinGroupApplyParam := CheckJoinGroupApplyParam{}
 		v.RegisterStructValidation(checkJoinGroupApplyParam.Validator(), &checkJoinGroupApplyParam)
+
+		addGroupBalanceParam := AddGroupBalanceParam{}
+		v.RegisterStructValidation(addGroupBalanceParam.Validator(), &addGroupBalanceParam)
 	}
 }
 
@@ -107,6 +110,24 @@ func (c *CheckJoinGroupApplyParam) Validator() validator.StructLevelFunc {
 				"binding",
 				"applyID error",
 			)
+		}
+	}
+}
+
+// AddGroupBalanceParam 修改用户组的余额参数
+type AddGroupBalanceParam struct {
+	GroupID int     `form:"groupID" json:"groupID" binding:"required"`
+	Balance float64 `form:"balance" json:"balance" binding:"required"`
+}
+
+func (p *AddGroupBalanceParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(AddGroupBalanceParam)
+		if data.GroupID <= 0 {
+			sl.ReportError(reflect.ValueOf(data.GroupID), "groupID", "groupID", "binding", "invalid groupID")
+		}
+		if data.Balance <= 0 {
+			sl.ReportError(reflect.ValueOf(data.Balance), "balance", "balance", "binding", "invalid balance")
 		}
 	}
 }

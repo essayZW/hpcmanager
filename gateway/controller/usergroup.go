@@ -298,6 +298,36 @@ func (ug *UserGroup) revokeUserApplyGroup(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// addBalance /api/group/balance PATCH 修改用户组的余额
+func (ug *UserGroup) addBalance(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.AddGroupBalanceParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := ug.userGroupService.AddBalance(c, &userpb.AddBalanceRequest{
+		BaseRequest: baseRequest,
+		GroupID:     int32(param.GroupID),
+		Money:       param.Balance,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("修改用户组余额失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, map[string]float64{
+		"balance": resp.Balance,
+	}, true, "success")
+	httpResp.Send(ctx)
+}
+
 // Registry 为用户组控制器注册相应的接口
 func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller UserGroup")
@@ -316,6 +346,7 @@ func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	userGroup.POST("/apply", ug.createJoinGroupApply)
 	userGroup.PATCH("/apply", ug.checkApply)
 	userGroup.DELETE("/apply/:id", ug.revokeUserApplyGroup)
+	userGroup.PATCH("/balance", ug.addBalance)
 	return userGroup
 }
 

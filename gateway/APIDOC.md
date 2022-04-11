@@ -419,6 +419,24 @@ id: number
 
 响应: 是否成功
 
+### /group/balance
+
+Method: PATCH
+
+描述: 修改用户组的余额
+
+参数:
+
+```go
+// AddGroupBalanceParam 修改用户组的余额参数
+type AddGroupBalanceParam struct {
+    GroupID int     `form:"groupID" json:"groupID" binding:"required"`
+    Balance float64 `form:"balance" json:"balance" binding:"required"`
+}
+```
+
+响应参数: 修改后的余额
+
 ## system 控制器
 
 ### /sys/install
