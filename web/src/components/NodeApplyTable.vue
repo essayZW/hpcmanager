@@ -201,10 +201,12 @@ defineExpose({
 
 const handleCurrentChange = (pageIndex: number) => {
   paginationInfo.pageIndex = pageIndex;
+  refreshTableData();
 };
 
 const handleSizeChange = (pageSize: number) => {
   paginationInfo.pageSize = pageSize;
+  refreshTableData();
 };
 
 // 表格行展开时候的回调事件
@@ -383,7 +385,7 @@ const checkButtonHandler = async (
         <el-table-column label="状态" align="center">
           <template #default="props">
             <span v-if="props.row.status == 1">正常</span>
-            <span v-else class="red">已经撤销</span>
+            <span v-else class="red">已撤销</span>
           </template>
         </el-table-column>
 

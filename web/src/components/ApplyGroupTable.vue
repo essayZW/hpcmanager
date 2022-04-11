@@ -186,7 +186,7 @@ const revokeButtonHandler = async (id: number) => {
         <el-table-column label="状态">
           <template #default="props">
             <span v-if="props.row.status == 1">正常</span>
-            <span v-else class="red">已经撤销</span>
+            <span v-else class="red">已撤销</span>
           </template>
         </el-table-column>
         <el-table-column label="操作">
