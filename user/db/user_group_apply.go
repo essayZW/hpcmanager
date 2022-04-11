@@ -54,7 +54,7 @@ func (ugadb *UserGroupApplyDB) ExistsApply(ctx context.Context, userID int, appl
 func (ugadb *UserGroupApplyDB) AdminLimitQueryApplyCount(ctx context.Context) (int, error) {
 	row, err := ugadb.db.QueryRow(
 		ctx,
-		"SELECT COUNT(*) FROM `user_group_apply` WHERE `tutor_check_status`=1",
+		"SELECT COUNT(*) FROM `user_group_apply`",
 	)
 	if err != nil {
 		logger.Warn("AdminLimitQueryApplyCount error: ", err)
@@ -73,11 +73,9 @@ func (ugadb *UserGroupApplyDB) AdminLimitQueryApplyInfo(
 	ctx context.Context,
 	offset, size int,
 ) ([]*UserGroupApply, error) {
-	// 查询所有tutor_check_status等于1的记录，代表已经被导师审核通过
-	// 只有导师已经审核通过的申请管理员才可以看到
 	rows, err := ugadb.db.Query(
 		ctx,
-		"SELECT * FROM `user_group_apply` WHERE `tutor_check_status`=1 ORDER BY id DESC LIMIT ?,?",
+		"SELECT * FROM `user_group_apply` ORDER BY id DESC LIMIT ?,?",
 		offset,
 		size,
 	)
