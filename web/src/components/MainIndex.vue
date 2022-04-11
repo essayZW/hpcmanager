@@ -48,6 +48,15 @@ onMounted(async () => {
     return;
   }
   userInfo.value = res as UserInfo;
+
+  if (!userInfo.value.tel || !userInfo.value.email || !userInfo.value.college) {
+    ElNotification({
+      title: '消息完善',
+      message: '请修改用户信息完善用户联系方式、邮箱以及学院信息',
+      type: 'warning',
+      offset: 80,
+    });
+  }
 });
 const refreshServiceState = async () => {
   if (!isSuperAdmin()) {
