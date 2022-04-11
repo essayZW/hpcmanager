@@ -119,7 +119,6 @@ func (ns *NodeService) PaginationGetNodeApply(
 	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
 	var paginationRes *logic.PaginationGetResult
 	var err error
-	// FIXME: 又是管理员有是导师身份情况下的查询BUG
 	if !isAdmin && !isTutor {
 		// 普通用户,只可以查看自己的包机申请记录
 		paginationRes, err = ns.nodeApplyLogic.PaginationGetByCreaterID(
@@ -133,7 +132,7 @@ func (ns *NodeService) PaginationGetNodeApply(
 		paginationRes, err = ns.nodeApplyLogic.PaginationGetByTutorID(ctx, int(req.BaseRequest.UserInfo.UserId), int(req.PageIndex), int(req.PageSize))
 	} else {
 		// 管理员用户,可以查看所有人的并且已经被导师审核通过的包机申请记录
-		paginationRes, err = ns.nodeApplyLogic.PaginationWithTutorChecked(ctx, int(req.PageIndex), int(req.PageSize))
+		paginationRes, err = ns.nodeApplyLogic.PaginationGet(ctx, int(req.PageIndex), int(req.PageSize))
 	}
 	if err != nil {
 		return err

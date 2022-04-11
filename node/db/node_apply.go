@@ -145,15 +145,15 @@ func (node *NodeApplyDB) QueryCountByTutorID(ctx context.Context, tutorID int) (
 	return count, nil
 }
 
-// LimitQueryWithTutorChecked 分页查询所有的申请记录信息
-func (node *NodeApplyDB) LimitQueryWithTutorChecked(
+// LimitQueryAll 分页查询所有的申请记录信息
+func (node *NodeApplyDB) LimitQueryAll(
 	ctx context.Context,
 	limit, offset int,
 ) ([]*NodeApply, error) {
 	// 查询被导师审核通过的所有申请
 	row, err := node.conn.Query(
 		ctx,
-		"SELECT * FROM `node_apply` WHERE `tutor_check_status`=1 ORDER BY id DESC LIMIT ?, ?",
+		"SELECT * FROM `node_apply` ORDER BY id DESC LIMIT ?, ?",
 		limit,
 		offset,
 	)
@@ -173,11 +173,11 @@ func (node *NodeApplyDB) LimitQueryWithTutorChecked(
 	return infos, nil
 }
 
-// QueryCountWithTutorChecked 查询申请总条数
-func (node *NodeApplyDB) QueryCountWithTutorChecked(ctx context.Context) (int, error) {
+// QueryAllCount 查询申请总条数
+func (node *NodeApplyDB) QueryAllCount(ctx context.Context) (int, error) {
 	res, err := node.conn.QueryRow(
 		ctx,
-		"SELECT COUNT(*) FROM `node_apply` WHERE `tutor_check_status`=1",
+		"SELECT COUNT(*) FROM `node_apply`",
 	)
 	if err != nil {
 		logger.Warn("QueryCountByTutorID error: ", err)

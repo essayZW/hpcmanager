@@ -132,8 +132,8 @@ func (node *NodeApply) PaginationGetByTutorID(
 	}, nil
 }
 
-// PaginationWithTutorChecked 分页 查询所有已经经过导师审核通过的申请信息
-func (node *NodeApply) PaginationWithTutorChecked(
+// PaginationGet 分页 查询所有已经经过导师审核通过的申请信息
+func (node *NodeApply) PaginationGet(
 	ctx context.Context,
 	pageIndex, pageSize int,
 ) (*PaginationGetResult, error) {
@@ -143,12 +143,12 @@ func (node *NodeApply) PaginationWithTutorChecked(
 	if pageSize <= 0 {
 		return nil, errors.New("invalid pageSize")
 	}
-	count, err := node.nodeApplyDB.QueryCountWithTutorChecked(ctx)
+	count, err := node.nodeApplyDB.QueryAllCount(ctx)
 	if err != nil {
 		return nil, err
 	}
 	limit := pageSize * (pageIndex - 1)
-	data, err := node.nodeApplyDB.LimitQueryWithTutorChecked(ctx, limit, pageSize)
+	data, err := node.nodeApplyDB.LimitQueryAll(ctx, limit, pageSize)
 	if err != nil {
 		return nil, err
 	}

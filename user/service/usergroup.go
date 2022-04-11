@@ -254,7 +254,6 @@ func (group *UserGroupService) PageGetApplyGroupInfo(
 
 	var result *logic.PaginationApplyResult
 	var err error
-	// FIXME: 又是管理员又是导师身份情况下的查询BUG
 	if isAdmin {
 		// 管理员只可以查看已经经过导师审核的所有的申请信息
 		result, err = group.userGroupLogic.AdminPageGetApplyInfo(
