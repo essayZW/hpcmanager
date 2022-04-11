@@ -9,6 +9,7 @@ import ProjectManager from '../components/ProjectManager.vue';
 import NodeApplyManager from '../components/common/NodeApplyManager.vue';
 import NodeDistributeManager from '../components/admin/NodeDistributeManager.vue';
 import NodeUsageManager from '../components/common/NodeUsageManager.vue';
+import NodeDistributeBillManager from '../components/common/NodeDistributeBillManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -85,6 +86,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/node_usage_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_bill_manager',
+          name: 'NodeDistributeBillManager',
+          component: NodeDistributeBillManager,
+        },
+        item: {
+          name: '机器独占账单',
+          to: '/main/node_distribute_bill_manager',
+        },
+      },
     ],
   ],
   [
@@ -143,6 +155,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器时长查看',
           to: '/main/node_usage_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_bill_manager',
+          name: 'NodeDistributeBillManager',
+          component: NodeDistributeBillManager,
+        },
+        item: {
+          name: '机器独占账单',
+          to: '/main/node_distribute_bill_manager',
         },
       },
     ],
@@ -227,6 +250,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/node_usage_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_bill_manager',
+          name: 'NodeDistributeBillManager',
+          component: NodeDistributeBillManager,
+        },
+        item: {
+          name: '机器独占账单',
+          to: '/main/node_distribute_bill_manager',
+        },
+      },
     ],
   ],
   // 超级管理员和普通管理员都这项操作
@@ -309,6 +343,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器时长查看',
           to: '/main/node_usage_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_bill_manager',
+          name: 'NodeDistributeBillManager',
+          component: NodeDistributeBillManager,
+        },
+        item: {
+          name: '机器独占账单',
+          to: '/main/node_distribute_bill_manager',
         },
       },
     ],
