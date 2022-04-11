@@ -8,7 +8,6 @@ import (
 
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/fee/db"
-	"github.com/essayZW/hpcmanager/logger"
 )
 
 // NodeDistributeBill 机器独占账单操作逻辑
@@ -213,10 +212,5 @@ func NewNodeDistributeBill(ndb *db.NodeDistributeBillDB, dynamicConfig config.Dy
 	}); err != nil {
 		return nil, err
 	}
-
-	go func() {
-		time.Sleep(time.Second)
-		logger.Debug(res)
-	}()
 	return res, nil
 }
