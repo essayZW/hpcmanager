@@ -10,6 +10,7 @@ import {
   checkApply,
   queryGroupByID,
   revokeGroupApply,
+  updateGroupBalance,
 } from '../api/group';
 import { PaginationQueryResponse } from '../api/api';
 import { getUserIdByUsername } from './user';
@@ -115,4 +116,17 @@ export async function getGroupInfoByID(id: number): Promise<GroupInfo> {
  */
 export async function revokeGroupApplyByID(id: number): Promise<boolean> {
   return revokeGroupApply(id);
+}
+
+/**
+ * 更新用户组的余额
+ */
+export async function addGroupBalance(
+  groupID: number,
+  money: number
+): Promise<boolean> {
+  return updateGroupBalance({
+    groupID,
+    balance: money,
+  });
 }

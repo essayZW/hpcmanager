@@ -242,3 +242,31 @@ export async function revokeGroupApply(id: number): Promise<boolean> {
   }
   return true;
 }
+
+/**
+ * 修改用户组余额接口参数
+ */
+export type AddBalanceParam = {
+  groupID: number;
+  balance: number;
+};
+
+/**
+ * 更新用户组的余额
+ */
+export async function updateGroupBalance(
+  param: AddBalanceParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/group/balance',
+    'PATCH',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}
