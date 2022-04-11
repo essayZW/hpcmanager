@@ -42,11 +42,17 @@ const logout = async () => {
     });
   }
 };
+
+const jumpToIndex = () => {
+  router.push({
+    path: '/main/index',
+  });
+};
 </script>
 <template>
   <el-container>
     <el-header class="header">
-      <div class="logo-title">
+      <div class="logo-title" @click="jumpToIndex">
         <el-image :src="LogoImageSrc" class="logo"></el-image>
         <h1>计算平台管理系统</h1>
       </div>

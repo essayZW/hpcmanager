@@ -2,6 +2,7 @@ import { PaginationQueryResponse } from '../api/api';
 import {
   NodeDistributeBill,
   paginationQueryNodeDistributeBill,
+  ping,
 } from '../api/fee';
 
 /**
@@ -12,4 +13,16 @@ export async function paginationGetNodeDistributeBill(
   pageSize: number
 ): Promise<PaginationQueryResponse<NodeDistributeBill>> {
   return paginationQueryNodeDistributeBill(pageIndex, pageSize);
+}
+
+/**
+ * 服务ping
+ */
+export async function servicePing(): Promise<boolean> {
+  try {
+    await ping();
+    return true;
+  } catch (error) {
+    return false;
+  }
 }

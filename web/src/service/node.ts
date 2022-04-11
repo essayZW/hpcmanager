@@ -12,6 +12,7 @@ import {
   HpcUsageTime,
   paginationQueryNodeUsageTime,
   updateNodeApplyInfo,
+  ping,
 } from '../api/node';
 
 /**
@@ -141,4 +142,16 @@ export async function updateNodeApplyInfoByID(
     startTime,
     endTime,
   });
+}
+
+/**
+ * 服务ping
+ */
+export async function servicePing(): Promise<boolean> {
+  try {
+    await ping();
+    return true;
+  } catch (error) {
+    return false;
+  }
 }

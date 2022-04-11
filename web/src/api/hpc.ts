@@ -1,6 +1,19 @@
 import { undefinedWithDefault } from '../utils/obj';
-import { ApiRequest } from './api';
+import { ApiRequest, PingResponse } from './api';
 
+// 作业调度系统服务ping测试
+export async function ping(): Promise<PingResponse> {
+  const { data, status } = await ApiRequest.request<PingResponse>(
+    '/hpc/ping',
+    'GET',
+    {},
+    {}
+  );
+  if (!status) {
+    throw new Error();
+  }
+  return data;
+}
 /**
  * hpc_group信息
  */

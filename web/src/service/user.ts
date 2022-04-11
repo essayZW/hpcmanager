@@ -13,6 +13,7 @@ import {
   updateUserInfo,
   CreateUserByAdminParam,
   addUserWithGroup,
+  ping,
 } from '../api/user';
 import { getCasConfig } from '../service/sys';
 
@@ -184,4 +185,16 @@ export async function createUserByAdmin(
   param: CreateUserByAdminParam
 ): Promise<number> {
   return addUserWithGroup(param);
+}
+
+/**
+ * 服务ping
+ */
+export async function servicePing(): Promise<boolean> {
+  try {
+    await ping();
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
