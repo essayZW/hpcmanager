@@ -19,7 +19,7 @@ type PayNodeDistributeBillParam struct {
 	ID         int     `form:"id"         json:"id"         binding:"required"`
 	PayMoney   float64 `form:"payMoney"   json:"payMoney"   binding:"required"`
 	PayType    float64 `form:"payType"    json:"payType"    binding:"required"`
-	PayMessage string  `form:"payMessage" json:"payMessage" binding:"required"`
+	PayMessage string  `form:"payMessage" json:"payMessage"`
 }
 
 func (param *PayNodeDistributeBillParam) Validator() validator.StructLevelFunc {
