@@ -339,6 +339,9 @@ func (group *UserGroup) AddBalance(ctx context.Context, groupID int, balance flo
 		return 0, false, err
 	}
 	newBalance := groupInfo.Balance + balance
+	if newBalance < 0 {
+		return 0, false, errors.New("new balance can't less than 0")
+	}
 	status, err := group.userGroupDB.UpdateGroupBalance(ctx, groupID, newBalance)
 	return newBalance, status, err
 }
