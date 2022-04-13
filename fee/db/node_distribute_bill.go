@@ -186,7 +186,7 @@ func (ndb NodeDistributeBillDB) UpdatePayFee(ctx context.Context, newInfo *NodeD
 
 // QueryByID 通过ID查询记录信息
 func (ndb *NodeDistributeBillDB) QueryByID(ctx context.Context, id int) (*NodeDistributeBill, error) {
-	row, err := ndb.conn.Query(ctx, "SELECT * FROM `node_distribute_bill` WHERE `id`=?", id)
+	row, err := ndb.conn.QueryRow(ctx, "SELECT * FROM `node_distribute_bill` WHERE `id`=?", id)
 	if err != nil {
 		logger.Warn("QueryByID error: ", err)
 		return nil, errors.New("QueryByID error")
