@@ -8,6 +8,7 @@ import (
 	feepb "github.com/essayZW/hpcmanager/fee/proto"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
 	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
+	"github.com/essayZW/hpcmanager/gateway/request/json"
 	"github.com/essayZW/hpcmanager/gateway/response"
 	"github.com/essayZW/hpcmanager/gateway/utils"
 	"github.com/essayZW/hpcmanager/proto"
@@ -72,6 +73,41 @@ func (f *fee) paginationGetNodeDistributeBill(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// payNodeDistributeBill /api/fee/distribute PUT 支付机器独占账单
+func (f *fee) payNodeDistributeBill(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.PayNodeDistributeBillParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := f.feeService.PayNodeDistributeBill(c, &feepb.PayNodeDistributeBillRequest{
+		BaseRequest: baseRequest,
+		Id:          int32(param.ID),
+		PayMoney:    param.PayMoney,
+		PayMessage:  param.PayMessage,
+		PayType:     int32(param.PayType),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("支付账单失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "账单没有发生任何变化")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter := router.Group("/fee")
 
@@ -79,6 +115,7 @@ func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	middleware.RegistryExcludeAPIPath("GET:/api/fee/ping")
 
 	feeRouter.GET("/distribute", f.paginationGetNodeDistributeBill)
+	feeRouter.PUT("/distribute", f.payNodeDistributeBill)
 
 	return feeRouter
 }

@@ -774,3 +774,23 @@ Method: GET
 参数: 分页参数
 
 响应: 查询的数据
+
+### /fee/distribute
+
+Method: PUT
+
+描述: 支付机器独占账单
+
+参数:
+
+```go
+// PayNodeDistributeBillParam 支付机器独占账单参数
+type PayNodeDistributeBillParam struct {
+    ID         int     `form:"id"         json:"id"         binding:"required"`
+    PayMoney   float64 `form:"payMoney"   json:"payMoney"   binding:"required"`
+    PayType    float64 `form:"payType"    json:"payType"    binding:"required"`
+    PayMessage string  `form:"payMessage" json:"payMessage" binding:"required"`
+}
+```
+
+响应: 是否支付成功

@@ -165,7 +165,7 @@ func (ndb *NodeDistributeBillDB) QueryWithLimitByUserID(
 func (ndb NodeDistributeBillDB) UpdatePayFee(ctx context.Context, newInfo *NodeDistributeBill) (bool, error) {
 	res, err := ndb.conn.Exec(ctx,
 		"UPDATE `node_distribute_bill` "+
-			"SET `pay_flag`=1, `pay_fee`=?, `pay_time`=?, `pay_type`=?, `pay_message`=? WHERE `id`=?",
+			"SET `pay_flag`=1, `pay_fee`=?, `pay_time`=?, `pay_type`=?, `pay_message`=? WHERE `id`=? AND `pay_flag`=0",
 		newInfo.PayFee,
 		newInfo.PayTime,
 		newInfo.PayType,
