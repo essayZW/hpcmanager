@@ -8,6 +8,7 @@ import (
 
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/fee/db"
+	"gopkg.in/guregu/null.v4"
 )
 
 // NodeDistributeBill 机器独占账单操作逻辑
@@ -179,6 +180,29 @@ func (ndbl *NodeDistributeBill) PaginationGetWithUserID(
 	}, nil
 }
 
+// PayBill 支付账单
+func (ndbl *NodeDistributeBill) PayBill(
+	ctx context.Context,
+	billID int,
+	money float64,
+	message string,
+	t PayType,
+) (bool, error) {
+	if billID <= 0 {
+		return false, errors.New("invalid bill id")
+	}
+	if money < 0 {
+		return false, errors.New("pay money must larger than 0")
+	}
+	return ndbl.ndb.UpdatePayFee(ctx, &db.NodeDistributeBill{
+		ID:         billID,
+		PayType:    null.IntFrom(int64(t)),
+		PayTime:    null.TimeFrom(time.Now()),
+		PayFee:     money,
+		PayMessage: null.StringFrom(message),
+	})
+}
+
 // NewNodeDistributeBill 创建新的机器独占账单操作逻辑结构体
 func NewNodeDistributeBill(ndb *db.NodeDistributeBillDB, dynamicConfig config.DynamicConfig) (*NodeDistributeBill, error) {
 	res := &NodeDistributeBill{
@@ -214,3 +238,17 @@ func NewNodeDistributeBill(ndb *db.NodeDistributeBillDB, dynamicConfig config.Dy
 	}
 	return res, nil
 }
+
+// GetInfoByID 通过ID查询信息
+func (ndbl *NodeDistributeBill) GetInfoByID(ctx context.Context, id int) (*db.NodeDistributeBill, error) {
+	return ndbl.ndb.QueryByID(ctx, id)
+}
+
+type PayType int8
+
+const (
+	// OfflinePay 线下缴费
+	OfflinePay = 1
+	// BalancePay 余额缴费
+	BalancePay = 2
+)

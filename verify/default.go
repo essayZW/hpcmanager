@@ -159,6 +159,10 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			PayNodeDistributeBill: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
 		},
 	}
 }

@@ -58,6 +58,8 @@ const (
 	CreateNodeDistributeBill = "__CREATE_NODE_DISTRIBUTE_BILL__"
 	// QueryNodeDistributeBill 查询节点独占账单
 	QueryNodeDistributeBill = "__QUERY_NODE_DISTRIBUTE_BILL__"
+	// PayNodeDistributeBill 支付节点独占账单
+	PayNodeDistributeBill = "__PAY_NODE_DISTRIBUTE_BILL__"
 )
 
 // Verify 进行操作的权限验证

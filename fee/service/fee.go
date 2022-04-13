@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/fee/logic"
 	feepb "github.com/essayZW/hpcmanager/fee/proto"
 	"github.com/essayZW/hpcmanager/logger"
@@ -18,6 +19,7 @@ type FeeService struct {
 	nodeDistributeBillLogic *logic.NodeDistributeBill
 	nodeService             nodepb.NodeService
 	userService             userpb.UserService
+	userGroupService        userpb.GroupService
 }
 
 // Ping ping测试
@@ -176,15 +178,72 @@ func (fs *FeeService) PaginationGetNodeDistributeBill(
 	return nil
 }
 
+// PayNodeDistributeBill 支持机器节点独占账单
+func (fs *FeeService) PayNodeDistributeBill(
+	ctx context.Context,
+	req *feepb.PayNodeDistributeBillRequest,
+	resp *feepb.PayNodeDistributeBillResponse,
+) error {
+	logger.Info("PayNodeDistributeBill:", req.BaseRequest)
+	if !verify.Identify(verify.PayNodeDistributeBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"PayNodeDistributeBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("PayNodeDistributeBill permission forbidden")
+	}
+
+	status, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		status, err := fs.nodeDistributeBillLogic.PayBill(
+			c,
+			int(req.Id),
+			req.PayMoney,
+			req.PayMessage,
+			logic.PayType(req.PayType),
+		)
+		if err != nil {
+			return status, err
+		}
+
+		if logic.OfflinePay == req.PayType {
+			// 是线下缴费
+			return status, nil
+		}
+		// 余额缴费
+		bill, err := fs.nodeDistributeBillLogic.GetInfoByID(c, int(req.Id))
+		if err != nil {
+			return false, err
+		}
+
+		_, err = fs.userGroupService.AddBalance(c, &userpb.AddBalanceRequest{
+			BaseRequest: req.BaseRequest,
+			GroupID:     int32(bill.UserGroupID),
+			Money:       -req.PayMoney,
+		})
+		if err != nil {
+			return false, err
+		}
+		return status, nil
+	})
+	resp.Success = status.(bool)
+	return err
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务
 func NewFee(client client.Client, nodeDistributeBillLogic *logic.NodeDistributeBill) *FeeService {
 	nodeService := nodepb.NewNodeService("node", client)
 	userService := userpb.NewUserService("user", client)
+	userGroupService := userpb.NewGroupService("user", client)
 	return &FeeService{
 		nodeDistributeBillLogic: nodeDistributeBillLogic,
 		nodeService:             nodeService,
 		userService:             userService,
+		userGroupService:        userGroupService,
 	}
 }

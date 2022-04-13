@@ -161,6 +161,44 @@ func (ndb *NodeDistributeBillDB) QueryWithLimitByUserID(
 	return infos, nil
 }
 
+// UpdatePayFee 更新支付状态
+func (ndb NodeDistributeBillDB) UpdatePayFee(ctx context.Context, newInfo *NodeDistributeBill) (bool, error) {
+	res, err := ndb.conn.Exec(ctx,
+		"UPDATE `node_distribute_bill` "+
+			"SET `pay_flag`=1, `pay_fee`=?, `pay_time`=?, `pay_type`=?, `pay_message`=? WHERE `id`=?",
+		newInfo.PayFee,
+		newInfo.PayTime,
+		newInfo.PayType,
+		newInfo.PayMessage,
+		newInfo.ID,
+	)
+	if err != nil {
+		logger.Warn("UpdatePayFee error: ", err)
+		return false, errors.New("UpdatePayFee error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdatePayFee error: ", err)
+		return false, errors.New("UpdatePayFee error")
+	}
+	return count > 0, nil
+}
+
+// QueryByID 通过ID查询记录信息
+func (ndb *NodeDistributeBillDB) QueryByID(ctx context.Context, id int) (*NodeDistributeBill, error) {
+	row, err := ndb.conn.Query(ctx, "SELECT * FROM `node_distribute_bill` WHERE `id`=?", id)
+	if err != nil {
+		logger.Warn("QueryByID error: ", err)
+		return nil, errors.New("QueryByID error")
+	}
+	var info NodeDistributeBill
+	if err := row.StructScan(&info); err != nil {
+		logger.Warn("QueryByID struct scan error: ", err)
+		return nil, errors.New("QueryByID struct scan error")
+	}
+	return &info, nil
+}
+
 // NewNodeDistributeBill 新建一个node_distribute_bill数据表操作结构体
 func NewNodeDistributeBill(conn *db.DB) *NodeDistributeBillDB {
 	return &NodeDistributeBillDB{

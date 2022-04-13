@@ -73,3 +73,55 @@ message PaginationGetNodeDistributeBillResponse {
     int32 count = 2;
 }
 ```
+
+## PayNodeDistributeBill
+
+描述: 支付机器独占账单
+
+原型定义: `rpc PayNodeDistributeBill(PayNodeDistributeBillRequest) returns (PayNodeDistributeBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message PayNodeDistributeBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 id = 2;
+    double payMoney = 3;
+    int32 payType = 4;
+    string payMessage = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message PayNodeDistributeBillResponse {
+    bool success = 1;
+}
+```
+
+# 附录
+
+## NodeDistributeBill
+
+描述: 机器独占账单消息定义
+
+```protobuf
+message NodeDistributeBill {
+    int32 id = 1;
+    int32 applyID = 2;
+    int32 nodeDistributeID = 3;
+    double fee = 4;
+    double payFee = 5;
+    int32 payFlag = 6;
+    int64 payTimeMilliUnix = 7;
+    int32 payType = 8;
+    string payMessage = 9;
+    int32 userID = 10;
+    string userUsername = 11;
+    string userName = 12;
+    int32 userGroupID = 13;
+    int64 createTimeMilliUnix = 14;
+    string extraAttributes = 15;
+}
+```

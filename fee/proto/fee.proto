@@ -14,6 +14,7 @@ service Fee {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc CreateNodeDistributeBill(CreateNodeDistributeBillRequest) returns (CreateNodeDistributeBillResponse) {}
     rpc PaginationGetNodeDistributeBill(PaginationGetNodeDistributeBillRequest) returns (PaginationGetNodeDistributeBillResponse) {}
+    rpc PayNodeDistributeBill(PayNodeDistributeBillRequest) returns (PayNodeDistributeBillResponse) {}
 }
 
 message CreateNodeDistributeBillRequest {
@@ -34,4 +35,16 @@ message PaginationGetNodeDistributeBillRequest {
 message PaginationGetNodeDistributeBillResponse {
     repeated fee.NodeDistributeBill bills = 1;
     int32 count = 2;
+}
+
+message PayNodeDistributeBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 id = 2;
+    double payMoney = 3;
+    int32 payType = 4;
+    string payMessage = 5;
+}
+
+message PayNodeDistributeBillResponse {
+    bool success = 1;
 }
