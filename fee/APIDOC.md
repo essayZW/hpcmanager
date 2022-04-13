@@ -100,6 +100,30 @@ message PayNodeDistributeBillResponse {
 }
 ```
 
+### GetNodeDistributeFeeRate
+
+描述: 查询机器节点独占费率
+
+原型定义: `rpc GetNodeDistributeFeeRate(GetNodeDistributeFeeRateRequest) returns (GetNodeDistributeFeeRateResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetNodeDistributeFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetNodeDistributeFeeRateResponse {
+    double rate36CPU = 1;
+    double rate4GPU = 2;
+    double rate8GPU = 3;
+}
+```
+
 # 附录
 
 ## NodeDistributeBill

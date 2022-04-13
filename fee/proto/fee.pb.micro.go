@@ -42,6 +42,7 @@ type FeeService interface {
 	CreateNodeDistributeBill(ctx context.Context, in *CreateNodeDistributeBillRequest, opts ...client.CallOption) (*CreateNodeDistributeBillResponse, error)
 	PaginationGetNodeDistributeBill(ctx context.Context, in *PaginationGetNodeDistributeBillRequest, opts ...client.CallOption) (*PaginationGetNodeDistributeBillResponse, error)
 	PayNodeDistributeBill(ctx context.Context, in *PayNodeDistributeBillRequest, opts ...client.CallOption) (*PayNodeDistributeBillResponse, error)
+	GetNodeDistributeFeeRate(ctx context.Context, in *GetNodeDistributeFeeRateRequest, opts ...client.CallOption) (*GetNodeDistributeFeeRateResponse, error)
 }
 
 type feeService struct {
@@ -96,6 +97,16 @@ func (c *feeService) PayNodeDistributeBill(ctx context.Context, in *PayNodeDistr
 	return out, nil
 }
 
+func (c *feeService) GetNodeDistributeFeeRate(ctx context.Context, in *GetNodeDistributeFeeRateRequest, opts ...client.CallOption) (*GetNodeDistributeFeeRateResponse, error) {
+	req := c.c.NewRequest(c.name, "Fee.GetNodeDistributeFeeRate", in)
+	out := new(GetNodeDistributeFeeRateResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Fee service
 
 type FeeHandler interface {
@@ -103,6 +114,7 @@ type FeeHandler interface {
 	CreateNodeDistributeBill(context.Context, *CreateNodeDistributeBillRequest, *CreateNodeDistributeBillResponse) error
 	PaginationGetNodeDistributeBill(context.Context, *PaginationGetNodeDistributeBillRequest, *PaginationGetNodeDistributeBillResponse) error
 	PayNodeDistributeBill(context.Context, *PayNodeDistributeBillRequest, *PayNodeDistributeBillResponse) error
+	GetNodeDistributeFeeRate(context.Context, *GetNodeDistributeFeeRateRequest, *GetNodeDistributeFeeRateResponse) error
 }
 
 func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.HandlerOption) error {
@@ -111,6 +123,7 @@ func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.Handler
 		CreateNodeDistributeBill(ctx context.Context, in *CreateNodeDistributeBillRequest, out *CreateNodeDistributeBillResponse) error
 		PaginationGetNodeDistributeBill(ctx context.Context, in *PaginationGetNodeDistributeBillRequest, out *PaginationGetNodeDistributeBillResponse) error
 		PayNodeDistributeBill(ctx context.Context, in *PayNodeDistributeBillRequest, out *PayNodeDistributeBillResponse) error
+		GetNodeDistributeFeeRate(ctx context.Context, in *GetNodeDistributeFeeRateRequest, out *GetNodeDistributeFeeRateResponse) error
 	}
 	type Fee struct {
 		fee
@@ -137,4 +150,8 @@ func (h *feeHandler) PaginationGetNodeDistributeBill(ctx context.Context, in *Pa
 
 func (h *feeHandler) PayNodeDistributeBill(ctx context.Context, in *PayNodeDistributeBillRequest, out *PayNodeDistributeBillResponse) error {
 	return h.FeeHandler.PayNodeDistributeBill(ctx, in, out)
+}
+
+func (h *feeHandler) GetNodeDistributeFeeRate(ctx context.Context, in *GetNodeDistributeFeeRateRequest, out *GetNodeDistributeFeeRateResponse) error {
+	return h.FeeHandler.GetNodeDistributeFeeRate(ctx, in, out)
 }

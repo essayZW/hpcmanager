@@ -233,6 +233,20 @@ func (fs *FeeService) PayNodeDistributeBill(
 	return err
 }
 
+// GetNodeDistributeFeeRate 查询机器独占费用的价格
+func (fs *FeeService) GetNodeDistributeFeeRate(
+	ctx context.Context,
+	req *feepb.GetNodeDistributeFeeRateRequest,
+	resp *feepb.GetNodeDistributeFeeRateResponse,
+) error {
+	logger.Info("GetNodeDistributeFeeRate: ", req.BaseRequest)
+	rates := fs.nodeDistributeBillLogic.GetRate(ctx)
+	resp.Rate36CPU = rates.Get36CPURate()
+	resp.Rate4GPU = rates.Get4GPU()
+	resp.Rate8GPU = rates.Get8GPU()
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务

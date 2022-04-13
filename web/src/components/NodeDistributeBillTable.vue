@@ -227,6 +227,7 @@ const handlerPayBillSubmit = async (isBalance: boolean) => {
   <el-dialog v-model="payBillDialog" title="账单缴费">
     <div class="pay-bill-dialog-body">
       <div class="rate-area">
+        <!-- FIXME: 对接费率查询接口 -->
         <h3>包机费率</h3>
         <p>
           <strong>36 核心节点:</strong

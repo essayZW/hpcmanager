@@ -11,17 +11,37 @@ import (
 	"gopkg.in/guregu/null.v4"
 )
 
-// NodeDistributeBill 机器独占账单操作逻辑
-type NodeDistributeBill struct {
-	ndb *db.NodeDistributeBillDB
-
-	mutex sync.Mutex
+// NodeDistributeRate 机器节点独占费率
+type NodeDistributeRate struct {
 	// rate36CPU 36 核心节点费率/年
 	rate36CPU float64
 	// rate4GPU 4 gpu核心节点费率/年
 	rate4GPU float64
 	// rate8GPU 8 gpu核心节点费率/年
 	rate8GPU float64
+}
+
+// Get36CPURate 查询36 CPU节点的费率
+func (ndr *NodeDistributeRate) Get36CPURate() float64 {
+	return ndr.rate36CPU
+}
+
+// Get4GPU 查询4 GPU节点的费率
+func (ndr *NodeDistributeRate) Get4GPU() float64 {
+	return ndr.rate4GPU
+}
+
+// Get8GPU 查询8 GPU节点的费率
+func (ndr *NodeDistributeRate) Get8GPU() float64 {
+	return ndr.rate8GPU
+}
+
+// NodeDistributeBill 机器独占账单操作逻辑
+type NodeDistributeBill struct {
+	ndb *db.NodeDistributeBillDB
+
+	mutex sync.Mutex
+	NodeDistributeRate
 }
 
 // Create 创建新的机器节点独占账单
@@ -203,6 +223,16 @@ func (ndbl *NodeDistributeBill) PayBill(
 	})
 }
 
+// GetInfoByID 通过ID查询信息
+func (ndbl *NodeDistributeBill) GetInfoByID(ctx context.Context, id int) (*db.NodeDistributeBill, error) {
+	return ndbl.ndb.QueryByID(ctx, id)
+}
+
+// GetRate 查询机器节点速率
+func (ndbl *NodeDistributeBill) GetRate(ctx context.Context) *NodeDistributeRate {
+	return &ndbl.NodeDistributeRate
+}
+
 // NewNodeDistributeBill 创建新的机器独占账单操作逻辑结构体
 func NewNodeDistributeBill(ndb *db.NodeDistributeBillDB, dynamicConfig config.DynamicConfig) (*NodeDistributeBill, error) {
 	res := &NodeDistributeBill{
@@ -237,11 +267,6 @@ func NewNodeDistributeBill(ndb *db.NodeDistributeBillDB, dynamicConfig config.Dy
 		return nil, err
 	}
 	return res, nil
-}
-
-// GetInfoByID 通过ID查询信息
-func (ndbl *NodeDistributeBill) GetInfoByID(ctx context.Context, id int) (*db.NodeDistributeBill, error) {
-	return ndbl.ndb.QueryByID(ctx, id)
 }
 
 type PayType int8
