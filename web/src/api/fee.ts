@@ -59,3 +59,42 @@ export async function paginationQueryNodeDistributeBill(
   }
   return resp.data;
 }
+
+/*
+ * 节点独占费率
+ */
+export type NodeDistributeFeeRate = {
+  rate36CPU: number;
+  rate4GPU: number;
+  rate8GPU: number;
+};
+
+/**
+ * 支付机器独占账单请求参数
+ */
+export type PayNodeDistributeBillParam = {
+  id: number;
+  payMoney: number;
+  payType: number;
+  payMessage: string;
+};
+
+/**
+ * 支付机器独占账单
+ */
+export async function payNodeDistributeBill(
+  param: PayNodeDistributeBillParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/fee/distribute',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}
