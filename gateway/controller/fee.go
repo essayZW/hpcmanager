@@ -108,6 +108,29 @@ func (f *fee) payNodeDistributeBill(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// getNodeDistributeFeeRate /api/fee/rate/distribute GET 查询机器节点独占费率
+func (f *fee) getNodeDistributeFeeRate(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := f.feeService.GetNodeDistributeFeeRate(c, &feepb.GetNodeDistributeFeeRateRequest{
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, "信息查询失败")
+		httpResp.Send(ctx)
+	}
+
+	httpResp := response.New(200, map[string]float64{
+		"36CPU": resp.Rate36CPU,
+		"4GPU":  resp.Rate4GPU,
+		"8GPU":  resp.Rate8GPU,
+	}, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter := router.Group("/fee")
 
@@ -117,6 +140,7 @@ func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter.GET("/distribute", f.paginationGetNodeDistributeBill)
 	feeRouter.PUT("/distribute", f.payNodeDistributeBill)
 
+	feeRouter.GET("/rate/distribute", f.getNodeDistributeFeeRate)
 	return feeRouter
 }
 

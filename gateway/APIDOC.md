@@ -794,3 +794,21 @@ type PayNodeDistributeBillParam struct {
 ```
 
 响应: 是否支付成功
+
+### /fee/rate/distribute
+
+Method: GET
+
+描述: 查询机器节点独占费率
+
+参数: 无
+
+响应:
+
+```json
+{
+    "36CPU": resp.Rate36CPU,
+    "4GPU":  resp.Rate4GPU,
+    "8GPU":  resp.Rate8GPU,
+}
+```
