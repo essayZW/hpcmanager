@@ -53,11 +53,14 @@ func (permission *Permission) addAdmin(ctx *gin.Context) {
 
 	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()
-	resp, err := permission.permissionService.AddUserPermission(c, &permissionpb.AddUserPermissionRequest{
-		Userid:      int32(param.UserID),
-		Level:       int32(verify.CommonAdmin),
-		BaseRequest: baseRequest,
-	})
+	resp, err := permission.permissionService.AddUserPermission(
+		c,
+		&permissionpb.AddUserPermissionRequest{
+			Userid:      int32(param.UserID),
+			Level:       int32(verify.CommonAdmin),
+			BaseRequest: baseRequest,
+		},
+	)
 	if err != nil {
 		httpResp := response.New(200, nil, false, fmt.Sprintf("添加用户权限失败: %s", err.Error()))
 		httpResp.Send(ctx)
@@ -88,10 +91,13 @@ func (permission *Permission) getUserPermission(ctx *gin.Context) {
 
 	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()
-	resp, err := permission.permissionService.GetUserPermission(c, &permissionpb.GetUserPermissionRequest{
-		Id:          int32(id),
-		BaseRequest: baseRequest,
-	})
+	resp, err := permission.permissionService.GetUserPermission(
+		c,
+		&permissionpb.GetUserPermissionRequest{
+			Id:          int32(id),
+			BaseRequest: baseRequest,
+		},
+	)
 
 	if err != nil {
 		httpResp := response.New(200, nil, false, fmt.Sprintf("查询用户权限信息失败: %s", err.Error()))
@@ -117,11 +123,14 @@ func (permission *Permission) removeAdmin(ctx *gin.Context) {
 	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()
 
-	resp, err := permission.permissionService.RemoveUserPermission(c, &permissionpb.RemoveUserPermissionRequest{
-		BaseRequest: baseRequest,
-		Userid:      int32(param.UserID),
-		Level:       int32(verify.CommonAdmin),
-	})
+	resp, err := permission.permissionService.RemoveUserPermission(
+		c,
+		&permissionpb.RemoveUserPermissionRequest{
+			BaseRequest: baseRequest,
+			Userid:      int32(param.UserID),
+			Level:       int32(verify.CommonAdmin),
+		},
+	)
 
 	if err != nil {
 		httpResp := response.New(200, nil, false, fmt.Sprintf("删除用户权限失败: %s", err.Error()))
@@ -144,7 +153,7 @@ func (permission *Permission) Registry(router *gin.RouterGroup) *gin.RouterGroup
 	logger.Info("registry gateway controller permission")
 	permissionRouter := router.Group("/permission")
 	permissionRouter.GET("/ping", permission.ping)
-	middleware.RegistryExcludeAPIPath("/api/permission/ping")
+	middleware.RegistryExcludeAPIPath("GET:/api/permission/ping")
 
 	permissionRouter.POST("/admin", permission.addAdmin)
 	permissionRouter.DELETE("/admin", permission.removeAdmin)

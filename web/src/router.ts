@@ -9,6 +9,8 @@ import NotFound from './pages/NotFound.vue';
 import InstallView from './pages/InstallView.vue';
 import LoginView from './pages/LoginView.vue';
 import UpdateUserInfo from './components/UpdateUserInfo.vue';
+import MainIndex from './components/MainIndex.vue';
+
 import { registryRouter } from './service/navigation';
 
 let registerFlag = false;
@@ -23,6 +25,7 @@ const Router: RouteRecordRaw[] = [
     path: '/main',
     name: 'Main',
     component: MainView,
+    redirect: '/main/index',
     beforeEnter: async () => {
       // 检查setToken参数
       const tokenValue = getQuery('setToken');
@@ -48,6 +51,11 @@ const Router: RouteRecordRaw[] = [
         path: '/main/update_user_info',
         name: 'UpdateUserInfo',
         component: UpdateUserInfo,
+      },
+      {
+        path: '/main/index',
+        name: 'MainIndex',
+        component: MainIndex,
       },
     ],
   },

@@ -28,8 +28,15 @@ func (p *PermissionDB) QueryIDByLevel(ctx context.Context, level int32) (int, er
 
 // Insert 插入一条新的权限记录
 func (p *PermissionDB) Insert(ctx context.Context, info *Permission) (int, error) {
-	res, err := p.conn.Exec(ctx, "INSERT INTO `permission` (`name`, `level`, `description`, `create_time`, `extraAttributes`) VALUES (?,?,?,?,?)", info.Name,
-		info.Level, info.Description, info.CreateTime, info.ExtraAttributes)
+	res, err := p.conn.Exec(
+		ctx,
+		"INSERT INTO `permission` (`name`, `level`, `description`, `create_time`, `extraAttributes`) VALUES (?,?,?,?,?)",
+		info.Name,
+		info.Level,
+		info.Description,
+		info.CreateTime,
+		info.ExtraAttributes,
+	)
 	if err != nil {
 		logger.Warn("insert into permission error: %v", err, " with data: ", info)
 		return 0, err

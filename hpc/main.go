@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/essayZW/hpcmanager/hpc/service"
 	"github.com/essayZW/hpcmanager/hpc/source"
 	"github.com/essayZW/hpcmanager/logger"
+	"github.com/go-redis/redis/v8"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/registry"
 )
@@ -47,35 +49,44 @@ func main() {
 	if err != nil {
 		logger.Fatal("MySQL conn error: ", err)
 	}
-	// 创建动态配置源
-	//etcdConfig, err := config.NewEtcd()
-	//if err != nil {
-	//logger.Fatal("Etcd config create error: ", err)
-	//}
 	// 创建redis连接
-	//redisConfig, err := config.LoadRedis()
-	//if err != nil {
-	//logger.Fatal("Redis conn error: ", err)
-	//}
-	//redisConn := redis.NewClient(&redis.Options{
-	//Addr:     redisConfig.Address,
-	//Password: redisConfig.Password,
-	//DB:       redisConfig.DB,
-	//})
-	//ping := redisConn.Ping(context.Background())
-	//ok, err := ping.Result()
-	//if err != nil {
-	//logger.Fatal("Redis ping error: ", err)
-	//}
-	//if ok != "PONG" {
-	//logger.Fatal("Redis ping get: ", ok)
-	//}
+	redisConfig, err := config.LoadRedis()
+	if err != nil {
+		logger.Fatal("Redis conn error: ", err)
+	}
+	redisConn := redis.NewClient(&redis.Options{
+		Addr:     redisConfig.Address,
+		Password: redisConfig.Password,
+		DB:       redisConfig.DB,
+	})
+	ping := redisConn.Ping(context.Background())
+	ok, err := ping.Result()
+	if err != nil {
+		logger.Fatal("Redis ping error: ", err)
+	}
+	if ok != "PONG" {
+		logger.Fatal("Redis ping get: ", ok)
+	}
 
 	env := os.Getenv(hpcmanager.EnvName)
-	hpcSource := source.New(
+	// 加载作业调度系统数据库配置
+	conf, err := config.LoadConfigSource()
+	if err != nil {
+		logger.Fatal("config load error", err)
+	}
+	var jobDBConf config.Database
+	if err := conf.Get("jobDatabase").Scan(&jobDBConf); err != nil {
+		logger.Fatal("config load error", err)
+	}
+	hpcSource, err := source.New(
 		source.WithCmdBaseDir(hpcCmdBaseDir),
 		source.WithDevSource(env == "dev"),
+		source.WithDevRedis(redisConn),
+		source.WithDBSource(&jobDBConf),
 	)
+	if err != nil {
+		logger.Fatal("hpcSource init error: ", err)
+	}
 
 	hpcLogic := logic.NewHpc(hpcSource, hpcdb.NewHpcUser(sqlConn), hpcdb.NewHpcGroup(sqlConn))
 

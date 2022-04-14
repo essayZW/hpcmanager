@@ -3,12 +3,15 @@ import { undefinedWithDefault } from '../utils/obj';
 
 // 用户服务ping测试
 export async function ping(): Promise<PingResponse> {
-  const { data } = await ApiRequest.request<PingResponse>(
+  const { data, status } = await ApiRequest.request<PingResponse>(
     '/user/ping',
     'GET',
     {},
     {}
   );
+  if (!status) {
+    throw new Error();
+  }
   return data;
 }
 

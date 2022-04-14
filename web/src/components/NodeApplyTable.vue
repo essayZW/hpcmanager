@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { NodeApplyInfo } from '../api/node';
 import {
   paginationGetNodeApplyInfo,
   nodeTypeToName,
   checkNodeApply,
+  revokeNodeApplyByID,
+  getNodeApplyByID,
+  updateNodeApplyInfoByID,
 } from '../service/node';
 import dayjs from 'dayjs';
 import { ProjectInfo } from '../api/project';
 import { UserInfo } from '../api/user';
-import { getUserInfoById, isAdmin, isTutor } from '../service/user';
+import {
+  getUserInfoById,
+  getUserInfoFromStorage,
+  isAdmin,
+  isTutor,
+} from '../service/user';
 import { getProjectInfoByID } from '../service/project';
 import { zeroWithDefault, timeOrBlank } from '../utils/obj';
 
@@ -23,6 +31,8 @@ const tableData = reactive<{
   data: [],
   loading: false,
 });
+
+const userInfo = getUserInfoFromStorage();
 
 // 加载表格数据
 const loadTableData = async (pageIndex: number, pageSize: number) => {
@@ -43,6 +53,118 @@ const loadTableData = async (pageIndex: number, pageSize: number) => {
   tableData.loading = false;
 };
 
+const canRevokeApply = (row: NodeApplyInfo): boolean => {
+  // 只有没有被管理员最终审核以及还没有撤销的以及是自己创建的申请才可以撤销
+  if (!userInfo) {
+    return false;
+  }
+  return (
+    row.managerCheckStatus == -1 &&
+    row.status == 1 &&
+    row.createrID == userInfo.UserId &&
+    row.tutorCheckStatus != 0
+  );
+};
+
+const revokeButtonHandler = async (id: number) => {
+  if (!confirm('确认需要撤销该申请吗?')) {
+    return;
+  }
+  try {
+    await revokeNodeApplyByID(id);
+    ElMessage({
+      type: 'success',
+      message: '撤销成功',
+    });
+    refreshTableData();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+};
+
+const canUpdateApply = (row: NodeApplyInfo): boolean => {
+  if (!userInfo) {
+    return false;
+  }
+  if (!row.status) {
+    return false;
+  }
+  if (row.managerCheckStatus != -1) {
+    return false;
+  }
+  if (isAdmin()) {
+    return true;
+  }
+  return userInfo.UserId == row.createrID;
+};
+
+const updateNodeApplyForm = reactive<{
+  id: number;
+  nodeType: string;
+  nodeNum: number | string;
+  startTime: number;
+  endTime: number;
+}>({
+  id: 0,
+  nodeType: '',
+  nodeNum: 0,
+  startTime: 0,
+  endTime: 0,
+});
+
+const updateNodeApplyHandler = async () => {
+  try {
+    await updateNodeApplyInfoByID(
+      updateNodeApplyForm.id,
+      updateNodeApplyForm.nodeType,
+      parseInt(updateNodeApplyForm.nodeNum as string),
+      new Date(updateNodeApplyForm.startTime).getTime(),
+      new Date(updateNodeApplyForm.endTime).getTime()
+    );
+    ElMessage({
+      type: 'success',
+      message: '修改成功',
+    });
+    hideUpdateDialog();
+    refreshTableData();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+};
+
+const updateButtonHandler = async (nodeApplyID: number) => {
+  try {
+    const info = await getNodeApplyByID(nodeApplyID);
+    updateNodeApplyForm.nodeType = info.nodeType;
+    updateNodeApplyForm.nodeNum = info.nodeNum;
+    updateNodeApplyForm.startTime = info.startTime * 1000;
+    updateNodeApplyForm.endTime = info.endTime * 1000;
+    updateNodeApplyForm.id = info.id;
+    showUpdateDialog();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+};
+
+const updateDialogShowFlag = ref<boolean>(false);
+
+const showUpdateDialog = () => {
+  updateDialogShowFlag.value = true;
+};
+
+const hideUpdateDialog = () => {
+  updateDialogShowFlag.value = false;
+};
+
 // 分页信息
 const paginationInfo = reactive<{
   pageIndex: number;
@@ -52,9 +174,23 @@ const paginationInfo = reactive<{
   pageSize: 5,
 });
 
+// 表格展开行中的数据
+const tableExpandRowInfo = reactive<{
+  [id: number]: {
+    projectInfo?: ProjectInfo;
+    applierInfo?: UserInfo;
+    tutorInfo?: UserInfo;
+    loading?: boolean;
+  };
+}>({});
+
 // 刷新表格当前页面的信息
 const refreshTableData = () => {
   loadTableData(paginationInfo.pageIndex, paginationInfo.pageSize);
+  // 清除缓存的表的扩展字段的属性
+  for (const key in tableExpandRowInfo) {
+    tableExpandRowInfo[key] = {};
+  }
 };
 
 refreshTableData();
@@ -65,21 +201,13 @@ defineExpose({
 
 const handleCurrentChange = (pageIndex: number) => {
   paginationInfo.pageIndex = pageIndex;
+  refreshTableData();
 };
 
 const handleSizeChange = (pageSize: number) => {
   paginationInfo.pageSize = pageSize;
+  refreshTableData();
 };
-
-// 表格展开行中的数据
-const tableExpandRowInfo = reactive<{
-  [id: number]: {
-    projectInfo?: ProjectInfo;
-    applierInfo?: UserInfo;
-    tutorInfo?: UserInfo;
-    loading: boolean;
-  };
-}>({});
 
 // 表格行展开时候的回调事件
 const handlerTableExpand = async (row: NodeApplyInfo) => {
@@ -193,75 +321,133 @@ const checkButtonHandler = async (
         :data="tableData.data"
         @expand-change="handlerTableExpand"
       >
-        <el-table-column label="ID" prop="id"></el-table-column>
+        <el-table-column
+          label="ID"
+          prop="id"
+          sortable
+          align="center"
+        ></el-table-column>
         <el-table-column
           label="申请人学号"
           prop="createrUsername"
+          align="center"
         ></el-table-column>
         <el-table-column
           label="申请人姓名"
           prop="createrName"
+          align="center"
         ></el-table-column>
         <el-table-column
           label="导师工号"
           prop="tutorUsername"
+          align="center"
         ></el-table-column>
-        <el-table-column label="导师姓名" prop="tutorName"></el-table-column>
-        <el-table-column label="申请时间">
+        <el-table-column
+          label="导师姓名"
+          prop="tutorName"
+          align="center"
+        ></el-table-column>
+        <el-table-column label="申请时间" align="center">
           <template #default="props">
             {{
               dayjs(props.row.createTime * 1000).format('YYYY-MM-DD HH:mm:ss')
             }}
           </template>
         </el-table-column>
-        <el-table-column label="节点类型">
+        <el-table-column label="节点类型" align="center">
           <template #default="props">
             {{ nodeTypeToName(props.row.nodeType) }}
           </template>
         </el-table-column>
-        <el-table-column label="节点数目" prop="nodeNum"></el-table-column>
-        <el-table-column label="状态">
-          <template #default="scope">
-            <span
-              v-if="
-                scope.row.status == 1 &&
-                scope.row.tutorCheckStatus == -1 &&
-                scope.row.managerCheckStatus == -1
-              "
-              >未审核</span
+        <el-table-column
+          label="节点数目"
+          prop="nodeNum"
+          align="center"
+        ></el-table-column>
+        <el-table-column label="导师审核状态" align="center">
+          <template #default="props">
+            <span v-if="props.row.tutorCheckStatus == -1">未审核</span>
+            <span v-else-if="props.row.tutorCheckStatus == 1" class="green"
+              >审核通过</span
             >
-            <span v-else-if="scope.row.status == 0" class="red">已经撤销</span>
-            <span
-              v-else-if="
-                scope.row.tutorCheckStatus == 1 &&
-                scope.row.managerCheckStatus == -1
-              "
-              class="green"
-              >导师审核通过</span
-            >
-            <span
-              v-else-if="
-                scope.row.tutorCheckStatus == 0 &&
-                scope.row.managerCheckStatus == -1
-              "
-              class="red"
-              >导师审核未通过</span
-            >
-            <span v-else-if="scope.row.managerCheckStatus == 1" class="green"
-              >管理员审核通过</span
-            >
-            <span v-else-if="scope.row.managerCheckStatus == 0" class="red"
-              >管理员审核未通过</span
-            >
+            <span v-else class="red">审核未通过</span>
           </template>
         </el-table-column>
-        <el-table-column label="详情" type="expand">
+        <el-table-column label="管理员审核状态" align="center">
+          <template #default="props">
+            <span v-if="props.row.managerCheckStatus == -1">未审核</span>
+            <span v-else-if="props.row.managerCheckStatus == 1" class="green"
+              >审核通过</span
+            >
+            <span v-else class="red">审核未通过</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" align="center">
+          <template #default="props">
+            <span v-if="props.row.status == 1">正常</span>
+            <span v-else class="red">已撤销</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" prop="status" align="center">
+          <template #default="props">
+            <div class="operation-button-area">
+              <el-button
+                v-if="canRevokeApply(props.row)"
+                type="warning"
+                class="operation-button"
+                @click="revokeButtonHandler(props.row.id)"
+                >撤销</el-button
+              >
+              <el-button
+                v-if="canUpdateApply(props.row)"
+                type="primary"
+                class="operation-button"
+                @click="updateButtonHandler(props.row.id)"
+                >修改</el-button
+              >
+              <span>无</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="详情" type="expand" align="center">
           <template #default="props">
             <div
               v-loading="tableExpandRowInfo[props.row.id].loading"
               class="table-expand-area"
             >
               <el-divider content-position="left">申请详情: </el-divider>
+              <div><strong>申请信息: </strong></div>
+              <div class="info">
+                <p>
+                  <span
+                    ><strong>申请使用时间: </strong>
+                    {{
+                      dayjs(props.row.startTime * 1000).format('YYYY-MM-DD')
+                    }}&nbsp;至&nbsp;{{
+                      dayjs(props.row.endTime * 1000).format('YYYY-MM-DD')
+                    }}
+                  </span>
+                </p>
+                <p>
+                  <span>
+                    <strong>修改时间: </strong>
+                    {{
+                      dayjs(props.row.modifyTime * 1000).format(
+                        'YYYY-MM-DD HH:mm:ss'
+                      )
+                    }}
+                  </span>
+                  <span>
+                    <strong>修改人姓名: </strong>
+                    {{ props.row.modifyName }}
+                  </span>
+                  <span>
+                    <strong>修改人学工号: </strong>
+                    {{ props.row.modifyUsername }}
+                  </span>
+                </p>
+              </div>
               <div><strong>申请人信息:</strong></div>
               <div class="info">
                 <p>
@@ -451,12 +637,22 @@ const checkButtonHandler = async (
                       </span>
                     </p>
                     <p
-                      v-if="isTutor() && props.row.tutorCheckStatus == -1"
+                      v-if="
+                        isTutor() &&
+                        props.row.tutorCheckStatus == -1 &&
+                        props.row.status == 1
+                      "
                       class="box-title"
                     >
                       <strong>操作</strong>
                     </p>
-                    <p v-if="isTutor() && props.row.tutorCheckStatus == -1">
+                    <p
+                      v-if="
+                        isTutor() &&
+                        props.row.tutorCheckStatus == -1 &&
+                        props.row.status == 1
+                      "
+                    >
                       <el-form class="form">
                         <el-form-item label="审核">
                           <el-button
@@ -532,12 +728,22 @@ const checkButtonHandler = async (
                       </span>
                     </p>
                     <p
-                      v-if="isAdmin() && props.row.managerCheckStatus == -1"
+                      v-if="
+                        isAdmin() &&
+                        props.row.managerCheckStatus == -1 &&
+                        props.row.status == 1
+                      "
                       class="box-title"
                     >
                       <strong>操作</strong>
                     </p>
-                    <p v-if="isAdmin() && props.row.managerCheckStatus == -1">
+                    <p
+                      v-if="
+                        isAdmin() &&
+                        props.row.managerCheckStatus == -1 &&
+                        props.row.status == 1
+                      "
+                    >
                       <el-form class="form">
                         <el-form-item label="审核">
                           <el-button
@@ -594,8 +800,52 @@ const checkButtonHandler = async (
       </el-pagination>
     </el-col>
   </el-row>
+  <el-dialog v-model="updateDialogShowFlag" title="修改申请信息">
+    <el-form>
+      <el-form-item label="ID">
+        <el-input
+          v-model="updateNodeApplyForm.id"
+          type="text"
+          disabled
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="机器节点类型">
+        <node-type-select
+          v-model="updateNodeApplyForm.nodeType"
+        ></node-type-select>
+      </el-form-item>
+      <el-form-item label="节点数量">
+        <el-input
+          v-model="updateNodeApplyForm.nodeNum"
+          type="number"
+          :min="1"
+          placeholder="申请的机器节点数量"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="申请独占时间范围:">
+        <el-date-picker
+          v-model="updateNodeApplyForm.startTime"
+          class="date-picker"
+          placeholder="起始日期"
+        ></el-date-picker>
+        <el-date-picker
+          v-model="updateNodeApplyForm.endTime"
+          class="date-picker"
+          placeholder="结束日期"
+        ></el-date-picker>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="hideUpdateDialog">取消</el-button>
+        <el-button type="primary" @click="updateNodeApplyHandler"
+          >确认</el-button
+        >
+      </span>
+    </template>
+  </el-dialog>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .button-row {
   margin-top: 16px;
   margin-bottom: 16px;
@@ -633,5 +883,15 @@ const checkButtonHandler = async (
     padding-left: 0px;
     font-size: 16px;
   }
+}
+.operation-button-area {
+  display: flex;
+  justify-content: center;
+}
+.operation-button {
+  display: inline-block;
+}
+.operation-button + span {
+  display: none;
 }
 </style>

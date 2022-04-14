@@ -48,8 +48,16 @@ func main() {
 	go nodebroker.RegistryCustomer(rabbitmqBroker, serviceClient)
 
 	nodeApplyDB := nodedb.NewNodeApply(sqldb)
+	nodeDistributeDB := nodedb.NewNodeDistribute(sqldb)
+	nodeUsageTimeDB := nodedb.NewNodeUsageTime(sqldb)
 
-	nodeService := service.NewNode(serviceClient, logic.NewNodeApply(nodeApplyDB), rabbitmqBroker)
+	nodeService := service.NewNode(
+		serviceClient,
+		logic.NewNodeApply(nodeApplyDB),
+		logic.NewNodeDistribute(nodeDistributeDB),
+		logic.NewNodeUsageTime(nodeUsageTimeDB),
+		rabbitmqBroker,
+	)
 	nodepb.RegisterNodeHandler(srv.Server(), nodeService)
 
 	srv.Init()

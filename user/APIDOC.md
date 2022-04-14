@@ -548,6 +548,78 @@ message ListGroupUserResponse {
 }
 ```
 
+## RevokeUserApplyGroup
+
+描述: 撤销某一个用户加入组的申请
+
+原型定义: `rpc RevokeUserApplyGroup(RevokeUserApplyGroupRequest) returns (RevokeUserApplyGroupResponse) {}`
+
+需求权限: `Guest` 及以上
+
+请求参数:
+
+```protobuf
+message RevokeUserApplyGroupRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message RevokeUserApplyGroupResponse {
+    bool success = 1;
+}
+```
+
+## GetGroupInfoByHpcID
+
+描述: 通过用户组的 HPC ID 查询用户组信息
+
+原型定义: `rpc GetGroupInfoByHpcID(GetGroupInfoByHpcIDRequest) returns (GetGroupInfoByHpcIDResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetGroupInfoByHpcIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcGroupID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetGroupInfoByHpcIDResponse {
+    user.GroupInfo groupInfo = 1;
+}
+```
+
+## AddBalance
+
+描述: 修改用户组的余额
+
+原型定义: `rpc AddBalance(AddBalanceRequest) returns (AddBalanceResponse) {}`
+
+请求参数:
+
+```protobuf
+message AddBalanceRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+    double money = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message AddBalanceResponse {
+    double balance = 1;
+}
+```
+
 # 附录
 
 ## UserInfo

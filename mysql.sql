@@ -72,6 +72,13 @@ DROP TABLE IF EXISTS `hpc_usagetime`;
 CREATE TABLE `hpc_usagetime` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
+  `username` varchar(32) NOT NULL,
+  `user_name` varchar(32) NOT NULL,
+  `hpc_username` varchar(64) NOT NULL,
+  `tutor_id` int NOT NULL,
+  `tutor_username` varchar(32) NOT NULL,
+  `tutor_user_name` varchar(32) NOT NULL,
+  `hpc_group_name` varchar(64) NOT NULL,
   `queue_name` varchar(64) NOT NULL,
   `wall_time` int NOT NULL DEFAULT '0',
   `gwall_time` int NOT NULL DEFAULT '0',
@@ -153,7 +160,38 @@ CREATE TABLE `node_distribute` (
   `id` int NOT NULL AUTO_INCREMENT,
   `apply_id` int NOT NULL,
   `handler_flag` tinyint NOT NULL DEFAULT '0',
-  `pay_flag` tinyint NOT NULL DEFAULT '0',
+  `handler_userid` int DEFAULT NULL,
+  `handler_username` varchar(32) DEFAULT NULL,
+  `handler_user_name` varchar(32) DEFAULT NULL,
+  `distribute_bill_id` int DEFAULT '0',
+  `create_time` timestamp NOT NULL,
+  `extraAttributes` varchar(2048) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `node_distribute_bill`
+--
+
+DROP TABLE IF EXISTS `node_distribute_bill`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `node_distribute_bill` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `apply_id` int NOT NULL,
+  `node_distribute_id` int NOT NULL,
+  `fee` decimal(18,2) NOT NULL,
+  `pay_fee` decimal(18,2) NOT NULL DEFAULT '0.00',
+  `pay_flag` tinyint DEFAULT '0',
+  `pay_time` timestamp NULL DEFAULT NULL,
+  `pay_type` tinyint DEFAULT NULL,
+  `pay_message` varchar(512) DEFAULT NULL,
+  `user_id` int NOT NULL,
+  `user_username` varchar(32) NOT NULL,
+  `user_name` varchar(32) NOT NULL,
+  `user_group_id` int NOT NULL,
+  `create_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -424,4 +462,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-03-18 21:33:21
+-- Dump completed on 2022-04-13 19:19:37

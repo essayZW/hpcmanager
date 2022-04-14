@@ -3,6 +3,7 @@ import {
   PermissionInfo,
   queryUserPermission,
   setAdmin,
+  ping,
 } from '../api/permission';
 
 /**
@@ -46,4 +47,16 @@ export async function setAdminByUserID(userID: number): Promise<boolean> {
  */
 export async function delAdminByUserID(userID: number): Promise<boolean> {
   return delAdmin(userID);
+}
+
+/**
+ * 服务ping
+ */
+export async function servicePing(): Promise<boolean> {
+  try {
+    await ping();
+    return true;
+  } catch (error) {
+    return false;
+  }
 }

@@ -19,7 +19,7 @@ if (info == null) {
 }
 </script>
 <template>
-  <el-menu class="aside-menu" router>
+  <el-menu class="aside-menu" router active-text-color="#000">
     <el-sub-menu v-if="routerNum.has(UserLevels.SuperAdmin)" index="1">
       <template #title>
         <span>超级管理员操作</span>

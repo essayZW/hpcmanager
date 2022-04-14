@@ -7,13 +7,14 @@ import "proto/ping.proto";
 import "proto/common.proto";
 import "gateway/proto/baserequest.proto";
 import "proto/hpcpublic.proto";
-
-service Hpc {
-    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+service Hpc { rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc AddUserWithGroup(AddUserWithGroupRequest) returns (AddUserWithGroupResponse) {}
     rpc AddUserToGroup(AddUserToGroupRequest) returns (AddUserToGroupResponse) {}
     rpc GetUserInfoByID(GetUserInfoByIDRequest) returns (GetUserInfoByIDResponse) {}
     rpc GetGroupInfoByID(GetGroupInfoByIDRequest) returns (GetGroupInfoByIDResponse) {}
+    rpc GetNodeUsage(GetNodeUsageRequest) returns (GetNodeUsageResponse) {}
+    rpc GetUserInfoByUsername(GetUserInfoByUsernameRequest) returns (GetUserInfoByUsernameResponse) {}
+    rpc GetGroupInfoByGroupName(GetGroupInfoByGroupNameRequest) returns (GetGroupInfoByGroupNameResponse) {}
 }
 
 message AddUserWithGroupRequest {
@@ -58,5 +59,33 @@ message GetGroupInfoByIDRequest {
 }
 
 message GetGroupInfoByIDResponse {
+    hpc.HpcGroup group = 1;
+}
+
+message GetNodeUsageRequest {
+    request.BaseRequest baseRequest = 1;
+    int64 startTimeUnix = 2;
+    int64 endTimeUnix = 3;
+}
+
+message GetNodeUsageResponse {
+    repeated hpc.HpcNodeUsage usages = 1;
+}
+
+message GetUserInfoByUsernameRequest {
+    request.BaseRequest baseRequest = 1;
+    string username = 2;
+}
+
+message GetUserInfoByUsernameResponse {
+    hpc.HpcUser user = 1;
+}
+
+message GetGroupInfoByGroupNameRequest {
+    request.BaseRequest baseRequest = 1;
+    string name = 2;
+}
+
+message GetGroupInfoByGroupNameResponse {
     hpc.HpcGroup group = 1;
 }

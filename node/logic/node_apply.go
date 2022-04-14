@@ -30,7 +30,12 @@ type ApplyNodeInfo struct {
 }
 
 // CreateNodeApply 创建新的机器节点申请记录
-func (node *NodeApply) CreateNodeApply(ctx context.Context, user, tutor *ApplyItemUserInfo, nodeInfo *ApplyNodeInfo, projectID int) (int64, error) {
+func (node *NodeApply) CreateNodeApply(
+	ctx context.Context,
+	user, tutor *ApplyItemUserInfo,
+	nodeInfo *ApplyNodeInfo,
+	projectID int,
+) (int64, error) {
 	if user.ID <= 0 {
 		return 0, errors.New("invalid user info")
 	}
@@ -76,7 +81,10 @@ type PaginationGetResult struct {
 }
 
 // PaginationGetByCreaterID 分页查询某一个用户创建的申请记录
-func (node *NodeApply) PaginationGetByCreaterID(ctx context.Context, createrID, pageIndex, pageSize int) (*PaginationGetResult, error) {
+func (node *NodeApply) PaginationGetByCreaterID(
+	ctx context.Context,
+	createrID, pageIndex, pageSize int,
+) (*PaginationGetResult, error) {
 	if pageIndex <= 0 {
 		return nil, errors.New("invalid pageIndex")
 	}
@@ -99,7 +107,10 @@ func (node *NodeApply) PaginationGetByCreaterID(ctx context.Context, createrID, 
 }
 
 // PaginationGetByTutorID 分页查询某个导师用户组下的所有申请记录信息
-func (node *NodeApply) PaginationGetByTutorID(ctx context.Context, tutorID, pageIndex, pageSize int) (*PaginationGetResult, error) {
+func (node *NodeApply) PaginationGetByTutorID(
+	ctx context.Context,
+	tutorID, pageIndex, pageSize int,
+) (*PaginationGetResult, error) {
 	if pageIndex <= 0 {
 		return nil, errors.New("invalid pageIndex")
 	}
@@ -121,20 +132,23 @@ func (node *NodeApply) PaginationGetByTutorID(ctx context.Context, tutorID, page
 	}, nil
 }
 
-// PaginationWithTutorChecked 分页 查询所有已经经过导师审核通过的申请信息
-func (node *NodeApply) PaginationWithTutorChecked(ctx context.Context, pageIndex, pageSize int) (*PaginationGetResult, error) {
+// PaginationGet 分页 查询所有已经经过导师审核通过的申请信息
+func (node *NodeApply) PaginationGet(
+	ctx context.Context,
+	pageIndex, pageSize int,
+) (*PaginationGetResult, error) {
 	if pageIndex <= 0 {
 		return nil, errors.New("invalid pageIndex")
 	}
 	if pageSize <= 0 {
 		return nil, errors.New("invalid pageSize")
 	}
-	count, err := node.nodeApplyDB.QueryCountWithTutorChecked(ctx)
+	count, err := node.nodeApplyDB.QueryAllCount(ctx)
 	if err != nil {
 		return nil, err
 	}
 	limit := pageSize * (pageIndex - 1)
-	data, err := node.nodeApplyDB.LimitQueryWithTutorChecked(ctx, limit, pageSize)
+	data, err := node.nodeApplyDB.LimitQueryAll(ctx, limit, pageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +159,12 @@ func (node *NodeApply) PaginationWithTutorChecked(ctx context.Context, pageIndex
 }
 
 // CheckNodeApplyByTutor 导师审核机器节点申请信息
-func (node *NodeApply) CheckNodeApplyByTutor(ctx context.Context, applyID int, status bool, message string) (bool, error) {
+func (node *NodeApply) CheckNodeApplyByTutor(
+	ctx context.Context,
+	applyID int,
+	status bool,
+	message string,
+) (bool, error) {
 	var tutorCheckStatus int8 = 1
 	if !status {
 		tutorCheckStatus = 0
@@ -159,7 +178,13 @@ func (node *NodeApply) CheckNodeApplyByTutor(ctx context.Context, applyID int, s
 }
 
 // CheckNodeApplyByAdmin 管理员审核机器节点申请信息
-func (node *NodeApply) CheckNodeApplyByAdmin(ctx context.Context, applyID int, status bool, message string, checkerInfo *ApplyItemUserInfo) (bool, error) {
+func (node *NodeApply) CheckNodeApplyByAdmin(
+	ctx context.Context,
+	applyID int,
+	status bool,
+	message string,
+	checkerInfo *ApplyItemUserInfo,
+) (bool, error) {
 	var adminCheckStatus int8 = 1
 	if !status {
 		adminCheckStatus = 0
@@ -172,6 +197,48 @@ func (node *NodeApply) CheckNodeApplyByAdmin(ctx context.Context, applyID int, s
 		ManagerCheckerID:       null.IntFrom(int64(checkerInfo.ID)),
 		ManagerCheckerName:     null.StringFrom(checkerInfo.Name),
 		ManagerCheckerUsername: null.StringFrom(checkerInfo.Username),
+	})
+}
+
+func (node *NodeApply) RevokeNodeApply(ctx context.Context, applyID int) (bool, error) {
+	return node.nodeApplyDB.UpdateStatus(ctx, applyID, 0)
+}
+
+// GetNodeApplyByID 通过ID查询机器节点申请记录信息
+func (node *NodeApply) GetNodeApplyByID(ctx context.Context, applyID int) (*db.NodeApply, error) {
+	return node.nodeApplyDB.QueryByID(ctx, applyID)
+}
+
+// UpdateNodeApplyInfo 更新节点申请信息
+func (node *NodeApply) UpdateNodeApplyInfo(
+	ctx context.Context,
+	applyID int,
+	createrID int,
+	nodeType string,
+	nodeNum int,
+	startTimeMilliUnix, endTimeMilliUnix int64,
+	modifyUserID int,
+	modifyUsername string,
+	modifyName string,
+) (bool, error) {
+	if applyID <= 0 {
+		return false, errors.New("invalid apply id")
+	}
+	if nodeType == "" {
+		return false, errors.New("nodeType can't be empty")
+	}
+	startTime := time.UnixMilli(startTimeMilliUnix)
+	endTime := time.UnixMilli(endTimeMilliUnix)
+	return node.nodeApplyDB.UpdateByCreaterID(ctx, &db.NodeApply{
+		ID:             applyID,
+		NodeType:       nodeType,
+		NodeNum:        nodeNum,
+		StartTime:      startTime,
+		EndTime:        endTime,
+		ModifyTime:     null.TimeFrom(time.Now()),
+		ModifyUserID:   modifyUserID,
+		ModifyUsername: modifyUsername,
+		ModifyName:     modifyName,
 	})
 }
 

@@ -1,4 +1,18 @@
-import { ApiRequest } from './api';
+import { ApiRequest, PingResponse } from './api';
+
+// 权限服务ping测试
+export async function ping(): Promise<PingResponse> {
+  const { data, status } = await ApiRequest.request<PingResponse>(
+    '/permission/ping',
+    'GET',
+    {},
+    {}
+  );
+  if (!status) {
+    throw new Error();
+  }
+  return data;
+}
 
 /**
  * 权限信息消息定义

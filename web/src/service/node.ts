@@ -4,6 +4,15 @@ import {
   paginationQueryNodeApplyInfo,
   createNodeApply as createNodeApplyAPI,
   checkNodeApply as checkNodeApplyAPI,
+  NodeDistribute,
+  paginationQueryNodeDistributeInfo,
+  queryNodeApplyByID,
+  finishNodeDistributeByID,
+  revokeNodeApply,
+  HpcUsageTime,
+  paginationQueryNodeUsageTime,
+  updateNodeApplyInfo,
+  ping,
 } from '../api/node';
 
 /**
@@ -51,6 +60,9 @@ export function nodeTypeToName(nodeType: string): string {
   }
 }
 
+/**
+ * 审核机器节点申请
+ */
 export function checkNodeApply(
   applyID: number,
   checkStatus: boolean,
@@ -63,4 +75,83 @@ export function checkNodeApply(
     checkMessage,
     tutorCheck,
   });
+}
+
+/**
+ * 分页查询机器节点分配工单信息
+ */
+export async function paginationGetNodeDistributeInfo(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<NodeDistribute>> {
+  return paginationQueryNodeDistributeInfo(pageIndex, pageSize);
+}
+
+/**
+ * 通过ID获取机器节点申请信息
+ */
+export async function getNodeApplyByID(id: number): Promise<NodeApplyInfo> {
+  return queryNodeApplyByID(id);
+}
+
+/**
+ * 处理机器节点申请工单
+ */
+export async function handlerNodeDistributeByID(id: number): Promise<boolean> {
+  return finishNodeDistributeByID(id);
+}
+
+/**
+ * 通过ID撤销机器节点申请
+ */
+export async function revokeNodeApplyByID(id: number): Promise<boolean> {
+  return revokeNodeApply(id);
+}
+
+/**
+ * 分页查询机器节点申请信息
+ */
+export async function paginationGetNodeUsageTime(
+  pageIndex: number,
+  pageSize: number,
+  startDateMilliUnix: number,
+  endDateMilliUnix: number
+): Promise<PaginationQueryResponse<HpcUsageTime>> {
+  return await paginationQueryNodeUsageTime(
+    pageIndex,
+    pageSize,
+    startDateMilliUnix,
+    endDateMilliUnix
+  );
+}
+
+/**
+ * 更新机器节点申请信息
+ */
+export async function updateNodeApplyInfoByID(
+  applyID: number,
+  nodeType: string,
+  nodeNum: number,
+  startTime: number,
+  endTime: number
+): Promise<boolean> {
+  return updateNodeApplyInfo({
+    id: applyID,
+    nodeType,
+    nodeNum,
+    startTime,
+    endTime,
+  });
+}
+
+/**
+ * 服务ping
+ */
+export async function servicePing(): Promise<boolean> {
+  try {
+    await ping();
+    return true;
+  } catch (error) {
+    return false;
+  }
 }

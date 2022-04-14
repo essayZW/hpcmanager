@@ -15,12 +15,19 @@ type UserPermission struct {
 }
 
 // GetUserPermissionByID 通过用户ID查询用户拥有的权限信息
-func (u *UserPermission) GetUserPermissionByID(ctx context.Context, id int) ([]*db.Permission, error) {
+func (u *UserPermission) GetUserPermissionByID(
+	ctx context.Context,
+	id int,
+) ([]*db.Permission, error) {
 	return u.db.QueryUserPermissionLevel(ctx, id)
 }
 
 // AddUserPermission 添加用户权限
-func (u *UserPermission) AddUserPermission(ctx context.Context, info *db.UserPermission, level verify.Level) error {
+func (u *UserPermission) AddUserPermission(
+	ctx context.Context,
+	info *db.UserPermission,
+	level verify.Level,
+) error {
 	// 查询权限level对应的权限ID
 	id, err := u.permissionLogic.GetIDByLevel(ctx, level)
 	if err != nil {
@@ -38,7 +45,11 @@ func (u *UserPermission) AddUserPermission(ctx context.Context, info *db.UserPer
 }
 
 // RemoveUserPermission 移除某条用户权限信息
-func (u *UserPermission) RemoveUserPermission(ctx context.Context, userid int, level verify.Level) error {
+func (u *UserPermission) RemoveUserPermission(
+	ctx context.Context,
+	userid int,
+	level verify.Level,
+) error {
 	// 查询权限level对应的权限ID
 	id, err := u.permissionLogic.GetIDByLevel(ctx, level)
 	if err != nil {

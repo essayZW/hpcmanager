@@ -73,7 +73,7 @@ func TestEtcdDynamicConfig(t *testing.T) {
 	}
 
 	for index, example := range examples {
-		wt.Add(1)
+		wt.Add(2)
 		t.Run("TestEtcdDynamicConfig"+strconv.Itoa(index), func(t *testing.T) {
 			err := etcdConfig.Registry(example.Path, example.Value, example.Handler)
 			if err != nil {

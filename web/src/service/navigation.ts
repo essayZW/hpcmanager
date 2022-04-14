@@ -7,6 +7,9 @@ import CheckGroupApply from '../components/tutor/CheckGroupApply.vue';
 import UserManager from '../components/admin/UserManager.vue';
 import ProjectManager from '../components/ProjectManager.vue';
 import NodeApplyManager from '../components/common/NodeApplyManager.vue';
+import NodeDistributeManager from '../components/admin/NodeDistributeManager.vue';
+import NodeUsageManager from '../components/common/NodeUsageManager.vue';
+import NodeDistributeBillManager from '../components/common/NodeDistributeBillManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -72,6 +75,28 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/node_apply_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/node_usage_manager',
+          name: 'NodeUsageManager',
+          component: NodeUsageManager,
+        },
+        item: {
+          name: '机器时长查看',
+          to: '/main/node_usage_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_bill_manager',
+          name: 'NodeDistributeBillManager',
+          component: NodeDistributeBillManager,
+        },
+        item: {
+          name: '机器独占账单',
+          to: '/main/node_distribute_bill_manager',
+        },
+      },
     ],
   ],
   [
@@ -79,24 +104,24 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
     [
       {
         routerRaw: {
-          path: '/main/tutor_check_group_apply',
-          name: 'TutorCheckGroupApply',
+          path: '/main/check_group_apply',
+          name: 'CheckGroupApply',
           component: CheckGroupApply,
         },
         item: {
           name: '审核用户组申请',
-          to: '/main/tutor_check_group_apply',
+          to: '/main/check_group_apply',
         },
       },
       {
         routerRaw: {
-          path: '/main/tutor_manager_user',
-          name: 'TutorManagerUser',
+          path: '/main/manager_user',
+          name: 'ManagerUser',
           component: UserManager,
         },
         item: {
           name: '用户管理',
-          to: '/main/tutor_manager_user',
+          to: '/main/manager_user',
         },
       },
       {
@@ -121,6 +146,28 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/node_apply_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/node_usage_manager',
+          name: 'NodeUsageManager',
+          component: NodeUsageManager,
+        },
+        item: {
+          name: '机器时长查看',
+          to: '/main/node_usage_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_bill_manager',
+          name: 'NodeDistributeBillManager',
+          component: NodeDistributeBillManager,
+        },
+        item: {
+          name: '机器独占账单',
+          to: '/main/node_distribute_bill_manager',
+        },
+      },
     ],
   ],
   [
@@ -139,24 +186,24 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
       },
       {
         routerRaw: {
-          path: '/main/admin_check_group_apply',
-          name: 'AdminCheckGroupApply',
+          path: '/main/check_group_apply',
+          name: 'CheckGroupApply',
           component: CheckGroupApply,
         },
         item: {
           name: '审核用户组申请',
-          to: '/main/admin_check_group_apply',
+          to: '/main/check_group_apply',
         },
       },
       {
         routerRaw: {
-          path: '/main/admin_manager_user',
-          name: 'AdminManagerUser',
+          path: '/main/manager_user',
+          name: 'ManagerUser',
           component: UserManager,
         },
         item: {
           name: '用户管理',
-          to: '/main/admin_manager_user',
+          to: '/main/manager_user',
         },
       },
       {
@@ -179,6 +226,39 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器节点申请审核',
           to: '/main/node_apply_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_manager',
+          name: 'NodeDistributeManager',
+          component: NodeDistributeManager,
+        },
+        item: {
+          name: '节点分配工单管理',
+          to: '/main/node_distribute_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_usage_manager',
+          name: 'NodeUsageManager',
+          component: NodeUsageManager,
+        },
+        item: {
+          name: '机器时长查看',
+          to: '/main/node_usage_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_bill_manager',
+          name: 'NodeDistributeBillManager',
+          component: NodeDistributeBillManager,
+        },
+        item: {
+          name: '机器独占账单',
+          to: '/main/node_distribute_bill_manager',
         },
       },
     ],
@@ -201,24 +281,24 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
       },
       {
         routerRaw: {
-          path: '/main/admin_check_group_apply',
-          name: 'AdminCheckGroupApply',
+          path: '/main/check_group_apply',
+          name: 'CheckGroupApply',
           component: CheckGroupApply,
         },
         item: {
           name: '审核用户组申请',
-          to: '/main/admin_check_group_apply',
+          to: '/main/check_group_apply',
         },
       },
       {
         routerRaw: {
-          path: '/main/admin_manager_user',
-          name: 'AdminManagerUser',
+          path: '/main/manager_user',
+          name: 'ManagerUser',
           component: UserManager,
         },
         item: {
           name: '用户管理',
-          to: '/main/admin_manager_user',
+          to: '/main/manager_user',
         },
       },
       {
@@ -241,6 +321,39 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器节点申请审核',
           to: '/main/node_apply_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_manager',
+          name: 'NodeDistributeManager',
+          component: NodeDistributeManager,
+        },
+        item: {
+          name: '节点分配工单管理',
+          to: '/main/node_distribute_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_usage_manager',
+          name: 'NodeUsageManager',
+          component: NodeUsageManager,
+        },
+        item: {
+          name: '机器时长查看',
+          to: '/main/node_usage_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_distribute_bill_manager',
+          name: 'NodeDistributeBillManager',
+          component: NodeDistributeBillManager,
+        },
+        item: {
+          name: '机器独占账单',
+          to: '/main/node_distribute_bill_manager',
         },
       },
     ],

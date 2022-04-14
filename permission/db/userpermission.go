@@ -13,7 +13,10 @@ type UserPermissionDB struct {
 }
 
 // QueryUserPermissionLevel 通过用户ID查询用户的权限所拥有的权限级别信息
-func (up *UserPermissionDB) QueryUserPermissionLevel(ctx context.Context, userid int) ([]*Permission, error) {
+func (up *UserPermissionDB) QueryUserPermissionLevel(
+	ctx context.Context,
+	userid int,
+) ([]*Permission, error) {
 	rows, err := up.conn.Query(ctx, "SELECT `permission`.* "+
 		"FROM `user_permission`, `permission` "+
 		"WHERE `user_id`=? AND `user_permission`.permission_id=`permission`.id", userid)
@@ -50,7 +53,12 @@ func (up *UserPermissionDB) Insert(ctx context.Context, info *UserPermission) er
 
 // Delete 删除某条用户权限记录
 func (up *UserPermissionDB) Delete(ctx context.Context, deleted *UserPermission) error {
-	res, err := up.conn.Exec(ctx, "DELETE FROM `user_permission` WHERE `user_id`=? AND `permission_id`=?", deleted.UserID, deleted.PermissionID)
+	res, err := up.conn.Exec(
+		ctx,
+		"DELETE FROM `user_permission` WHERE `user_id`=? AND `permission_id`=?",
+		deleted.UserID,
+		deleted.PermissionID,
+	)
 	if err != nil {
 		return err
 	}

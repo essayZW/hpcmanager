@@ -14,6 +14,15 @@ service Node {
     rpc CreateNodeApply(CreateNodeApplyRequest) returns (CreateNodeApplyResponse) {}
     rpc PaginationGetNodeApply(PaginationGetNodeApplyRequest) returns (PaginationGetNodeApplyResponse) {}
     rpc CheckNodeApply(CheckNodeApplyRequest) returns (CheckNodeApplyResponse) {}
+    rpc CreateNodeDistributeWO(CreateNodeDistributeWORequest) returns (CreateNodeDistributeWOResponse) {}
+    rpc PaginationGetNodeDistributeWO(PaginationGetNodeDistributeWORequest) returns (PaginationGetNodeDistributeWOResponse) {}
+    rpc GetNodeApplyByID(GetNodeApplyByIDRequest) returns (GetNodeApplyByIDResponse) {}
+    rpc FinishNodeDistributeWO(FinishNodeDistributeWORequest) returns (FinishNodeDistributeWOResponse) {}
+    rpc RevokeNodeApply(RevokeNodeApplyRequest) returns (RevokeNodeApplyResponse) {}
+    rpc AddNodeUsageTimeRecord(AddNodeUsageTimeRecordRequest) returns (AddNodeUsageTimeRecordResponse) {}
+    rpc PaginationGetNodeUsage(PaginationGetNodeUsageRequest) returns (PaginationGetNodeUsageResponse) {}
+    rpc UpdateNodeApply(UpdateNodeApplyRequest) returns (UpdateNodeApplyResponse) {}
+    rpc GetNodeDistributeInfoByID(GetNodeDistributeInfoByIDRequest) returns (GetNodeDistributeInfoByIDResponse) {}
 }
 
 message CreateNodeApplyRequest {
@@ -50,4 +59,103 @@ message CheckNodeApplyRequest {
 
 message CheckNodeApplyResponse {
     bool success = 1;
+}
+
+message CreateNodeDistributeWORequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+}
+
+message CreateNodeDistributeWOResponse {
+    int32 id = 1;
+}
+
+message PaginationGetNodeDistributeWORequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+
+message PaginationGetNodeDistributeWOResponse {
+    repeated node.NodeDistribute wos = 1;
+    int32 count = 2;
+}
+
+message GetNodeApplyByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+}
+
+message GetNodeApplyByIDResponse {
+    node.NodeApply apply = 1;
+}
+
+message FinishNodeDistributeWORequest {
+    request.BaseRequest baseRequest = 1;
+    int32 distributeID = 2;
+}
+
+message FinishNodeDistributeWOResponse {
+    bool success = 1;
+}
+
+message RevokeNodeApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+}
+
+message RevokeNodeApplyResponse {
+    bool success = 1;
+}
+
+message AddNodeUsageTimeRecordRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userID = 2;
+    string username = 3;
+    string name = 4;
+    string hpcUserName = 5;
+    int32 tutorID = 6;
+    string tutorUsername = 7;
+    string tutorName = 8;
+    string hpcGroupName = 9;
+    string queueName = 10;
+    double wallTime = 11;
+    double gwallTime = 12;
+    int64 startTimeUnix =  13;
+    int64 endTimeUnix = 14;
+}
+
+message AddNodeUsageTimeRecordResponse {
+    int32 id = 1;
+}
+
+message PaginationGetNodeUsageRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+    int64 startDateMilliUnix = 4;
+    int64 endDateMilliUnix = 5;
+}
+
+message PaginationGetNodeUsageResponse {
+    int32 count = 1;
+    repeated node.NodeUsageTime usages = 2;
+}
+
+message UpdateNodeApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    node.NodeApply newInfos = 2;
+}
+
+message UpdateNodeApplyResponse {
+    bool success = 1;
+}
+
+message GetNodeDistributeInfoByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 id = 2;
+}
+
+message GetNodeDistributeInfoByIDResponse {
+    node.NodeDistribute wo = 1;
 }

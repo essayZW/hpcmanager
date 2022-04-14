@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/essayZW/hpcmanager/logger"
 	userdb "github.com/essayZW/hpcmanager/user/db"
 	"github.com/go-redis/redis/v8"
+	"github.com/mozillazg/go-pinyin"
 )
 
 var userLogic *User
@@ -49,6 +51,15 @@ func init() {
 		logger.Fatal("Redis ping get: ", ok)
 	}
 	userLogic = NewUser(userdb.NewUser(sqlConn), etcdConfig, redisConn)
+}
+
+func getUserDB() *userdb.UserDB {
+	// 创建数据库连接
+	sqlConn, err := db.NewDB()
+	if err != nil {
+		logger.Fatal("MySQL conn error: ", err)
+	}
+	return userdb.NewUser(sqlConn)
 }
 
 func TestLoginCheck(t *testing.T) {
@@ -235,7 +246,12 @@ func TestPaginationGetUserInfo(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			infos, err := userLogic.PaginationGetUserInfo(context.Background(), test.PageIndex, test.PageSize, 0)
+			infos, err := userLogic.PaginationGetUserInfo(
+				context.Background(),
+				test.PageIndex,
+				test.PageSize,
+				0,
+			)
 			if err != nil {
 				if !test.Error {
 					t.Errorf("Get: %v Except: %v", err, test.Error)
@@ -289,6 +305,117 @@ func TestChangeUserGroup(t *testing.T) {
 			}
 			if test.Error {
 				t.Errorf("Get: %v, Except: %v", err, test.Error)
+			}
+		})
+	}
+}
+
+func TestPinyinLib(t *testing.T) {
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name string
+
+		args args
+		want string
+	}{
+		{
+			name: "success1",
+			args: args{
+				name: "测试",
+			},
+			want: "ceshi",
+		},
+		{
+			name: "success1",
+			args: args{
+				name: "大佬",
+			},
+			want: "dalao",
+		},
+		{
+			name: "success1",
+			args: args{
+				name: "大佬1",
+			},
+			want: "dalao1",
+		},
+		{
+			name: "success1",
+			args: args{
+				name: "1大佬",
+			},
+			want: "1dalao",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pinyin.Fallback = func(r rune, a pinyin.Args) []string {
+				return []string{string(r)}
+			}
+			got := pinyin.LazyPinyin(tt.args.name, pinyin.NewArgs())
+			if strings.Join(got, "") != tt.want {
+				t.Errorf("Want=%s, Got=%s", tt.want, got)
+			}
+		})
+	}
+}
+
+func TestUser_addSuffixForPYName(t *testing.T) {
+	type fields struct {
+		userDB *userdb.UserDB
+	}
+	type args struct {
+		ctx    context.Context
+		pyName string
+	}
+	userDB := getUserDB()
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "test dalao",
+			fields: fields{
+				userDB: userDB,
+			},
+			args: args{
+				ctx:    context.Background(),
+				pyName: "dalao",
+			},
+			want:    "dalao3",
+			wantErr: false,
+		},
+		{
+			name: "test none",
+			fields: fields{
+				userDB: userDB,
+			},
+			args: args{
+				ctx:    context.Background(),
+				pyName: "none",
+			},
+			want:    "none",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := &User{
+				userDB: tt.fields.userDB,
+			}
+			got, err := u.addSuffixForPYName(tt.args.ctx, tt.args.pyName)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("User.addSuffixForPYName() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("User.addSuffixForPYName() = %v, want %v", got, tt.want)
 			}
 		})
 	}

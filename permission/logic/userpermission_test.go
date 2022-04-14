@@ -50,7 +50,11 @@ func TestRemoveUserPermission(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			err := userPermissionLogic.RemoveUserPermission(context.Background(), test.UserID, test.level)
+			err := userPermissionLogic.RemoveUserPermission(
+				context.Background(),
+				test.UserID,
+				test.level,
+			)
 			if (err != nil) == test.Except {
 				t.Errorf("Except %v, Get %v", test.Except, err)
 			}

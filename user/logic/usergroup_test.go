@@ -22,7 +22,7 @@ func init() {
 	if err != nil {
 		logger.Fatal("MySQL conn error: ", err)
 	}
-	userGroupLogic = NewUserGroup(userdb.NewUserGroup(sqlConn), userdb.NewUserGroupApply(sqlConn))
+	userGroupLogic = NewUserGroup(userdb.NewUserGroup(sqlConn), userdb.NewUserGroupApply(sqlConn), nil)
 }
 
 func TestGetGroupByID(t *testing.T) {
@@ -107,7 +107,11 @@ func TestPaginationGetGroupInfo(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			infos, err := userGroupLogic.PaginationGetGroupInfo(context.Background(), test.PageIndex, test.PageSize)
+			infos, err := userGroupLogic.PaginationGetGroupInfo(
+				context.Background(),
+				test.PageIndex,
+				test.PageSize,
+			)
 			if err != nil {
 				if !test.Error {
 					t.Errorf("Get:%v Except: %v", err, test.Error)
@@ -180,7 +184,11 @@ func TestCreateUserJoinGroupApply(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			_, err := userGroupLogic.CreateUserJoinGroupApply(context.Background(), test.UserInfo, test.ApplyGroupID)
+			_, err := userGroupLogic.CreateUserJoinGroupApply(
+				context.Background(),
+				test.UserInfo,
+				test.ApplyGroupID,
+			)
 			if err != nil {
 				if !test.Error {
 					t.Errorf("Get: %v Except: %v", err, test.Error)
@@ -297,7 +305,13 @@ func TestTutorCheckApply(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			_, err := userGroupLogic.TutorCheckApply(context.Background(), test.TutorID, test.ApplyID, test.CheckStatus, test.CheckMessage)
+			_, err := userGroupLogic.TutorCheckApply(
+				context.Background(),
+				test.TutorID,
+				test.ApplyID,
+				test.CheckStatus,
+				test.CheckMessage,
+			)
 			if err != nil {
 				if !test.Error {
 					t.Errorf("Get: %v, Except: %v", err, test.Error)
@@ -367,7 +381,15 @@ func TestAdminCheckApply(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			_, err := userGroupLogic.AdminCheckApply(context.Background(), test.ApplyID, test.CheckerID, test.CheckerUsername, test.CheckerName, test.CheckStatus, test.CheckMessage)
+			_, err := userGroupLogic.AdminCheckApply(
+				context.Background(),
+				test.ApplyID,
+				test.CheckerID,
+				test.CheckerUsername,
+				test.CheckerName,
+				test.CheckStatus,
+				test.CheckMessage,
+			)
 			if err != nil {
 				if !test.Error {
 					t.Errorf("Get: %v, Except: %v", err, test.Error)

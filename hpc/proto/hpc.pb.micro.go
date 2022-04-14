@@ -43,6 +43,9 @@ type HpcService interface {
 	AddUserToGroup(ctx context.Context, in *AddUserToGroupRequest, opts ...client.CallOption) (*AddUserToGroupResponse, error)
 	GetUserInfoByID(ctx context.Context, in *GetUserInfoByIDRequest, opts ...client.CallOption) (*GetUserInfoByIDResponse, error)
 	GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, opts ...client.CallOption) (*GetGroupInfoByIDResponse, error)
+	GetNodeUsage(ctx context.Context, in *GetNodeUsageRequest, opts ...client.CallOption) (*GetNodeUsageResponse, error)
+	GetUserInfoByUsername(ctx context.Context, in *GetUserInfoByUsernameRequest, opts ...client.CallOption) (*GetUserInfoByUsernameResponse, error)
+	GetGroupInfoByGroupName(ctx context.Context, in *GetGroupInfoByGroupNameRequest, opts ...client.CallOption) (*GetGroupInfoByGroupNameResponse, error)
 }
 
 type hpcService struct {
@@ -107,6 +110,36 @@ func (c *hpcService) GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDR
 	return out, nil
 }
 
+func (c *hpcService) GetNodeUsage(ctx context.Context, in *GetNodeUsageRequest, opts ...client.CallOption) (*GetNodeUsageResponse, error) {
+	req := c.c.NewRequest(c.name, "Hpc.GetNodeUsage", in)
+	out := new(GetNodeUsageResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *hpcService) GetUserInfoByUsername(ctx context.Context, in *GetUserInfoByUsernameRequest, opts ...client.CallOption) (*GetUserInfoByUsernameResponse, error) {
+	req := c.c.NewRequest(c.name, "Hpc.GetUserInfoByUsername", in)
+	out := new(GetUserInfoByUsernameResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *hpcService) GetGroupInfoByGroupName(ctx context.Context, in *GetGroupInfoByGroupNameRequest, opts ...client.CallOption) (*GetGroupInfoByGroupNameResponse, error) {
+	req := c.c.NewRequest(c.name, "Hpc.GetGroupInfoByGroupName", in)
+	out := new(GetGroupInfoByGroupNameResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Hpc service
 
 type HpcHandler interface {
@@ -115,6 +148,9 @@ type HpcHandler interface {
 	AddUserToGroup(context.Context, *AddUserToGroupRequest, *AddUserToGroupResponse) error
 	GetUserInfoByID(context.Context, *GetUserInfoByIDRequest, *GetUserInfoByIDResponse) error
 	GetGroupInfoByID(context.Context, *GetGroupInfoByIDRequest, *GetGroupInfoByIDResponse) error
+	GetNodeUsage(context.Context, *GetNodeUsageRequest, *GetNodeUsageResponse) error
+	GetUserInfoByUsername(context.Context, *GetUserInfoByUsernameRequest, *GetUserInfoByUsernameResponse) error
+	GetGroupInfoByGroupName(context.Context, *GetGroupInfoByGroupNameRequest, *GetGroupInfoByGroupNameResponse) error
 }
 
 func RegisterHpcHandler(s server.Server, hdlr HpcHandler, opts ...server.HandlerOption) error {
@@ -124,6 +160,9 @@ func RegisterHpcHandler(s server.Server, hdlr HpcHandler, opts ...server.Handler
 		AddUserToGroup(ctx context.Context, in *AddUserToGroupRequest, out *AddUserToGroupResponse) error
 		GetUserInfoByID(ctx context.Context, in *GetUserInfoByIDRequest, out *GetUserInfoByIDResponse) error
 		GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, out *GetGroupInfoByIDResponse) error
+		GetNodeUsage(ctx context.Context, in *GetNodeUsageRequest, out *GetNodeUsageResponse) error
+		GetUserInfoByUsername(ctx context.Context, in *GetUserInfoByUsernameRequest, out *GetUserInfoByUsernameResponse) error
+		GetGroupInfoByGroupName(ctx context.Context, in *GetGroupInfoByGroupNameRequest, out *GetGroupInfoByGroupNameResponse) error
 	}
 	type Hpc struct {
 		hpc
@@ -154,4 +193,16 @@ func (h *hpcHandler) GetUserInfoByID(ctx context.Context, in *GetUserInfoByIDReq
 
 func (h *hpcHandler) GetGroupInfoByID(ctx context.Context, in *GetGroupInfoByIDRequest, out *GetGroupInfoByIDResponse) error {
 	return h.HpcHandler.GetGroupInfoByID(ctx, in, out)
+}
+
+func (h *hpcHandler) GetNodeUsage(ctx context.Context, in *GetNodeUsageRequest, out *GetNodeUsageResponse) error {
+	return h.HpcHandler.GetNodeUsage(ctx, in, out)
+}
+
+func (h *hpcHandler) GetUserInfoByUsername(ctx context.Context, in *GetUserInfoByUsernameRequest, out *GetUserInfoByUsernameResponse) error {
+	return h.HpcHandler.GetUserInfoByUsername(ctx, in, out)
+}
+
+func (h *hpcHandler) GetGroupInfoByGroupName(ctx context.Context, in *GetGroupInfoByGroupNameRequest, out *GetGroupInfoByGroupNameResponse) error {
+	return h.HpcHandler.GetGroupInfoByGroupName(ctx, in, out)
 }

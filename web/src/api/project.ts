@@ -1,4 +1,18 @@
-import { ApiRequest, PaginationQueryResponse } from './api';
+import { ApiRequest, PaginationQueryResponse, PingResponse } from './api';
+
+// 项目服务ping测试
+export async function ping(): Promise<PingResponse> {
+  const { data, status } = await ApiRequest.request<PingResponse>(
+    '/project/ping',
+    'GET',
+    {},
+    {}
+  );
+  if (!status) {
+    throw new Error();
+  }
+  return data;
+}
 /**
  * 项目信息
  */

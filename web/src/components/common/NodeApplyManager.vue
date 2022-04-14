@@ -41,6 +41,8 @@ const createNodeApplyFormData = reactive<{
     numbering: string;
     expenses: string;
     description: string;
+    createrUserName: string;
+    createrUsername: string;
   };
 }>({
   nodeType: '',
@@ -52,6 +54,8 @@ const createNodeApplyFormData = reactive<{
     numbering: '',
     expenses: '',
     description: '',
+    createrUserName: '',
+    createrUsername: '',
   },
   startTime: new Date().getTime(),
   endTime: dayjs(new Date()).add(1, 'year').valueOf(),
@@ -73,6 +77,8 @@ const searchProjectInfo = async () => {
     createNodeApplyFormData.projectInfo.numbering = data.numbering;
     createNodeApplyFormData.projectInfo.expenses = data.expenses;
     createNodeApplyFormData.projectInfo.description = data.description;
+    createNodeApplyFormData.projectInfo.createrUsername = data.createrUsername;
+    createNodeApplyFormData.projectInfo.createrUserName = data.createrName;
   } catch (error) {
     ElMessage({
       type: 'error',
@@ -103,8 +109,8 @@ const createNodeApplyFormSubmit = async () => {
       parseInt(createNodeApplyFormData.projectInfo.id as string),
       createNodeApplyFormData.nodeType,
       parseInt(createNodeApplyFormData.nodeNum as string),
-      createNodeApplyFormData.startTime,
-      createNodeApplyFormData.endTime
+      new Date(createNodeApplyFormData.startTime).getTime(),
+      new Date(createNodeApplyFormData.endTime).getTime()
     );
     ElMessage({
       type: 'success',
@@ -221,6 +227,16 @@ if (userInfo) {
           >
         </p>
         <p>
+          <span
+            ><strong>创建人学(工)号: </strong
+            >{{ createNodeApplyFormData.projectInfo.createrUsername }}</span
+          >
+          <span
+            ><strong>创建人姓名: </strong
+            >{{ createNodeApplyFormData.projectInfo.createrUserName }}</span
+          >
+        </p>
+        <p>
           <span><strong>描述: </strong></span
           >{{
             zeroWithDefault(
@@ -241,7 +257,7 @@ if (userInfo) {
     </template>
   </el-drawer>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .project-info {
   span {
     margin: 8px 8px;

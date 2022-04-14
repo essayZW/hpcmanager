@@ -24,7 +24,13 @@ func (param *ChangeUserPermissionParam) Validator() validator.StructLevelFunc {
 	return func(sl validator.StructLevel) {
 		data := sl.Current().Interface().(ChangeUserPermissionParam)
 		if data.UserID <= 0 {
-			sl.ReportError(reflect.ValueOf(data.UserID), "userID", "userID", "binding", "invalid userID")
+			sl.ReportError(
+				reflect.ValueOf(data.UserID),
+				"userID",
+				"userID",
+				"binding",
+				"invalid userID",
+			)
 		}
 	}
 }

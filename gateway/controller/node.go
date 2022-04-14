@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/essayZW/hpcmanager/gateway/middleware"
@@ -57,7 +58,7 @@ func (n *node) createNodeApply(ctx *gin.Context) {
 		NodeType:    param.NodeType,
 		NodeNum:     int32(param.NodeNum),
 		StartTime:   param.StartTime,
-		EndTime:     param.StartTime,
+		EndTime:     param.EndTime,
 		BaseRequest: baseRequest,
 	})
 	if err != nil {
@@ -137,6 +138,229 @@ func (n *node) checkNodeApply(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// paginationGetNodeDistributeWOS /api/node/distribute GET 分页查询机器节点分配处理工单信息
+func (n *node) paginationGetNodeDistributeWOS(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	dataResp, err := n.nodeService.PaginationGetNodeDistributeWO(
+		c,
+		&nodepb.PaginationGetNodeDistributeWORequest{
+			BaseRequest: baseRequest,
+			PageIndex:   int32(pageIndex),
+			PageSize:    int32(pageSize),
+		},
+	)
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询用户信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	responseData := &response.PaginationQueryResponse{
+		Count: int(dataResp.Count),
+		Data:  dataResp.Wos,
+	}
+	if dataResp.Wos == nil {
+		responseData.Data = make([]*nodepb.NodeDistribute, 0)
+	}
+	httpResp := response.New(200, responseData, true, "success")
+	httpResp.Send(ctx)
+}
+
+// getNodeApplyByID /api/node/apply/:id GET 通过ID查询机器节点申请信息
+func (n *node) getNodeApplyByID(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	idStr := ctx.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "invalid id")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	info, err := n.nodeService.GetNodeApplyByID(c, &nodepb.GetNodeApplyByIDRequest{
+		ApplyID:     int32(id),
+		BaseRequest: baseRequest,
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询机器节点申请信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, info.Apply, true, "success")
+	httpResp.Send(ctx)
+}
+
+// finishNodeDistributeByID /api/node/distribute PATCH 处理机器处理分配工单
+func (n *node) finishNodeDistributeByID(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.FinishNodeDistributeParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := n.nodeService.FinishNodeDistributeWO(c, &nodepb.FinishNodeDistributeWORequest{
+		BaseRequest:  baseRequest,
+		DistributeID: int32(param.ID),
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("处理工单失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "处理工单失败,可能已经被处理")
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
+// revokeNodeApply /api/node/apply/:id DELETE 撤销某一个机器节点申请记录
+func (n *node) revokeNodeApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	idStr := ctx.Param("id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "invalid id")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := n.nodeService.RevokeNodeApply(c, &nodepb.RevokeNodeApplyRequest{
+		BaseRequest: baseRequest,
+		ApplyID:     int32(id),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("撤销申请失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "撤销申请失败,可能已经被处理")
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
+// paginationGetNodeUsageRecord /api/node/usage GET 分页查询一段时间内的机器节点使用记录
+func (n *node) paginationGetNodeUsageRecord(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	startDate, endDate, err := utils.ParseDateRange(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := n.nodeService.PaginationGetNodeUsage(c, &nodepb.PaginationGetNodeUsageRequest{
+		BaseRequest:        baseRequest,
+		PageIndex:          int32(pageIndex),
+		PageSize:           int32(pageSize),
+		StartDateMilliUnix: startDate.UnixMilli(),
+		EndDateMilliUnix:   endDate.UnixMilli(),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	respData := response.PaginationQueryResponse{
+		Data:  resp.Usages,
+		Count: int(resp.Count),
+	}
+	if resp.Usages == nil {
+		respData.Data = make([]*nodepb.NodeUsageTime, 0)
+	}
+	httpResp := response.New(200, respData, true, "success")
+	httpResp.Send(ctx)
+}
+
+// updateNodeApply /api/node/apply UPDATE 更新机器节点申请信息
+func (n *node) updateNodeApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.UpdateNodeApplyParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := n.nodeService.UpdateNodeApply(c, &nodepb.UpdateNodeApplyRequest{
+		BaseRequest: baseRequest,
+		NewInfos: &nodepb.NodeApply{
+			Id:        int32(param.ID),
+			NodeType:  param.NodeType,
+			NodeNum:   int32(param.NodeNum),
+			StartTime: param.StartTime,
+			EndTime:   param.EndTime,
+		},
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("更新机器节点申请信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "更新并没有变化")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "更新成功")
+	httpResp.Send(ctx)
+}
+
 func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter := router.Group("/node")
 
@@ -146,6 +370,14 @@ func (n *node) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	nodeRouter.POST("/apply", n.createNodeApply)
 	nodeRouter.GET("/apply", n.paginationGet)
 	nodeRouter.PATCH("/apply", n.checkNodeApply)
+	nodeRouter.PUT("/apply", n.updateNodeApply)
+	nodeRouter.GET("/apply/:id", n.getNodeApplyByID)
+	nodeRouter.DELETE("/apply/:id", n.revokeNodeApply)
+
+	nodeRouter.GET("/distribute", n.paginationGetNodeDistributeWOS)
+	nodeRouter.PATCH("/distribute", n.finishNodeDistributeByID)
+
+	nodeRouter.GET("/usage", n.paginationGetNodeUsageRecord)
 	return nodeRouter
 }
 

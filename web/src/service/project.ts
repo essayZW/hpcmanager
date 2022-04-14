@@ -3,6 +3,7 @@ import {
   paginationQueryProjectInfos,
   createProject as apiCreateProject,
   queryByID,
+  ping,
 } from '../api/project';
 import { PaginationQueryResponse } from '../api/api';
 
@@ -46,4 +47,16 @@ export async function createProject(
  */
 export async function getProjectInfoByID(id: number): Promise<ProjectInfo> {
   return queryByID(id);
+}
+
+/**
+ * 服务ping
+ */
+export async function servicePing(): Promise<boolean> {
+  try {
+    await ping();
+    return true;
+  } catch (error) {
+    return false;
+  }
 }

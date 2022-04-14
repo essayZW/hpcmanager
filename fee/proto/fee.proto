@@ -1,0 +1,61 @@
+syntax="proto3";
+
+option go_package="github.com/essayZW/hpcmanager/fee/proto;fee";
+
+package fee;
+
+import "proto/ping.proto";
+import "proto/common.proto";
+import "gateway/proto/baserequest.proto";
+import "proto/fee_public.proto";
+
+
+service Fee {
+    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+    rpc CreateNodeDistributeBill(CreateNodeDistributeBillRequest) returns (CreateNodeDistributeBillResponse) {}
+    rpc PaginationGetNodeDistributeBill(PaginationGetNodeDistributeBillRequest) returns (PaginationGetNodeDistributeBillResponse) {}
+    rpc PayNodeDistributeBill(PayNodeDistributeBillRequest) returns (PayNodeDistributeBillResponse) {}
+    rpc GetNodeDistributeFeeRate(GetNodeDistributeFeeRateRequest) returns (GetNodeDistributeFeeRateResponse) {}
+}
+
+message CreateNodeDistributeBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 nodeDistributeID = 2;
+}
+
+message CreateNodeDistributeBillResponse {
+    int32 id = 1;
+}
+
+message PaginationGetNodeDistributeBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+
+message PaginationGetNodeDistributeBillResponse {
+    repeated fee.NodeDistributeBill bills = 1;
+    int32 count = 2;
+}
+
+message PayNodeDistributeBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 id = 2;
+    double payMoney = 3;
+    int32 payType = 4;
+    string payMessage = 5;
+}
+
+message PayNodeDistributeBillResponse {
+    bool success = 1;
+}
+
+message GetNodeDistributeFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+}
+
+message GetNodeDistributeFeeRateResponse {
+    double rate36CPU = 1;
+    double rate4GPU = 2;
+    double rate8GPU = 3;
+}

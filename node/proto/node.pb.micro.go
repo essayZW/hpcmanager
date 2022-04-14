@@ -42,6 +42,15 @@ type NodeService interface {
 	CreateNodeApply(ctx context.Context, in *CreateNodeApplyRequest, opts ...client.CallOption) (*CreateNodeApplyResponse, error)
 	PaginationGetNodeApply(ctx context.Context, in *PaginationGetNodeApplyRequest, opts ...client.CallOption) (*PaginationGetNodeApplyResponse, error)
 	CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequest, opts ...client.CallOption) (*CheckNodeApplyResponse, error)
+	CreateNodeDistributeWO(ctx context.Context, in *CreateNodeDistributeWORequest, opts ...client.CallOption) (*CreateNodeDistributeWOResponse, error)
+	PaginationGetNodeDistributeWO(ctx context.Context, in *PaginationGetNodeDistributeWORequest, opts ...client.CallOption) (*PaginationGetNodeDistributeWOResponse, error)
+	GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByIDRequest, opts ...client.CallOption) (*GetNodeApplyByIDResponse, error)
+	FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, opts ...client.CallOption) (*FinishNodeDistributeWOResponse, error)
+	RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, opts ...client.CallOption) (*RevokeNodeApplyResponse, error)
+	AddNodeUsageTimeRecord(ctx context.Context, in *AddNodeUsageTimeRecordRequest, opts ...client.CallOption) (*AddNodeUsageTimeRecordResponse, error)
+	PaginationGetNodeUsage(ctx context.Context, in *PaginationGetNodeUsageRequest, opts ...client.CallOption) (*PaginationGetNodeUsageResponse, error)
+	UpdateNodeApply(ctx context.Context, in *UpdateNodeApplyRequest, opts ...client.CallOption) (*UpdateNodeApplyResponse, error)
+	GetNodeDistributeInfoByID(ctx context.Context, in *GetNodeDistributeInfoByIDRequest, opts ...client.CallOption) (*GetNodeDistributeInfoByIDResponse, error)
 }
 
 type nodeService struct {
@@ -96,6 +105,96 @@ func (c *nodeService) CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequ
 	return out, nil
 }
 
+func (c *nodeService) CreateNodeDistributeWO(ctx context.Context, in *CreateNodeDistributeWORequest, opts ...client.CallOption) (*CreateNodeDistributeWOResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.CreateNodeDistributeWO", in)
+	out := new(CreateNodeDistributeWOResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeService) PaginationGetNodeDistributeWO(ctx context.Context, in *PaginationGetNodeDistributeWORequest, opts ...client.CallOption) (*PaginationGetNodeDistributeWOResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.PaginationGetNodeDistributeWO", in)
+	out := new(PaginationGetNodeDistributeWOResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeService) GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByIDRequest, opts ...client.CallOption) (*GetNodeApplyByIDResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.GetNodeApplyByID", in)
+	out := new(GetNodeApplyByIDResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeService) FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, opts ...client.CallOption) (*FinishNodeDistributeWOResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.FinishNodeDistributeWO", in)
+	out := new(FinishNodeDistributeWOResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeService) RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, opts ...client.CallOption) (*RevokeNodeApplyResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.RevokeNodeApply", in)
+	out := new(RevokeNodeApplyResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeService) AddNodeUsageTimeRecord(ctx context.Context, in *AddNodeUsageTimeRecordRequest, opts ...client.CallOption) (*AddNodeUsageTimeRecordResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.AddNodeUsageTimeRecord", in)
+	out := new(AddNodeUsageTimeRecordResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeService) PaginationGetNodeUsage(ctx context.Context, in *PaginationGetNodeUsageRequest, opts ...client.CallOption) (*PaginationGetNodeUsageResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.PaginationGetNodeUsage", in)
+	out := new(PaginationGetNodeUsageResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeService) UpdateNodeApply(ctx context.Context, in *UpdateNodeApplyRequest, opts ...client.CallOption) (*UpdateNodeApplyResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.UpdateNodeApply", in)
+	out := new(UpdateNodeApplyResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeService) GetNodeDistributeInfoByID(ctx context.Context, in *GetNodeDistributeInfoByIDRequest, opts ...client.CallOption) (*GetNodeDistributeInfoByIDResponse, error) {
+	req := c.c.NewRequest(c.name, "Node.GetNodeDistributeInfoByID", in)
+	out := new(GetNodeDistributeInfoByIDResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Node service
 
 type NodeHandler interface {
@@ -103,6 +202,15 @@ type NodeHandler interface {
 	CreateNodeApply(context.Context, *CreateNodeApplyRequest, *CreateNodeApplyResponse) error
 	PaginationGetNodeApply(context.Context, *PaginationGetNodeApplyRequest, *PaginationGetNodeApplyResponse) error
 	CheckNodeApply(context.Context, *CheckNodeApplyRequest, *CheckNodeApplyResponse) error
+	CreateNodeDistributeWO(context.Context, *CreateNodeDistributeWORequest, *CreateNodeDistributeWOResponse) error
+	PaginationGetNodeDistributeWO(context.Context, *PaginationGetNodeDistributeWORequest, *PaginationGetNodeDistributeWOResponse) error
+	GetNodeApplyByID(context.Context, *GetNodeApplyByIDRequest, *GetNodeApplyByIDResponse) error
+	FinishNodeDistributeWO(context.Context, *FinishNodeDistributeWORequest, *FinishNodeDistributeWOResponse) error
+	RevokeNodeApply(context.Context, *RevokeNodeApplyRequest, *RevokeNodeApplyResponse) error
+	AddNodeUsageTimeRecord(context.Context, *AddNodeUsageTimeRecordRequest, *AddNodeUsageTimeRecordResponse) error
+	PaginationGetNodeUsage(context.Context, *PaginationGetNodeUsageRequest, *PaginationGetNodeUsageResponse) error
+	UpdateNodeApply(context.Context, *UpdateNodeApplyRequest, *UpdateNodeApplyResponse) error
+	GetNodeDistributeInfoByID(context.Context, *GetNodeDistributeInfoByIDRequest, *GetNodeDistributeInfoByIDResponse) error
 }
 
 func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.HandlerOption) error {
@@ -111,6 +219,15 @@ func RegisterNodeHandler(s server.Server, hdlr NodeHandler, opts ...server.Handl
 		CreateNodeApply(ctx context.Context, in *CreateNodeApplyRequest, out *CreateNodeApplyResponse) error
 		PaginationGetNodeApply(ctx context.Context, in *PaginationGetNodeApplyRequest, out *PaginationGetNodeApplyResponse) error
 		CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequest, out *CheckNodeApplyResponse) error
+		CreateNodeDistributeWO(ctx context.Context, in *CreateNodeDistributeWORequest, out *CreateNodeDistributeWOResponse) error
+		PaginationGetNodeDistributeWO(ctx context.Context, in *PaginationGetNodeDistributeWORequest, out *PaginationGetNodeDistributeWOResponse) error
+		GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByIDRequest, out *GetNodeApplyByIDResponse) error
+		FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, out *FinishNodeDistributeWOResponse) error
+		RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, out *RevokeNodeApplyResponse) error
+		AddNodeUsageTimeRecord(ctx context.Context, in *AddNodeUsageTimeRecordRequest, out *AddNodeUsageTimeRecordResponse) error
+		PaginationGetNodeUsage(ctx context.Context, in *PaginationGetNodeUsageRequest, out *PaginationGetNodeUsageResponse) error
+		UpdateNodeApply(ctx context.Context, in *UpdateNodeApplyRequest, out *UpdateNodeApplyResponse) error
+		GetNodeDistributeInfoByID(ctx context.Context, in *GetNodeDistributeInfoByIDRequest, out *GetNodeDistributeInfoByIDResponse) error
 	}
 	type Node struct {
 		node
@@ -137,4 +254,40 @@ func (h *nodeHandler) PaginationGetNodeApply(ctx context.Context, in *Pagination
 
 func (h *nodeHandler) CheckNodeApply(ctx context.Context, in *CheckNodeApplyRequest, out *CheckNodeApplyResponse) error {
 	return h.NodeHandler.CheckNodeApply(ctx, in, out)
+}
+
+func (h *nodeHandler) CreateNodeDistributeWO(ctx context.Context, in *CreateNodeDistributeWORequest, out *CreateNodeDistributeWOResponse) error {
+	return h.NodeHandler.CreateNodeDistributeWO(ctx, in, out)
+}
+
+func (h *nodeHandler) PaginationGetNodeDistributeWO(ctx context.Context, in *PaginationGetNodeDistributeWORequest, out *PaginationGetNodeDistributeWOResponse) error {
+	return h.NodeHandler.PaginationGetNodeDistributeWO(ctx, in, out)
+}
+
+func (h *nodeHandler) GetNodeApplyByID(ctx context.Context, in *GetNodeApplyByIDRequest, out *GetNodeApplyByIDResponse) error {
+	return h.NodeHandler.GetNodeApplyByID(ctx, in, out)
+}
+
+func (h *nodeHandler) FinishNodeDistributeWO(ctx context.Context, in *FinishNodeDistributeWORequest, out *FinishNodeDistributeWOResponse) error {
+	return h.NodeHandler.FinishNodeDistributeWO(ctx, in, out)
+}
+
+func (h *nodeHandler) RevokeNodeApply(ctx context.Context, in *RevokeNodeApplyRequest, out *RevokeNodeApplyResponse) error {
+	return h.NodeHandler.RevokeNodeApply(ctx, in, out)
+}
+
+func (h *nodeHandler) AddNodeUsageTimeRecord(ctx context.Context, in *AddNodeUsageTimeRecordRequest, out *AddNodeUsageTimeRecordResponse) error {
+	return h.NodeHandler.AddNodeUsageTimeRecord(ctx, in, out)
+}
+
+func (h *nodeHandler) PaginationGetNodeUsage(ctx context.Context, in *PaginationGetNodeUsageRequest, out *PaginationGetNodeUsageResponse) error {
+	return h.NodeHandler.PaginationGetNodeUsage(ctx, in, out)
+}
+
+func (h *nodeHandler) UpdateNodeApply(ctx context.Context, in *UpdateNodeApplyRequest, out *UpdateNodeApplyResponse) error {
+	return h.NodeHandler.UpdateNodeApply(ctx, in, out)
+}
+
+func (h *nodeHandler) GetNodeDistributeInfoByID(ctx context.Context, in *GetNodeDistributeInfoByIDRequest, out *GetNodeDistributeInfoByIDResponse) error {
+	return h.NodeHandler.GetNodeDistributeInfoByID(ctx, in, out)
 }

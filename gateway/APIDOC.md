@@ -405,6 +405,38 @@ map[string]interface{}{
 }
 ```
 
+### /group/apply/:id
+
+Method: DELETE
+
+描述: 撤销某个申请
+
+参数:
+
+```text
+id: number
+```
+
+响应: 是否成功
+
+### /group/balance
+
+Method: PATCH
+
+描述: 修改用户组的余额
+
+参数:
+
+```go
+// AddGroupBalanceParam 修改用户组的余额参数
+type AddGroupBalanceParam struct {
+    GroupID int     `form:"groupID" json:"groupID" binding:"required"`
+    Balance float64 `form:"balance" json:"balance" binding:"required"`
+}
+```
+
+响应参数: 修改后的余额
+
 ## system 控制器
 
 ### /sys/install
@@ -618,4 +650,165 @@ type CreateNodeApplyParam struct {
 }
 ```
 
-响应: 是否审核成功
+### /node/apply
+
+Method: PUT
+
+描述: 修改机器节点申请信息
+
+参数:
+
+```go
+// UpdateNodeApplyParam 更新机器节点申请信息表单
+type UpdateNodeApplyParam struct {
+    ID        int    `form:"id"        json:"id"        binding:"required"`
+    NodeType  string `form:"nodeType"  json:"nodeType"  binding:"required"`
+    NodeNum   int    `form:"nodeNum"   json:"nodeNum"   binding:"required"`
+    StartTime int64  `form:"startTime" json:"startTime" binding:"required"`
+    EndTime   int64  `form:"endTime"   json:"endTime"   binding:"required"`
+}
+
+```
+
+响应: 是否修改成功
+
+### /node/apply/:id
+
+Method: DELETE
+
+描述: 撤销某一个机器节点申请记录
+
+参数:
+
+```text
+id: number
+```
+
+响应: 是否成功
+
+响应: 是否撤销成功
+
+### /node/distribute
+
+Method: GET
+
+描述: 分页查询用户节点分配工单信息
+
+请求参数:
+
+```typescript
+type param = {
+  pageIndex: number;
+  pageSize: number;
+};
+```
+
+响应参数: 分页的信息
+
+### /node/distribute
+
+Method: PATCH
+
+描述: 处理机器处理分配工单
+
+请求参数:
+
+```go
+// FinishNodeDistributeParam 处理机器节点分配工单参数
+type FinishNodeDistributeParam struct {
+    ID int `form:"id" json:"id" binding:"required"`
+}
+```
+
+响应参数: 是否成功
+
+### /node/apply/:id
+
+Method: GET
+
+描述: 通过 ID 查询机器节点申请信息
+
+请求参数:
+
+```text
+id: number
+```
+
+响应参数: 申请信息
+
+### /node/usage
+
+Method: GET
+
+描述: 分页查询一段时间内的机器节点使用记录
+
+请求参数:
+
+```protobuf
+pageIndex: number
+pageSize: number
+startDateMilliUnix: number
+endDateMilliUnix: number
+```
+
+响应参数: 分页的结果以及总的数量
+
+## fee 控制器
+
+### /fee/ping
+
+Method: GET
+
+描述：进行 group 服务的 ping 测试
+
+参数：无
+
+响应：请求 ID、PONG
+
+### /fee/distribute
+
+Method: GET
+
+描述: 分页查询机器节点独占账单
+
+参数: 分页参数
+
+响应: 查询的数据
+
+### /fee/distribute
+
+Method: PUT
+
+描述: 支付机器独占账单
+
+参数:
+
+```go
+// PayNodeDistributeBillParam 支付机器独占账单参数
+type PayNodeDistributeBillParam struct {
+    ID         int     `form:"id"         json:"id"         binding:"required"`
+    PayMoney   float64 `form:"payMoney"   json:"payMoney"   binding:"required"`
+    PayType    float64 `form:"payType"    json:"payType"    binding:"required"`
+    PayMessage string  `form:"payMessage" json:"payMessage" binding:"required"`
+}
+```
+
+响应: 是否支付成功
+
+### /fee/rate/distribute
+
+Method: GET
+
+描述: 查询机器节点独占费率
+
+参数: 无
+
+响应:
+
+```json
+{
+    "36CPU": resp.Rate36CPU,
+    "4GPU":  resp.Rate4GPU,
+    "8GPU":  resp.Rate8GPU,
+}
+```

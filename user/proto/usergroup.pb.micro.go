@@ -47,6 +47,9 @@ type GroupService interface {
 	CheckApply(ctx context.Context, in *CheckApplyRequest, opts ...client.CallOption) (*CheckApplyResponse, error)
 	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*CreateGroupResponse, error)
 	GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByIDRequest, opts ...client.CallOption) (*GetApplyInfoByIDResponse, error)
+	RevokeUserApplyGroup(ctx context.Context, in *RevokeUserApplyGroupRequest, opts ...client.CallOption) (*RevokeUserApplyGroupResponse, error)
+	GetGroupInfoByHpcID(ctx context.Context, in *GetGroupInfoByHpcIDRequest, opts ...client.CallOption) (*GetGroupInfoByHpcIDResponse, error)
+	AddBalance(ctx context.Context, in *AddBalanceRequest, opts ...client.CallOption) (*AddBalanceResponse, error)
 }
 
 type groupService struct {
@@ -151,6 +154,36 @@ func (c *groupService) GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByI
 	return out, nil
 }
 
+func (c *groupService) RevokeUserApplyGroup(ctx context.Context, in *RevokeUserApplyGroupRequest, opts ...client.CallOption) (*RevokeUserApplyGroupResponse, error) {
+	req := c.c.NewRequest(c.name, "GroupService.RevokeUserApplyGroup", in)
+	out := new(RevokeUserApplyGroupResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupService) GetGroupInfoByHpcID(ctx context.Context, in *GetGroupInfoByHpcIDRequest, opts ...client.CallOption) (*GetGroupInfoByHpcIDResponse, error) {
+	req := c.c.NewRequest(c.name, "GroupService.GetGroupInfoByHpcID", in)
+	out := new(GetGroupInfoByHpcIDResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupService) AddBalance(ctx context.Context, in *AddBalanceRequest, opts ...client.CallOption) (*AddBalanceResponse, error) {
+	req := c.c.NewRequest(c.name, "GroupService.AddBalance", in)
+	out := new(AddBalanceResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for GroupService service
 
 type GroupServiceHandler interface {
@@ -163,6 +196,9 @@ type GroupServiceHandler interface {
 	CheckApply(context.Context, *CheckApplyRequest, *CheckApplyResponse) error
 	CreateGroup(context.Context, *CreateGroupRequest, *CreateGroupResponse) error
 	GetApplyInfoByID(context.Context, *GetApplyInfoByIDRequest, *GetApplyInfoByIDResponse) error
+	RevokeUserApplyGroup(context.Context, *RevokeUserApplyGroupRequest, *RevokeUserApplyGroupResponse) error
+	GetGroupInfoByHpcID(context.Context, *GetGroupInfoByHpcIDRequest, *GetGroupInfoByHpcIDResponse) error
+	AddBalance(context.Context, *AddBalanceRequest, *AddBalanceResponse) error
 }
 
 func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts ...server.HandlerOption) error {
@@ -176,6 +212,9 @@ func RegisterGroupServiceHandler(s server.Server, hdlr GroupServiceHandler, opts
 		CheckApply(ctx context.Context, in *CheckApplyRequest, out *CheckApplyResponse) error
 		CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error
 		GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByIDRequest, out *GetApplyInfoByIDResponse) error
+		RevokeUserApplyGroup(ctx context.Context, in *RevokeUserApplyGroupRequest, out *RevokeUserApplyGroupResponse) error
+		GetGroupInfoByHpcID(ctx context.Context, in *GetGroupInfoByHpcIDRequest, out *GetGroupInfoByHpcIDResponse) error
+		AddBalance(ctx context.Context, in *AddBalanceRequest, out *AddBalanceResponse) error
 	}
 	type GroupService struct {
 		groupService
@@ -222,4 +261,16 @@ func (h *groupServiceHandler) CreateGroup(ctx context.Context, in *CreateGroupRe
 
 func (h *groupServiceHandler) GetApplyInfoByID(ctx context.Context, in *GetApplyInfoByIDRequest, out *GetApplyInfoByIDResponse) error {
 	return h.GroupServiceHandler.GetApplyInfoByID(ctx, in, out)
+}
+
+func (h *groupServiceHandler) RevokeUserApplyGroup(ctx context.Context, in *RevokeUserApplyGroupRequest, out *RevokeUserApplyGroupResponse) error {
+	return h.GroupServiceHandler.RevokeUserApplyGroup(ctx, in, out)
+}
+
+func (h *groupServiceHandler) GetGroupInfoByHpcID(ctx context.Context, in *GetGroupInfoByHpcIDRequest, out *GetGroupInfoByHpcIDResponse) error {
+	return h.GroupServiceHandler.GetGroupInfoByHpcID(ctx, in, out)
+}
+
+func (h *groupServiceHandler) AddBalance(ctx context.Context, in *AddBalanceRequest, out *AddBalanceResponse) error {
+	return h.GroupServiceHandler.AddBalance(ctx, in, out)
 }

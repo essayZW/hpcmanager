@@ -46,6 +46,22 @@ func (hpc *HpcGroupDB) QueryByID(ctx context.Context, id int) (*HpcGroup, error)
 	return &info, nil
 }
 
+// QueryByName 通过用户组的名查询计算节点用户组的信息
+func (hpc *HpcGroupDB) QueryByName(ctx context.Context, name string) (*HpcGroup, error) {
+	res, err := hpc.conn.QueryRow(ctx, "SELECT * FROM `hpc_group` WHERE `name`=?", name)
+	if err != nil {
+		logger.Warn("QueryByName error: ", err)
+		return nil, errors.New("QueryByName error")
+	}
+	var info HpcGroup
+	err = res.StructScan(&info)
+	if err != nil {
+		logger.Warn("QueryByName structScan error: ", err)
+		return nil, errors.New("QueryByName structScan error")
+	}
+	return &info, nil
+}
+
 // NewHpcGroup 创建新的NewHpcGroup结构体并返回指针
 func NewHpcGroup(db *db.DB) *HpcGroupDB {
 	return &HpcGroupDB{

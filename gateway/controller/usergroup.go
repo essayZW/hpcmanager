@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -50,11 +51,14 @@ func (ug *UserGroup) paginationGetGroupInfo(ctx *gin.Context) {
 
 	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()
-	resp, err := ug.userGroupService.PaginationGetGroupInfo(c, &userpb.PaginationGetGroupInfoRequest{
-		PageSize:    int32(pageSize),
-		PageIndex:   int32(pageIndex),
-		BaseRequest: baseRequest,
-	})
+	resp, err := ug.userGroupService.PaginationGetGroupInfo(
+		c,
+		&userpb.PaginationGetGroupInfoRequest{
+			PageSize:    int32(pageSize),
+			PageIndex:   int32(pageIndex),
+			BaseRequest: baseRequest,
+		},
+	)
 	if err != nil {
 		res := response.New(200, nil, false, "信息查询失败")
 		res.Send(ctx)
@@ -114,11 +118,14 @@ func (ug *UserGroup) paginationGetApplyJoinGroup(ctx *gin.Context) {
 
 	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()
-	groupResp, err := ug.userGroupService.PageGetApplyGroupInfo(c, &userpb.PageGetApplyGroupInfoRequest{
-		PageIndex:   int32(pageIndex),
-		PageSize:    int32(pageSize),
-		BaseRequest: baseRequest,
-	})
+	groupResp, err := ug.userGroupService.PageGetApplyGroupInfo(
+		c,
+		&userpb.PageGetApplyGroupInfoRequest{
+			PageIndex:   int32(pageIndex),
+			PageSize:    int32(pageSize),
+			BaseRequest: baseRequest,
+		},
+	)
 	if err != nil {
 		httpResp := response.New(200, nil, false, "用户组申请信息查询失败")
 		httpResp.Send(ctx)
@@ -257,6 +264,70 @@ func (ug *UserGroup) checkApply(ctx *gin.Context) {
 	return
 }
 
+// revokeUserApplyGroup /api/group/apply/:id DELETE 撤销某个申请
+func (ug *UserGroup) revokeUserApplyGroup(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	idStr := ctx.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "invalid id")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := ug.userGroupService.RevokeUserApplyGroup(c, &userpb.RevokeUserApplyGroupRequest{
+		BaseRequest: baseRequest,
+		ApplyID:     int32(id),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("撤销申请失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "撤销申请失败,可能是已经被撤销")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
+// addBalance /api/group/balance PATCH 修改用户组的余额
+func (ug *UserGroup) addBalance(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.AddGroupBalanceParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	resp, err := ug.userGroupService.AddBalance(c, &userpb.AddBalanceRequest{
+		BaseRequest: baseRequest,
+		GroupID:     int32(param.GroupID),
+		Money:       param.Balance,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("修改用户组余额失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, map[string]float64{
+		"balance": resp.Balance,
+	}, true, "success")
+	httpResp.Send(ctx)
+}
+
 // Registry 为用户组控制器注册相应的接口
 func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller UserGroup")
@@ -274,6 +345,8 @@ func (ug *UserGroup) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	userGroup.GET("/tutor/:username", ug.searchTutorInfo)
 	userGroup.POST("/apply", ug.createJoinGroupApply)
 	userGroup.PATCH("/apply", ug.checkApply)
+	userGroup.DELETE("/apply/:id", ug.revokeUserApplyGroup)
+	userGroup.PATCH("/balance", ug.addBalance)
 	return userGroup
 }
 

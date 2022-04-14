@@ -21,7 +21,13 @@ type Cas struct {
 // ValidToken 验证认证中心传过来的回调token
 func (cas *Cas) ValidToken(service, token string) (AuthenticationSuccess, error) {
 	// 1. 构造请求验证token
-	urlPath := fmt.Sprintf("%s%s?ticket=%s&service=%s", cas.AuthServer, serverValidPath, token, service)
+	urlPath := fmt.Sprintf(
+		"%s%s?ticket=%s&service=%s",
+		cas.AuthServer,
+		serverValidPath,
+		token,
+		service,
+	)
 	logger.Debug(urlPath)
 	resp, err := http.Get(urlPath)
 	if err != nil {

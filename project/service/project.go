@@ -22,7 +22,11 @@ type ProjectService struct {
 }
 
 // Ping ping测试
-func (ps *ProjectService) Ping(ctx context.Context, req *publicproto.Empty, resp *publicproto.PingResponse) error {
+func (ps *ProjectService) Ping(
+	ctx context.Context,
+	req *publicproto.Empty,
+	resp *publicproto.PingResponse,
+) error {
 	logger.Info("Project PING ", req)
 	resp.Msg = "PONG"
 	resp.Ip = req.BaseRequest.RequestInfo.RemoteIP
@@ -31,19 +35,36 @@ func (ps *ProjectService) Ping(ctx context.Context, req *publicproto.Empty, resp
 }
 
 // CreateProject 创建新的项目记录
-func (ps *ProjectService) CreateProject(ctx context.Context, req *projectpb.CreateProjectRequest, resp *projectpb.CreateProjectResponse) error {
+func (ps *ProjectService) CreateProject(
+	ctx context.Context,
+	req *projectpb.CreateProjectRequest,
+	resp *projectpb.CreateProjectResponse,
+) error {
 	logger.Info("CreateProject: ", req.BaseRequest)
 	if !verify.Identify(verify.CreateProject, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("CreateProject permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"CreateProject permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("CreateProject permission forbidden")
 	}
-	id, err := ps.projectLogic.Create(context.Background(), int(req.BaseRequest.UserInfo.UserId), req.BaseRequest.UserInfo.Name, req.BaseRequest.UserInfo.Username, &projectdb.Project{
-		Name:        req.ProjectInfo.Name,
-		From:        req.ProjectInfo.From,
-		Numbering:   req.ProjectInfo.Numbering,
-		Expenses:    req.ProjectInfo.Expenses,
-		Description: req.ProjectInfo.Description,
-	})
+	id, err := ps.projectLogic.Create(
+		context.Background(),
+		int(req.BaseRequest.UserInfo.UserId),
+		req.BaseRequest.UserInfo.Name,
+		req.BaseRequest.UserInfo.Username,
+		&projectdb.Project{
+			Name:        req.ProjectInfo.Name,
+			From:        req.ProjectInfo.From,
+			Numbering:   req.ProjectInfo.Numbering,
+			Expenses:    req.ProjectInfo.Expenses,
+			Description: req.ProjectInfo.Description,
+		},
+	)
 	if err != nil {
 		return err
 	}
@@ -52,10 +73,21 @@ func (ps *ProjectService) CreateProject(ctx context.Context, req *projectpb.Crea
 }
 
 // GetProjectInfoByID 通过ID查询项目信息
-func (ps *ProjectService) GetProjectInfoByID(ctx context.Context, req *projectpb.GetProjectInfoByIDRequest, resp *projectpb.GetProjectInfoByIDResponse) error {
+func (ps *ProjectService) GetProjectInfoByID(
+	ctx context.Context,
+	req *projectpb.GetProjectInfoByIDRequest,
+	resp *projectpb.GetProjectInfoByIDResponse,
+) error {
 	logger.Info("GetProjectInfoByID: ", req.BaseRequest)
 	if !verify.Identify(verify.GetProjectInfo, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("GetProjectInfoByID permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"GetProjectInfoByID permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("GetProjectInfoByID permission forbidden")
 	}
 	info, err := ps.projectLogic.GetByID(context.Background(), int(req.Id))
@@ -105,10 +137,21 @@ func (ps *ProjectService) GetProjectInfoByID(ctx context.Context, req *projectpb
 }
 
 // PaginationGetProjectInfos 分页查询项目信息
-func (ps *ProjectService) PaginationGetProjectInfos(ctx context.Context, req *projectpb.PaginationGetProjectInfosRequest, resp *projectpb.PaginationGetProjectInfosResponse) error {
+func (ps *ProjectService) PaginationGetProjectInfos(
+	ctx context.Context,
+	req *projectpb.PaginationGetProjectInfosRequest,
+	resp *projectpb.PaginationGetProjectInfosResponse,
+) error {
 	logger.Info("PaginationGetProjectInfos: ", req.BaseRequest)
 	if !verify.Identify(verify.GetProjectInfo, req.BaseRequest.UserInfo.Levels) {
-		logger.Info("PaginationGetProjectInfos permission forbidden: ", req.BaseRequest.RequestInfo.Id, ", fromUserId: ", req.BaseRequest.UserInfo.UserId, ", withLevels: ", req.BaseRequest.UserInfo.Levels)
+		logger.Info(
+			"PaginationGetProjectInfos permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
 		return errors.New("PaginationGetProjectInfos permission forbidden")
 	}
 	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
@@ -118,7 +161,12 @@ func (ps *ProjectService) PaginationGetProjectInfos(ctx context.Context, req *pr
 	// 验证查询范围
 	if !isAdmin && !isTutor {
 		// 普通用户只可以查询自己创建的项目信息
-		res, err = ps.projectLogic.PaginationGetByCreaterUserID(context.Background(), int(req.PageIndex), int(req.PageSize), int(req.BaseRequest.UserInfo.UserId))
+		res, err = ps.projectLogic.PaginationGetByCreaterUserID(
+			context.Background(),
+			int(req.PageIndex),
+			int(req.PageSize),
+			int(req.BaseRequest.UserInfo.UserId),
+		)
 	} else if !isAdmin && isTutor {
 		// 导师用户只可以查询自己组用户的所有的项目信息
 		ids, err := ps.userService.ListGroupUser(ctx, &userpb.ListGroupUserRequest{

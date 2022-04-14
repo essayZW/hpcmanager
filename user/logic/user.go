@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -15,6 +16,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/mozillazg/go-pinyin"
 )
+
+func init() {
+	pinyin.Fallback = func(r rune, a pinyin.Args) []string {
+		return []string{string(r)}
+	}
+}
 
 // 对于已经登录的用户来说，会在redis中存储两个值
 // 其中一个是TokenPrefix+token,用来快速判断某个token的归属者,其值为用户帐号
@@ -105,6 +112,12 @@ func (u *User) AddUser(ctx context.Context, userInfo *db.User) (int, error) {
 		pinyinDict := pinyin.LazyPinyin(userInfo.Name, pinyin.NewArgs())
 		userInfo.PinyinName = strings.Join(pinyinDict, "")
 	}
+	// 判断该拼音的名称是否重复,如果重复的话,添加相应的后缀确保其不重复
+	newPYName, err := u.addSuffixForPYName(ctx, userInfo.PinyinName)
+	if err != nil {
+		return 0, errors.New("invalid name with pinyin name")
+	}
+	userInfo.PinyinName = newPYName
 	if userInfo.CreateTime.IsZero() {
 		userInfo.CreateTime = time.Now()
 	}
@@ -116,6 +129,19 @@ func (u *User) AddUser(ctx context.Context, userInfo *db.User) (int, error) {
 		return 0, err
 	}
 	return id, nil
+}
+
+// addSuffixForPYName 为拼音姓名添加唯一的后缀标志
+func (u *User) addSuffixForPYName(ctx context.Context, pyName string) (string, error) {
+	count, err := u.userDB.QueryCountWithPYNamePrefix(ctx, pyName)
+	if err != nil {
+		return "", err
+	}
+	if count == 0 {
+		return pyName, nil
+	}
+	suffix := strconv.Itoa(count)
+	return pyName + suffix, nil
 }
 
 // GetUserInfoByID 通过ID查询用户信息
@@ -130,7 +156,10 @@ type PaginationUserResult struct {
 }
 
 // PaginationGetUserInfo 分页查询用户信息
-func (u *User) PaginationGetUserInfo(ctx context.Context, pageIndex, pageSize, groupID int) (*PaginationUserResult, error) {
+func (u *User) PaginationGetUserInfo(
+	ctx context.Context,
+	pageIndex, pageSize, groupID int,
+) (*PaginationUserResult, error) {
 	if pageIndex < 1 {
 		return nil, errors.New("pageIndex must large than 0")
 	}
@@ -196,7 +225,7 @@ func NewUser(db *db.UserDB, configConn config.DynamicConfig, redisConn *redis.Cl
 		TokenExpireTime: time.Duration(24) * time.Hour,
 	}
 	var expireTime float64
-	configConn.Registry("user/TokenExpireTime", &expireTime, func(newV interface{}) {
+	configConn.Registry("user_TokenExpireTime", &expireTime, func(newV interface{}) {
 		user.mutex.Lock()
 		defer user.mutex.Unlock()
 		user.TokenExpireTime = time.Duration(int(expireTime)) * time.Minute

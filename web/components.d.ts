@@ -8,10 +8,12 @@ declare module 'vue' {
     ApplyGroupTable: typeof import('./src/components/ApplyGroupTable.vue')['default']
     AsideNavigation: typeof import('./src/components/AsideNavigation.vue')['default']
     CheckGroupApply: typeof import('./src/components/tutor/CheckGroupApply.vue')['default']
+    CommonIndex: typeof import('./src/components/common/CommonIndex.vue')['default'];
     ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
+    ElCards: typeof import('element-plus/es')['ElCards'];
     ElCol: typeof import('element-plus/es')['ElCol']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
@@ -34,6 +36,8 @@ declare module 'vue' {
     ElMenuItemGroup: typeof import('element-plus/es')['ElMenuItemGroup']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElPagination: typeof import('element-plus/es')['ElPagination']
+    ElPopover: typeof import('element-plus/es')['ElPopover'];
+    ElResult: typeof import('element-plus/es')['ElResult'];
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
@@ -48,9 +52,15 @@ declare module 'vue' {
     IEpAvatar: typeof import('~icons/ep/avatar')['default']
     IIcRoundRefresh: typeof import('~icons/ic/round-refresh')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
+    MainIndex: typeof import('./src/components/MainIndex.vue')['default']
     NodeApplyManager: typeof import('./src/components/common/NodeApplyManager.vue')['default']
     NodeApplyTable: typeof import('./src/components/NodeApplyTable.vue')['default']
+    NodeDistributeBillManager: typeof import('./src/components/common/NodeDistributeBillManager.vue')['default']
+    NodeDistributeBillTable: typeof import('./src/components/NodeDistributeBillTable.vue')['default']
+    NodeDistributeManager: typeof import('./src/components/admin/NodeDistributeManager.vue')['default']
     NodeTypeSelect: typeof import('./src/components/form/NodeTypeSelect.vue')['default']
+    NodeUsageManager: typeof import('./src/components/common/NodeUsageManager.vue')['default']
+    NodeUsageTable: typeof import('./src/components/NodeUsageTable.vue')['default']
     PageTitle: typeof import('./src/components/PageTitle.vue')['default']
     ProjectManager: typeof import('./src/components/ProjectManager.vue')['default']
     UpdateUserInfo: typeof import('./src/components/UpdateUserInfo.vue')['default']

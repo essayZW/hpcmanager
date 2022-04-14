@@ -2,9 +2,13 @@
 import PageTitle from '../PageTitle.vue';
 import { reactive, ref } from 'vue';
 import { GroupInfo } from '../../api/group';
-import { paginationGetGroupInfo, createGroup } from '../../service/group';
+import {
+  paginationGetGroupInfo,
+  createGroup,
+  addGroupBalance,
+} from '../../service/group';
 import { PaginationQueryResponse } from '../../api/api';
-import { getUserInfoById } from '../../service/user';
+import { getUserInfoById, isAdmin } from '../../service/user';
 import { UserInfo } from '../../api/user';
 import { requiredWithLength, FormInstance } from '../../utils/validateRule';
 import { zeroWithDefault } from '../../utils/obj';
@@ -67,7 +71,6 @@ const tableRowExtraInfo = reactive<{
   };
 }>({});
 const rowExpanded = async (row: GroupInfo) => {
-  // TODO: 考虑使用缓存淘汰
   if (tableRowExtraInfo[row.id] && tableRowExtraInfo[row.id].user) {
     return;
   }
@@ -150,6 +153,83 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
         type: 'error',
         message: `${error}`,
       });
+    }
+    return valid;
+  });
+};
+
+const groupBalanceUpdateDialog = ref<boolean>(false);
+
+const showGroupBalanceUpdateDialog = (groupInfo: GroupInfo) => {
+  groupBalanceUpdateFormData.addFee = 0;
+  groupBalanceUpdateFormData.id = groupInfo.id;
+  groupBalanceUpdateFormData.tutorName = groupInfo.tutorName;
+  groupBalanceUpdateFormData.tutorUsername = groupInfo.tutorUsername;
+  groupBalanceUpdateDialog.value = true;
+};
+
+const hideGroupBalanceUpdateDialog = () => {
+  groupBalanceUpdateDialog.value = false;
+};
+
+const groupBalanceUpdateFormData = reactive<{
+  id: number;
+  tutorName: string;
+  tutorUsername: string;
+  oldFee: number;
+  addFee: number;
+}>({
+  id: 0,
+  tutorUsername: '无',
+  tutorName: '无',
+  oldFee: 0,
+  addFee: 0,
+});
+
+const groupBalanceUpdateFormRule = {
+  addFee: [
+    { required: true, message: '新增余额不能为空', trigger: 'blur' },
+    {
+      validator: (
+        _: unknown,
+        value: number,
+        callback: (arg0: Error | undefined) => void
+      ) => {
+        if (value <= 0) {
+          callback(new Error('新增余额必须大于0'));
+        }
+        callback(undefined);
+      },
+      trigger: 'blur',
+    },
+  ],
+};
+
+const groupBalanceUpdateFormElem = ref<FormInstance>();
+
+const groupBalanceUpdateFormSubmit = (elem: FormInstance | undefined) => {
+  if (!elem) {
+    return;
+  }
+  elem.validate(async (valid) => {
+    if (valid) {
+      try {
+        await addGroupBalance(
+          groupBalanceUpdateFormData.id,
+          groupBalanceUpdateFormData.addFee
+        );
+        hideGroupBalanceUpdateDialog();
+        ElMessage({
+          type: 'success',
+          message: '修改成功',
+        });
+        refreshTable();
+      } catch (error) {
+        ElMessage({
+          type: 'error',
+          message: `${error}`,
+        });
+      }
     }
     return valid;
   });
@@ -288,6 +368,17 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
                   }}</span
                 >
               </p>
+              <p><strong>操作:</strong></p>
+              <p class="info">
+                <el-button
+                  v-if="isAdmin()"
+                  type="primary"
+                  size="small"
+                  @click="showGroupBalanceUpdateDialog(props.row)"
+                  >余额充值</el-button
+                >
+                <span v-else>无</span>
+              </p>
             </div>
           </template>
         </el-table-column>
@@ -345,6 +436,45 @@ const submitCreateGroupForm = (elem: FormInstance | undefined) => {
         <el-button
           type="primary"
           @click="submitCreateGroupForm(createGroupFormElem)"
+          >确认</el-button
+        >
+      </span>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="groupBalanceUpdateDialog" title="用户组余额充值">
+    <el-form
+      ref="groupBalanceUpdateFormElem"
+      :model="groupBalanceUpdateFormData"
+      :rules="groupBalanceUpdateFormRule"
+      @submit.prevent
+    >
+      <el-form-item label="用户组ID:">
+        <span>{{ groupBalanceUpdateFormData.id }}</span>
+      </el-form-item>
+      <el-form-item label="导师姓名:">
+        <span>{{ groupBalanceUpdateFormData.tutorName }}</span>
+      </el-form-item>
+      <el-form-item label="导师工号:">
+        <span>{{ groupBalanceUpdateFormData.tutorUsername }}</span>
+      </el-form-item>
+      <el-form-item label="现有余额">
+        <span>{{ groupBalanceUpdateFormData.oldFee }}元</span>
+      </el-form-item>
+      <el-form-item label="添加的余额" prop="addFee">
+        <el-input
+          v-model.number="groupBalanceUpdateFormData.addFee"
+          type="text"
+        >
+          <template #append>元</template>
+        </el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="hideGroupBalanceUpdateDialog">取消</el-button>
+        <el-button
+          type="primary"
+          @click="groupBalanceUpdateFormSubmit(groupBalanceUpdateFormElem)"
           >确认</el-button
         >
       </span>

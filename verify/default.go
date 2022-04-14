@@ -45,10 +45,10 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: SuperAdmin,
 			},
-			// 普通成员权限及以上
+			// 游客权限及以上
 			GetUserInfo: {
 				maxLevel: MaxLevel,
-				minLevel: Common,
+				minLevel: Guest,
 			},
 			// 导师权限及以上
 			GetGroupInfo: {
@@ -57,6 +57,11 @@ func newDefault() *hardcodeVerify {
 			},
 			// 游客权限
 			ApplyJoinGroup: {
+				maxLevel: Guest,
+				minLevel: Guest,
+			},
+			// 游客权限
+			RevokeUserApplyGroup: {
 				maxLevel: Guest,
 				minLevel: Guest,
 			},
@@ -96,7 +101,16 @@ func newDefault() *hardcodeVerify {
 				minLevel: Common,
 			},
 			// 需要普通用户及以上权限
+			RevokeNodeApply: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 需要普通用户及以上权限
 			GetNodeApplyInfo: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			UpdateNodeApply: {
 				maxLevel: MaxLevel,
 				minLevel: Common,
 			},
@@ -104,6 +118,50 @@ func newDefault() *hardcodeVerify {
 			CheckNodeApply: {
 				maxLevel: MaxLevel,
 				minLevel: Tutor,
+			},
+			// 暂定需要普通管理员及以上的权限
+			CreateNodeDistributeWO: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			// 需要普通管理员及以上的权限
+			QueryNodeDistributeWO: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			// 需要普通管理员及以上权限
+			FinishNodeDistributeWO: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			// 需要普通用户及以上权限
+			QueryNodeUsage: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 需要超级管理员及以上权限
+			AddNodeUsage: {
+				maxLevel: MaxLevel,
+				minLevel: SuperAdmin,
+			},
+			// 需要管理员以上权限
+			CreateNodeDistributeBill: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			// 需要普通权限以上
+			QueryNodeDistributeBill: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 需要普通管理员及以上权限
+			AddGroupBalance: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			PayNodeDistributeBill: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
 			},
 		},
 	}

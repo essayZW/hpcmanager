@@ -66,7 +66,10 @@ func main() {
 	}
 
 	permissionLogic := logic.NewPermission(permissiondb.NewPermission(sqldb))
-	userPermissionLogic := logic.NewUserPermission(permissiondb.NewUserPermission(sqldb), permissionLogic)
+	userPermissionLogic := logic.NewUserPermission(
+		permissiondb.NewUserPermission(sqldb),
+		permissionLogic,
+	)
 
 	permissionService := service.NewPermission(serviceClient, userPermissionLogic, permissionLogic)
 	permissionpb.RegisterPermissionHandler(srv.Server(), permissionService)

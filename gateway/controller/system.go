@@ -173,7 +173,10 @@ func (sys *System) casAuthValid(ctx *gin.Context) {
 		return
 	}
 
-	info, err := sys.casServer.ValidToken(defaultCasConfig.ServiceAddr+defaultCasConfig.ValidPath, ticket)
+	info, err := sys.casServer.ValidToken(
+		defaultCasConfig.ServiceAddr+defaultCasConfig.ValidPath,
+		ticket,
+	)
 	if err != nil {
 		resp := response.New(200, nil, false, err.Error())
 		resp.Send(ctx)

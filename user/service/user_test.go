@@ -296,7 +296,13 @@ func TestCreateToken(t *testing.T) {
 				Username:    test.Username,
 			}, &resp)
 			if (err != nil) != test.Error {
-				t.Errorf("Except %v Get %v UserInfo %v Token %v", test.Error, err, resp.UserInfo, resp.Token)
+				t.Errorf(
+					"Except %v Get %v UserInfo %v Token %v",
+					test.Error,
+					err,
+					resp.UserInfo,
+					resp.Token,
+				)
 			}
 		})
 	}
