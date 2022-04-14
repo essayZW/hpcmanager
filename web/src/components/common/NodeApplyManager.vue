@@ -41,6 +41,8 @@ const createNodeApplyFormData = reactive<{
     numbering: string;
     expenses: string;
     description: string;
+    createrUserName: string;
+    createrUsername: string;
   };
 }>({
   nodeType: '',
@@ -52,6 +54,8 @@ const createNodeApplyFormData = reactive<{
     numbering: '',
     expenses: '',
     description: '',
+    createrUserName: '',
+    createrUsername: '',
   },
   startTime: new Date().getTime(),
   endTime: dayjs(new Date()).add(1, 'year').valueOf(),
@@ -73,6 +77,8 @@ const searchProjectInfo = async () => {
     createNodeApplyFormData.projectInfo.numbering = data.numbering;
     createNodeApplyFormData.projectInfo.expenses = data.expenses;
     createNodeApplyFormData.projectInfo.description = data.description;
+    createNodeApplyFormData.projectInfo.createrUsername = data.createrUsername;
+    createNodeApplyFormData.projectInfo.createrUserName = data.createrName;
   } catch (error) {
     ElMessage({
       type: 'error',
@@ -218,6 +224,16 @@ if (userInfo) {
                 '无'
               )
             }}</span
+          >
+        </p>
+        <p>
+          <span
+            ><strong>创建人学(工)号: </strong
+            >{{ createNodeApplyFormData.projectInfo.createrUsername }}</span
+          >
+          <span
+            ><strong>创建人姓名: </strong
+            >{{ createNodeApplyFormData.projectInfo.createrUserName }}</span
           >
         </p>
         <p>
