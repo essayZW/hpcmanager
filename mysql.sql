@@ -438,6 +438,8 @@ DROP TABLE IF EXISTS `week_usage_bill`;
 CREATE TABLE `week_usage_bill` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
+  `user_username` varchar(32) NOT NULL,
+  `user_name` varchar(32) NOT NULL,
   `wall_time` int NOT NULL,
   `gwall_time` int NOT NULL,
   `fee` decimal(18,2) NOT NULL,
@@ -448,6 +450,8 @@ CREATE TABLE `week_usage_bill` (
   `pay_time` timestamp NULL DEFAULT NULL,
   `pay_type` tinyint DEFAULT NULL,
   `pay_message` varchar(256) DEFAULT NULL,
+  `user_group_id` int NOT NULL,
+  `create_time` timestamp NOT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -462,4 +466,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-04-13 19:19:37
+-- Dump completed on 2022-04-14 21:30:11
