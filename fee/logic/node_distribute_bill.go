@@ -88,7 +88,7 @@ func (ndbl *NodeDistributeBill) Create(
 }
 
 // CalFee 计算账单的费用
-func (ndbl *NodeDistributeBill) CalFee(startTimeUnix, endTimeUnix int64, nodeType string) (float64, error) {
+func (ndbl *NodeDistributeBill) CalFee(startTimeUnix, endTimeUnix int64, nodeType string, nodeNum int) (float64, error) {
 	year := ndbl.calTimeDurationYear(startTimeUnix, endTimeUnix)
 	var res float64
 	var err error = nil
@@ -105,6 +105,7 @@ func (ndbl *NodeDistributeBill) CalFee(startTimeUnix, endTimeUnix int64, nodeTyp
 		res = 0
 		err = errors.New("invalid nodeType")
 	}
+	res = res * float64(nodeNum)
 	return res, err
 }
 

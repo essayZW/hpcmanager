@@ -179,7 +179,7 @@ const handlerPayBillSubmit = async (isBalance: boolean) => {
         </el-table-column>
         <el-table-column label="实缴费用" align="center">
           <template #default="props">
-            <span v-if="props.row.payFlag">{{ props.row.fee }}元</span>
+            <span v-if="props.row.payFlag">{{ props.row.payFee }}元</span>
             <span v-else>未缴费</span>
           </template>
         </el-table-column>

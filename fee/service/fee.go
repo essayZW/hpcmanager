@@ -70,6 +70,7 @@ func (fs *FeeService) CreateNodeDistributeBill(
 		nodeApplyInfo.Apply.StartTime,
 		nodeApplyInfo.Apply.EndTime,
 		nodeApplyInfo.Apply.NodeType,
+		int(nodeApplyInfo.Apply.NodeNum),
 	)
 	if err != nil {
 		return err

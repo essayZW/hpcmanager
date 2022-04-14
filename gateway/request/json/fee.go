@@ -17,7 +17,7 @@ func init() {
 // PayNodeDistributeBillParam 支付机器独占账单参数
 type PayNodeDistributeBillParam struct {
 	ID         int     `form:"id"         json:"id"         binding:"required"`
-	PayMoney   float64 `form:"payMoney"   json:"payMoney"   binding:"required"`
+	PayMoney   float64 `form:"payMoney"   json:"payMoney"`
 	PayType    float64 `form:"payType"    json:"payType"    binding:"required"`
 	PayMessage string  `form:"payMessage" json:"payMessage"`
 }
