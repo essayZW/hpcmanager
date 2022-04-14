@@ -98,3 +98,17 @@ export async function payNodeDistributeBill(
   }
   return true;
 }
+
+/**
+ * 查询机器独占账单费率
+ */
+export async function queryNodeDistributeFeeRate(): Promise<NodeDistributeFeeRate> {
+  const resp = await ApiRequest.request<NodeDistributeFeeRate>(
+    '/fee/rate/distribute',
+    'GET'
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}

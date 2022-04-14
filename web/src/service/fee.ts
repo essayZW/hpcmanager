@@ -4,6 +4,8 @@ import {
   paginationQueryNodeDistributeBill,
   ping,
   payNodeDistributeBill as payNodeDistributeBillApi,
+  NodeDistributeFeeRate,
+  queryNodeDistributeFeeRate,
 } from '../api/fee';
 
 /**
@@ -57,4 +59,11 @@ export function payTypeToString(payType: number): string {
     default:
       return '未知';
   }
+}
+
+/**
+ * 查询机器独占账单费率
+ */
+export async function getNodeDistributeFeeRate(): Promise<NodeDistributeFeeRate> {
+  return queryNodeDistributeFeeRate();
 }

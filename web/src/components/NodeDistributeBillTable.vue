@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { NodeDistributeBill, NodeDistributeFeeRate } from '../api/fee';
 import {
+  getNodeDistributeFeeRate,
   paginationGetNodeDistributeBill,
   payNodeDistributeBill,
   payTypeToString,
@@ -70,6 +71,19 @@ const payBillDialogInfo = reactive<{
   rateInfo?: NodeDistributeFeeRate;
   applyInfo?: NodeApplyInfo;
 }>({});
+
+onMounted(async () => {
+  try {
+    const data = await getNodeDistributeFeeRate();
+    payBillDialogInfo.rateInfo = data;
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+    return;
+  }
+});
 
 const showPayBillDialog = async () => {
   if (!payBillRow.value) {
@@ -227,7 +241,6 @@ const handlerPayBillSubmit = async (isBalance: boolean) => {
   <el-dialog v-model="payBillDialog" title="账单缴费">
     <div class="pay-bill-dialog-body">
       <div class="rate-area">
-        <!-- FIXME: 对接费率查询接口 -->
         <h3>包机费率</h3>
         <p>
           <strong>36 核心节点:</strong

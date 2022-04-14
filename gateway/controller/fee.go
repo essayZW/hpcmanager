@@ -124,9 +124,9 @@ func (f *fee) getNodeDistributeFeeRate(ctx *gin.Context) {
 	}
 
 	httpResp := response.New(200, map[string]float64{
-		"36CPU": resp.Rate36CPU,
-		"4GPU":  resp.Rate4GPU,
-		"8GPU":  resp.Rate8GPU,
+		"rate36CPU": resp.Rate36CPU,
+		"rate4GPU":  resp.Rate4GPU,
+		"rate8GPU":  resp.Rate8GPU,
 	}, true, "success")
 	httpResp.Send(ctx)
 }
