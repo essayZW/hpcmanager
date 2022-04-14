@@ -13,6 +13,7 @@ import (
 
 // NodeDistributeRate 机器节点独占费率
 type NodeDistributeRate struct {
+	mutex sync.Mutex
 	// rate36CPU 36 核心节点费率/年
 	rate36CPU float64
 	// rate4GPU 4 gpu核心节点费率/年
@@ -23,16 +24,22 @@ type NodeDistributeRate struct {
 
 // Get36CPURate 查询36 CPU节点的费率
 func (ndr *NodeDistributeRate) Get36CPURate() float64 {
+	ndr.mutex.Lock()
+	defer ndr.mutex.Unlock()
 	return ndr.rate36CPU
 }
 
 // Get4GPU 查询4 GPU节点的费率
 func (ndr *NodeDistributeRate) Get4GPU() float64 {
+	ndr.mutex.Lock()
+	defer ndr.mutex.Unlock()
 	return ndr.rate4GPU
 }
 
 // Get8GPU 查询8 GPU节点的费率
 func (ndr *NodeDistributeRate) Get8GPU() float64 {
+	ndr.mutex.Lock()
+	defer ndr.mutex.Unlock()
 	return ndr.rate8GPU
 }
 
@@ -40,7 +47,6 @@ func (ndr *NodeDistributeRate) Get8GPU() float64 {
 type NodeDistributeBill struct {
 	ndb *db.NodeDistributeBillDB
 
-	mutex sync.Mutex
 	NodeDistributeRate
 }
 
