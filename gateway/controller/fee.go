@@ -131,6 +131,51 @@ func (f *fee) getNodeDistributeFeeRate(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// paginationGetNodeWeekUsageBills /api/fee/usage/week GET 分页查询机器节点机时周账单
+func (f *fee) paginationGetNodeWeekUsageBills(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	startTime, endTime, err := utils.ParseDateRange(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := f.feeService.PaginationGetNodeWeekUsageBillRecords(c, &feepb.PaginationGetNodeWeekUsageBillRecordsResquest{
+		BaseRequest:   baseRequest,
+		PageIndex:     int32(pageIndex),
+		PageSize:      int32(pageSize),
+		StartTimeUnix: startTime.Unix(),
+		EndTimeUnix:   endTime.Unix(),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询账单信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	responseData := response.PaginationQueryResponse{
+		Data:  resp.Bills,
+		Count: int(resp.Count),
+	}
+	if resp.Bills == nil {
+		responseData.Data = make([]*feepb.NodeWeekUsageBill, 0)
+	}
+	httpResp := response.New(200, responseData, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter := router.Group("/fee")
 
@@ -141,6 +186,8 @@ func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter.PUT("/distribute", f.payNodeDistributeBill)
 
 	feeRouter.GET("/rate/distribute", f.getNodeDistributeFeeRate)
+
+	feeRouter.GET("/usage/week", f.paginationGetNodeWeekUsageBills)
 	return feeRouter
 }
 

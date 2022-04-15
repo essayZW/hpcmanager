@@ -812,3 +812,20 @@ Method: GET
     "8GPU":  resp.Rate8GPU,
 }
 ```
+
+### /fee/usage/week
+
+Method: GET
+
+描述: 分页查询机器节点周账单
+
+参数:
+
+```typescript
+pageIndex: number;
+pageSize: number;
+startDateMilliUnix: number;
+endDateMilliUnix: number;
+```
+
+响应: 分页查询的结果
