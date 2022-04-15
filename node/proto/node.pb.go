@@ -1462,6 +1462,108 @@ func (x *GetNodeDistributeInfoByIDResponse) GetWo() *NodeDistribute {
 	return nil
 }
 
+type GetNodeUsageTimeRecordByIDRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BaseRequest *proto.BaseRequest `protobuf:"bytes,1,opt,name=baseRequest,proto3" json:"baseRequest,omitempty"`
+	Id          int32              `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *GetNodeUsageTimeRecordByIDRequest) Reset() {
+	*x = GetNodeUsageTimeRecordByIDRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_node_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetNodeUsageTimeRecordByIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNodeUsageTimeRecordByIDRequest) ProtoMessage() {}
+
+func (x *GetNodeUsageTimeRecordByIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_node_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNodeUsageTimeRecordByIDRequest.ProtoReflect.Descriptor instead.
+func (*GetNodeUsageTimeRecordByIDRequest) Descriptor() ([]byte, []int) {
+	return file_proto_node_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *GetNodeUsageTimeRecordByIDRequest) GetBaseRequest() *proto.BaseRequest {
+	if x != nil {
+		return x.BaseRequest
+	}
+	return nil
+}
+
+func (x *GetNodeUsageTimeRecordByIDRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type GetNodeUsageTimeRecordByIDResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Record *NodeUsageTime `protobuf:"bytes,1,opt,name=record,proto3" json:"record,omitempty"`
+}
+
+func (x *GetNodeUsageTimeRecordByIDResponse) Reset() {
+	*x = GetNodeUsageTimeRecordByIDResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_node_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetNodeUsageTimeRecordByIDResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNodeUsageTimeRecordByIDResponse) ProtoMessage() {}
+
+func (x *GetNodeUsageTimeRecordByIDResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_node_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNodeUsageTimeRecordByIDResponse.ProtoReflect.Descriptor instead.
+func (*GetNodeUsageTimeRecordByIDResponse) Descriptor() ([]byte, []int) {
+	return file_proto_node_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GetNodeUsageTimeRecordByIDResponse) GetRecord() *NodeUsageTime {
+	if x != nil {
+		return x.Record
+	}
+	return nil
+}
+
 var File_proto_node_proto protoreflect.FileDescriptor
 
 var file_proto_node_proto_rawDesc = []byte{
@@ -1657,7 +1759,19 @@ var file_proto_node_proto_rawDesc = []byte{
 	0x74, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
 	0x73, 0x65, 0x12, 0x24, 0x0a, 0x02, 0x77, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14,
 	0x2e, 0x6e, 0x6f, 0x64, 0x65, 0x2e, 0x4e, 0x6f, 0x64, 0x65, 0x44, 0x69, 0x73, 0x74, 0x72, 0x69,
-	0x62, 0x75, 0x74, 0x65, 0x52, 0x02, 0x77, 0x6f, 0x32, 0xc8, 0x09, 0x0a, 0x04, 0x4e, 0x6f, 0x64,
+	0x62, 0x75, 0x74, 0x65, 0x52, 0x02, 0x77, 0x6f, 0x22, 0x6b, 0x0a, 0x21, 0x47, 0x65, 0x74, 0x4e,
+	0x6f, 0x64, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x65, 0x63, 0x6f,
+	0x72, 0x64, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x36, 0x0a,
+	0x0b, 0x62, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x14, 0x2e, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x42, 0x61, 0x73,
+	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x0b, 0x62, 0x61, 0x73, 0x65, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x05, 0x52, 0x02, 0x69, 0x64, 0x22, 0x51, 0x0a, 0x22, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65,
+	0x55, 0x73, 0x61, 0x67, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x42,
+	0x79, 0x49, 0x44, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x06, 0x72,
+	0x65, 0x63, 0x6f, 0x72, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x6e, 0x6f,
+	0x64, 0x65, 0x2e, 0x4e, 0x6f, 0x64, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x54, 0x69, 0x6d, 0x65,
+	0x52, 0x06, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x32, 0xbb, 0x0a, 0x0a, 0x04, 0x4e, 0x6f, 0x64,
 	0x65, 0x12, 0x37, 0x0a, 0x04, 0x50, 0x69, 0x6e, 0x67, 0x12, 0x12, 0x2e, 0x70, 0x75, 0x62, 0x6c,
 	0x69, 0x63, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x19, 0x2e,
 	0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x50, 0x69, 0x6e, 0x67,
@@ -1734,10 +1848,17 @@ var file_proto_node_proto_rawDesc = []byte{
 	0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x6e, 0x6f, 0x64, 0x65, 0x2e,
 	0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x44, 0x69, 0x73, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74,
 	0x65, 0x49, 0x6e, 0x66, 0x6f, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x00, 0x42, 0x2f, 0x5a, 0x2d, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x65, 0x73, 0x73, 0x61, 0x79, 0x5a, 0x57, 0x2f, 0x68, 0x70, 0x63, 0x6d, 0x61, 0x6e,
-	0x61, 0x67, 0x65, 0x72, 0x2f, 0x6e, 0x6f, 0x64, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x3b,
-	0x6e, 0x6f, 0x64, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x22, 0x00, 0x12, 0x71, 0x0a, 0x1a, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x55, 0x73,
+	0x61, 0x67, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x42, 0x79, 0x49,
+	0x44, 0x12, 0x27, 0x2e, 0x6e, 0x6f, 0x64, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65,
+	0x55, 0x73, 0x61, 0x67, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x42,
+	0x79, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28, 0x2e, 0x6e, 0x6f, 0x64,
+	0x65, 0x2e, 0x47, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x54, 0x69,
+	0x6d, 0x65, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x2f, 0x5a, 0x2d, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
+	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x73, 0x73, 0x61, 0x79, 0x5a, 0x57, 0x2f, 0x68, 0x70, 0x63,
+	0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x2f, 0x6e, 0x6f, 0x64, 0x65, 0x2f, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x3b, 0x6e, 0x6f, 0x64, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1752,7 +1873,7 @@ func file_proto_node_proto_rawDescGZIP() []byte {
 	return file_proto_node_proto_rawDescData
 }
 
-var file_proto_node_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_proto_node_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_proto_node_proto_goTypes = []interface{}{
 	(*CreateNodeApplyRequest)(nil),                // 0: node.CreateNodeApplyRequest
 	(*CreateNodeApplyResponse)(nil),               // 1: node.CreateNodeApplyResponse
@@ -1778,63 +1899,69 @@ var file_proto_node_proto_goTypes = []interface{}{
 	(*UpdateNodeApplyResponse)(nil),               // 21: node.UpdateNodeApplyResponse
 	(*GetNodeDistributeInfoByIDRequest)(nil),      // 22: node.GetNodeDistributeInfoByIDRequest
 	(*GetNodeDistributeInfoByIDResponse)(nil),     // 23: node.GetNodeDistributeInfoByIDResponse
-	(*proto.BaseRequest)(nil),                     // 24: request.BaseRequest
-	(*NodeApply)(nil),                             // 25: node.NodeApply
-	(*NodeDistribute)(nil),                        // 26: node.NodeDistribute
-	(*NodeUsageTime)(nil),                         // 27: node.NodeUsageTime
-	(*proto1.Empty)(nil),                          // 28: publicproto.Empty
-	(*proto1.PingResponse)(nil),                   // 29: publicproto.PingResponse
+	(*GetNodeUsageTimeRecordByIDRequest)(nil),     // 24: node.GetNodeUsageTimeRecordByIDRequest
+	(*GetNodeUsageTimeRecordByIDResponse)(nil),    // 25: node.GetNodeUsageTimeRecordByIDResponse
+	(*proto.BaseRequest)(nil),                     // 26: request.BaseRequest
+	(*NodeApply)(nil),                             // 27: node.NodeApply
+	(*NodeDistribute)(nil),                        // 28: node.NodeDistribute
+	(*NodeUsageTime)(nil),                         // 29: node.NodeUsageTime
+	(*proto1.Empty)(nil),                          // 30: publicproto.Empty
+	(*proto1.PingResponse)(nil),                   // 31: publicproto.PingResponse
 }
 var file_proto_node_proto_depIdxs = []int32{
-	24, // 0: node.CreateNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
-	24, // 1: node.PaginationGetNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
-	25, // 2: node.PaginationGetNodeApplyResponse.applies:type_name -> node.NodeApply
-	24, // 3: node.CheckNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
-	24, // 4: node.CreateNodeDistributeWORequest.baseRequest:type_name -> request.BaseRequest
-	24, // 5: node.PaginationGetNodeDistributeWORequest.baseRequest:type_name -> request.BaseRequest
-	26, // 6: node.PaginationGetNodeDistributeWOResponse.wos:type_name -> node.NodeDistribute
-	24, // 7: node.GetNodeApplyByIDRequest.baseRequest:type_name -> request.BaseRequest
-	25, // 8: node.GetNodeApplyByIDResponse.apply:type_name -> node.NodeApply
-	24, // 9: node.FinishNodeDistributeWORequest.baseRequest:type_name -> request.BaseRequest
-	24, // 10: node.RevokeNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
-	24, // 11: node.AddNodeUsageTimeRecordRequest.baseRequest:type_name -> request.BaseRequest
-	24, // 12: node.PaginationGetNodeUsageRequest.baseRequest:type_name -> request.BaseRequest
-	27, // 13: node.PaginationGetNodeUsageResponse.usages:type_name -> node.NodeUsageTime
-	24, // 14: node.UpdateNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
-	25, // 15: node.UpdateNodeApplyRequest.newInfos:type_name -> node.NodeApply
-	24, // 16: node.GetNodeDistributeInfoByIDRequest.baseRequest:type_name -> request.BaseRequest
-	26, // 17: node.GetNodeDistributeInfoByIDResponse.wo:type_name -> node.NodeDistribute
-	28, // 18: node.Node.Ping:input_type -> publicproto.Empty
-	0,  // 19: node.Node.CreateNodeApply:input_type -> node.CreateNodeApplyRequest
-	2,  // 20: node.Node.PaginationGetNodeApply:input_type -> node.PaginationGetNodeApplyRequest
-	4,  // 21: node.Node.CheckNodeApply:input_type -> node.CheckNodeApplyRequest
-	6,  // 22: node.Node.CreateNodeDistributeWO:input_type -> node.CreateNodeDistributeWORequest
-	8,  // 23: node.Node.PaginationGetNodeDistributeWO:input_type -> node.PaginationGetNodeDistributeWORequest
-	10, // 24: node.Node.GetNodeApplyByID:input_type -> node.GetNodeApplyByIDRequest
-	12, // 25: node.Node.FinishNodeDistributeWO:input_type -> node.FinishNodeDistributeWORequest
-	14, // 26: node.Node.RevokeNodeApply:input_type -> node.RevokeNodeApplyRequest
-	16, // 27: node.Node.AddNodeUsageTimeRecord:input_type -> node.AddNodeUsageTimeRecordRequest
-	18, // 28: node.Node.PaginationGetNodeUsage:input_type -> node.PaginationGetNodeUsageRequest
-	20, // 29: node.Node.UpdateNodeApply:input_type -> node.UpdateNodeApplyRequest
-	22, // 30: node.Node.GetNodeDistributeInfoByID:input_type -> node.GetNodeDistributeInfoByIDRequest
-	29, // 31: node.Node.Ping:output_type -> publicproto.PingResponse
-	1,  // 32: node.Node.CreateNodeApply:output_type -> node.CreateNodeApplyResponse
-	3,  // 33: node.Node.PaginationGetNodeApply:output_type -> node.PaginationGetNodeApplyResponse
-	5,  // 34: node.Node.CheckNodeApply:output_type -> node.CheckNodeApplyResponse
-	7,  // 35: node.Node.CreateNodeDistributeWO:output_type -> node.CreateNodeDistributeWOResponse
-	9,  // 36: node.Node.PaginationGetNodeDistributeWO:output_type -> node.PaginationGetNodeDistributeWOResponse
-	11, // 37: node.Node.GetNodeApplyByID:output_type -> node.GetNodeApplyByIDResponse
-	13, // 38: node.Node.FinishNodeDistributeWO:output_type -> node.FinishNodeDistributeWOResponse
-	15, // 39: node.Node.RevokeNodeApply:output_type -> node.RevokeNodeApplyResponse
-	17, // 40: node.Node.AddNodeUsageTimeRecord:output_type -> node.AddNodeUsageTimeRecordResponse
-	19, // 41: node.Node.PaginationGetNodeUsage:output_type -> node.PaginationGetNodeUsageResponse
-	21, // 42: node.Node.UpdateNodeApply:output_type -> node.UpdateNodeApplyResponse
-	23, // 43: node.Node.GetNodeDistributeInfoByID:output_type -> node.GetNodeDistributeInfoByIDResponse
-	31, // [31:44] is the sub-list for method output_type
-	18, // [18:31] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	26, // 0: node.CreateNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
+	26, // 1: node.PaginationGetNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
+	27, // 2: node.PaginationGetNodeApplyResponse.applies:type_name -> node.NodeApply
+	26, // 3: node.CheckNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
+	26, // 4: node.CreateNodeDistributeWORequest.baseRequest:type_name -> request.BaseRequest
+	26, // 5: node.PaginationGetNodeDistributeWORequest.baseRequest:type_name -> request.BaseRequest
+	28, // 6: node.PaginationGetNodeDistributeWOResponse.wos:type_name -> node.NodeDistribute
+	26, // 7: node.GetNodeApplyByIDRequest.baseRequest:type_name -> request.BaseRequest
+	27, // 8: node.GetNodeApplyByIDResponse.apply:type_name -> node.NodeApply
+	26, // 9: node.FinishNodeDistributeWORequest.baseRequest:type_name -> request.BaseRequest
+	26, // 10: node.RevokeNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
+	26, // 11: node.AddNodeUsageTimeRecordRequest.baseRequest:type_name -> request.BaseRequest
+	26, // 12: node.PaginationGetNodeUsageRequest.baseRequest:type_name -> request.BaseRequest
+	29, // 13: node.PaginationGetNodeUsageResponse.usages:type_name -> node.NodeUsageTime
+	26, // 14: node.UpdateNodeApplyRequest.baseRequest:type_name -> request.BaseRequest
+	27, // 15: node.UpdateNodeApplyRequest.newInfos:type_name -> node.NodeApply
+	26, // 16: node.GetNodeDistributeInfoByIDRequest.baseRequest:type_name -> request.BaseRequest
+	28, // 17: node.GetNodeDistributeInfoByIDResponse.wo:type_name -> node.NodeDistribute
+	26, // 18: node.GetNodeUsageTimeRecordByIDRequest.baseRequest:type_name -> request.BaseRequest
+	29, // 19: node.GetNodeUsageTimeRecordByIDResponse.record:type_name -> node.NodeUsageTime
+	30, // 20: node.Node.Ping:input_type -> publicproto.Empty
+	0,  // 21: node.Node.CreateNodeApply:input_type -> node.CreateNodeApplyRequest
+	2,  // 22: node.Node.PaginationGetNodeApply:input_type -> node.PaginationGetNodeApplyRequest
+	4,  // 23: node.Node.CheckNodeApply:input_type -> node.CheckNodeApplyRequest
+	6,  // 24: node.Node.CreateNodeDistributeWO:input_type -> node.CreateNodeDistributeWORequest
+	8,  // 25: node.Node.PaginationGetNodeDistributeWO:input_type -> node.PaginationGetNodeDistributeWORequest
+	10, // 26: node.Node.GetNodeApplyByID:input_type -> node.GetNodeApplyByIDRequest
+	12, // 27: node.Node.FinishNodeDistributeWO:input_type -> node.FinishNodeDistributeWORequest
+	14, // 28: node.Node.RevokeNodeApply:input_type -> node.RevokeNodeApplyRequest
+	16, // 29: node.Node.AddNodeUsageTimeRecord:input_type -> node.AddNodeUsageTimeRecordRequest
+	18, // 30: node.Node.PaginationGetNodeUsage:input_type -> node.PaginationGetNodeUsageRequest
+	20, // 31: node.Node.UpdateNodeApply:input_type -> node.UpdateNodeApplyRequest
+	22, // 32: node.Node.GetNodeDistributeInfoByID:input_type -> node.GetNodeDistributeInfoByIDRequest
+	24, // 33: node.Node.GetNodeUsageTimeRecordByID:input_type -> node.GetNodeUsageTimeRecordByIDRequest
+	31, // 34: node.Node.Ping:output_type -> publicproto.PingResponse
+	1,  // 35: node.Node.CreateNodeApply:output_type -> node.CreateNodeApplyResponse
+	3,  // 36: node.Node.PaginationGetNodeApply:output_type -> node.PaginationGetNodeApplyResponse
+	5,  // 37: node.Node.CheckNodeApply:output_type -> node.CheckNodeApplyResponse
+	7,  // 38: node.Node.CreateNodeDistributeWO:output_type -> node.CreateNodeDistributeWOResponse
+	9,  // 39: node.Node.PaginationGetNodeDistributeWO:output_type -> node.PaginationGetNodeDistributeWOResponse
+	11, // 40: node.Node.GetNodeApplyByID:output_type -> node.GetNodeApplyByIDResponse
+	13, // 41: node.Node.FinishNodeDistributeWO:output_type -> node.FinishNodeDistributeWOResponse
+	15, // 42: node.Node.RevokeNodeApply:output_type -> node.RevokeNodeApplyResponse
+	17, // 43: node.Node.AddNodeUsageTimeRecord:output_type -> node.AddNodeUsageTimeRecordResponse
+	19, // 44: node.Node.PaginationGetNodeUsage:output_type -> node.PaginationGetNodeUsageResponse
+	21, // 45: node.Node.UpdateNodeApply:output_type -> node.UpdateNodeApplyResponse
+	23, // 46: node.Node.GetNodeDistributeInfoByID:output_type -> node.GetNodeDistributeInfoByIDResponse
+	25, // 47: node.Node.GetNodeUsageTimeRecordByID:output_type -> node.GetNodeUsageTimeRecordByIDResponse
+	34, // [34:48] is the sub-list for method output_type
+	20, // [20:34] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_proto_node_proto_init() }
@@ -2132,6 +2259,30 @@ func file_proto_node_proto_init() {
 				return nil
 			}
 		}
+		file_proto_node_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetNodeUsageTimeRecordByIDRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_node_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetNodeUsageTimeRecordByIDResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2139,7 +2290,7 @@ func file_proto_node_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_node_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   24,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

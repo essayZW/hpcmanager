@@ -139,6 +139,11 @@ func (n *NodeUsageTime) PaginationGetNodeUsageRecordByTutorID(
 	}, nil
 }
 
+// GetRecordByID 通过ID查询机时记录信息
+func (n *NodeUsageTime) GetRecordByID(ctx context.Context, id int) (*db.HpcUsageTime, error) {
+	return n.nodeUsageTimeDB.QueryByID(ctx, id)
+}
+
 // NewNodeUsageTime 创建新的计算节点使用时长记录的操作逻辑
 func NewNodeUsageTime(nodeUsageTimeDB *db.NodeUsageTimeDB) *NodeUsageTime {
 	return &NodeUsageTime{

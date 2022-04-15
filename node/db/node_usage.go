@@ -186,6 +186,21 @@ func (n *NodeUsageTimeDB) QueryWithLimitByTutorID(
 	return infos, nil
 }
 
+// QueryByID 通过ID查询记录信息
+func (n *NodeUsageTimeDB) QueryByID(ctx context.Context, id int) (*HpcUsageTime, error) {
+	row, err := n.conn.QueryRow(ctx, "SELECT * FROM `hpc_usagetime` WHERE id=?", id)
+	if err != nil {
+		logger.Warn("QueryByID error: ", err)
+		return nil, errors.New("QueryByID error")
+	}
+	var info HpcUsageTime
+	if err := row.StructScan(&info); err != nil {
+		logger.Warn("QueryByID struct scan error: ", err)
+		return nil, errors.New("QueryByID struct scan error")
+	}
+	return &info, nil
+}
+
 // NewNodeUsageTime 创建新的操作计算节点记录的结构体
 func NewNodeUsageTime(conn *db.DB) *NodeUsageTimeDB {
 	return &NodeUsageTimeDB{
