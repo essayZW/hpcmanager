@@ -127,6 +127,7 @@ func (fs *FeeService) PaginationGetNodeDistributeBill(
 
 	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
 	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	// FIXME: 所有的记录应该按照倒序排序
 	if !isAdmin && !isTutor {
 		// 普通用户,只能查询自己的账单信息
 		infos, err = fs.nodeDistributeBillLogic.PaginationGetWithUserID(
