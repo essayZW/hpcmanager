@@ -10,6 +10,7 @@ import NodeApplyManager from '../components/common/NodeApplyManager.vue';
 import NodeDistributeManager from '../components/admin/NodeDistributeManager.vue';
 import NodeUsageManager from '../components/common/NodeUsageManager.vue';
 import NodeDistributeBillManager from '../components/common/NodeDistributeBillManager.vue';
+import NodeUsageBillManager from '../components/common/NodeUsageBillManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -97,6 +98,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/node_distribute_bill_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/node_usage_bill_manager',
+          name: 'NodeUsageBillManager',
+          component: NodeUsageBillManager,
+        },
+        item: {
+          name: '机器时长账单',
+          to: '/main/node_usage_bill_manager',
+        },
+      },
     ],
   ],
   [
@@ -155,6 +167,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器时长查看',
           to: '/main/node_usage_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_usage_bill_manager',
+          name: 'NodeUsageBillManager',
+          component: NodeUsageBillManager,
+        },
+        item: {
+          name: '机器时长账单',
+          to: '/main/node_usage_bill_manager',
         },
       },
       {
@@ -252,6 +275,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
       },
       {
         routerRaw: {
+          path: '/main/node_usage_bill_manager',
+          name: 'NodeUsageBillManager',
+          component: NodeUsageBillManager,
+        },
+        item: {
+          name: '机器时长账单',
+          to: '/main/node_usage_bill_manager',
+        },
+      },
+      {
+        routerRaw: {
           path: '/main/node_distribute_bill_manager',
           name: 'NodeDistributeBillManager',
           component: NodeDistributeBillManager,
@@ -343,6 +377,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器时长查看',
           to: '/main/node_usage_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_usage_bill_manager',
+          name: 'NodeUsageBillManager',
+          component: NodeUsageBillManager,
+        },
+        item: {
+          name: '机器时长账单',
+          to: '/main/node_usage_bill_manager',
         },
       },
       {

@@ -59,6 +59,8 @@ declare module 'vue' {
     NodeDistributeBillTable: typeof import('./src/components/NodeDistributeBillTable.vue')['default']
     NodeDistributeManager: typeof import('./src/components/admin/NodeDistributeManager.vue')['default']
     NodeTypeSelect: typeof import('./src/components/form/NodeTypeSelect.vue')['default']
+    NodeUsageBillManager: typeof import('./src/components/common/NodeUsageBillManager.vue')['default']
+    NodeUsageBillTable: typeof import('./src/components/NodeUsageBillTable.vue')['default']
     NodeUsageManager: typeof import('./src/components/common/NodeUsageManager.vue')['default']
     NodeUsageTable: typeof import('./src/components/NodeUsageTable.vue')['default']
     PageTitle: typeof import('./src/components/PageTitle.vue')['default']

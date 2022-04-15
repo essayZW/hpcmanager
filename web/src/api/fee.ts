@@ -112,3 +112,54 @@ export async function queryNodeDistributeFeeRate(): Promise<NodeDistributeFeeRat
   }
   return resp.data;
 }
+
+export type NodeWeekUsageBill = {
+  id: number;
+  userID: number;
+  username: string;
+  name: string;
+  wallTime: number;
+  gwallTime: number;
+  fee: number;
+  payFee: number;
+  startTime: number;
+  endTime: number;
+  payFlag: number;
+  payTime: number;
+  payType: number;
+  payMessage: string;
+  userGroupID: number;
+  createTime: number;
+  extraAttributes: string;
+};
+
+/**
+ * 分页查询机器节点时长周账单记录
+ */
+export async function paginationQueryNodeWeekUsageBill(
+  pageIndex: number,
+  pageSize: number,
+  startDateMilliUnix: number,
+  endDateMilliUnix: number
+): Promise<PaginationQueryResponse<NodeWeekUsageBill>> {
+  const resp = await ApiRequest.request<
+    PaginationQueryResponse<NodeWeekUsageBill>
+  >('/fee/usage/week', 'GET', {
+    pageIndex,
+    pageSize,
+    startDateMilliUnix,
+    endDateMilliUnix,
+  });
+
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  for (const single of resp.data.Data) {
+    undefinedWithDefault(single, 'wallTime', 0);
+    undefinedWithDefault(single, 'gwallTime', 0);
+    undefinedWithDefault(single, 'payFlag', 0);
+    undefinedWithDefault(single, 'fee', 0);
+    undefinedWithDefault(single, 'payType', 0);
+  }
+  return resp.data;
+}

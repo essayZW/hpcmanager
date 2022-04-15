@@ -6,6 +6,8 @@ import {
   payNodeDistributeBill as payNodeDistributeBillApi,
   NodeDistributeFeeRate,
   queryNodeDistributeFeeRate,
+  paginationQueryNodeWeekUsageBill,
+  NodeWeekUsageBill,
 } from '../api/fee';
 
 /**
@@ -66,4 +68,21 @@ export function payTypeToString(payType: number): string {
  */
 export async function getNodeDistributeFeeRate(): Promise<NodeDistributeFeeRate> {
   return queryNodeDistributeFeeRate();
+}
+
+/**
+ * 分页查询机器时长周账单记录
+ */
+export async function paginationGetNodeWeekUsageBill(
+  pageIndex: number,
+  pageSize: number,
+  startDateMilliUnix: number,
+  endDateMilliUnix: number
+): Promise<PaginationQueryResponse<NodeWeekUsageBill>> {
+  return paginationQueryNodeWeekUsageBill(
+    pageIndex,
+    pageSize,
+    startDateMilliUnix,
+    endDateMilliUnix
+  );
 }
