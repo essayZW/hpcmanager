@@ -17,9 +17,11 @@ import (
 
 type FeeService struct {
 	nodeDistributeBillLogic *logic.NodeDistributeBill
-	nodeService             nodepb.NodeService
-	userService             userpb.UserService
-	userGroupService        userpb.GroupService
+	nodeWeekUsageBillLogic  *logic.NodeWeekUsageBill
+
+	nodeService      nodepb.NodeService
+	userService      userpb.UserService
+	userGroupService userpb.GroupService
 }
 
 // Ping ping测试
@@ -248,15 +250,74 @@ func (fs *FeeService) GetNodeDistributeFeeRate(
 	return nil
 }
 
+// CreateNodeWeekUsageBill 创建机器机时周账单
+func (fs *FeeService) CreateNodeWeekUsageBill(
+	ctx context.Context,
+	req *feepb.CreateNodeWeekUsageBillRequest,
+	resp *feepb.CreateNodeWeekUsageBillResponse,
+) error {
+	logger.Info("CreateNodeWeekUsageBill: ", req.BaseRequest)
+	if !verify.Identify(verify.CreateNodeWeekUsageBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"CreateNodeWeekUsageBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("CreateNodeWeekUsageBill permission forbidden")
+	}
+
+	// 查询对应的机器时长记录信息
+	recordResp, err := fs.nodeService.GetNodeUsageTimeRecordByID(ctx, &nodepb.GetNodeUsageTimeRecordByIDRequest{
+		BaseRequest: req.BaseRequest,
+		Id:          req.NodeWeekUsageRecordID,
+	})
+	if err != nil {
+		return err
+	}
+	// 查询记录拥有者的信息
+	userInfoResp, err := fs.userService.GetUserInfo(ctx, &userpb.GetUserInfoRequest{
+		BaseRequest: req.BaseRequest,
+		Userid:      recordResp.Record.UserID,
+	})
+	if err != nil {
+		return err
+	}
+
+	id, err := fs.nodeWeekUsageBillLogic.CreateBill(
+		ctx,
+		int(userInfoResp.UserInfo.Id),
+		int(userInfoResp.UserInfo.GroupId),
+		userInfoResp.UserInfo.Username,
+		userInfoResp.UserInfo.Name,
+		int(recordResp.Record.WallTime),
+		int(recordResp.Record.GwallTime),
+		recordResp.Record.StartTime,
+		recordResp.Record.EndTime,
+	)
+	if err != nil {
+		return err
+	}
+	resp.Id = int32(id)
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务
-func NewFee(client client.Client, nodeDistributeBillLogic *logic.NodeDistributeBill) *FeeService {
+func NewFee(
+	client client.Client,
+	nodeDistributeBillLogic *logic.NodeDistributeBill,
+	nodeWeekUsageBillLogic *logic.NodeWeekUsageBill,
+) *FeeService {
 	nodeService := nodepb.NewNodeService("node", client)
 	userService := userpb.NewUserService("user", client)
 	userGroupService := userpb.NewGroupService("user", client)
 	return &FeeService{
 		nodeDistributeBillLogic: nodeDistributeBillLogic,
+		nodeWeekUsageBillLogic:  nodeWeekUsageBillLogic,
 		nodeService:             nodeService,
 		userService:             userService,
 		userGroupService:        userGroupService,

@@ -79,8 +79,8 @@ func (this *NodeWeekUsageBill) CreateBill(
 
 // CalFee 计算机时费用
 func (this *NodeWeekUsageBill) CalFee(ctx context.Context, wallTime, gwallTime int) float64 {
-	// TODO: 需要确真实的计算算法
-	return this.cpu*float64(wallTime) + this.gpu*float64(gwallTime)
+	// TODO: 需要确定真实的计算算法
+	return this.cpu*float64(wallTime)/3600 + this.gpu*float64(gwallTime)/3600
 }
 
 // NewNodeWeekUsageBill 创建新的机器机时周账单数据操作逻辑结构体

@@ -159,7 +159,12 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			// 需要普通管理员及以上权限
 			PayNodeDistributeBill: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			CreateNodeWeekUsageBill: {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},

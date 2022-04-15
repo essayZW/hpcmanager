@@ -49,8 +49,9 @@ func main() {
 	if err != nil {
 		logger.Fatal("create logic error: ", err)
 	}
+	nodeWeekUsageBillLogic, err := logic.NewNodeWeekUsageBill(feedb.NewNodeWeekUsageBill(sqldb), etcdConfig)
 
-	feeService := service.NewFee(serviceClient, nodeDistributeBillLogic)
+	feeService := service.NewFee(serviceClient, nodeDistributeBillLogic, nodeWeekUsageBillLogic)
 	feepb.RegisterFeeHandler(srv.Server(), feeService)
 
 	srv.Init()

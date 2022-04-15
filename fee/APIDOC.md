@@ -100,7 +100,7 @@ message PayNodeDistributeBillResponse {
 }
 ```
 
-### GetNodeDistributeFeeRate
+## GetNodeDistributeFeeRate
 
 描述: 查询机器节点独占费率
 
@@ -121,6 +121,29 @@ message GetNodeDistributeFeeRateResponse {
     double rate36CPU = 1;
     double rate4GPU = 2;
     double rate8GPU = 3;
+}
+```
+
+## CreateNodeWeekUsageBill
+
+描述: 创建机器节点时长周账单
+
+原型定义: `rpc CreateNodeWeekUsageBill(CreateNodeWeekUsageBillRequest) returns (CreateNodeWeekUsageBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message CreateNodeWeekUsageBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 nodeWeekUsageRecordID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message CreateNodeWeekUsageBillResponse {
+    int32 id = 1;
 }
 ```
 
