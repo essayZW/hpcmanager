@@ -369,7 +369,8 @@ func (fs *FeeService) PaginationGetNodeWeekUsageBillRecords(
 			EndTime:     infos.Data[index].EndTime.Unix(),
 			PayFlag:     int32(infos.Data[index].PayFlag),
 			PayTime:     infos.Data[index].PayTime.Time.Unix(),
-			PayMessage:  infos.Data[index].PayMessage,
+			PayType:     int32(infos.Data[index].PayType.Int64),
+			PayMessage:  infos.Data[index].PayMessage.String,
 			UserGroupID: int32(infos.Data[index].UserGroupID),
 			CreateTime:  infos.Data[index].CreateTime.Unix(),
 		}
