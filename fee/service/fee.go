@@ -275,6 +275,7 @@ func (fs *FeeService) CreateNodeWeekUsageBill(
 		Id:          req.NodeWeekUsageRecordID,
 	})
 	if err != nil {
+		logger.Warn("query node usage time record error: ", err)
 		return err
 	}
 	// 查询记录拥有者的信息
