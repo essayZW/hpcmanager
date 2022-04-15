@@ -83,6 +83,117 @@ func (this *NodeWeekUsageBill) CalFee(ctx context.Context, wallTime, gwallTime i
 	return this.cpu*float64(wallTime)/3600 + this.gpu*float64(gwallTime)/3600
 }
 
+// PaginationGetWeekUsageBillResult 分页查询机器节点周账单结果
+type PaginationGetWeekUsageBillResult struct {
+	Count int
+	Data  []*db.NodeWeekUsageBill
+}
+
+// PaginationGetWithTimeRange 分页查询一段时间内的所有的账单记录
+func (this *NodeWeekUsageBill) PaginationGetWithTimeRange(
+	ctx context.Context,
+	pageIndex, pageSize int,
+	startTimeUnix, endTimeUnix int64,
+) (*PaginationGetWeekUsageBillResult, error) {
+	if pageIndex <= 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize <= 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+	startTime := time.Unix(startTimeUnix, 0)
+	endTime := time.Unix(endTimeUnix, 0)
+	if endTime.Before(startTime) {
+		return nil, errors.New("end time can't before than start time")
+	}
+	count, err := this.nodeWeekUsageBillDB.QueryCountWithTimeRange(ctx, startTime, endTime)
+	if err != nil {
+		return nil, errors.New("query count error")
+	}
+	limit := pageSize * (pageIndex - 1)
+	data, err := this.nodeWeekUsageBillDB.QueryLimitWithTimeRange(ctx, limit, pageSize, startTime, endTime)
+	if err != nil {
+		return nil, errors.New("query data error")
+	}
+	return &PaginationGetWeekUsageBillResult{
+		Count: count,
+		Data:  data,
+	}, nil
+}
+
+// PaginationGetWithTimeRangeWithUserID 分页查询某一段时间内的某个用户的账单
+func (this *NodeWeekUsageBill) PaginationGetWithTimeRangeWithUserID(
+	ctx context.Context,
+	userID int,
+	pageIndex, pageSize int,
+	startTimeUnix, endTimeUnix int64,
+) (*PaginationGetWeekUsageBillResult, error) {
+	if pageIndex <= 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize <= 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+	startTime := time.Unix(startTimeUnix, 0)
+	endTime := time.Unix(endTimeUnix, 0)
+	if endTime.Before(startTime) {
+		return nil, errors.New("end time can't before than start time")
+	}
+	count, err := this.nodeWeekUsageBillDB.QueryCountWithTimeRangeByUserID(ctx, userID, startTime, endTime)
+	if err != nil {
+		return nil, errors.New("query count error")
+	}
+	limit := pageSize * (pageIndex - 1)
+	data, err := this.nodeWeekUsageBillDB.QueryLimitWithTimeRangeByUserID(ctx, userID, limit, pageSize, startTime, endTime)
+	if err != nil {
+		return nil, errors.New("query data error")
+	}
+	return &PaginationGetWeekUsageBillResult{
+		Count: count,
+		Data:  data,
+	}, nil
+}
+
+// PaginationGetWithTimeRangeWithGroupID 分页查询某一段时间内的某个用户的账单
+func (this *NodeWeekUsageBill) PaginationGetWithTimeRangeWithGroupID(
+	ctx context.Context,
+	userGroupID int,
+	pageIndex, pageSize int,
+	startTimeUnix, endTimeUnix int64,
+) (*PaginationGetWeekUsageBillResult, error) {
+	if pageIndex <= 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize <= 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+	startTime := time.Unix(startTimeUnix, 0)
+	endTime := time.Unix(endTimeUnix, 0)
+	if endTime.Before(startTime) {
+		return nil, errors.New("end time can't before than start time")
+	}
+	count, err := this.nodeWeekUsageBillDB.QueryCountWithTimeRangeByGroupID(ctx, userGroupID, startTime, endTime)
+	if err != nil {
+		return nil, errors.New("query count error")
+	}
+	limit := pageSize * (pageIndex - 1)
+	data, err := this.nodeWeekUsageBillDB.QueryLimitWithTimeRangeByGroupID(
+		ctx,
+		userGroupID,
+		limit,
+		pageSize,
+		startTime,
+		endTime,
+	)
+	if err != nil {
+		return nil, errors.New("query data error")
+	}
+	return &PaginationGetWeekUsageBillResult{
+		Count: count,
+		Data:  data,
+	}, nil
+}
+
 // NewNodeWeekUsageBill 创建新的机器机时周账单数据操作逻辑结构体
 func NewNodeWeekUsageBill(
 	nodeWeekUsageBillDB *db.NodeWeekUsageBillDB,

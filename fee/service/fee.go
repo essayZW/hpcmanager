@@ -296,6 +296,90 @@ func (fs *FeeService) CreateNodeWeekUsageBill(
 	return nil
 }
 
+// PaginationGetNodeWeekUsageBillRecords 分页查询机器节点时长账单
+func (fs *FeeService) PaginationGetNodeWeekUsageBillRecords(
+	ctx context.Context,
+	req *feepb.PaginationGetNodeWeekUsageBillRecordsResquest,
+	resp *feepb.PaginationGetNodeWeekUsageBillRecordsResponse,
+) error {
+	logger.Info("PaginationGetNodeWeekUsageBillRecords: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeWeekUsageBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryNodeWeekUsageBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryNodeWeekUsageBill permission forbidden")
+	}
+
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+
+	var infos *logic.PaginationGetWeekUsageBillResult
+	var err error
+	if !isAdmin && !isTutor {
+		// 普通学生权限,只能查询自己的所有的账单信息
+		infos, err = fs.nodeWeekUsageBillLogic.PaginationGetWithTimeRangeWithUserID(
+			ctx,
+			int(req.BaseRequest.UserInfo.UserId),
+			int(req.PageIndex),
+			int(req.PageSize),
+			req.StartTimeUnix,
+			req.EndTimeUnix,
+		)
+	} else if !isAdmin && isTutor {
+		// 导师权限,能查询自己组的所有的用户的账单的信息
+		infos, err = fs.nodeWeekUsageBillLogic.PaginationGetWithTimeRangeWithGroupID(
+			ctx,
+			int(req.BaseRequest.UserInfo.GroupId),
+			int(req.PageIndex),
+			int(req.PageSize),
+			req.StartTimeUnix,
+			req.EndTimeUnix,
+		)
+	} else {
+		// 管理员权限,能查看所有的用户的账单的信息
+		infos, err = fs.nodeWeekUsageBillLogic.PaginationGetWithTimeRange(
+			ctx,
+			int(req.PageIndex),
+			int(req.PageSize),
+			req.StartTimeUnix,
+			req.EndTimeUnix,
+		)
+	}
+	if err != nil {
+		return err
+	}
+	resp.Count = int32(infos.Count)
+	resp.Bills = make([]*feepb.NodeWeekUsageBill, len(infos.Data))
+	for index := range infos.Data {
+		resp.Bills[index] = &feepb.NodeWeekUsageBill{
+			Id:          int32(infos.Data[index].ID),
+			UserID:      int32(infos.Data[index].UserID),
+			Username:    infos.Data[index].Username,
+			Name:        infos.Data[index].UserName,
+			WallTime:    int32(infos.Data[index].WallTime),
+			GwallTime:   int32(infos.Data[index].GWallTime),
+			Fee:         infos.Data[index].Fee,
+			PayFee:      infos.Data[index].PayFee,
+			StartTime:   infos.Data[index].StartTime.Unix(),
+			EndTime:     infos.Data[index].EndTime.Unix(),
+			PayFlag:     int32(infos.Data[index].PayFlag),
+			PayTime:     infos.Data[index].PayTime.Time.Unix(),
+			PayMessage:  infos.Data[index].PayMessage,
+			UserGroupID: int32(infos.Data[index].UserGroupID),
+			CreateTime:  infos.Data[index].CreateTime.Unix(),
+		}
+		if infos.Data[index].ExtraAttributes != nil {
+			resp.Bills[index].ExtraAttributes = infos.Data[index].ExtraAttributes.String()
+		}
+	}
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务

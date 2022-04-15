@@ -22,3 +22,22 @@ message NodeDistributeBill {
     string extraAttributes = 15;
 }
 
+message NodeWeekUsageBill {
+    int32 id = 1;
+    int32 userID = 2;
+    string username = 3;
+    string name = 4;
+    int32 wallTime = 5;
+    int32 gwallTime = 6;
+    double fee = 7;
+    double payFee = 8;
+    int64 startTime = 9;
+    int64 endTime = 10;
+    int32 payFlag = 11;
+    int64 payTime = 12;
+    int32 payType = 13;
+    string payMessage = 14;
+    int32 userGroupID = 15;
+    int64 createTime = 16;
+    string extraAttributes = 17;
+}

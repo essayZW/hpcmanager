@@ -17,6 +17,7 @@ service Fee {
     rpc PayNodeDistributeBill(PayNodeDistributeBillRequest) returns (PayNodeDistributeBillResponse) {}
     rpc GetNodeDistributeFeeRate(GetNodeDistributeFeeRateRequest) returns (GetNodeDistributeFeeRateResponse) {}
     rpc CreateNodeWeekUsageBill(CreateNodeWeekUsageBillRequest) returns (CreateNodeWeekUsageBillResponse) {}
+    rpc PaginationGetNodeWeekUsageBillRecords(PaginationGetNodeWeekUsageBillRecordsResquest) returns (PaginationGetNodeWeekUsageBillRecordsResponse) {}
 }
 
 message CreateNodeDistributeBillRequest {
@@ -72,4 +73,17 @@ message CreateNodeWeekUsageBillRequest {
 
 message CreateNodeWeekUsageBillResponse {
     int32 id = 1;
+}
+
+message PaginationGetNodeWeekUsageBillRecordsResquest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+    int64 startTimeUnix = 4;
+    int64 endTimeUnix = 5;
+}
+
+message PaginationGetNodeWeekUsageBillRecordsResponse {
+    int32 count = 1;
+    repeated fee.NodeWeekUsageBill bills = 2;
 }

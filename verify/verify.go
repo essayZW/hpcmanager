@@ -62,6 +62,8 @@ const (
 	PayNodeDistributeBill = "__PAY_NODE_DISTRIBUTE_BILL__"
 	// CreateNodeWeekUsageBill 创建机器机时周账单
 	CreateNodeWeekUsageBill = "__CREATE_NODE_WEEK_USAGE_BILL__"
+	// QueryNodeWeekUsageBill 查询机器节点时长账单记录
+	QueryNodeWeekUsageBill = "__QUERY_NODE_WEEK_USAGE_BILL__"
 )
 
 // Verify 进行操作的权限验证

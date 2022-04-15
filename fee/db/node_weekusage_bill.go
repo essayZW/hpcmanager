@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
@@ -42,6 +43,170 @@ func (this *NodeWeekUsageBillDB) Insert(ctx context.Context, newInfo *NodeWeekUs
 		return 0, errors.New("Insert error")
 	}
 	return id, nil
+}
+
+// QueryCountWithTimeRange 查询一段时间内的所有记录的数量
+func (this *NodeWeekUsageBillDB) QueryCountWithTimeRange(ctx context.Context, startTime, endTime time.Time) (int, error) {
+	row, err := this.conn.QueryRow(
+		ctx,
+		"SELECT COUNT(*) FROM `week_usage_bill` WHERE `start_time`>=? AND `end_time`<=?",
+		startTime,
+		endTime,
+	)
+	if err != nil {
+		logger.Warn("QueryCountWithTimeRange error: ", err)
+		return 0, errors.New("QueryCountWithTimeRange error")
+	}
+	var count int
+	if err := row.Scan(&count); err != nil {
+		logger.Warn("QueryCountWithTimeRange struct scan error: ", err)
+		return 0, errors.New("QueryCountWithTimeRange struct scan error")
+	}
+	return count, nil
+}
+
+// QueryLimitWithTimeRange 分页查询一段时间内的记录
+func (this *NodeWeekUsageBillDB) QueryLimitWithTimeRange(
+	ctx context.Context,
+	limit, offset int,
+	startTime, endTime time.Time,
+) ([]*NodeWeekUsageBill, error) {
+	rows, err := this.conn.Query(
+		ctx,
+		"SELECT * FROM `week_usage_bill` WHERE `start_time`>=? AND `end_time`<=? LIMIT ?,?",
+		startTime,
+		endTime,
+		limit,
+		offset,
+	)
+	if err != nil {
+		logger.Warn("QueryLimitWithTimeRange error: ", err)
+		return nil, errors.New("QueryLimitWithTimeRange error")
+	}
+	res := make([]*NodeWeekUsageBill, 0)
+	for rows.Next() {
+		var info NodeWeekUsageBill
+		if err := rows.StructScan(&info); err != nil {
+			logger.Warn("QueryLimitWithTimeRange struct scan error: ", err)
+			return nil, errors.New("QueryLimitWithTimeRange struct scan error")
+		}
+		res = append(res, &info)
+	}
+	return res, nil
+}
+
+// QueryCountWithTimeRangeByUserID 查询一段时间内的某个用户的账单记录的数量
+func (this *NodeWeekUsageBillDB) QueryCountWithTimeRangeByUserID(
+	ctx context.Context,
+	userID int,
+	startTime, endTime time.Time,
+) (int, error) {
+	row, err := this.conn.QueryRow(
+		ctx,
+		"SELECT COUNT(*) FROM `week_usage_bill` WHERE `user_id`=? AND `start_time`>=? AND `end_time`<=?",
+		userID,
+		startTime,
+		endTime,
+	)
+	if err != nil {
+		logger.Warn("QueryCountWithTimeRangeByUserID error: ", err)
+		return 0, errors.New("QueryCountWithTimeRangeByUserID error")
+	}
+	var count int
+	if err := row.Scan(&count); err != nil {
+		logger.Warn("QueryCountWithTimeRangeByUserID struct scan error: ", err)
+		return 0, errors.New("QueryCountWithTimeRangeByUserID struct scan error")
+	}
+	return count, nil
+}
+
+// QueryLimitWithTimeRangeByUserID 分页查询一段时间范围内的某一个用户的账单
+func (this *NodeWeekUsageBillDB) QueryLimitWithTimeRangeByUserID(
+	ctx context.Context,
+	userID int,
+	limit, offset int,
+	startTime, endTime time.Time,
+) ([]*NodeWeekUsageBill, error) {
+	rows, err := this.conn.Query(
+		ctx,
+		"SELECT * FROM `week_usage_bill` WHERE `user_id`=? AND `start_time`>=? AND `end_time`<=? LIMIT ?, ?",
+		userID,
+		startTime,
+		endTime,
+		limit,
+		offset,
+	)
+	if err != nil {
+		logger.Warn("QueryLimitWithTimeRangeByUserID error: ", err)
+		return nil, errors.New("QueryLimitWithTimeRangeByUserID error")
+	}
+	res := make([]*NodeWeekUsageBill, 0)
+	for rows.Next() {
+		var info NodeWeekUsageBill
+		if err := rows.StructScan(&info); err != nil {
+			logger.Warn("QueryLimitWithTimeRangeByUserID struct scan error: ", err)
+			return nil, errors.New("QueryLimitWithTimeRangeByUserID struct scan error")
+		}
+		res = append(res, &info)
+	}
+	return res, nil
+}
+
+// QueryCountWithTimeRangeByGroupID 查询一段时间内的某个用户的账单记录的数量
+func (this *NodeWeekUsageBillDB) QueryCountWithTimeRangeByGroupID(
+	ctx context.Context,
+	groupID int,
+	startTime, endTime time.Time,
+) (int, error) {
+	row, err := this.conn.QueryRow(
+		ctx,
+		"SELECT COUNT(*) FROM `week_usage_bill` WHERE `user_group_id`=? AND `start_time`>=? AND `end_time`<=?",
+		groupID,
+		startTime,
+		endTime,
+	)
+	if err != nil {
+		logger.Warn("QueryCountWithTimeRangeByGroupID error: ", err)
+		return 0, errors.New("QueryCountWithTimeRangeByGroupID error")
+	}
+	var count int
+	if err := row.Scan(&count); err != nil {
+		logger.Warn("QueryCountWithTimeRangeByGroupID struct scan error: ", err)
+		return 0, errors.New("QueryCountWithTimeRangeByGroupID struct scan error")
+	}
+	return count, nil
+}
+
+// QueryLimitWithTimeRangeByGroupID 分页查询一段时间范围内的某一个用户的账单
+func (this *NodeWeekUsageBillDB) QueryLimitWithTimeRangeByGroupID(
+	ctx context.Context,
+	groupID int,
+	limit, offset int,
+	startTime, endTime time.Time,
+) ([]*NodeWeekUsageBill, error) {
+	rows, err := this.conn.Query(
+		ctx,
+		"SELECT * FROM `week_usage_bill` WHERE `user_group_id`=? AND `start_time`>=? AND `end_time`<=? LIMIT ?, ?",
+		groupID,
+		startTime,
+		endTime,
+		limit,
+		offset,
+	)
+	if err != nil {
+		logger.Warn("QueryLimitWithTimeRangeByGroupID error: ", err)
+		return nil, errors.New("QueryLimitWithTimeRangeByGroupID error")
+	}
+	res := make([]*NodeWeekUsageBill, 0)
+	for rows.Next() {
+		var info NodeWeekUsageBill
+		if err := rows.StructScan(&info); err != nil {
+			logger.Warn("QueryLimitWithTimeRangeByGroupID struct scan error: ", err)
+			return nil, errors.New("QueryLimitWithTimeRangeByGroupID struct scan error")
+		}
+		res = append(res, &info)
+	}
+	return res, nil
 }
 
 // NewNodeWeekUsageBill 创建新的机器节点机时周账单数据库操作映射结构体
