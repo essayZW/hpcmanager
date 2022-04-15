@@ -269,19 +269,10 @@ func (fs *FeeService) CreateNodeWeekUsageBill(
 		return errors.New("CreateNodeWeekUsageBill permission forbidden")
 	}
 
-	// 查询对应的机器时长记录信息
-	recordResp, err := fs.nodeService.GetNodeUsageTimeRecordByID(ctx, &nodepb.GetNodeUsageTimeRecordByIDRequest{
-		BaseRequest: req.BaseRequest,
-		Id:          req.NodeWeekUsageRecordID,
-	})
-	if err != nil {
-		logger.Warn("query node usage time record error: ", err)
-		return err
-	}
 	// 查询记录拥有者的信息
 	userInfoResp, err := fs.userService.GetUserInfo(ctx, &userpb.GetUserInfoRequest{
 		BaseRequest: req.BaseRequest,
-		Userid:      recordResp.Record.UserID,
+		Userid:      req.UserID,
 	})
 	if err != nil {
 		return err
@@ -293,10 +284,10 @@ func (fs *FeeService) CreateNodeWeekUsageBill(
 		int(userInfoResp.UserInfo.GroupId),
 		userInfoResp.UserInfo.Username,
 		userInfoResp.UserInfo.Name,
-		int(recordResp.Record.WallTime),
-		int(recordResp.Record.GwallTime),
-		recordResp.Record.StartTime,
-		recordResp.Record.EndTime,
+		int(req.WallTime),
+		int(req.GwallTime),
+		req.StartTime,
+		req.EndTime,
 	)
 	if err != nil {
 		return err

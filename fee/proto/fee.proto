@@ -63,7 +63,11 @@ message GetNodeDistributeFeeRateResponse {
 
 message CreateNodeWeekUsageBillRequest {
     request.BaseRequest baseRequest = 1;
-    int32 nodeWeekUsageRecordID = 2;
+    int32 userID = 2;
+    int32 wallTime = 3;
+    int32 gwallTime = 4;
+    int64 startTime = 5;
+    int64 endTime = 6;
 }
 
 message CreateNodeWeekUsageBillResponse {
