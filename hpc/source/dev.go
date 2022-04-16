@@ -119,7 +119,10 @@ func (dev *hpcDev) GetNodeUsageWithDate(
 			return nil, err
 		}
 		wallTime := rander.Float64() * float64(rander.Intn(int(endTime.Sub(startTime).Seconds())))
-		gwallTime := rander.Float64() * float64(rander.Intn(64))
+		gwallTime := rander.Float64() * float64(rander.Intn(int(endTime.Sub(startTime).Seconds())))
+		if rander.Float64() > 0.5 {
+			gwallTime = 0
+		}
 		infos[i] = &HpcNodeUsage{
 			Username:  usernames[randUserNameIndex],
 			GroupName: groupName,
