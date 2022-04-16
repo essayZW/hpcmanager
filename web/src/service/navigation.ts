@@ -10,7 +10,9 @@ import NodeApplyManager from '../components/common/NodeApplyManager.vue';
 import NodeDistributeManager from '../components/admin/NodeDistributeManager.vue';
 import NodeUsageManager from '../components/common/NodeUsageManager.vue';
 import NodeDistributeBillManager from '../components/common/NodeDistributeBillManager.vue';
-import NodeUsageBillManager from '../components/common/NodeUsageBillManager.vue';
+import UserNodeUsageBillManager from '../components/common/UserNodeUsageBillManager.vue';
+import GroupNodeUsageBillManager from '../components/tutor/GroupNodeUsageBillManager.vue';
+import AdminNodeUsageBillManager from '../components/admin/AdminNodeUsageBillManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -100,13 +102,13 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
       },
       {
         routerRaw: {
-          path: '/main/node_usage_bill_manager',
-          name: 'NodeUsageBillManager',
-          component: NodeUsageBillManager,
+          path: '/main/user_node_usage_bill_manager',
+          name: 'UserNodeUsageBillManager',
+          component: UserNodeUsageBillManager,
         },
         item: {
           name: '机器时长账单',
-          to: '/main/node_usage_bill_manager',
+          to: '/main/user_node_usage_bill_manager',
         },
       },
     ],
@@ -171,13 +173,13 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
       },
       {
         routerRaw: {
-          path: '/main/node_usage_bill_manager',
-          name: 'NodeUsageBillManager',
-          component: NodeUsageBillManager,
+          path: '/main/group_node_usage_bill_manager',
+          name: 'GroupNodeUsageBillManager',
+          component: GroupNodeUsageBillManager,
         },
         item: {
           name: '机器时长账单',
-          to: '/main/node_usage_bill_manager',
+          to: '/main/group_node_usage_bill_manager',
         },
       },
       {
@@ -275,13 +277,13 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
       },
       {
         routerRaw: {
-          path: '/main/node_usage_bill_manager',
-          name: 'NodeUsageBillManager',
-          component: NodeUsageBillManager,
+          path: '/main/admin_node_usage_bill_manager',
+          name: 'AdminNodeUsageBillManager',
+          component: AdminNodeUsageBillManager,
         },
         item: {
-          name: '机器时长账单',
-          to: '/main/node_usage_bill_manager',
+          name: '机时账单缴费',
+          to: '/main/admin_node_usage_bill_manager',
         },
       },
       {
@@ -381,13 +383,13 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
       },
       {
         routerRaw: {
-          path: '/main/node_usage_bill_manager',
-          name: 'NodeUsageBillManager',
-          component: NodeUsageBillManager,
+          path: '/main/admin_node_usage_bill_manager',
+          name: 'AdminNodeUsageBillManager',
+          component: AdminNodeUsageBillManager,
         },
         item: {
-          name: '机器时长账单',
-          to: '/main/node_usage_bill_manager',
+          name: '机时账单缴费',
+          to: '/main/admin_node_usage_bill_manager',
         },
       },
       {
