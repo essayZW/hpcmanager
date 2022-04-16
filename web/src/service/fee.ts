@@ -8,6 +8,8 @@ import {
   queryNodeDistributeFeeRate,
   paginationQueryNodeWeekUsageBill,
   NodeWeekUsageBill,
+  paginationQueryGroupNodeWeekUsageBill,
+  NodeWeekUsageBillForGroup,
 } from '../api/fee';
 
 /**
@@ -85,4 +87,15 @@ export async function paginationGetNodeWeekUsageBill(
     startDateMilliUnix,
     endDateMilliUnix
   );
+}
+
+/**
+ * 分页分组查询机器节点机器时长账单
+ */
+export async function paginationGetGroupNodeUsageBill(
+  pageIndex: number,
+  pageSize: number,
+  payFlag: boolean
+): Promise<PaginationQueryResponse<NodeWeekUsageBillForGroup>> {
+  return paginationQueryGroupNodeWeekUsageBill(pageIndex, pageSize, payFlag);
 }

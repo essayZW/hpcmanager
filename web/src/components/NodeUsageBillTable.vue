@@ -47,7 +47,7 @@ const paginationInfo = reactive<{
   pageSize: 10,
 });
 
-const refreshTableDate = () => {
+const refreshTableData = () => {
   loadTableData(
     paginationInfo.pageIndex,
     paginationInfo.pageSize,
@@ -56,16 +56,16 @@ const refreshTableDate = () => {
   );
 };
 
-refreshTableDate();
+refreshTableData();
 
 const handleCurrentChange = (pageIndex: number) => {
   paginationInfo.pageIndex = pageIndex;
-  refreshTableDate();
+  refreshTableData();
 };
 
 const handleSizeChange = (pageSize: number) => {
   paginationInfo.pageSize = pageSize;
-  refreshTableDate();
+  refreshTableData();
 };
 </script>
 <template>
@@ -81,7 +81,7 @@ const handleSizeChange = (pageSize: number) => {
         end-placeholder="End date"
       />
     </div>
-    <el-button type="primary" @click="refreshTableDate">
+    <el-button type="primary" @click="refreshTableData">
       <el-icon class="el-icon--left">
         <i-ic-round-refresh />
       </el-icon>

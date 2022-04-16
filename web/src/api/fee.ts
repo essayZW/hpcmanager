@@ -163,3 +163,38 @@ export async function paginationQueryNodeWeekUsageBill(
   }
   return resp.data;
 }
+
+/**
+ * 用户组的机器时长账单信息
+ */
+export type NodeWeekUsageBillForGroup = {
+  wallTime: number;
+  gwallTime: number;
+  fee: number;
+  payFee: number;
+  userGroupID: number;
+};
+
+export async function paginationQueryGroupNodeWeekUsageBill(
+  pageIndex: number,
+  pageSize: number,
+  payFlag: boolean
+): Promise<PaginationQueryResponse<NodeWeekUsageBillForGroup>> {
+  const resp = await ApiRequest.request<
+    PaginationQueryResponse<NodeWeekUsageBillForGroup>
+  >('/fee/usage/group/week', 'GET', {
+    pageIndex,
+    pageSize,
+    payFlag,
+  });
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  for (const info of resp.data.Data) {
+    undefinedWithDefault(info, 'wallTime', 0);
+    undefinedWithDefault(info, 'gwallTime', 0);
+    undefinedWithDefault(info, 'fee', 0);
+    undefinedWithDefault(info, 'payFee', 0);
+  }
+  return resp.data;
+}

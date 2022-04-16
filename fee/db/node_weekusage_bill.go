@@ -218,7 +218,7 @@ func (this *NodeWeekUsageBillDB) QueryGroupByGroupIDWithLimit(
 	rows, err := this.conn.Query(
 		ctx,
 		"SELECT SUM(`wall_time`) AS `wall_time`, SUM(`gwall_time`) AS `gwall_time`, SUM(`fee`) AS `fee`, SUM(`pay_fee`) AS `pay_fee`, `pay_flag`, `user_group_id` "+
-			"FROM `week_usage_bill` WHERE `pay_flag`=? GROUP BY `user_group_id` ORDER BY `user_group_id` ASC LIMIT ?,?",
+			"FROM `week_usage_bill` GROUP BY `user_group_id`, `pay_flag` HAVING `pay_flag`=? ORDER BY `user_group_id` ASC LIMIT ?,?",
 		payFlag,
 		limit,
 		offset,
