@@ -115,7 +115,7 @@ const handleSizeChange = (pageSize: number) => {
         </el-table-column>
         <el-table-column label="CPU机时" align="center">
           <template #default="props">
-            {{ timeSecondFormat(props.row.gwallTime) }}
+            {{ timeSecondFormat(props.row.wallTime) }}
           </template>
         </el-table-column>
         <el-table-column label="GPU机时" align="center">

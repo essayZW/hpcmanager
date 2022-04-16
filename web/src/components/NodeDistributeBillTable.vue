@@ -342,4 +342,11 @@ const handlerPayBillSubmit = async (isBalance: boolean) => {
     min-width: 30%;
   }
 }
+.pagination-row {
+  margin: 16px 0px;
+  .pagination-control-panel {
+    margin: 0px auto;
+    justify-content: center;
+  }
+}
 </style>
