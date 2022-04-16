@@ -46,3 +46,13 @@ type NodeWeekUsageBill struct {
 	CreateTime      time.Time   `db:"create_time"`
 	ExtraAttributes *db.JSON    `db:"extraAttributes"`
 }
+
+// NodeWeekUsageBillForUserGroup 按照user_group_id分组的查询结果
+type NodeWeekUsageBillForUserGroup struct {
+	WallTime    int     `db:"wall_time"`
+	GWallTime   int     `db:"gwall_time"`
+	Fee         float64 `db:"fee"`
+	PayFee      float64 `db:"pay_fee"`
+	PayFlag     int8    `db:"pay_flag"`
+	UserGroupID int     `db:"user_group_id"`
+}

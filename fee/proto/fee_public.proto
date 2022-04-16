@@ -41,3 +41,11 @@ message NodeWeekUsageBill {
     int64 createTime = 16;
     string extraAttributes = 17;
 }
+
+message NodeWeekUsageBillForUserGroup {
+    int32 wallTime = 1;
+    int32 gwallTime = 2;
+    double fee = 3;
+    double payFee = 4;
+    int32 userGroupID = 6;
+}

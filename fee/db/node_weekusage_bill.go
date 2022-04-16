@@ -209,6 +209,55 @@ func (this *NodeWeekUsageBillDB) QueryLimitWithTimeRangeByGroupID(
 	return res, nil
 }
 
+// QueryGroupByGroupIDWithLimit 分页查询按照userGroupID分组的组账单记录,并根据是否支付的状态进行筛选
+func (this *NodeWeekUsageBillDB) QueryGroupByGroupIDWithLimit(
+	ctx context.Context,
+	limit, offset int,
+	payFlag int8,
+) ([]*NodeWeekUsageBillForUserGroup, error) {
+	rows, err := this.conn.Query(
+		ctx,
+		"SELECT SUM(`wall_time`) AS `wall_time`, SUM(`gwall_time`) AS `gwall_time`, SUM(`fee`) AS `fee`, SUM(`pay_fee`) AS `pay_fee`, `pay_flag`, `user_group_id` "+
+			"FROM `week_usage_bill` WHERE `pay_flag`=? GROUP BY `user_group_id` ORDER BY `user_group_id` ASC LIMIT ?,?",
+		payFlag,
+		limit,
+		offset,
+	)
+	if err != nil {
+		logger.Warn("QueryGroupByGroupIDWithLimit error: ", err)
+		return nil, errors.New("QueryGroupByGroupIDWithLimit error")
+	}
+	infos := make([]*NodeWeekUsageBillForUserGroup, 0)
+	for rows.Next() {
+		var info NodeWeekUsageBillForUserGroup
+		if err := rows.StructScan(&info); err != nil {
+			logger.Warn("QueryGroupByGroupIDWithLimit struct scan error: ", err)
+			return nil, errors.New("QueryGroupByGroupIDWithLimit struct scan error")
+		}
+		infos = append(infos, &info)
+	}
+	return infos, nil
+}
+
+// QueryCountGroupByGroupID 查询某种支付状态下的账单的组的数量
+func (this *NodeWeekUsageBillDB) QueryCountGroupByGroupID(ctx context.Context, payFlag int8) (int, error) {
+	row, err := this.conn.QueryRow(
+		ctx,
+		"SELECT COUNT(DISTINCT `user_group_id`) FROM `week_usage_bill` WHERE `pay_flag`=?",
+		payFlag,
+	)
+	if err != nil {
+		logger.Warn("QueryCountGroupByGroupID error: ", err)
+		return 0, errors.New("QueryCountGroupByGroupID error")
+	}
+	var count int
+	if err := row.Scan(&count); err != nil {
+		logger.Warn("QueryCountGroupByGroupID struct scan error: ", err)
+		return 0, errors.New("QueryCountGroupByGroupID struct scan error")
+	}
+	return count, nil
+}
+
 // NewNodeWeekUsageBill 创建新的机器节点机时周账单数据库操作映射结构体
 func NewNodeWeekUsageBill(conn *db.DB) *NodeWeekUsageBillDB {
 	return &NodeWeekUsageBillDB{

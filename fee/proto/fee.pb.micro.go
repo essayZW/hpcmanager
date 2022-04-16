@@ -45,6 +45,7 @@ type FeeService interface {
 	GetNodeDistributeFeeRate(ctx context.Context, in *GetNodeDistributeFeeRateRequest, opts ...client.CallOption) (*GetNodeDistributeFeeRateResponse, error)
 	CreateNodeWeekUsageBill(ctx context.Context, in *CreateNodeWeekUsageBillRequest, opts ...client.CallOption) (*CreateNodeWeekUsageBillResponse, error)
 	PaginationGetNodeWeekUsageBillRecords(ctx context.Context, in *PaginationGetNodeWeekUsageBillRecordsResquest, opts ...client.CallOption) (*PaginationGetNodeWeekUsageBillRecordsResponse, error)
+	PaginationGetUserGroupUsageBillRecords(ctx context.Context, in *PaginationGetUserGroupUsageBillRecordsRequest, opts ...client.CallOption) (*PaginationGetUserGroupUsageBillRecordsResponse, error)
 }
 
 type feeService struct {
@@ -129,6 +130,16 @@ func (c *feeService) PaginationGetNodeWeekUsageBillRecords(ctx context.Context, 
 	return out, nil
 }
 
+func (c *feeService) PaginationGetUserGroupUsageBillRecords(ctx context.Context, in *PaginationGetUserGroupUsageBillRecordsRequest, opts ...client.CallOption) (*PaginationGetUserGroupUsageBillRecordsResponse, error) {
+	req := c.c.NewRequest(c.name, "Fee.PaginationGetUserGroupUsageBillRecords", in)
+	out := new(PaginationGetUserGroupUsageBillRecordsResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Fee service
 
 type FeeHandler interface {
@@ -139,6 +150,7 @@ type FeeHandler interface {
 	GetNodeDistributeFeeRate(context.Context, *GetNodeDistributeFeeRateRequest, *GetNodeDistributeFeeRateResponse) error
 	CreateNodeWeekUsageBill(context.Context, *CreateNodeWeekUsageBillRequest, *CreateNodeWeekUsageBillResponse) error
 	PaginationGetNodeWeekUsageBillRecords(context.Context, *PaginationGetNodeWeekUsageBillRecordsResquest, *PaginationGetNodeWeekUsageBillRecordsResponse) error
+	PaginationGetUserGroupUsageBillRecords(context.Context, *PaginationGetUserGroupUsageBillRecordsRequest, *PaginationGetUserGroupUsageBillRecordsResponse) error
 }
 
 func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.HandlerOption) error {
@@ -150,6 +162,7 @@ func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.Handler
 		GetNodeDistributeFeeRate(ctx context.Context, in *GetNodeDistributeFeeRateRequest, out *GetNodeDistributeFeeRateResponse) error
 		CreateNodeWeekUsageBill(ctx context.Context, in *CreateNodeWeekUsageBillRequest, out *CreateNodeWeekUsageBillResponse) error
 		PaginationGetNodeWeekUsageBillRecords(ctx context.Context, in *PaginationGetNodeWeekUsageBillRecordsResquest, out *PaginationGetNodeWeekUsageBillRecordsResponse) error
+		PaginationGetUserGroupUsageBillRecords(ctx context.Context, in *PaginationGetUserGroupUsageBillRecordsRequest, out *PaginationGetUserGroupUsageBillRecordsResponse) error
 	}
 	type Fee struct {
 		fee
@@ -188,4 +201,8 @@ func (h *feeHandler) CreateNodeWeekUsageBill(ctx context.Context, in *CreateNode
 
 func (h *feeHandler) PaginationGetNodeWeekUsageBillRecords(ctx context.Context, in *PaginationGetNodeWeekUsageBillRecordsResquest, out *PaginationGetNodeWeekUsageBillRecordsResponse) error {
 	return h.FeeHandler.PaginationGetNodeWeekUsageBillRecords(ctx, in, out)
+}
+
+func (h *feeHandler) PaginationGetUserGroupUsageBillRecords(ctx context.Context, in *PaginationGetUserGroupUsageBillRecordsRequest, out *PaginationGetUserGroupUsageBillRecordsResponse) error {
+	return h.FeeHandler.PaginationGetUserGroupUsageBillRecords(ctx, in, out)
 }

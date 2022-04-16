@@ -174,6 +174,33 @@ message PaginationGetNodeWeekUsageBillRecordsResponse {
 }
 ```
 
+## PaginationGetUserGroupUsageBillRecords
+
+描述: 分组分页查询账单信息
+
+原型定义: `rpc PaginationGetUserGroupUsageBillRecords(PaginationGetUserGroupUsageBillRecordsRequest) returns (PaginationGetUserGroupUsageBillRecordsResponse) {}`
+
+请求参数:
+
+```protobuf
+message PaginationGetUserGroupUsageBillRecordsRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+    int32 pageIndex = 3;
+    int32 pageSize = 4;
+    bool payFlag = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message PaginationGetUserGroupUsageBillRecordsResponse {
+    int32 count = 1;
+    repeated fee.NodeWeekUsageBillForUserGroup bills = 2;
+}
+```
+
 # 附录
 
 ## NodeDistributeBill
@@ -223,5 +250,19 @@ message NodeWeekUsageBill {
     int32 userGroupID = 15;
     int64 createTime = 16;
     string extraAttributes = 17;
+}
+```
+
+## NodeWeekUsageBillForUserGroup
+
+描述: 机器时长账单分组查询
+
+```protobuf
+message NodeWeekUsageBillForUserGroup {
+    int32 wallTime = 1;
+    int32 gwallTime = 2;
+    double fee = 3;
+    double payFee = 4;
+    int32 userGroupID = 6;
 }
 ```

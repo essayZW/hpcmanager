@@ -203,6 +203,45 @@ func (this *NodeWeekUsageBill) PaginationGetWithTimeRangeWithGroupID(
 	}, nil
 }
 
+// PaginationGetGroupByGroupIDResult 分页查询所有组的账单结果
+type PaginationGetGroupByGroupIDResult struct {
+	Data  []*db.NodeWeekUsageBillForUserGroup
+	Count int
+}
+
+// PaginationGetGroupByGroupIDWithPayFlag 按照组ID进行分组，分页查询某个支付状态下的所有结果
+func (this *NodeWeekUsageBill) PaginationGetGroupByGroupIDWithPayFlag(
+	ctx context.Context,
+	pageIndex, pageSize int,
+	payFlag bool,
+) (*PaginationGetGroupByGroupIDResult, error) {
+	if pageIndex <= 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize <= 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+	var payFlagInt int8
+	if payFlag {
+		payFlagInt = 1
+	} else {
+		payFlagInt = 0
+	}
+	count, err := this.nodeWeekUsageBillDB.QueryCountGroupByGroupID(ctx, payFlagInt)
+	if err != nil {
+		return nil, err
+	}
+	limit := pageSize * (pageIndex - 1)
+	data, err := this.nodeWeekUsageBillDB.QueryGroupByGroupIDWithLimit(ctx, limit, pageSize, payFlagInt)
+	if err != nil {
+		return nil, err
+	}
+	return &PaginationGetGroupByGroupIDResult{
+		Count: count,
+		Data:  data,
+	}, nil
+}
+
 // NewNodeWeekUsageBill 创建新的机器机时周账单数据操作逻辑结构体
 func NewNodeWeekUsageBill(
 	nodeWeekUsageBillDB *db.NodeWeekUsageBillDB,

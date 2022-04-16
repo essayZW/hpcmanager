@@ -382,6 +382,54 @@ func (fs *FeeService) PaginationGetNodeWeekUsageBillRecords(
 	return nil
 }
 
+// PaginationGetUserGroupUsageBillRecords 分页查询所有用户组的账单记录
+func (fs *FeeService) PaginationGetUserGroupUsageBillRecords(
+	ctx context.Context,
+	req *feepb.PaginationGetUserGroupUsageBillRecordsRequest,
+	resp *feepb.PaginationGetUserGroupUsageBillRecordsResponse,
+) error {
+	logger.Info("PaginationGetUserGroupUsageBillRecords: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeWeekUsageBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryNodeWeekUsageBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryNodeWeekUsageBill permission forbidden")
+	}
+
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	if !isAdmin {
+		return errors.New("permission forbidden: need admin")
+	}
+
+	res, err := fs.nodeWeekUsageBillLogic.PaginationGetGroupByGroupIDWithPayFlag(
+		ctx,
+		int(req.PageIndex),
+		int(req.PageSize),
+		req.PayFlag,
+	)
+	if err != nil {
+		return err
+	}
+
+	resp.Count = int32(res.Count)
+	resp.Bills = make([]*feepb.NodeWeekUsageBillForUserGroup, len(res.Data))
+	for index := range resp.Bills {
+		resp.Bills[index] = &feepb.NodeWeekUsageBillForUserGroup{
+			WallTime:    int32(res.Data[index].WallTime),
+			GwallTime:   int32(res.Data[index].GWallTime),
+			Fee:         res.Data[index].Fee,
+			PayFlag:     int32(res.Data[index].PayFee),
+			UserGroupID: int32(res.Data[index].UserGroupID),
+		}
+	}
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务
