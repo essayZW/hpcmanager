@@ -126,12 +126,6 @@ const handleSizeChange = (pageSize: number) => {
         <el-table-column label="应缴费用" align="center">
           <template #default="props"> {{ props.row.fee }}元 </template>
         </el-table-column>
-        <el-table-column label="缴费状态" align="center">
-          <template #default="props">
-            <span v-if="props.row.payFlag">已缴费</span>
-            <span v-else>未缴费</span>
-          </template>
-        </el-table-column>
       </el-table>
     </el-col>
   </el-row>
