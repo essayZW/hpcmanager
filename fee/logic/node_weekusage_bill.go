@@ -8,6 +8,7 @@ import (
 
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/fee/db"
+	"github.com/shopspring/decimal"
 )
 
 type NodeUsageFeeRate struct {
@@ -79,8 +80,16 @@ func (this *NodeWeekUsageBill) CreateBill(
 
 // CalFee 计算机时费用
 func (this *NodeWeekUsageBill) CalFee(ctx context.Context, wallTime, gwallTime int) float64 {
-	// TODO: 需要确定真实的计算算法
-	return this.cpu*float64(wallTime)/3600 + this.gpu*float64(gwallTime)/3600
+	gwallFee := float64(gwallTime) * this.gpu
+	wallFee := float64(wallTime) * this.cpu
+	var fee decimal.Decimal
+	if gwallFee > 0 {
+		fee = decimal.NewFromFloat(gwallFee).Round(2)
+	} else {
+		fee = decimal.NewFromFloat(wallFee).Round(2)
+	}
+	resFee, _ := fee.DivRound(decimal.NewFromInt(3600), 2).Float64()
+	return resFee
 }
 
 // PaginationGetWeekUsageBillResult 分页查询机器节点周账单结果

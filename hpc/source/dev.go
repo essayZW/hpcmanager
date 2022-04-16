@@ -118,7 +118,7 @@ func (dev *hpcDev) GetNodeUsageWithDate(
 			logger.Warn(err)
 			return nil, err
 		}
-		wallTime := rander.Float64() * float64(rander.Intn(64))
+		wallTime := rander.Float64() * float64(rander.Intn(int(endTime.Sub(startTime).Seconds())))
 		gwallTime := rander.Float64() * float64(rander.Intn(64))
 		infos[i] = &HpcNodeUsage{
 			Username:  usernames[randUserNameIndex],

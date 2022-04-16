@@ -22,6 +22,7 @@ require (
 	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/node v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/user v0.0.0-00010101000000-000000000000
+	github.com/shopspring/decimal v1.3.1
 	go-micro.dev/v4 v4.6.0
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/guregu/null.v4 v4.0.0
