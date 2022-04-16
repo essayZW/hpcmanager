@@ -829,3 +829,19 @@ endDateMilliUnix: number;
 ```
 
 响应: 分页查询的结果
+
+### /fee/usage/group/week
+
+Method: GET
+
+描述: 按照组 ID 进行分组，并分页查询某个组的账单信息
+
+参数:
+
+```typescript
+pageIndex: number;
+pageSize: number;
+payFlag: boolean;
+```
+
+响应: 分页查询的结果

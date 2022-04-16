@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	feepb "github.com/essayZW/hpcmanager/fee/proto"
@@ -176,6 +177,58 @@ func (f *fee) paginationGetNodeWeekUsageBills(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// paginationGetNodeWeekUsageBillsGroupByGroupID 分页查询机时周账单并按照组ID进行分组
+func (f *fee) paginationGetNodeWeekUsageBillsGroupByGroupID(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	payFlagStr, ok := ctx.GetQuery("payFlag")
+	if !ok {
+		httpResp := response.New(200, nil, false, "缺少payFlag参数")
+		httpResp.Send(ctx)
+		return
+	}
+	payFlag, err := strconv.ParseBool(payFlagStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "payFlag 必须是一个Bool值")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := f.feeService.PaginationGetUserGroupUsageBillRecords(c, &feepb.PaginationGetUserGroupUsageBillRecordsRequest{
+		BaseRequest: baseRequest,
+		PageIndex:   int32(pageIndex),
+		PageSize:    int32(pageSize),
+		PayFlag:     payFlag,
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询账单失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	responseData := response.PaginationQueryResponse{
+		Count: int(resp.Count),
+		Data:  resp.Bills,
+	}
+	if resp.Bills == nil {
+		responseData.Data = make([]*feepb.NodeWeekUsageBillForUserGroup, 0)
+	}
+	httpResp := response.New(200, responseData, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter := router.Group("/fee")
 
@@ -188,6 +241,7 @@ func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter.GET("/rate/distribute", f.getNodeDistributeFeeRate)
 
 	feeRouter.GET("/usage/week", f.paginationGetNodeWeekUsageBills)
+	feeRouter.GET("/usage/group/week", f.paginationGetNodeWeekUsageBillsGroupByGroupID)
 	return feeRouter
 }
 
