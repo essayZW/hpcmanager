@@ -8,7 +8,7 @@ import GroupWeekUsageBillTable from '../GroupWeekUsageTable.vue';
     title="机器时长账单管理"
     des="查看并管理机器时长周账单信息,以及对账单进行缴费"
   ></page-title>
-  <el-tabs type="card">
+  <el-tabs type="card" class="tabs">
     <el-tab-pane label="机时记录">
       <node-usage-bill-table></node-usage-bill-table>
     </el-tab-pane>
@@ -17,4 +17,8 @@ import GroupWeekUsageBillTable from '../GroupWeekUsageTable.vue';
     </el-tab-pane>
   </el-tabs>
 </template>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.tabs {
+  margin-top: 16px;
+}
+</style>

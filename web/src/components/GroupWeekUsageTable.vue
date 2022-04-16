@@ -2,6 +2,7 @@
 import { reactive } from 'vue';
 import { paginationGetGroupNodeUsageBill } from '../service/fee';
 import { NodeWeekUsageBillForGroup } from '../api/fee';
+import { timeSecondFormat } from '../utils/obj';
 
 const tableData = reactive<{
   data: NodeWeekUsageBillForGroup[];
@@ -54,7 +55,7 @@ const handleSizeChange = (pageSize: number) => {
 };
 </script>
 <template>
-  <el-row justify="space-between" class="refresh-button-row">
+  <el-row justify="end" class="refresh-button-row">
     <el-button type="primary" @click="refreshTableData">
       <el-icon class="el-icon--left">
         <i-ic-round-refresh />
@@ -64,16 +65,28 @@ const handleSizeChange = (pageSize: number) => {
   </el-row>
   <el-row justify="center">
     <el-col :span="24">
-      <el-table border table-layout="auto">
+      <el-table border table-layout="auto" :data="tableData.data">
         <el-table-column
           label="组ID"
           prop="userGroupID"
           align="center"
         ></el-table-column>
-        <el-table-column label="CPU机时" align="center"></el-table-column>
-        <el-table-column label="GPU机时" align="center"></el-table-column>
-        <el-table-column label="应缴费用" align="center"></el-table-column>
-        <el-table-column label="未缴费用" align="center"></el-table-column>
+        <el-table-column label="CPU机时" align="center">
+          <template #default="props">
+            {{ timeSecondFormat(props.row.wallTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="GPU机时" align="center">
+          <template #default="props">
+            {{ timeSecondFormat(props.row.gwallTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="应缴费用" align="center">
+          <template #default="props"> {{ props.row.fee }}元 </template>
+        </el-table-column>
+        <el-table-column label="已缴费用" align="center">
+          <template #default="props"> {{ props.row.payFee }}元 </template>
+        </el-table-column>
         <el-table-column
           label="详情"
           type="expand"
