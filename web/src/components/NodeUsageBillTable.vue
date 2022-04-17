@@ -2,7 +2,10 @@
 import { reactive } from 'vue';
 import { NodeWeekUsageBill } from '../api/fee';
 import dayjs from 'dayjs';
-import { paginationGetNodeWeekUsageBill } from '../service/fee';
+import {
+  paginationGetNodeWeekUsageBill,
+  payTypeToString,
+} from '../service/fee';
 import { timeSecondFormat, zeroWithDefault } from '../utils/obj';
 
 const tableData = reactive<{
@@ -141,6 +144,14 @@ const handleSizeChange = (pageSize: number) => {
               >已缴费 {{ zeroWithDefault(props.row.payFee, 0) }}元</span
             >
             <span v-else class="red">未缴费</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="缴费方式" align="center">
+          <template #default="props">
+            <span v-if="props.row.payFlag">{{
+              payTypeToString(props.row.payType)
+            }}</span>
+            <span v-else>未缴费</span>
           </template>
         </el-table-column>
       </el-table>
