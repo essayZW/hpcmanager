@@ -335,6 +335,29 @@ message GetNodeDistributeInfoByIDResponse {
 }
 ```
 
+## GetNodeUsageTimeRecordByID
+
+描述: 通过 ID 查询机时记录信息
+
+原型定义: `rpc GetNodeUsageTimeRecordByID(GetNodeUsageTimeRecordByIDRequest) returns (GetNodeUsageTimeRecordByIDResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetNodeUsageTimeRecordByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 id = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetNodeUsageTimeRecordByIDResponse {
+    node.NodeUsageTime record = 1;
+}
+```
+
 # 附录
 
 ### NodeApply

@@ -60,6 +60,12 @@ const (
 	QueryNodeDistributeBill = "__QUERY_NODE_DISTRIBUTE_BILL__"
 	// PayNodeDistributeBill 支付节点独占账单
 	PayNodeDistributeBill = "__PAY_NODE_DISTRIBUTE_BILL__"
+	// CreateNodeWeekUsageBill 创建机器机时周账单
+	CreateNodeWeekUsageBill = "__CREATE_NODE_WEEK_USAGE_BILL__"
+	// QueryNodeWeekUsageBill 查询机器节点时长账单记录
+	QueryNodeWeekUsageBill = "__QUERY_NODE_WEEK_USAGE_BILL__"
+	// PayNodeUsageBill 支付机器节点机时账单
+	PayNodeUsageBill = "__PAY_NODE_USAGE_BILL__"
 )
 
 // Verify 进行操作的权限验证

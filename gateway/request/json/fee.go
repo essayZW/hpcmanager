@@ -11,6 +11,8 @@ func init() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		payNodeDistributeBill := PayNodeDistributeBillParam{}
 		v.RegisterStructValidation(payNodeDistributeBill.Validator(), &payNodeDistributeBill)
+		payGroupNodeUsageBill := PayGroupNodeUsageBillParam{}
+		v.RegisterStructValidation(payGroupNodeUsageBill.Validator(), &payGroupNodeUsageBill)
 	}
 }
 
@@ -30,6 +32,26 @@ func (param *PayNodeDistributeBillParam) Validator() validator.StructLevelFunc {
 		}
 		if data.PayType != 1 && data.PayType != 2 {
 			sl.ReportError(reflect.ValueOf(data.PayType), "payType", "payType", "binding", "invalid payType")
+		}
+	}
+}
+
+// PayGroupNodeUsageBillParam 支付用户组机器节点时长账单参数
+type PayGroupNodeUsageBillParam struct {
+	UserGroupID int     `form:"userGroupID" json:"userGroupID" binding:"required"`
+	PayType     float64 `form:"payType"     json:"payType"     binding:"required"`
+	PayMessage  string  `form:"payMessage"  json:"payMessage"`
+	NeedFee     float64 `form:"needFee"     json:"needFee"     binding:"required"`
+}
+
+func (param *PayGroupNodeUsageBillParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(PayGroupNodeUsageBillParam)
+		if data.PayType != 1 && data.PayType != 2 {
+			sl.ReportError(reflect.ValueOf(data.PayType), "payType", "payType", "binding", "invalid payType")
+		}
+		if data.NeedFee < 0 {
+			sl.ReportError(reflect.ValueOf(data.NeedFee), "needFee", "needFee", "binding", "invalid needFee")
 		}
 	}
 }

@@ -4,6 +4,7 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AdminNodeUsageBillManager: typeof import('./src/components/admin/AdminNodeUsageBillManager.vue')['default']
     ApplyGroup: typeof import('./src/components/guest/ApplyGroup.vue')['default']
     ApplyGroupTable: typeof import('./src/components/ApplyGroupTable.vue')['default']
     AsideNavigation: typeof import('./src/components/AsideNavigation.vue')['default']
@@ -48,6 +49,8 @@ declare module 'vue' {
     ElTimeline: typeof import('element-plus/es')['ElTimeline']
     ElTimelineItem: typeof import('element-plus/es')['ElTimelineItem']
     GroupManager: typeof import('./src/components/admin/GroupManager.vue')['default']
+    GroupNodeUsageBillManager: typeof import('./src/components/tutor/GroupNodeUsageBillManager.vue')['default']
+    GroupWeekUsageTable: typeof import('./src/components/GroupWeekUsageTable.vue')['default']
     IEpArrowDown: typeof import('~icons/ep/arrow-down')['default']
     IEpAvatar: typeof import('~icons/ep/avatar')['default']
     IIcRoundRefresh: typeof import('~icons/ic/round-refresh')['default']
@@ -59,12 +62,15 @@ declare module 'vue' {
     NodeDistributeBillTable: typeof import('./src/components/NodeDistributeBillTable.vue')['default']
     NodeDistributeManager: typeof import('./src/components/admin/NodeDistributeManager.vue')['default']
     NodeTypeSelect: typeof import('./src/components/form/NodeTypeSelect.vue')['default']
+    NodeUsageBillManager: typeof import('./src/components/common/NodeUsageBillManager.vue')['default']
+    NodeUsageBillTable: typeof import('./src/components/NodeUsageBillTable.vue')['default']
     NodeUsageManager: typeof import('./src/components/common/NodeUsageManager.vue')['default']
     NodeUsageTable: typeof import('./src/components/NodeUsageTable.vue')['default']
     PageTitle: typeof import('./src/components/PageTitle.vue')['default']
     ProjectManager: typeof import('./src/components/ProjectManager.vue')['default']
     UpdateUserInfo: typeof import('./src/components/UpdateUserInfo.vue')['default']
     UserManager: typeof import('./src/components/admin/UserManager.vue')['default']
+    UserNodeUsageBillManager: typeof import('./src/components/common/UserNodeUsageBillManager.vue')['default']
     UserTable: typeof import('./src/components/UserTable.vue')['default']
   }
 }

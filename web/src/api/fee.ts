@@ -112,3 +112,140 @@ export async function queryNodeDistributeFeeRate(): Promise<NodeDistributeFeeRat
   }
   return resp.data;
 }
+
+export type NodeWeekUsageBill = {
+  id: number;
+  userID: number;
+  username: string;
+  name: string;
+  wallTime: number;
+  gwallTime: number;
+  fee: number;
+  payFee: number;
+  startTime: number;
+  endTime: number;
+  payFlag: number;
+  payTime: number;
+  payType: number;
+  payMessage: string;
+  userGroupID: number;
+  createTime: number;
+  extraAttributes: string;
+};
+
+/**
+ * 分页查询机器节点时长周账单记录
+ */
+export async function paginationQueryNodeWeekUsageBill(
+  pageIndex: number,
+  pageSize: number,
+  startDateMilliUnix: number,
+  endDateMilliUnix: number
+): Promise<PaginationQueryResponse<NodeWeekUsageBill>> {
+  const resp = await ApiRequest.request<
+    PaginationQueryResponse<NodeWeekUsageBill>
+  >('/fee/usage/week', 'GET', {
+    pageIndex,
+    pageSize,
+    startDateMilliUnix,
+    endDateMilliUnix,
+  });
+
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  for (const single of resp.data.Data) {
+    undefinedWithDefault(single, 'wallTime', 0);
+    undefinedWithDefault(single, 'gwallTime', 0);
+    undefinedWithDefault(single, 'payFlag', 0);
+    undefinedWithDefault(single, 'fee', 0);
+    undefinedWithDefault(single, 'payType', 0);
+  }
+  return resp.data;
+}
+
+/**
+ * 用户组的机器时长账单信息
+ */
+export type NodeWeekUsageBillForGroup = {
+  wallTime: number;
+  gwallTime: number;
+  fee: number;
+  payFee: number;
+  userGroupID: number;
+};
+
+export async function paginationQueryGroupNodeWeekUsageBill(
+  pageIndex: number,
+  pageSize: number,
+  payFlag: boolean
+): Promise<PaginationQueryResponse<NodeWeekUsageBillForGroup>> {
+  const resp = await ApiRequest.request<
+    PaginationQueryResponse<NodeWeekUsageBillForGroup>
+  >('/fee/usage/group/week', 'GET', {
+    pageIndex,
+    pageSize,
+    payFlag,
+  });
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  for (const info of resp.data.Data) {
+    undefinedWithDefault(info, 'wallTime', 0);
+    undefinedWithDefault(info, 'gwallTime', 0);
+    undefinedWithDefault(info, 'fee', 0);
+    undefinedWithDefault(info, 'payFee', 0);
+  }
+  return resp.data;
+}
+
+/**
+ * 支付用户组机器节点时长账单参数定义
+ */
+export type PayGroupNodeUsageBillsParam = {
+  userGroupID: number;
+  payType: number;
+  payMessage: string;
+  needFee: number;
+};
+
+/**
+ * 更新用户组节点使用时长状态(支付)
+ */
+export async function updateGroupNodeUsageBills(
+  param: PayGroupNodeUsageBillsParam
+): Promise<number> {
+  const resp = await ApiRequest.request<{
+    count: number;
+  }>(
+    '/fee/usage/group/bill',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data.count;
+}
+
+/**
+ * 机器节点机时费率
+ */
+export type nodeUsageFeeRate = {
+  cpu: number;
+  gpu: number;
+};
+
+export async function queryNodeUsageFeeRateInfo(): Promise<nodeUsageFeeRate> {
+  const resp = await ApiRequest.request<nodeUsageFeeRate>(
+    '/fee/rate/usage',
+    'GET'
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}

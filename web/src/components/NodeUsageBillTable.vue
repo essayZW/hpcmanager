@@ -1,19 +1,23 @@
 <script setup lang="ts">
-import { HpcUsageTime } from '../api/node';
 import { reactive } from 'vue';
-import { paginationGetNodeUsageTime } from '../service/node';
+import { NodeWeekUsageBill } from '../api/fee';
 import dayjs from 'dayjs';
-import { timeSecondFormat } from '../utils/obj';
+import {
+  paginationGetNodeWeekUsageBill,
+  payTypeToString,
+} from '../service/fee';
+import { timeSecondFormat, zeroWithDefault } from '../utils/obj';
 
-// 表格数据
 const tableData = reactive<{
-  data: HpcUsageTime[];
+  data: NodeWeekUsageBill[];
   count: number;
   timeRange: Date[];
+  loading: boolean;
 }>({
   data: [],
   count: 0,
   timeRange: [dayjs(new Date().getTime()).add(-1, 'year').toDate(), new Date()],
+  loading: false,
 });
 
 // 加载表格某一页的数据
@@ -23,8 +27,9 @@ const loadTableData = async (
   startTime: number,
   endTime: number
 ) => {
+  tableData.loading = true;
   try {
-    const data = await paginationGetNodeUsageTime(
+    const data = await paginationGetNodeWeekUsageBill(
       pageIndex,
       pageSize,
       startTime,
@@ -38,6 +43,7 @@ const loadTableData = async (
       message: `${error}`,
     });
   }
+  tableData.loading = false;
 };
 
 const paginationInfo = reactive<{
@@ -91,30 +97,37 @@ const handleSizeChange = (pageSize: number) => {
   </el-row>
   <el-row justify="center">
     <el-col :span="24">
-      <el-table border table-layout="auto" :data="tableData.data">
+      <el-table
+        v-loading="tableData.loading"
+        table-layout="auto"
+        border
+        :data="tableData.data"
+      >
         <el-table-column
-          label="用户学号"
-          prop="username"
+          label="用户学(工)号"
           align="center"
+          prop="username"
         ></el-table-column>
         <el-table-column
           label="用户姓名"
+          align="center"
           prop="name"
-          align="center"
         ></el-table-column>
         <el-table-column
-          label="导师工号"
-          prop="tutorUsername"
+          label="用户组ID"
           align="center"
+          prop="userGroupID"
         ></el-table-column>
-        <el-table-column
-          label="导师姓名"
-          prop="tutorName"
-          align="center"
-        ></el-table-column>
+        <el-table-column label="时间范围" align="center">
+          <template #default="props">
+            {{ dayjs(props.row.startTime * 1000).format('YYYY-MM-DD') }}至{{
+              dayjs(props.row.endTime * 1000).format('YYYY-MM-DD')
+            }}
+          </template>
+        </el-table-column>
         <el-table-column label="CPU机时" align="center">
           <template #default="props">
-            {{ timeSecondFormat(props.row.gwallTime) }}
+            {{ timeSecondFormat(props.row.wallTime) }}
           </template>
         </el-table-column>
         <el-table-column label="GPU机时" align="center">
@@ -122,24 +135,25 @@ const handleSizeChange = (pageSize: number) => {
             {{ timeSecondFormat(props.row.gwallTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="开始时间" align="center">
+        <el-table-column label="应缴费用" align="center">
+          <template #default="props"> {{ props.row.fee }}元 </template>
+        </el-table-column>
+        <el-table-column label="缴费状态" align="center">
           <template #default="props">
-            {{ dayjs(props.row.startTime * 1000).format('YYYY-MM-DD') }}
+            <span v-if="props.row.payFlag" class="green"
+              >已缴费 {{ zeroWithDefault(props.row.payFee, 0) }}元</span
+            >
+            <span v-else class="red">未缴费</span>
           </template>
         </el-table-column>
-        <el-table-column label="结束时间" align="center">
+        <el-table-column label="缴费方式" align="center">
           <template #default="props">
-            {{ dayjs(props.row.endTime * 1000).format('YYYY-MM-DD') }}
+            <span v-if="props.row.payFlag">{{
+              payTypeToString(props.row.payType)
+            }}</span>
+            <span v-else>未缴费</span>
           </template>
         </el-table-column>
-        <!-- TODO: 待后端数据库变更中引入作业ID以及作业名数据之后,将数据添加到详情信息中 -->
-        <!--
-        <el-table-column label="详情" type="expand" align="center">
-          <template #default="props">
-            {{ dayjs(props.row.endTime * 1000).format('YYYY-MM-DD') }}
-          </template>
-        </el-table-column>
-        -->
       </el-table>
     </el-col>
   </el-row>
@@ -171,5 +185,11 @@ const handleSizeChange = (pageSize: number) => {
     margin: 0px auto;
     justify-content: center;
   }
+}
+.green {
+  color: green;
+}
+.red {
+  color: red;
 }
 </style>

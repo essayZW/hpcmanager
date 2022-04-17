@@ -5,7 +5,7 @@ go 1.17
 replace github.com/essayZW/hpcmanager => ../../
 
 require (
-	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220325022819-73eda3346d18
+	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220407104607-62c2981baf63
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/hpc v0.0.0-00010101000000-000000000000
@@ -79,3 +79,5 @@ replace github.com/essayZW/hpcmanager/user => ../../user
 replace github.com/essayZW/hpcmanager/project => ../../project
 
 replace github.com/essayZW/hpcmanager/permission => ../../permission
+
+replace github.com/essayZW/hpcmanager/fee => ../../fee

@@ -23,6 +23,7 @@ service Node {
     rpc PaginationGetNodeUsage(PaginationGetNodeUsageRequest) returns (PaginationGetNodeUsageResponse) {}
     rpc UpdateNodeApply(UpdateNodeApplyRequest) returns (UpdateNodeApplyResponse) {}
     rpc GetNodeDistributeInfoByID(GetNodeDistributeInfoByIDRequest) returns (GetNodeDistributeInfoByIDResponse) {}
+    rpc GetNodeUsageTimeRecordByID(GetNodeUsageTimeRecordByIDRequest) returns (GetNodeUsageTimeRecordByIDResponse) {}
 }
 
 message CreateNodeApplyRequest {
@@ -158,4 +159,13 @@ message GetNodeDistributeInfoByIDRequest {
 
 message GetNodeDistributeInfoByIDResponse {
     node.NodeDistribute wo = 1;
+}
+
+message GetNodeUsageTimeRecordByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 id = 2;
+}
+
+message GetNodeUsageTimeRecordByIDResponse {
+    node.NodeUsageTime record = 1;
 }

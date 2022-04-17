@@ -487,27 +487,41 @@ func (ns *NodeService) AddNodeUsageTimeRecord(
 		)
 		return errors.New("AddNodeUsageTimeRecord permission forbidden")
 	}
-	id, err := ns.nodeUsageTime.AddRecord(ctx, &db.HpcUsageTime{
-		UserID:        int(req.UserID),
-		Username:      req.Username,
-		UserName:      req.Name,
-		HpcUsername:   req.HpcUserName,
-		TutorID:       int(req.TutorID),
-		TutorUsername: req.TutorUsername,
-		TutorUserName: req.TutorName,
-		HpcGroupName:  req.HpcGroupName,
-		QueueName:     req.QueueName,
-		WallTime:      req.WallTime,
-		GWallTime:     req.GwallTime,
-		StartTime:     time.Unix(req.StartTimeUnix, 0),
-		EndTime:       time.Unix(req.EndTimeUnix, 0),
+	id, err := hpcdb.Transaction(context.Background(), func(ctx context.Context, i ...interface{}) (interface{}, error) {
+		id, err := ns.nodeUsageTime.AddRecord(ctx, &db.HpcUsageTime{
+			UserID:        int(req.UserID),
+			Username:      req.Username,
+			UserName:      req.Name,
+			HpcUsername:   req.HpcUserName,
+			TutorID:       int(req.TutorID),
+			TutorUsername: req.TutorUsername,
+			TutorUserName: req.TutorName,
+			HpcGroupName:  req.HpcGroupName,
+			QueueName:     req.QueueName,
+			WallTime:      req.WallTime,
+			GWallTime:     req.GwallTime,
+			StartTime:     time.Unix(req.StartTimeUnix, 0),
+			EndTime:       time.Unix(req.EndTimeUnix, 0),
+		})
+		if err != nil {
+			return id, err
+		}
+		// 创建相应的机器时长周账单
+		_, err = ns.feeService.CreateNodeWeekUsageBill(ctx, &feepb.CreateNodeWeekUsageBillRequest{
+			BaseRequest: req.BaseRequest,
+			UserID:      req.UserID,
+			WallTime:    int32(req.WallTime),
+			GwallTime:   int32(req.GwallTime),
+			StartTime:   req.StartTimeUnix,
+			EndTime:     req.EndTimeUnix,
+		})
+		if err != nil {
+			return id, err
+		}
+		return id, nil
 	})
-	if err != nil {
-		return err
-	}
-	resp.Id = int32(id)
-	// TODO: 创建相应的机器独占账单
-	return nil
+	resp.Id = int32(id.(int64))
+	return err
 }
 
 // PaginationGetNodeUsage 分页查询机器节点使用详情信息
@@ -678,6 +692,53 @@ func (ns *NodeService) GetNodeDistributeInfoByID(
 	}
 	if info.ExtraAttributes != nil {
 		resp.Wo.ExtraAttributes = info.ExtraAttributes.String()
+	}
+	return nil
+}
+
+// GetNodeUsageTimeRecordByID 通过ID查询机器时长记录
+func (ns *NodeService) GetNodeUsageTimeRecordByID(
+	ctx context.Context,
+	req *nodepb.GetNodeUsageTimeRecordByIDRequest,
+	resp *nodepb.GetNodeUsageTimeRecordByIDResponse,
+) error {
+	logger.Info("GetNodeDistributeInfoByID: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeUsage, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryNodeUsage permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryNodeUsage permission forbidden")
+	}
+
+	info, err := ns.nodeUsageTime.GetRecordByID(ctx, int(req.Id))
+	if err != nil {
+		return err
+	}
+
+	resp.Record = &nodepb.NodeUsageTime{
+		Id:            int32(info.ID),
+		UserID:        int32(info.UserID),
+		Username:      info.Username,
+		Name:          info.UserName,
+		HpcUserName:   info.HpcUsername,
+		TutorID:       int32(info.TutorID),
+		TutorUsername: info.TutorUsername,
+		TutorName:     info.TutorUserName,
+		HpcGroupName:  info.HpcGroupName,
+		QueueName:     info.QueueName,
+		WallTime:      info.WallTime,
+		GwallTime:     info.GWallTime,
+		StartTime:     info.StartTime.Unix(),
+		EndTime:       info.EndTime.Unix(),
+		CreateTime:    info.CreateTime.Unix(),
+	}
+	if info.ExtraAttributes != nil {
+		resp.Record.ExtraAttributes = info.ExtraAttributes.String()
 	}
 	return nil
 }

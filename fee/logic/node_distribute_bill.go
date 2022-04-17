@@ -221,6 +221,9 @@ func (ndbl *NodeDistributeBill) PayBill(
 	if money < 0 {
 		return false, errors.New("pay money must larger than 0")
 	}
+	if t != BalancePay && t != OfflinePay {
+		return false, errors.New("invalid pay type")
+	}
 	return ndbl.ndb.UpdatePayFee(ctx, &db.NodeDistributeBill{
 		ID:         billID,
 		PayType:    null.IntFrom(int64(t)),
@@ -280,7 +283,7 @@ type PayType int8
 
 const (
 	// OfflinePay 线下缴费
-	OfflinePay = 1
+	OfflinePay PayType = 1
 	// BalancePay 余额缴费
-	BalancePay = 2
+	BalancePay PayType = 2
 )

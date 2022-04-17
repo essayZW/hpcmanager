@@ -812,3 +812,73 @@ Method: GET
     "8GPU":  resp.Rate8GPU,
 }
 ```
+
+### /fee/usage/week
+
+Method: GET
+
+描述: 分页查询机器节点周账单
+
+参数:
+
+```typescript
+pageIndex: number;
+pageSize: number;
+startDateMilliUnix: number;
+endDateMilliUnix: number;
+```
+
+响应: 分页查询的结果
+
+### /fee/usage/group/week
+
+Method: GET
+
+描述: 按照组 ID 进行分组，并分页查询某个组的账单信息
+
+参数:
+
+```typescript
+pageIndex: number;
+pageSize: number;
+payFlag: boolean;
+```
+
+响应: 分页查询的结果
+
+### /fee/usage/group/bill
+
+Method: PUT
+
+描述: 通过用户组 ID 支付用户组的机器节点机时未支付账单
+
+参数:
+
+```go
+// PayGroupNodeUsageBillParam 支付用户组机器节点时长账单参数
+type PayGroupNodeUsageBillParam struct {
+    UserGroupID int     `form:"userGroupID" json:"userGroupID" binding:"required"`
+    PayType     float64 `form:"payType"     json:"payType"     binding:"required"`
+    PayMessage  string  `form:"payMessage"  json:"payMessage"`
+    NeedFee     float64 `form:"needFee"     json:"needFee"     binding:"required"`
+}
+```
+
+响应: 支付成功的账单数目
+
+### /fee/rate/usage
+
+Method: GET
+
+描述: 查询机器时长费率信息
+
+参数: 无
+
+响应:
+
+```go
+map[string]float64{
+    "cpu": 0,
+    "gpu": 0,
+}
+```

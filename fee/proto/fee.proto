@@ -16,6 +16,11 @@ service Fee {
     rpc PaginationGetNodeDistributeBill(PaginationGetNodeDistributeBillRequest) returns (PaginationGetNodeDistributeBillResponse) {}
     rpc PayNodeDistributeBill(PayNodeDistributeBillRequest) returns (PayNodeDistributeBillResponse) {}
     rpc GetNodeDistributeFeeRate(GetNodeDistributeFeeRateRequest) returns (GetNodeDistributeFeeRateResponse) {}
+    rpc CreateNodeWeekUsageBill(CreateNodeWeekUsageBillRequest) returns (CreateNodeWeekUsageBillResponse) {}
+    rpc PaginationGetNodeWeekUsageBillRecords(PaginationGetNodeWeekUsageBillRecordsResquest) returns (PaginationGetNodeWeekUsageBillRecordsResponse) {}
+    rpc PaginationGetUserGroupUsageBillRecords(PaginationGetUserGroupUsageBillRecordsRequest) returns (PaginationGetUserGroupUsageBillRecordsResponse) {}
+    rpc PayGroupNodeUsageBill(PayGroupNodeUsageBillRequest) returns (PayGroupNodeUsageBillResponse) {}
+    rpc GetNodeUsageFeeRate(GetNodeUsageFeeRateRequest) returns (GetNodeUsageFeeRateResponse) {}
 }
 
 message CreateNodeDistributeBillRequest {
@@ -58,4 +63,64 @@ message GetNodeDistributeFeeRateResponse {
     double rate36CPU = 1;
     double rate4GPU = 2;
     double rate8GPU = 3;
+}
+
+message CreateNodeWeekUsageBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userID = 2;
+    int32 wallTime = 3;
+    int32 gwallTime = 4;
+    int64 startTime = 5;
+    int64 endTime = 6;
+}
+
+message CreateNodeWeekUsageBillResponse {
+    int32 id = 1;
+}
+
+message PaginationGetNodeWeekUsageBillRecordsResquest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+    int64 startTimeUnix = 4;
+    int64 endTimeUnix = 5;
+}
+
+message PaginationGetNodeWeekUsageBillRecordsResponse {
+    int32 count = 1;
+    repeated fee.NodeWeekUsageBill bills = 2;
+}
+
+message PaginationGetUserGroupUsageBillRecordsRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+    int32 pageIndex = 3;
+    int32 pageSize = 4;
+    bool payFlag = 5;
+}
+
+message PaginationGetUserGroupUsageBillRecordsResponse {
+    int32 count = 1;
+    repeated fee.NodeWeekUsageBillForUserGroup bills = 2;
+}
+
+message PayGroupNodeUsageBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userGroupID = 2;
+    int32 payType = 3;
+    string payMessage = 4;
+    double needFee = 5;
+}
+
+message PayGroupNodeUsageBillResponse {
+    int32 payCount = 1;
+}
+
+message GetNodeUsageFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+}
+
+message GetNodeUsageFeeRateResponse {
+    double cpu = 1;
+    double gpu = 2;
 }

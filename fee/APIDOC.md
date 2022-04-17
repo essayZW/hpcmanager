@@ -100,7 +100,7 @@ message PayNodeDistributeBillResponse {
 }
 ```
 
-### GetNodeDistributeFeeRate
+## GetNodeDistributeFeeRate
 
 描述: 查询机器节点独占费率
 
@@ -121,6 +121,132 @@ message GetNodeDistributeFeeRateResponse {
     double rate36CPU = 1;
     double rate4GPU = 2;
     double rate8GPU = 3;
+}
+```
+
+## CreateNodeWeekUsageBill
+
+描述: 创建机器节点时长周账单
+
+原型定义: `rpc CreateNodeWeekUsageBill(CreateNodeWeekUsageBillRequest) returns (CreateNodeWeekUsageBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message CreateNodeWeekUsageBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 nodeWeekUsageRecordID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message CreateNodeWeekUsageBillResponse {
+    int32 id = 1;
+}
+```
+
+## PaginationGetNodeWeekUsageBillRecords
+
+描述: 分页查询机器节点机时周账单
+
+原型定义: `rpc PaginationGetNodeWeekUsageBillRecords(PaginationGetNodeWeekUsageBillRecordsResquest) returns (PaginationGetNodeWeekUsageBillRecordsResponse) {}`
+
+请求参数:
+
+```protobuf
+message PaginationGetNodeWeekUsageBillRecordsResquest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+    int64 startTimeUnix = 4;
+    int64 endTimeUnix = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message PaginationGetNodeWeekUsageBillRecordsResponse {
+    int32 count = 1;
+    repeated fee.NodeWeekUsageBill bills = 2;
+}
+```
+
+## PaginationGetUserGroupUsageBillRecords
+
+描述: 分组分页查询账单信息
+
+原型定义: `rpc PaginationGetUserGroupUsageBillRecords(PaginationGetUserGroupUsageBillRecordsRequest) returns (PaginationGetUserGroupUsageBillRecordsResponse) {}`
+
+请求参数:
+
+```protobuf
+message PaginationGetUserGroupUsageBillRecordsRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 groupID = 2;
+    int32 pageIndex = 3;
+    int32 pageSize = 4;
+    bool payFlag = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message PaginationGetUserGroupUsageBillRecordsResponse {
+    int32 count = 1;
+    repeated fee.NodeWeekUsageBillForUserGroup bills = 2;
+}
+```
+
+## PayGroupNodeUsageBill
+
+描述: 支付某个用户组的所有的机器节点时长待缴费账单
+
+原型定义: `rpc PayGroupNodeUsageBill(PayGroupNodeUsageBillRequest) returns (PayGroupNodeUsageBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message PayGroupNodeUsageBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userGroupID = 2;
+    int32 payType = 3;
+    string payMessage = 4;
+    double needFee = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message PayGroupNodeUsageBillResponse {
+    int32 payCount = 1;
+}
+```
+
+## GetNodeUsageFeeRate
+
+描述: 查询机器节点时间费率
+
+原型定义: `rpc GetNodeUsageFeeRate(GetNodeUsageFeeRateRequest) returns (GetNodeUsageFeeRateResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetNodeUsageFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetNodeUsageFeeRateResponse {
+    double cpu = 1;
+    double gpu = 2;
 }
 ```
 
@@ -147,5 +273,45 @@ message NodeDistributeBill {
     int32 userGroupID = 13;
     int64 createTimeMilliUnix = 14;
     string extraAttributes = 15;
+}
+```
+
+## NodeWeekUsageBill
+
+描述: 机器时长周账单定义
+
+```protobuf
+message NodeWeekUsageBill {
+    int32 id = 1;
+    int32 userID = 2;
+    string username = 3;
+    string name = 4;
+    int32 wallTime = 5;
+    int32 gwallTime = 6;
+    double fee = 7;
+    double payFee = 8;
+    int64 startTime = 9;
+    int64 endTime = 10;
+    int32 payFlag = 11;
+    int64 payTime = 12;
+    int32 payType = 13;
+    string payMessage = 14;
+    int32 userGroupID = 15;
+    int64 createTime = 16;
+    string extraAttributes = 17;
+}
+```
+
+## NodeWeekUsageBillForUserGroup
+
+描述: 机器时长账单分组查询
+
+```protobuf
+message NodeWeekUsageBillForUserGroup {
+    int32 wallTime = 1;
+    int32 gwallTime = 2;
+    double fee = 3;
+    double payFee = 4;
+    int32 userGroupID = 6;
 }
 ```

@@ -17,9 +17,11 @@ import (
 
 type FeeService struct {
 	nodeDistributeBillLogic *logic.NodeDistributeBill
-	nodeService             nodepb.NodeService
-	userService             userpb.UserService
-	userGroupService        userpb.GroupService
+	nodeWeekUsageBillLogic  *logic.NodeWeekUsageBill
+
+	nodeService      nodepb.NodeService
+	userService      userpb.UserService
+	userGroupService userpb.GroupService
 }
 
 // Ping ping测试
@@ -125,6 +127,7 @@ func (fs *FeeService) PaginationGetNodeDistributeBill(
 
 	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
 	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	// FIXME: 所有的记录应该按照倒序排序
 	if !isAdmin && !isTutor {
 		// 普通用户,只能查询自己的账单信息
 		infos, err = fs.nodeDistributeBillLogic.PaginationGetWithUserID(
@@ -210,7 +213,7 @@ func (fs *FeeService) PayNodeDistributeBill(
 			return status, err
 		}
 
-		if logic.OfflinePay == req.PayType {
+		if logic.OfflinePay == logic.PayType(req.PayType) {
 			// 是线下缴费
 			return status, nil
 		}
@@ -248,15 +251,269 @@ func (fs *FeeService) GetNodeDistributeFeeRate(
 	return nil
 }
 
+// CreateNodeWeekUsageBill 创建机器机时周账单
+func (fs *FeeService) CreateNodeWeekUsageBill(
+	ctx context.Context,
+	req *feepb.CreateNodeWeekUsageBillRequest,
+	resp *feepb.CreateNodeWeekUsageBillResponse,
+) error {
+	logger.Info("CreateNodeWeekUsageBill: ", req.BaseRequest)
+	if !verify.Identify(verify.CreateNodeWeekUsageBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"CreateNodeWeekUsageBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("CreateNodeWeekUsageBill permission forbidden")
+	}
+
+	// 查询记录拥有者的信息
+	userInfoResp, err := fs.userService.GetUserInfo(ctx, &userpb.GetUserInfoRequest{
+		BaseRequest: req.BaseRequest,
+		Userid:      req.UserID,
+	})
+	if err != nil {
+		return err
+	}
+
+	id, err := fs.nodeWeekUsageBillLogic.CreateBill(
+		ctx,
+		int(userInfoResp.UserInfo.Id),
+		int(userInfoResp.UserInfo.GroupId),
+		userInfoResp.UserInfo.Username,
+		userInfoResp.UserInfo.Name,
+		int(req.WallTime),
+		int(req.GwallTime),
+		req.StartTime,
+		req.EndTime,
+	)
+	if err != nil {
+		return err
+	}
+	resp.Id = int32(id)
+	return nil
+}
+
+// PaginationGetNodeWeekUsageBillRecords 分页查询机器节点时长账单
+func (fs *FeeService) PaginationGetNodeWeekUsageBillRecords(
+	ctx context.Context,
+	req *feepb.PaginationGetNodeWeekUsageBillRecordsResquest,
+	resp *feepb.PaginationGetNodeWeekUsageBillRecordsResponse,
+) error {
+	logger.Info("PaginationGetNodeWeekUsageBillRecords: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeWeekUsageBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryNodeWeekUsageBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryNodeWeekUsageBill permission forbidden")
+	}
+
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+
+	var infos *logic.PaginationGetWeekUsageBillResult
+	var err error
+	if !isAdmin && !isTutor {
+		// 普通学生权限,只能查询自己的所有的账单信息
+		infos, err = fs.nodeWeekUsageBillLogic.PaginationGetWithTimeRangeWithUserID(
+			ctx,
+			int(req.BaseRequest.UserInfo.UserId),
+			int(req.PageIndex),
+			int(req.PageSize),
+			req.StartTimeUnix,
+			req.EndTimeUnix,
+		)
+	} else if !isAdmin && isTutor {
+		// 导师权限,能查询自己组的所有的用户的账单的信息
+		infos, err = fs.nodeWeekUsageBillLogic.PaginationGetWithTimeRangeWithGroupID(
+			ctx,
+			int(req.BaseRequest.UserInfo.GroupId),
+			int(req.PageIndex),
+			int(req.PageSize),
+			req.StartTimeUnix,
+			req.EndTimeUnix,
+		)
+	} else {
+		// 管理员权限,能查看所有的用户的账单的信息
+		infos, err = fs.nodeWeekUsageBillLogic.PaginationGetWithTimeRange(
+			ctx,
+			int(req.PageIndex),
+			int(req.PageSize),
+			req.StartTimeUnix,
+			req.EndTimeUnix,
+		)
+	}
+	if err != nil {
+		return err
+	}
+	resp.Count = int32(infos.Count)
+	resp.Bills = make([]*feepb.NodeWeekUsageBill, len(infos.Data))
+	for index := range infos.Data {
+		resp.Bills[index] = &feepb.NodeWeekUsageBill{
+			Id:          int32(infos.Data[index].ID),
+			UserID:      int32(infos.Data[index].UserID),
+			Username:    infos.Data[index].Username,
+			Name:        infos.Data[index].UserName,
+			WallTime:    int32(infos.Data[index].WallTime),
+			GwallTime:   int32(infos.Data[index].GWallTime),
+			Fee:         infos.Data[index].Fee,
+			PayFee:      infos.Data[index].PayFee,
+			StartTime:   infos.Data[index].StartTime.Unix(),
+			EndTime:     infos.Data[index].EndTime.Unix(),
+			PayFlag:     int32(infos.Data[index].PayFlag),
+			PayTime:     infos.Data[index].PayTime.Time.Unix(),
+			PayType:     int32(infos.Data[index].PayType.Int64),
+			PayMessage:  infos.Data[index].PayMessage.String,
+			UserGroupID: int32(infos.Data[index].UserGroupID),
+			CreateTime:  infos.Data[index].CreateTime.Unix(),
+		}
+		if infos.Data[index].ExtraAttributes != nil {
+			resp.Bills[index].ExtraAttributes = infos.Data[index].ExtraAttributes.String()
+		}
+	}
+	return nil
+}
+
+// PaginationGetUserGroupUsageBillRecords 分页查询所有用户组的账单记录
+func (fs *FeeService) PaginationGetUserGroupUsageBillRecords(
+	ctx context.Context,
+	req *feepb.PaginationGetUserGroupUsageBillRecordsRequest,
+	resp *feepb.PaginationGetUserGroupUsageBillRecordsResponse,
+) error {
+	logger.Info("PaginationGetUserGroupUsageBillRecords: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeWeekUsageBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryNodeWeekUsageBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryNodeWeekUsageBill permission forbidden")
+	}
+
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	if !isAdmin {
+		return errors.New("permission forbidden: need admin")
+	}
+
+	res, err := fs.nodeWeekUsageBillLogic.PaginationGetGroupByGroupIDWithPayFlag(
+		ctx,
+		int(req.PageIndex),
+		int(req.PageSize),
+		req.PayFlag,
+	)
+	if err != nil {
+		return err
+	}
+
+	resp.Count = int32(res.Count)
+	resp.Bills = make([]*feepb.NodeWeekUsageBillForUserGroup, len(res.Data))
+	for index := range resp.Bills {
+		resp.Bills[index] = &feepb.NodeWeekUsageBillForUserGroup{
+			WallTime:    int32(res.Data[index].WallTime),
+			GwallTime:   int32(res.Data[index].GWallTime),
+			Fee:         res.Data[index].Fee,
+			PayFee:      res.Data[index].PayFee,
+			UserGroupID: int32(res.Data[index].UserGroupID),
+		}
+	}
+	return nil
+}
+
+// PayGroupNodeUsageBill 支付用户组机器时长账单
+func (fs *FeeService) PayGroupNodeUsageBill(
+	ctx context.Context,
+	req *feepb.PayGroupNodeUsageBillRequest,
+	resp *feepb.PayGroupNodeUsageBillResponse,
+) error {
+	logger.Info("PayGroupNodeUsageBill: ", req.BaseRequest)
+	if !verify.Identify(verify.PayNodeUsageBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"PayNodeUsageBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("PayNodeUsageBill permission forbidden")
+	}
+
+	count, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		// 先重新查询一次,避免有新添加的记录被缴费,从而导致实际缴费金额不够
+		billInfo, err := fs.nodeWeekUsageBillLogic.GetGroupBillByGroupID(c, int(req.UserGroupID), false)
+		if err != nil {
+			return int64(0), err
+		}
+		if req.NeedFee != billInfo.Fee {
+			// 预期支付的原始费用不等于现在所有需要支付的费用,说明账单记录发生了变化
+			return int64(0), errors.New("bill has changed, need refresh bill info")
+		}
+
+		count, err := fs.nodeWeekUsageBillLogic.PayGroupBillByGroupID(
+			c,
+			int(req.UserGroupID),
+			logic.PayType(req.PayType),
+			req.PayMessage,
+		)
+		if err != nil {
+			return int64(0), err
+		}
+		if logic.PayType(req.PayType) == logic.OfflinePay {
+			// 线下付费
+			return count, nil
+		}
+		// 余额缴费
+		_, err = fs.userGroupService.AddBalance(c, &userpb.AddBalanceRequest{
+			BaseRequest: req.BaseRequest,
+			GroupID:     req.UserGroupID,
+			Money:       -billInfo.Fee,
+		})
+		if err != nil {
+			return count, err
+		}
+		return count, nil
+	})
+	resp.PayCount = int32(count.(int64))
+	return err
+}
+
+// GetNodeUsageFeeRate 查询机器节点时间费率
+func (fs *FeeService) GetNodeUsageFeeRate(
+	ctx context.Context,
+	req *feepb.GetNodeUsageFeeRateRequest,
+	resp *feepb.GetNodeUsageFeeRateResponse,
+) error {
+	logger.Info("GetNodeUsageFeeRate: ", req.BaseRequest)
+	resp.Cpu = fs.nodeWeekUsageBillLogic.GetCPURate()
+	resp.Gpu = fs.nodeWeekUsageBillLogic.GetGPURate()
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务
-func NewFee(client client.Client, nodeDistributeBillLogic *logic.NodeDistributeBill) *FeeService {
+func NewFee(
+	client client.Client,
+	nodeDistributeBillLogic *logic.NodeDistributeBill,
+	nodeWeekUsageBillLogic *logic.NodeWeekUsageBill,
+) *FeeService {
 	nodeService := nodepb.NewNodeService("node", client)
 	userService := userpb.NewUserService("user", client)
 	userGroupService := userpb.NewGroupService("user", client)
 	return &FeeService{
 		nodeDistributeBillLogic: nodeDistributeBillLogic,
+		nodeWeekUsageBillLogic:  nodeWeekUsageBillLogic,
 		nodeService:             nodeService,
 		userService:             userService,
 		userGroupService:        userGroupService,
