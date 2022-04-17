@@ -153,6 +153,12 @@ func (dev *hpcDev) getAllUsernames(ctx context.Context) ([]string, error) {
 	return strSlice, nil
 }
 
+func (dev *hpcDev) QuotaQuery(username string, fs string) (*QuotaUsageInfo, error) {
+	// TODO: 需要实现
+	logger.Fatal("need implement")
+	return nil, nil
+}
+
 func newDev(options *Options) HpcSource {
 	if options.redisConn == nil {
 		logger.Fatal("invalid redis conn")

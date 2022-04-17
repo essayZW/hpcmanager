@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os/exec"
 	"path"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -23,7 +24,7 @@ func (source *defaultSource) AddUserToGroup(
 	userName, groupName string,
 	gid int,
 ) (map[string]interface{}, error) {
-	return source.timeoutExec(
+	return source.timeoutExecInBaseDir(
 		"php",
 		"useradd.php",
 		"--user",
@@ -38,7 +39,7 @@ func (source *defaultSource) AddUserToGroup(
 func (source *defaultSource) AddUserWithGroup(
 	userName, groupName string,
 ) (map[string]interface{}, error) {
-	return source.timeoutExec(
+	return source.timeoutExecInBaseDir(
 		"php",
 		"useradd_withgroup.php",
 		"--user",
@@ -84,8 +85,8 @@ func (source *defaultSource) selectWithDate(
 	return infos, nil
 }
 
-// exec 执行指定的命令
-func (source *defaultSource) exec(
+// execInBaseDir 执行指定的命令
+func (source *defaultSource) execInBaseDir(
 	ctx context.Context,
 	executor, file string,
 	args ...string,
@@ -105,14 +106,46 @@ func (source *defaultSource) exec(
 	return res, nil
 }
 
-func (source *defaultSource) timeoutExec(
+func (source *defaultSource) timeoutExecInBaseDir(
 	executor, file string,
 	args ...string,
 ) (map[string]interface{}, error) {
 	// 最大的超时时间为4秒
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(4))
 	defer cancel()
-	return source.exec(ctx, executor, file, args...)
+	return source.execInBaseDir(ctx, executor, file, args...)
+}
+
+// NOTE: 如果max为0代表容量无限制
+func (source *defaultSource) QuotaQuery(username string, fs string) (*QuotaUsageInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "lfs", "quota", "-quh", username, fs)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil, err
+	}
+	re := regexp.MustCompile(`[\s+]`)
+	resStrSlices := re.Split(string(output), -1)
+	if len(resStrSlices) < 5 {
+		logger.Warn("resStrSlices len must larger 5: ", resStrSlices, " ", string(output))
+		return nil, errors.New("error when parse cmd output")
+	}
+	used, err := strconv.Atoi(resStrSlices[2])
+	if err != nil {
+		logger.Warn("parse output error: ", err)
+		return nil, err
+	}
+	max, err := strconv.Atoi(resStrSlices[4])
+	if err != nil {
+		logger.Warn("parse output error: ", err)
+		return nil, err
+	}
+	res := &QuotaUsageInfo{
+		Used: used,
+		Max:  max,
+	}
+	return res, nil
 }
 
 func newSource(options *Options) (HpcSource, error) {
