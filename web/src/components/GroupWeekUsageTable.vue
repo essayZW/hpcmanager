@@ -5,7 +5,7 @@ import {
   payGroupNodeUsageBills,
 } from '../service/fee';
 import { NodeWeekUsageBillForGroup } from '../api/fee';
-import { timeSecondFormat } from '../utils/obj';
+import { timeSecondFormat, zeroWithDefault } from '../utils/obj';
 import { GroupInfo } from '../api/group';
 import { getGroupInfoByID } from '../service/group';
 
@@ -102,10 +102,21 @@ const showBillDialog = () => {
 };
 
 const payBillInfo = ref<NodeWeekUsageBillForGroup | undefined>(undefined);
-const handlerPayButtonClick = (row: NodeWeekUsageBillForGroup) => {
+const payBillGroupInfo = ref<GroupInfo | undefined>(undefined);
+
+const handlerPayButtonClick = async (row: NodeWeekUsageBillForGroup) => {
   payBillInfo.value = row;
   payBillForm.payFee = row.fee;
   payBillForm.payMessage = '';
+  try {
+    const info = await getGroupInfoByID(payBillInfo.value.userGroupID);
+    payBillGroupInfo.value = info;
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
   showBillDialog();
 };
 
@@ -268,6 +279,12 @@ const handlerPayBillSubmit = async (balancePay: boolean) => {
               placeholder="可以为空,此次缴费的备注,不超过500字"
             ></el-input>
           </el-form-item>
+          <el-form-item label="用户组余额: ">
+            <span v-if="payBillGroupInfo"
+              >{{ zeroWithDefault(payBillGroupInfo?.balance, 0) }}元</span
+            >
+            <span v-else class="red">数据加载失败</span>
+          </el-form-item>
         </el-form>
       </div>
     </div>
@@ -307,5 +324,8 @@ const handlerPayBillSubmit = async (balancePay: boolean) => {
   .rate-area {
     min-width: 30%;
   }
+}
+.red {
+  color: red;
 }
 </style>

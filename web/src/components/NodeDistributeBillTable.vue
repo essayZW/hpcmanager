@@ -10,18 +10,24 @@ import {
 import { isAdmin } from '../service/user';
 import { NodeApplyInfo } from '../api/node';
 import { getNodeApplyByID, nodeTypeToName } from '../service/node';
+import { GroupInfo } from '../api/group';
+import { getGroupInfoByID } from '../service/group';
 import dayjs from 'dayjs';
+import { zeroWithDefault } from '../utils/obj';
 
 const tableData = reactive<{
   data: NodeDistributeBill[];
   count: number;
+  loading: boolean;
 }>({
   data: [],
   count: 0,
+  loading: false,
 });
 
 // 加载表格数据
 const loadTableData = async (pageIndex: number, pageSize: number) => {
+  tableData.loading = true;
   try {
     const data = await paginationGetNodeDistributeBill(pageIndex, pageSize);
     tableData.data = data.Data;
@@ -32,6 +38,7 @@ const loadTableData = async (pageIndex: number, pageSize: number) => {
       type: 'error',
     });
   }
+  tableData.loading = false;
 };
 
 // 分页信息
@@ -70,6 +77,7 @@ const payBillDialog = ref<boolean>(false);
 const payBillDialogInfo = reactive<{
   rateInfo?: NodeDistributeFeeRate;
   applyInfo?: NodeApplyInfo;
+  groupInfo?: GroupInfo;
 }>({});
 
 onMounted(async () => {
@@ -102,6 +110,16 @@ const showPayBillDialog = async () => {
       message: `${error}`,
     });
   }
+  try {
+    const data = await getGroupInfoByID(payBillRow.value.userGroupID);
+    payBillDialogInfo.groupInfo = data;
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+  payBillForm.payFee = payBillRow.value.fee;
   payBillDialog.value = true;
 };
 
@@ -167,7 +185,12 @@ const handlerPayBillSubmit = async (isBalance: boolean) => {
   </el-row>
   <el-row justify="center">
     <el-col :span="24">
-      <el-table border table-layout="auto" :data="tableData.data">
+      <el-table
+        v-loading="tableData.loading"
+        border
+        table-layout="auto"
+        :data="tableData.data"
+      >
         <el-table-column label="ID" align="center" prop="id"></el-table-column>
         <el-table-column
           label="工单ID"
@@ -309,6 +332,14 @@ const handlerPayBillSubmit = async (isBalance: boolean) => {
               autosize
               placeholder="可以为空,此次缴费的备注,不超过500字"
             ></el-input>
+          </el-form-item>
+          <el-form-item label="用户组余额: ">
+            <span v-if="payBillDialogInfo.groupInfo"
+              >{{
+                zeroWithDefault(payBillDialogInfo.groupInfo?.balance, 0)
+              }}元</span
+            >
+            <span v-else class="red">数据加载失败</span>
           </el-form-item>
         </el-form>
       </div>
