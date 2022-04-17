@@ -423,6 +423,7 @@ func (fs *FeeService) PaginationGetUserGroupUsageBillRecords(
 			WallTime:    int32(res.Data[index].WallTime),
 			GwallTime:   int32(res.Data[index].GWallTime),
 			Fee:         res.Data[index].Fee,
+			PayFee:      res.Data[index].PayFee,
 			UserGroupID: int32(res.Data[index].UserGroupID),
 		}
 	}
@@ -452,11 +453,11 @@ func (fs *FeeService) PayGroupNodeUsageBill(
 		// 先重新查询一次,避免有新添加的记录被缴费,从而导致实际缴费金额不够
 		billInfo, err := fs.nodeWeekUsageBillLogic.GetGroupBillByGroupID(c, int(req.UserGroupID), false)
 		if err != nil {
-			return false, err
+			return int64(0), err
 		}
 		if req.NeedFee != billInfo.Fee {
 			// 预期支付的原始费用不等于现在所有需要支付的费用,说明账单记录发生了变化
-			return false, errors.New("bill has changed, need refresh bill info")
+			return int64(0), errors.New("bill has changed, need refresh bill info")
 		}
 
 		count, err := fs.nodeWeekUsageBillLogic.PayGroupBillByGroupID(
@@ -466,9 +467,9 @@ func (fs *FeeService) PayGroupNodeUsageBill(
 			req.PayMessage,
 		)
 		if err != nil {
-			return false, err
+			return int64(0), err
 		}
-		if logic.PayType(req.PayType) != logic.OfflinePay {
+		if logic.PayType(req.PayType) == logic.OfflinePay {
 			// 线下付费
 			return count, nil
 		}
@@ -479,7 +480,7 @@ func (fs *FeeService) PayGroupNodeUsageBill(
 			Money:       -billInfo.Fee,
 		})
 		if err != nil {
-			return 0, err
+			return count, err
 		}
 		return count, nil
 	})

@@ -267,7 +267,7 @@ func (this *NodeWeekUsageBillDB) QueryGroupBillByGroupID(
 	row, err := this.conn.QueryRow(
 		ctx,
 		"SELECT SUM(`wall_time`) AS `wall_time`, SUM(`gwall_time`) AS `gwall_time`, SUM(`fee`) AS `fee`, SUM(`pay_fee`) AS `pay_fee`, `pay_flag`, `user_group_id` "+
-			"FROM `week_usage_bill` WHERE `user_group_id`=? AND `pay_flag`=?",
+			"FROM `week_usage_bill` WHERE `user_group_id`=? AND `pay_flag`=? GROUP BY `user_group_id`, `pay_flag`",
 		groupID,
 		payFlag,
 	)
