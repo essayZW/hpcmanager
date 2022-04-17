@@ -258,6 +258,59 @@ func (this *NodeWeekUsageBillDB) QueryCountGroupByGroupID(ctx context.Context, p
 	return count, nil
 }
 
+// QueryGroupBillByGroupID 通过用户组ID查询某个用户组的账单情况
+func (this *NodeWeekUsageBillDB) QueryGroupBillByGroupID(
+	ctx context.Context,
+	groupID int,
+	payFlag int8,
+) (*NodeWeekUsageBillForUserGroup, error) {
+	row, err := this.conn.QueryRow(
+		ctx,
+		"SELECT SUM(`wall_time`) AS `wall_time`, SUM(`gwall_time`) AS `gwall_time`, SUM(`fee`) AS `fee`, SUM(`pay_fee`) AS `pay_fee`, `pay_flag`, `user_group_id` "+
+			"FROM `week_usage_bill` WHERE `user_group_id`=? AND `pay_flag`=?",
+		groupID,
+		payFlag,
+	)
+	if err != nil {
+		logger.Warn("QueryGroupBillByGroupID error: ", err)
+		return nil, errors.New("QueryGroupBillByGroupID error")
+	}
+	var info NodeWeekUsageBillForUserGroup
+	if err := row.StructScan(&info); err != nil {
+		logger.Warn("QueryGroupBillByGroupID struct scan error: ", err)
+		return nil, errors.New("QueryGroupBillByGroupID struct scan error")
+	}
+	return &info, nil
+}
+
+// UpdateBillsPayStatusByGroupID 通过用户组ID更新用户组的账单的支付状态
+func (this *NodeWeekUsageBillDB) UpdateBillsPayStatusByGroupID(
+	ctx context.Context,
+	groupID int,
+	payMessage string,
+	payType int8,
+	payTime time.Time,
+) (int64, error) {
+	res, err := this.conn.Exec(
+		ctx,
+		"UPDATE `week_usage_bill` SET `pay_fee`=`fee`, `pay_flag`=1, `pay_message`=?, `pay_type`=?, `pay_time`=? WHERE `user_group_id`=? AND `pay_flag`=0",
+		payMessage,
+		payType,
+		payTime,
+		groupID,
+	)
+	if err != nil {
+		logger.Warn("UpdateBillsPayStatusByGroupID error: ", err)
+		return 0, errors.New("UpdateBillsPayStatusByGroupID error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateBillsPayStatusByGroupID update error: ", err)
+		return 0, errors.New("UpdateBillsPayStatusByGroupID update error")
+	}
+	return count, nil
+}
+
 // NewNodeWeekUsageBill 创建新的机器节点机时周账单数据库操作映射结构体
 func NewNodeWeekUsageBill(conn *db.DB) *NodeWeekUsageBillDB {
 	return &NodeWeekUsageBillDB{

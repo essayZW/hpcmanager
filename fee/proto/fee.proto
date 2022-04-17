@@ -19,6 +19,7 @@ service Fee {
     rpc CreateNodeWeekUsageBill(CreateNodeWeekUsageBillRequest) returns (CreateNodeWeekUsageBillResponse) {}
     rpc PaginationGetNodeWeekUsageBillRecords(PaginationGetNodeWeekUsageBillRecordsResquest) returns (PaginationGetNodeWeekUsageBillRecordsResponse) {}
     rpc PaginationGetUserGroupUsageBillRecords(PaginationGetUserGroupUsageBillRecordsRequest) returns (PaginationGetUserGroupUsageBillRecordsResponse) {}
+    rpc PayGroupNodeUsageBill(PayGroupNodeUsageBillRequest) returns (PayGroupNodeUsageBillResponse) {}
 }
 
 message CreateNodeDistributeBillRequest {
@@ -100,4 +101,16 @@ message PaginationGetUserGroupUsageBillRecordsRequest {
 message PaginationGetUserGroupUsageBillRecordsResponse {
     int32 count = 1;
     repeated fee.NodeWeekUsageBillForUserGroup bills = 2;
+}
+
+message PayGroupNodeUsageBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userGroupID = 2;
+    int32 payType = 3;
+    string payMessage = 4;
+    double needFee = 5;
+}
+
+message PayGroupNodeUsageBillResponse {
+    int32 payCount = 1;
 }

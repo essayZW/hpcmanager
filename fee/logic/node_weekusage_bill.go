@@ -242,6 +242,37 @@ func (this *NodeWeekUsageBill) PaginationGetGroupByGroupIDWithPayFlag(
 	}, nil
 }
 
+// GetGroupBillByGroupID 通过用户组ID查询用户组的账单情况
+func (this *NodeWeekUsageBill) GetGroupBillByGroupID(
+	ctx context.Context,
+	groupID int,
+	payFlag bool,
+) (*db.NodeWeekUsageBillForUserGroup, error) {
+	var payFlagInt int8
+	if payFlag {
+		payFlagInt = 1
+	} else {
+		payFlagInt = 0
+	}
+	return this.nodeWeekUsageBillDB.QueryGroupBillByGroupID(ctx, groupID, payFlagInt)
+}
+
+// PayGroupBillByGroupID 通过用户组ID支付用户组的机时未缴费账单
+func (this *NodeWeekUsageBill) PayGroupBillByGroupID(
+	ctx context.Context,
+	groupID int,
+	payType PayType,
+	payMessage string,
+) (int64, error) {
+	if groupID <= 0 {
+		return 0, errors.New("invalid groupID")
+	}
+	if payType != OfflinePay && payType != BalancePay {
+		return 0, errors.New("invalid pay type")
+	}
+	return this.nodeWeekUsageBillDB.UpdateBillsPayStatusByGroupID(ctx, groupID, payMessage, int8(payType), time.Now())
+}
+
 // NewNodeWeekUsageBill 创建新的机器机时周账单数据操作逻辑结构体
 func NewNodeWeekUsageBill(
 	nodeWeekUsageBillDB *db.NodeWeekUsageBillDB,

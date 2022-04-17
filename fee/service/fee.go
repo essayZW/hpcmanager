@@ -213,7 +213,7 @@ func (fs *FeeService) PayNodeDistributeBill(
 			return status, err
 		}
 
-		if logic.OfflinePay == req.PayType {
+		if logic.OfflinePay == logic.PayType(req.PayType) {
 			// 是线下缴费
 			return status, nil
 		}
@@ -423,11 +423,68 @@ func (fs *FeeService) PaginationGetUserGroupUsageBillRecords(
 			WallTime:    int32(res.Data[index].WallTime),
 			GwallTime:   int32(res.Data[index].GWallTime),
 			Fee:         res.Data[index].Fee,
-			PayFlag:     int32(res.Data[index].PayFee),
 			UserGroupID: int32(res.Data[index].UserGroupID),
 		}
 	}
 	return nil
+}
+
+// PayGroupNodeUsageBill 支付用户组机器时长账单
+func (fs *FeeService) PayGroupNodeUsageBill(
+	ctx context.Context,
+	req *feepb.PayGroupNodeUsageBillRequest,
+	resp *feepb.PayGroupNodeUsageBillResponse,
+) error {
+	logger.Info("PayGroupNodeUsageBill: ", req.BaseRequest)
+	if !verify.Identify(verify.PayNodeUsageBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"PayNodeUsageBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("PayNodeUsageBill permission forbidden")
+	}
+
+	count, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		// 先重新查询一次,避免有新添加的记录被缴费,从而导致实际缴费金额不够
+		billInfo, err := fs.nodeWeekUsageBillLogic.GetGroupBillByGroupID(c, int(req.UserGroupID), false)
+		if err != nil {
+			return false, err
+		}
+		if req.NeedFee != billInfo.Fee {
+			// 预期支付的原始费用不等于现在所有需要支付的费用,说明账单记录发生了变化
+			return false, errors.New("bill has changed, need refresh bill info")
+		}
+
+		count, err := fs.nodeWeekUsageBillLogic.PayGroupBillByGroupID(
+			c,
+			int(req.UserGroupID),
+			logic.PayType(req.PayType),
+			req.PayMessage,
+		)
+		if err != nil {
+			return false, err
+		}
+		if logic.PayType(req.PayType) != logic.OfflinePay {
+			// 线下付费
+			return count, nil
+		}
+		// 余额缴费
+		_, err = fs.userGroupService.AddBalance(c, &userpb.AddBalanceRequest{
+			BaseRequest: req.BaseRequest,
+			GroupID:     req.UserGroupID,
+			Money:       -billInfo.Fee,
+		})
+		if err != nil {
+			return 0, err
+		}
+		return count, nil
+	})
+	resp.PayCount = int32(count.(int64))
+	return err
 }
 
 var _ feepb.FeeHandler = (*FeeService)(nil)

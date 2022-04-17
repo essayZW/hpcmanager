@@ -201,6 +201,32 @@ message PaginationGetUserGroupUsageBillRecordsResponse {
 }
 ```
 
+## PayGroupNodeUsageBill
+
+描述: 支付某个用户组的所有的机器节点时长待缴费账单
+
+原型定义: `rpc PayGroupNodeUsageBill(PayGroupNodeUsageBillRequest) returns (PayGroupNodeUsageBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message PayGroupNodeUsageBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userGroupID = 2;
+    int32 payType = 3;
+    string payMessage = 4;
+    double needFee = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message PayGroupNodeUsageBillResponse {
+    int32 payCount = 1;
+}
+```
+
 # 附录
 
 ## NodeDistributeBill
