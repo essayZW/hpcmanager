@@ -263,6 +263,30 @@ func (f *fee) payGroupNodeUsageBill(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// getNodeUsageFeeRate /api/fee/rate/usage GET 查询机器时长费率信息
+func (f *fee) getNodeUsageFeeRate(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := f.feeService.GetNodeUsageFeeRate(c, &feepb.GetNodeUsageFeeRateRequest{
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询费率信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, map[string]float64{
+		"cpu": resp.Cpu,
+		"gpu": resp.Gpu,
+	}, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter := router.Group("/fee")
 
@@ -273,6 +297,7 @@ func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter.PUT("/distribute", f.payNodeDistributeBill)
 
 	feeRouter.GET("/rate/distribute", f.getNodeDistributeFeeRate)
+	feeRouter.GET("/rate/usage", f.getNodeUsageFeeRate)
 
 	feeRouter.GET("/usage/week", f.paginationGetNodeWeekUsageBills)
 	feeRouter.GET("/usage/group/week", f.paginationGetNodeWeekUsageBillsGroupByGroupID)

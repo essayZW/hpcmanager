@@ -865,3 +865,20 @@ type PayGroupNodeUsageBillParam struct {
 ```
 
 响应: 支付成功的账单数目
+
+### /fee/rate/usage
+
+Method: GET
+
+描述: 查询机器时长费率信息
+
+参数: 无
+
+响应:
+
+```go
+map[string]float64{
+    "cpu": 0,
+    "gpu": 0,
+}
+```
