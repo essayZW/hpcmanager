@@ -58,7 +58,7 @@ func (ndb *NodeDistributeBillDB) QueryAllCount(ctx context.Context) (int, error)
 
 // QueryAllWithLimit 分页查询账单信息
 func (ndb *NodeDistributeBillDB) QueryAllWithLimit(ctx context.Context, limit, offset int) ([]*NodeDistributeBill, error) {
-	rows, err := ndb.conn.Query(ctx, "SELECT * FROM `node_distribute_bill` LIMIT ?,?", limit, offset)
+	rows, err := ndb.conn.Query(ctx, "SELECT * FROM `node_distribute_bill` ORDER BY `id` DESC LIMIT ?,?", limit, offset)
 	if err != nil {
 		logger.Warn("QueryAllWithLimit error: ", err)
 		return nil, errors.New("QueryAllWithLimit error")
@@ -97,7 +97,7 @@ func (ndb *NodeDistributeBillDB) QueryWithLimitByGroupID(
 ) ([]*NodeDistributeBill, error) {
 	rows, err := ndb.conn.Query(
 		ctx,
-		"SELECT * FROM `node_distribute_bill` WHERE `user_group_id`=? LIMIT ?,?",
+		"SELECT * FROM `node_distribute_bill` WHERE `user_group_id`=? ORDER BY `id` DESC LIMIT ?,?",
 		groupID,
 		limit,
 		offset,
@@ -140,7 +140,7 @@ func (ndb *NodeDistributeBillDB) QueryWithLimitByUserID(
 ) ([]*NodeDistributeBill, error) {
 	rows, err := ndb.conn.Query(
 		ctx,
-		"SELECT * FROM `node_distribute_bill` WHERE `user_id`=? LIMIT ?,?",
+		"SELECT * FROM `node_distribute_bill` WHERE `user_id`=? ORDER BY `id` DESC LIMIT ?,?",
 		groupID,
 		limit,
 		offset,
