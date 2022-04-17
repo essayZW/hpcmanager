@@ -230,3 +230,22 @@ export async function updateGroupNodeUsageBills(
   }
   return resp.data.count;
 }
+
+/**
+ * 机器节点机时费率
+ */
+export type nodeUsageFeeRate = {
+  cpu: number;
+  gpu: number;
+};
+
+export async function queryNodeUsageFeeRateInfo(): Promise<nodeUsageFeeRate> {
+  const resp = await ApiRequest.request<nodeUsageFeeRate>(
+    '/fee/rate/usage',
+    'GET'
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}

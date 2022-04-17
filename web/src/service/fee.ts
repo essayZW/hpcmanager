@@ -11,6 +11,8 @@ import {
   paginationQueryGroupNodeWeekUsageBill,
   NodeWeekUsageBillForGroup,
   updateGroupNodeUsageBills,
+  nodeUsageFeeRate,
+  queryNodeUsageFeeRateInfo,
 } from '../api/fee';
 
 /**
@@ -116,4 +118,11 @@ export async function payGroupNodeUsageBills(
     payMessage,
     needFee,
   });
+}
+
+/**
+ * 查询机器时长账单费率
+ */
+export async function getNodeUsageFeeRate(): Promise<nodeUsageFeeRate> {
+  return queryNodeUsageFeeRateInfo();
 }

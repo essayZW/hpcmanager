@@ -13,7 +13,7 @@ const noPayTableElem = ref<typeof GroupWeekUsageBillTable | undefined>(
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-const tabClickHandler = (tab: any, event: Event) => {
+const tabClickHandler = (tab: any, _event: Event) => {
   if (noPayTableElem.value && tab.paneName == 'showNoPay') {
     noPayTableElem.value.refreshTable();
   }

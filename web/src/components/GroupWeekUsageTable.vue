@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { reactive, ref, defineExpose } from 'vue';
+import { reactive, ref, defineExpose, onBeforeMount } from 'vue';
 import {
+  getNodeUsageFeeRate,
   paginationGetGroupNodeUsageBill,
   payGroupNodeUsageBills,
 } from '../service/fee';
-import { NodeWeekUsageBillForGroup } from '../api/fee';
+import { NodeWeekUsageBillForGroup, nodeUsageFeeRate } from '../api/fee';
 import { timeSecondFormat, zeroWithDefault } from '../utils/obj';
 import { GroupInfo } from '../api/group';
 import { getGroupInfoByID } from '../service/group';
@@ -152,6 +153,20 @@ const handlerPayBillSubmit = async (balancePay: boolean) => {
     });
   }
 };
+
+const feeRateInfo = ref<nodeUsageFeeRate | undefined>(undefined);
+
+onBeforeMount(async () => {
+  try {
+    const data = await getNodeUsageFeeRate();
+    feeRateInfo.value = data;
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+});
 </script>
 <template>
   <el-row justify="end" class="refresh-button-row">
@@ -250,10 +265,10 @@ const handlerPayBillSubmit = async (balancePay: boolean) => {
       <div class="rate-area">
         <h3>包机费率</h3>
         <p>
-          <strong>CPU费率:</strong>
+          <strong>CPU费率:{{ feeRateInfo.cpu }}元</strong>
         </p>
         <p>
-          <strong>GPU费率:</strong>
+          <strong>GPU费率:{{ feeRateInfo.gpu }}元</strong>
         </p>
       </div>
       <div>
