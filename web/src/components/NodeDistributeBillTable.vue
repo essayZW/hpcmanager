@@ -305,7 +305,7 @@ const handlerPayBillSubmit = async (isBalance: boolean) => {
           <el-form-item label="缴费备注: ">
             <el-input
               v-model="payBillForm.message"
-              typr="text"
+              typr="textarea"
               autosize
               placeholder="可以为空,此次缴费的备注,不超过500字"
             ></el-input>

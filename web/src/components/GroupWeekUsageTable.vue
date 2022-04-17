@@ -1,24 +1,33 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { reactive, ref, defineExpose } from 'vue';
 import { paginationGetGroupNodeUsageBill } from '../service/fee';
 import { NodeWeekUsageBillForGroup } from '../api/fee';
 import { timeSecondFormat } from '../utils/obj';
+import { GroupInfo } from '../api/group';
+import { getGroupInfoByID } from '../service/group';
+
+const propsParam = defineProps<{
+  payFlag: boolean;
+}>();
 
 const tableData = reactive<{
   data: NodeWeekUsageBillForGroup[];
   count: number;
+  loading: boolean;
 }>({
   data: [],
   count: 0,
+  loading: false,
 });
 
 // 加载表格某一页的数据
 const loadTableData = async (pageIndex: number, pageSize: number) => {
+  tableData.loading = true;
   try {
     const data = await paginationGetGroupNodeUsageBill(
       pageIndex,
       pageSize,
-      false
+      propsParam.payFlag ? true : false
     );
     tableData.data = data.Data;
     tableData.count = data.Count;
@@ -28,6 +37,7 @@ const loadTableData = async (pageIndex: number, pageSize: number) => {
       message: `${error}`,
     });
   }
+  tableData.loading = false;
 };
 
 const paginationInfo = reactive<{
@@ -42,8 +52,9 @@ const refreshTableData = () => {
   loadTableData(paginationInfo.pageIndex, paginationInfo.pageSize);
 };
 
-refreshTableData();
-
+defineExpose({
+  refreshTable: refreshTableData,
+});
 const handleCurrentChange = (pageIndex: number) => {
   paginationInfo.pageIndex = pageIndex;
   refreshTableData();
@@ -53,6 +64,57 @@ const handleSizeChange = (pageSize: number) => {
   paginationInfo.pageSize = pageSize;
   refreshTableData();
 };
+
+const rowExpandInfo = reactive<{
+  [id: number]: {
+    groupInfo?: GroupInfo;
+  };
+}>({});
+
+const rowExpandHandler = async (row: NodeWeekUsageBillForGroup) => {
+  if (!rowExpandInfo[row.userGroupID]) {
+    rowExpandInfo[row.userGroupID] = {};
+  }
+  if (!rowExpandInfo[row.userGroupID].groupInfo) {
+    try {
+      const info = await getGroupInfoByID(row.userGroupID);
+      rowExpandInfo[row.userGroupID].groupInfo = info;
+    } catch (error) {
+      ElMessage({
+        type: 'error',
+        message: `${error}`,
+      });
+    }
+  }
+};
+
+const payBillDialogVisibleFlag = ref<boolean>(false);
+
+const hideBillDialog = () => {
+  payBillDialogVisibleFlag.value = false;
+};
+
+const showBillDialog = () => {
+  payBillDialogVisibleFlag.value = true;
+};
+
+const payBillInfo = ref<NodeWeekUsageBillForGroup | undefined>(undefined);
+const handlerPayButtonClick = (row: NodeWeekUsageBillForGroup) => {
+  payBillInfo.value = row;
+  payBillForm.payFee = row.fee;
+  payBillForm.payMessage = '';
+  showBillDialog();
+};
+
+const payBillForm = reactive<{
+  payFee: number;
+  payMessage: string;
+}>({
+  payFee: 0,
+  payMessage: '',
+});
+
+const handlerPayBillSubmit = async (balancePay: boolean) => {};
 </script>
 <template>
   <el-row justify="end" class="refresh-button-row">
@@ -65,7 +127,13 @@ const handleSizeChange = (pageSize: number) => {
   </el-row>
   <el-row justify="center">
     <el-col :span="24">
-      <el-table border table-layout="auto" :data="tableData.data">
+      <el-table
+        v-loading="tableData.loading"
+        border
+        table-layout="auto"
+        :data="tableData.data"
+        @expand-change="rowExpandHandler"
+      >
         <el-table-column
           label="组ID"
           prop="userGroupID"
@@ -87,11 +155,31 @@ const handleSizeChange = (pageSize: number) => {
         <el-table-column label="已缴费用" align="center">
           <template #default="props"> {{ props.row.payFee }}元 </template>
         </el-table-column>
-        <el-table-column
-          label="详情"
-          type="expand"
-          align="center"
-        ></el-table-column>
+        <el-table-column v-if="!propsParam.payFlag" label="操作" align="center">
+          <template #default="props">
+            <el-button type="primary" @click="handlerPayButtonClick(props.row)"
+              >缴费</el-button
+            >
+          </template>
+        </el-table-column>
+        <el-table-column label="详情" type="expand" align="center">
+          <template #default="props">
+            <p class="info">
+              <span
+                ><strong>导师姓名: </strong
+                >{{
+                  rowExpandInfo[props.row.userGroupID]?.groupInfo?.tutorName
+                }}</span
+              >
+              <span
+                ><strong>导师工号: </strong
+                >{{
+                  rowExpandInfo[props.row.userGroupID]?.groupInfo?.tutorUsername
+                }}</span
+              >
+            </p>
+          </template>
+        </el-table-column>
       </el-table>
     </el-col>
   </el-row>
@@ -112,6 +200,58 @@ const handleSizeChange = (pageSize: number) => {
       </el-pagination>
     </el-col>
   </el-row>
+  <el-dialog
+    v-if="!propsParam.payFlag"
+    v-model="payBillDialogVisibleFlag"
+    title="新建用户"
+  >
+    <div class="pay-bill-dialog-body">
+      <div class="rate-area">
+        <h3>包机费率</h3>
+        <p>
+          <strong>CPU费率:</strong>
+        </p>
+        <p>
+          <strong>GPU费率:</strong>
+        </p>
+      </div>
+      <div>
+        <el-form inline>
+          <el-form-item label="应缴费金额: ">
+            <span>{{ payBillInfo?.fee }}元</span>
+          </el-form-item>
+          <el-form-item label="实缴费金额: ">
+            <el-input
+              v-model.number="payBillForm.payFee"
+              type="text"
+              placeholder="实际缴费的金额"
+            >
+              <template #append>元</template>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="缴费备注: ">
+            <el-input
+              v-model="payBillForm.payMessage"
+              autosize
+              type="textarea"
+              placeholder="可以为空,此次缴费的备注,不超过500字"
+            ></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="hideBillDialog">取消</el-button>
+        <el-button type="primary" @click="handlerPayBillSubmit(true)"
+          >余额缴费</el-button
+        >
+        <el-button type="primary" @click="handlerPayBillSubmit(false)"
+          >线下缴费</el-button
+        >
+      </span>
+    </template>
+  </el-dialog>
 </template>
 <style lang="less" scoped>
 .refresh-button-row {
@@ -122,6 +262,19 @@ const handleSizeChange = (pageSize: number) => {
   .pagination-control-panel {
     margin: 0px auto;
     justify-content: center;
+  }
+}
+.info {
+  span {
+    margin-left: 16px;
+  }
+}
+.pay-bill-dialog-body {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  .rate-area {
+    min-width: 30%;
   }
 }
 </style>
