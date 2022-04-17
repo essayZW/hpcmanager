@@ -229,6 +229,40 @@ func (f *fee) paginationGetNodeWeekUsageBillsGroupByGroupID(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// payGroupNodeUsageBill /api/fee/usage/group/bill PUT 支付用户组机器节点机时账单
+func (f *fee) payGroupNodeUsageBill(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.PayGroupNodeUsageBillParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := f.feeService.PayGroupNodeUsageBill(c, &feepb.PayGroupNodeUsageBillRequest{
+		BaseRequest: baseRequest,
+		UserGroupID: int32(param.UserGroupID),
+		PayType:     int32(param.PayType),
+		PayMessage:  param.PayMessage,
+		NeedFee:     param.NeedFee,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("缴费失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, map[string]int{
+		"count": int(resp.PayCount),
+	}, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter := router.Group("/fee")
 
@@ -242,6 +276,7 @@ func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	feeRouter.GET("/usage/week", f.paginationGetNodeWeekUsageBills)
 	feeRouter.GET("/usage/group/week", f.paginationGetNodeWeekUsageBillsGroupByGroupID)
+	feeRouter.PUT("/usage/group/bill", f.payGroupNodeUsageBill)
 	return feeRouter
 }
 
