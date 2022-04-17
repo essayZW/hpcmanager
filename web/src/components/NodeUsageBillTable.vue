@@ -3,16 +3,18 @@ import { reactive } from 'vue';
 import { NodeWeekUsageBill } from '../api/fee';
 import dayjs from 'dayjs';
 import { paginationGetNodeWeekUsageBill } from '../service/fee';
-import { timeSecondFormat } from '../utils/obj';
+import { timeSecondFormat, zeroWithDefault } from '../utils/obj';
 
 const tableData = reactive<{
   data: NodeWeekUsageBill[];
   count: number;
   timeRange: Date[];
+  loading: boolean;
 }>({
   data: [],
   count: 0,
   timeRange: [dayjs(new Date().getTime()).add(-1, 'year').toDate(), new Date()],
+  loading: false,
 });
 
 // 加载表格某一页的数据
@@ -22,6 +24,7 @@ const loadTableData = async (
   startTime: number,
   endTime: number
 ) => {
+  tableData.loading = true;
   try {
     const data = await paginationGetNodeWeekUsageBill(
       pageIndex,
@@ -37,6 +40,7 @@ const loadTableData = async (
       message: `${error}`,
     });
   }
+  tableData.loading = false;
 };
 
 const paginationInfo = reactive<{
@@ -90,7 +94,12 @@ const handleSizeChange = (pageSize: number) => {
   </el-row>
   <el-row justify="center">
     <el-col :span="24">
-      <el-table table-layout="auto" border :data="tableData.data">
+      <el-table
+        v-loading="tableData.loading"
+        table-layout="auto"
+        border
+        :data="tableData.data"
+      >
         <el-table-column
           label="用户学(工)号"
           align="center"
@@ -126,6 +135,14 @@ const handleSizeChange = (pageSize: number) => {
         <el-table-column label="应缴费用" align="center">
           <template #default="props"> {{ props.row.fee }}元 </template>
         </el-table-column>
+        <el-table-column label="缴费状态" align="center">
+          <template #default="props">
+            <span v-if="props.row.payFlag" class="green"
+              >已缴费 {{ zeroWithDefault(props.row.payFee, 0) }}元</span
+            >
+            <span v-else class="red">未缴费</span>
+          </template>
+        </el-table-column>
       </el-table>
     </el-col>
   </el-row>
@@ -157,5 +174,11 @@ const handleSizeChange = (pageSize: number) => {
     margin: 0px auto;
     justify-content: center;
   }
+}
+.green {
+  color: green;
+}
+.red {
+  color: red;
 }
 </style>

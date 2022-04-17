@@ -28,7 +28,7 @@ const tabClickHandler = (tab: any, event: Event) => {
     des="查看并管理机器时长周账单信息,以及对账单进行缴费"
   ></page-title>
   <el-tabs type="card" class="tabs" @tab-click="tabClickHandler">
-    <el-tab-pane label="机时记录">
+    <el-tab-pane label="机时账单记录">
       <node-usage-bill-table></node-usage-bill-table>
     </el-tab-pane>
     <el-tab-pane label="待缴费记录" name="showNoPay">
