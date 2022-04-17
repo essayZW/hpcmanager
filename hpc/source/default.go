@@ -117,6 +117,7 @@ func (source *defaultSource) timeoutExecInBaseDir(
 }
 
 // NOTE: 如果max为0代表容量无限制
+// TODO: 登录计算节点服务器查看执行命令返回的数据的单位,查看hpc_ug数据库的hpcquota数据表
 func (source *defaultSource) QuotaQuery(username string, fs string) (*QuotaUsageInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()

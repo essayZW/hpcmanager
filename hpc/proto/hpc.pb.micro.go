@@ -46,6 +46,7 @@ type HpcService interface {
 	GetNodeUsage(ctx context.Context, in *GetNodeUsageRequest, opts ...client.CallOption) (*GetNodeUsageResponse, error)
 	GetUserInfoByUsername(ctx context.Context, in *GetUserInfoByUsernameRequest, opts ...client.CallOption) (*GetUserInfoByUsernameResponse, error)
 	GetGroupInfoByGroupName(ctx context.Context, in *GetGroupInfoByGroupNameRequest, opts ...client.CallOption) (*GetGroupInfoByGroupNameResponse, error)
+	GetQuotaByHpcUserID(ctx context.Context, in *GetQuotaByHpcUserIDRequest, opts ...client.CallOption) (*GetQuotaByHpcUserIDResponse, error)
 }
 
 type hpcService struct {
@@ -140,6 +141,16 @@ func (c *hpcService) GetGroupInfoByGroupName(ctx context.Context, in *GetGroupIn
 	return out, nil
 }
 
+func (c *hpcService) GetQuotaByHpcUserID(ctx context.Context, in *GetQuotaByHpcUserIDRequest, opts ...client.CallOption) (*GetQuotaByHpcUserIDResponse, error) {
+	req := c.c.NewRequest(c.name, "Hpc.GetQuotaByHpcUserID", in)
+	out := new(GetQuotaByHpcUserIDResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Hpc service
 
 type HpcHandler interface {
@@ -151,6 +162,7 @@ type HpcHandler interface {
 	GetNodeUsage(context.Context, *GetNodeUsageRequest, *GetNodeUsageResponse) error
 	GetUserInfoByUsername(context.Context, *GetUserInfoByUsernameRequest, *GetUserInfoByUsernameResponse) error
 	GetGroupInfoByGroupName(context.Context, *GetGroupInfoByGroupNameRequest, *GetGroupInfoByGroupNameResponse) error
+	GetQuotaByHpcUserID(context.Context, *GetQuotaByHpcUserIDRequest, *GetQuotaByHpcUserIDResponse) error
 }
 
 func RegisterHpcHandler(s server.Server, hdlr HpcHandler, opts ...server.HandlerOption) error {
@@ -163,6 +175,7 @@ func RegisterHpcHandler(s server.Server, hdlr HpcHandler, opts ...server.Handler
 		GetNodeUsage(ctx context.Context, in *GetNodeUsageRequest, out *GetNodeUsageResponse) error
 		GetUserInfoByUsername(ctx context.Context, in *GetUserInfoByUsernameRequest, out *GetUserInfoByUsernameResponse) error
 		GetGroupInfoByGroupName(ctx context.Context, in *GetGroupInfoByGroupNameRequest, out *GetGroupInfoByGroupNameResponse) error
+		GetQuotaByHpcUserID(ctx context.Context, in *GetQuotaByHpcUserIDRequest, out *GetQuotaByHpcUserIDResponse) error
 	}
 	type Hpc struct {
 		hpc
@@ -205,4 +218,8 @@ func (h *hpcHandler) GetUserInfoByUsername(ctx context.Context, in *GetUserInfoB
 
 func (h *hpcHandler) GetGroupInfoByGroupName(ctx context.Context, in *GetGroupInfoByGroupNameRequest, out *GetGroupInfoByGroupNameResponse) error {
 	return h.HpcHandler.GetGroupInfoByGroupName(ctx, in, out)
+}
+
+func (h *hpcHandler) GetQuotaByHpcUserID(ctx context.Context, in *GetQuotaByHpcUserIDRequest, out *GetQuotaByHpcUserIDResponse) error {
+	return h.HpcHandler.GetQuotaByHpcUserID(ctx, in, out)
 }

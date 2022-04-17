@@ -427,6 +427,29 @@ func (h *HpcService) GetGroupInfoByGroupName(
 	return nil
 }
 
+// GetQuotaByHpcUserID 通过计算节点用户ID查询用户存储情况信息
+func (h *HpcService) GetQuotaByHpcUserID(
+	ctx context.Context,
+	req *hpcproto.GetQuotaByHpcUserIDRequest,
+	resp *hpcproto.GetQuotaByHpcUserIDResponse,
+) error {
+	logger.Info("GetQuotaByHpcUserID: ", req.BaseRequest)
+	// 先查询对应的HPC用户信息
+	userInfo, err := h.hpcLogic.GetUserInfoByID(ctx, int(req.HpcUserID))
+	if err != nil {
+		return err
+	}
+	res, err := h.hpcLogic.GetUserQuotaByUsername(ctx, userInfo.NodeUsername)
+	if err != nil {
+		return errors.New("query quota info error")
+	}
+	resp.Used = int32(res.Used)
+	resp.Max = int32(res.Max)
+	resp.StartTimeUnix = userInfo.QuotaStartTime.Time.Unix()
+	resp.EndTimeUnix = userInfo.QuotaEndTime.Time.Unix()
+	return nil
+}
+
 var _ hpcproto.HpcHandler = (*HpcService)(nil)
 
 // NewHpc 新建一个Hpc服务

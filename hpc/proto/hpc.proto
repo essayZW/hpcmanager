@@ -15,6 +15,7 @@ service Hpc { rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc GetNodeUsage(GetNodeUsageRequest) returns (GetNodeUsageResponse) {}
     rpc GetUserInfoByUsername(GetUserInfoByUsernameRequest) returns (GetUserInfoByUsernameResponse) {}
     rpc GetGroupInfoByGroupName(GetGroupInfoByGroupNameRequest) returns (GetGroupInfoByGroupNameResponse) {}
+    rpc GetQuotaByHpcUserID(GetQuotaByHpcUserIDRequest) returns (GetQuotaByHpcUserIDResponse) {}
 }
 
 message AddUserWithGroupRequest {
@@ -88,4 +89,16 @@ message GetGroupInfoByGroupNameRequest {
 
 message GetGroupInfoByGroupNameResponse {
     hpc.HpcGroup group = 1;
+}
+
+message GetQuotaByHpcUserIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcUserID = 2;
+}
+
+message GetQuotaByHpcUserIDResponse {
+    int32 used = 1;
+    int32 max = 2;
+    int64 startTimeUnix = 3;
+    int64 endTimeUnix = 4;
 }

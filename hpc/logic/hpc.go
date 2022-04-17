@@ -146,6 +146,11 @@ func (hpc *HpcLogic) GetGroupInfoByName(ctx context.Context, name string) (*db.H
 	return hpc.hpcGroupDB.QueryByName(ctx, name)
 }
 
+func (hpc *HpcLogic) GetUserQuotaByUsername(ctx context.Context, username string) (*source.QuotaUsageInfo, error) {
+	// OPTIMIZE: 硬编码的fs参数应该进行优化
+	return hpc.hpcSource.QuotaQuery(username, "/data")
+}
+
 // NewHpc 创建一个HPC作业调度系统逻辑操作
 func NewHpc(
 	hpcSource source.HpcSource,
