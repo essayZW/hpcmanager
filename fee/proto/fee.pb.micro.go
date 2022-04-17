@@ -47,6 +47,7 @@ type FeeService interface {
 	PaginationGetNodeWeekUsageBillRecords(ctx context.Context, in *PaginationGetNodeWeekUsageBillRecordsResquest, opts ...client.CallOption) (*PaginationGetNodeWeekUsageBillRecordsResponse, error)
 	PaginationGetUserGroupUsageBillRecords(ctx context.Context, in *PaginationGetUserGroupUsageBillRecordsRequest, opts ...client.CallOption) (*PaginationGetUserGroupUsageBillRecordsResponse, error)
 	PayGroupNodeUsageBill(ctx context.Context, in *PayGroupNodeUsageBillRequest, opts ...client.CallOption) (*PayGroupNodeUsageBillResponse, error)
+	GetNodeUsageFeeRate(ctx context.Context, in *GetNodeUsageFeeRateRequest, opts ...client.CallOption) (*GetNodeUsageFeeRateResponse, error)
 }
 
 type feeService struct {
@@ -151,6 +152,16 @@ func (c *feeService) PayGroupNodeUsageBill(ctx context.Context, in *PayGroupNode
 	return out, nil
 }
 
+func (c *feeService) GetNodeUsageFeeRate(ctx context.Context, in *GetNodeUsageFeeRateRequest, opts ...client.CallOption) (*GetNodeUsageFeeRateResponse, error) {
+	req := c.c.NewRequest(c.name, "Fee.GetNodeUsageFeeRate", in)
+	out := new(GetNodeUsageFeeRateResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Fee service
 
 type FeeHandler interface {
@@ -163,6 +174,7 @@ type FeeHandler interface {
 	PaginationGetNodeWeekUsageBillRecords(context.Context, *PaginationGetNodeWeekUsageBillRecordsResquest, *PaginationGetNodeWeekUsageBillRecordsResponse) error
 	PaginationGetUserGroupUsageBillRecords(context.Context, *PaginationGetUserGroupUsageBillRecordsRequest, *PaginationGetUserGroupUsageBillRecordsResponse) error
 	PayGroupNodeUsageBill(context.Context, *PayGroupNodeUsageBillRequest, *PayGroupNodeUsageBillResponse) error
+	GetNodeUsageFeeRate(context.Context, *GetNodeUsageFeeRateRequest, *GetNodeUsageFeeRateResponse) error
 }
 
 func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.HandlerOption) error {
@@ -176,6 +188,7 @@ func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.Handler
 		PaginationGetNodeWeekUsageBillRecords(ctx context.Context, in *PaginationGetNodeWeekUsageBillRecordsResquest, out *PaginationGetNodeWeekUsageBillRecordsResponse) error
 		PaginationGetUserGroupUsageBillRecords(ctx context.Context, in *PaginationGetUserGroupUsageBillRecordsRequest, out *PaginationGetUserGroupUsageBillRecordsResponse) error
 		PayGroupNodeUsageBill(ctx context.Context, in *PayGroupNodeUsageBillRequest, out *PayGroupNodeUsageBillResponse) error
+		GetNodeUsageFeeRate(ctx context.Context, in *GetNodeUsageFeeRateRequest, out *GetNodeUsageFeeRateResponse) error
 	}
 	type Fee struct {
 		fee
@@ -222,4 +235,8 @@ func (h *feeHandler) PaginationGetUserGroupUsageBillRecords(ctx context.Context,
 
 func (h *feeHandler) PayGroupNodeUsageBill(ctx context.Context, in *PayGroupNodeUsageBillRequest, out *PayGroupNodeUsageBillResponse) error {
 	return h.FeeHandler.PayGroupNodeUsageBill(ctx, in, out)
+}
+
+func (h *feeHandler) GetNodeUsageFeeRate(ctx context.Context, in *GetNodeUsageFeeRateRequest, out *GetNodeUsageFeeRateResponse) error {
+	return h.FeeHandler.GetNodeUsageFeeRate(ctx, in, out)
 }

@@ -227,6 +227,29 @@ message PayGroupNodeUsageBillResponse {
 }
 ```
 
+## GetNodeUsageFeeRate
+
+描述: 查询机器节点时间费率
+
+原型定义: `rpc GetNodeUsageFeeRate(GetNodeUsageFeeRateRequest) returns (GetNodeUsageFeeRateResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetNodeUsageFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetNodeUsageFeeRateResponse {
+    double cpu = 1;
+    double gpu = 2;
+}
+```
+
 # 附录
 
 ## NodeDistributeBill

@@ -20,6 +20,7 @@ service Fee {
     rpc PaginationGetNodeWeekUsageBillRecords(PaginationGetNodeWeekUsageBillRecordsResquest) returns (PaginationGetNodeWeekUsageBillRecordsResponse) {}
     rpc PaginationGetUserGroupUsageBillRecords(PaginationGetUserGroupUsageBillRecordsRequest) returns (PaginationGetUserGroupUsageBillRecordsResponse) {}
     rpc PayGroupNodeUsageBill(PayGroupNodeUsageBillRequest) returns (PayGroupNodeUsageBillResponse) {}
+    rpc GetNodeUsageFeeRate(GetNodeUsageFeeRateRequest) returns (GetNodeUsageFeeRateResponse) {}
 }
 
 message CreateNodeDistributeBillRequest {
@@ -113,4 +114,13 @@ message PayGroupNodeUsageBillRequest {
 
 message PayGroupNodeUsageBillResponse {
     int32 payCount = 1;
+}
+
+message GetNodeUsageFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+}
+
+message GetNodeUsageFeeRateResponse {
+    double cpu = 1;
+    double gpu = 2;
 }

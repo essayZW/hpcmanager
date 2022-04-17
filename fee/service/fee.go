@@ -488,6 +488,18 @@ func (fs *FeeService) PayGroupNodeUsageBill(
 	return err
 }
 
+// GetNodeUsageFeeRate 查询机器节点时间费率
+func (fs *FeeService) GetNodeUsageFeeRate(
+	ctx context.Context,
+	req *feepb.GetNodeUsageFeeRateRequest,
+	resp *feepb.GetNodeUsageFeeRateResponse,
+) error {
+	logger.Info("GetNodeUsageFeeRate: ", req.BaseRequest)
+	resp.Cpu = fs.nodeWeekUsageBillLogic.GetCPURate()
+	resp.Gpu = fs.nodeWeekUsageBillLogic.GetGPURate()
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务
