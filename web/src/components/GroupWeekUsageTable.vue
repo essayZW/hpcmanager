@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import { reactive, ref, defineExpose } from 'vue';
-import { paginationGetGroupNodeUsageBill } from '../service/fee';
+import {
+  paginationGetGroupNodeUsageBill,
+  payGroupNodeUsageBills,
+} from '../service/fee';
 import { NodeWeekUsageBillForGroup } from '../api/fee';
 import { timeSecondFormat } from '../utils/obj';
 import { GroupInfo } from '../api/group';
@@ -114,7 +117,30 @@ const payBillForm = reactive<{
   payMessage: '',
 });
 
-const handlerPayBillSubmit = async (balancePay: boolean) => {};
+const handlerPayBillSubmit = async (balancePay: boolean) => {
+  if (!payBillInfo.value) {
+    return;
+  }
+  try {
+    const count = await payGroupNodeUsageBills(
+      payBillInfo.value?.userGroupID,
+      balancePay,
+      payBillForm.payMessage,
+      payBillInfo.value?.fee
+    );
+    ElMessage({
+      type: 'success',
+      message: `成功支付了${count}条账单记录`,
+    });
+    refreshTableData();
+    hideBillDialog();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+};
 </script>
 <template>
   <el-row justify="end" class="refresh-button-row">
@@ -152,7 +178,11 @@ const handlerPayBillSubmit = async (balancePay: boolean) => {};
         <el-table-column label="应缴费用" align="center">
           <template #default="props"> {{ props.row.fee }}元 </template>
         </el-table-column>
-        <el-table-column label="已缴费用" align="center">
+        <el-table-column
+          v-if="propsParam.payFlag"
+          label="已缴费用"
+          align="center"
+        >
           <template #default="props"> {{ props.row.payFee }}元 </template>
         </el-table-column>
         <el-table-column v-if="!propsParam.payFlag" label="操作" align="center">
@@ -224,6 +254,7 @@ const handlerPayBillSubmit = async (balancePay: boolean) => {};
             <el-input
               v-model.number="payBillForm.payFee"
               type="text"
+              disabled
               placeholder="实际缴费的金额"
             >
               <template #append>元</template>

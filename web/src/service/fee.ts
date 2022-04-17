@@ -10,6 +10,7 @@ import {
   NodeWeekUsageBill,
   paginationQueryGroupNodeWeekUsageBill,
   NodeWeekUsageBillForGroup,
+  updateGroupNodeUsageBills,
 } from '../api/fee';
 
 /**
@@ -98,4 +99,21 @@ export async function paginationGetGroupNodeUsageBill(
   payFlag: boolean
 ): Promise<PaginationQueryResponse<NodeWeekUsageBillForGroup>> {
   return paginationQueryGroupNodeWeekUsageBill(pageIndex, pageSize, payFlag);
+}
+
+/**
+ * 支付用户组的所有未支付的机器节点时长账单
+ */
+export async function payGroupNodeUsageBills(
+  userGroupID: number,
+  isBalancePay: boolean,
+  payMessage: string,
+  needFee: number
+): Promise<number> {
+  return updateGroupNodeUsageBills({
+    userGroupID,
+    payType: isBalancePay ? 2 : 1,
+    payMessage,
+    needFee,
+  });
 }

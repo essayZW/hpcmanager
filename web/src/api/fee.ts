@@ -198,3 +198,35 @@ export async function paginationQueryGroupNodeWeekUsageBill(
   }
   return resp.data;
 }
+
+/**
+ * 支付用户组机器节点时长账单参数定义
+ */
+export type PayGroupNodeUsageBillsParam = {
+  userGroupID: number;
+  payType: number;
+  payMessage: string;
+  needFee: number;
+};
+
+/**
+ * 更新用户组节点使用时长状态(支付)
+ */
+export async function updateGroupNodeUsageBills(
+  param: PayGroupNodeUsageBillsParam
+): Promise<number> {
+  const resp = await ApiRequest.request<{
+    count: number;
+  }>(
+    '/fee/usage/group/bill',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data.count;
+}
