@@ -165,8 +165,8 @@ const expandChangeHandler = async (row: UserInfo) => {
   }
   if (
     !tableRowExtraInfo[row.id].quotaInfo &&
-    tableRowExtraInfo[row.id].hpcUser?.nodeStartTime &&
-    (tableRowExtraInfo[row.id].hpcUser as HpcUser).nodeStartTime > 0
+    tableRowExtraInfo[row.id].hpcUser?.quotaStartTime &&
+    (tableRowExtraInfo[row.id].hpcUser as HpcUser).quotaStartTime > 0
   ) {
     try {
       const quotaInfo = await getHpcUserQuotaInfo(row.hpcUserID);

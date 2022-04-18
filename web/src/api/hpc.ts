@@ -49,8 +49,8 @@ export type HpcUser = {
   nodeUsername: string;
   nodeUID: number;
   nodeMaxQuota: number;
-  nodeStartTime: number;
-  nodeEndTime: number;
+  quotaStartTime: number;
+  quotaEndTime: number;
   extraAttributes: string;
 };
 
