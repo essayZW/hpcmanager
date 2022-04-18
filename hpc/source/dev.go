@@ -15,6 +15,7 @@ const hashPrefix = "__HPC_SOURCE_DEV"
 const redisGroupName = hashPrefix + "_GROUP_NAME__"
 const redisUserName = hashPrefix + "_USER_NAME__"
 const redisUserGroupName = hashPrefix + "_USER_GROUP_NAME__"
+const redisUserMaxQuotaName = hashPrefix + "_USER_MAX_QUOTA__"
 
 type hpcDev struct {
 	redisConn *redis.Client
@@ -155,9 +156,14 @@ func (dev *hpcDev) getAllUsernames(ctx context.Context) ([]string, error) {
 }
 
 func (dev *hpcDev) QuotaQuery(username string, fs string) (*QuotaUsageInfo, error) {
+	redisCmd := dev.redisConn.HGet(context.Background(), redisUserMaxQuotaName, username)
+	maxQuotaTB, err := redisCmd.Int()
+	if err != nil {
+		return nil, err
+	}
 	rander := rand.New(rand.NewSource(time.Now().UnixMicro()))
-	maxQuotaKB := rander.Intn(1073741824)
-	usedKB := rander.Intn(maxQuotaKB)
+	maxQuotaKB := maxQuotaTB * 1073741824
+	usedKB := rander.Intn(maxQuotaKB + 1)
 	return &QuotaUsageInfo{
 		Used: dev.parseKBToStr(usedKB),
 		Max:  dev.parseKBToStr(maxQuotaKB),
@@ -166,13 +172,20 @@ func (dev *hpcDev) QuotaQuery(username string, fs string) (*QuotaUsageInfo, erro
 
 func (dev *hpcDev) parseKBToStr(kb int) string {
 	kbFloat := float64(kb)
-	if res := kbFloat / 1048576; res >= 1 {
+	if res := kbFloat / 1073741824; res >= 1 {
+		return fmt.Sprintf("%.2fT", res)
+	} else if res := kbFloat / 1048576; res >= 1 {
 		return fmt.Sprintf("%.2fG", res)
 	} else if res := kbFloat / 1024; res >= 1 {
 		return fmt.Sprintf("%.2fM", res)
 	} else {
 		return fmt.Sprintf("%.2fK", kbFloat)
 	}
+}
+
+func (dev *hpcDev) QuotaModify(username string, fs string, mLimitTB int) error {
+	dev.redisConn.HSet(context.Background(), redisUserMaxQuotaName, username, mLimitTB)
+	return nil
 }
 func newDev(options *Options) HpcSource {
 	if options.redisConn == nil {
