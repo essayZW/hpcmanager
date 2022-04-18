@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os/exec"
 	"path"
 	"regexp"
@@ -138,6 +139,28 @@ func (source *defaultSource) QuotaQuery(username string, fs string) (*QuotaUsage
 		res.Max = "无限制"
 	}
 	return res, nil
+}
+
+func (source *defaultSource) QuotaModify(username string, fs string, mLimitTB int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(
+		ctx,
+		"lfs",
+		"setquota",
+		"-u",
+		username,
+		"-b",
+		fmt.Sprintf("%fT", float64(mLimitTB)*0.8),
+		"-B",
+		fmt.Sprintf("%dT", mLimitTB),
+	)
+	_, err := cmd.CombinedOutput()
+	if err != nil {
+		logger.Warn("quota set error: ", err, " with param: ", username, fs, mLimitTB)
+		return err
+	}
+	return nil
 }
 
 func newSource(options *Options) (HpcSource, error) {

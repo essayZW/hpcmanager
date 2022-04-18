@@ -19,6 +19,8 @@ type HpcSource interface {
 	GetNodeUsageWithDate(ctx context.Context, startTime, endTime time.Time) ([]*HpcNodeUsage, error)
 	// QuotaQuery 用户的存储信息查询
 	QuotaQuery(username string, fs string) (*QuotaUsageInfo, error)
+	// QuotaModify 修改用户的存储信息
+	QuotaModify(username string, fs string, mLimitTB int) error
 }
 
 // New 创建默认的作业调度源
