@@ -163,7 +163,11 @@ const expandChangeHandler = async (row: UserInfo) => {
       });
     }
   }
-  if (!tableRowExtraInfo[row.id].quotaInfo) {
+  if (
+    !tableRowExtraInfo[row.id].quotaInfo &&
+    tableRowExtraInfo[row.id].hpcUser?.nodeStartTime &&
+    (tableRowExtraInfo[row.id].hpcUser as HpcUser).nodeStartTime > 0
+  ) {
     try {
       const quotaInfo = await getHpcUserQuotaInfo(row.hpcUserID);
       tableRowExtraInfo[row.id].quotaInfo = quotaInfo;
