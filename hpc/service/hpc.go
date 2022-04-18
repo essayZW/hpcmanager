@@ -451,6 +451,33 @@ func (h *HpcService) GetQuotaByHpcUserID(
 	if err != nil {
 		return err
 	}
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	if !isTutor && !isAdmin {
+		// 普通用户,需判断自己是不是该hpc_user的记录对应者
+		userResp, err := h.userService.GetUserInfo(ctx, &userpb.GetUserInfoRequest{
+			Userid:      req.BaseRequest.UserInfo.UserId,
+			BaseRequest: req.BaseRequest,
+		})
+		if err != nil {
+			return errors.New("user info get error")
+		}
+		if userResp.UserInfo.HpcUserID != req.HpcUserID {
+			return errors.New("user only can query self hpc user info")
+		}
+	} else if !isAdmin && isTutor {
+		// 导师用户,需判断该hpc_user对应的用户是否属于自己的组
+		userResp, err := h.userService.GetUserInfoByHpcID(ctx, &userpb.GetUserInfoByHpcIDRequest{
+			BaseRequest: req.BaseRequest,
+			HpcUserID:   req.HpcUserID,
+		})
+		if err != nil {
+			return errors.New("user info get error")
+		}
+		if userResp.Info.GroupId != req.BaseRequest.UserInfo.GroupId {
+			return errors.New("tutor only can query self group's user info")
+		}
+	}
 	res, err := h.hpcLogic.GetUserQuotaByUsername(ctx, userInfo.NodeUsername)
 	if err != nil {
 		return errors.New("query quota info error")
