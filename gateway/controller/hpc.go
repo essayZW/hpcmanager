@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -91,6 +92,40 @@ func (hpc *Hpc) getGroupByID(ctx *gin.Context) {
 	return
 }
 
+// queryUserQuota /api/hpc/quota/:hpcID 通过计算节点用户ID查询用户存储信息
+func (hpc *Hpc) queryUserQuota(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	idStr := ctx.Param("hpcID")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "错误的参数id")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := hpc.hpcService.GetQuotaByHpcUserID(c, &hpcpb.GetQuotaByHpcUserIDRequest{
+		BaseRequest: baseRequest,
+		HpcUserID:   int32(id),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, map[string]interface{}{
+		"used":          resp.Used,
+		"max":           resp.Max,
+		"startTimeUnix": resp.StartTimeUnix,
+		"endTimeUnix":   resp.EndTimeUnix,
+	}, true, "success")
+	httpResp.Send(ctx)
+}
+
 // Registry 注册相应的处理函数
 func (hpc *Hpc) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller hpc")
@@ -100,6 +135,7 @@ func (hpc *Hpc) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	hpcRouter.GET("/user/:id", hpc.getUserByID)
 	hpcRouter.GET("/group/:id", hpc.getGroupByID)
+	hpcRouter.GET("/quota/:hpcID", hpc.queryUserQuota)
 	return hpcRouter
 }
 

@@ -197,6 +197,25 @@ message HpcGroup {
 }
 ```
 
+### /hpc/quota/:hpcID
+
+Method: GET
+
+描述: 通过用户 hpc ID 查询用户存储信息
+
+参数: hpcID
+
+响应:
+
+```go
+map[string]interface{}{
+        "used":          resp.Used,
+        "max":           resp.Max,
+        "startTimeUnix": resp.StartTimeUnix,
+        "endTimeUnix":   resp.EndTimeUnix,
+}
+```
+
 ## permission 控制器
 
 ### /permission/ping
