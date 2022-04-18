@@ -53,6 +53,9 @@ const paginationInfo = reactive<{
 });
 
 const refreshTableData = () => {
+  for (const key in rowExpandInfo) {
+    rowExpandInfo[key] = {};
+  }
   loadTableData(paginationInfo.pageIndex, paginationInfo.pageSize);
 };
 
