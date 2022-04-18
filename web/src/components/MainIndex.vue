@@ -113,7 +113,7 @@ onUnmounted(() => {
         </p>
       </el-card>
     </el-col>
-    <el-col :sm="0" :lg="1"> </el-col>
+    <el-col v-if="isSuperAdmin()" :sm="0" :lg="1"> </el-col>
     <el-col v-if="isSuperAdmin()" :lg="10" :sm="22">
       <el-card>
         <template #header>
