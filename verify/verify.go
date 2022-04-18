@@ -66,6 +66,8 @@ const (
 	QueryNodeWeekUsageBill = "__QUERY_NODE_WEEK_USAGE_BILL__"
 	// PayNodeUsageBill 支付机器节点机时账单
 	PayNodeUsageBill = "__PAY_NODE_USAGE_BILL__"
+	// QueryUserHpcQuota 查询用户的计算节点存储空间使用情况
+	QueryUserHpcQuota = "__QUERY_USER_HPC_QUOTA__"
 )
 
 // Verify 进行操作的权限验证

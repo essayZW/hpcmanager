@@ -434,6 +434,18 @@ func (h *HpcService) GetQuotaByHpcUserID(
 	resp *hpcproto.GetQuotaByHpcUserIDResponse,
 ) error {
 	logger.Info("GetQuotaByHpcUserID: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryUserHpcQuota, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryUserHpcQuota permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryUserHpcQuota permission forbidden")
+	}
+	// TODO: 应该根据不同的权限等级限制查询范围
 	// 先查询对应的HPC用户信息
 	userInfo, err := h.hpcLogic.GetUserInfoByID(ctx, int(req.HpcUserID))
 	if err != nil {
