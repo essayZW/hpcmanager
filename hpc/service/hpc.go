@@ -455,8 +455,8 @@ func (h *HpcService) GetQuotaByHpcUserID(
 	if err != nil {
 		return errors.New("query quota info error")
 	}
-	resp.Used = int32(res.Used)
-	resp.Max = int32(res.Max)
+	resp.Used = res.Used
+	resp.Max = res.Max
 	resp.StartTimeUnix = userInfo.QuotaStartTime.Time.Unix()
 	resp.EndTimeUnix = userInfo.QuotaEndTime.Time.Unix()
 	return nil
