@@ -6,14 +6,17 @@ import {
   isSuperAdmin,
   servicePing as userPing,
 } from '../service/user';
+import { UserQuotaInfo } from '../api/hpc';
+
 import { servicePing as permissionPing } from '../service/permission';
 import { servicePing as nodePing } from '../service/node';
 import { servicePing as projectPing } from '../service/project';
 import { servicePing as feePing } from '../service/fee';
-import { servicePing as hpcPing } from '../service/hpc';
+import { servicePing as hpcPing, getHpcUserQuotaInfo } from '../service/hpc';
 
 import { zeroWithDefault } from '../utils/obj';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import dayjs from 'dayjs';
 
 document.title = '计算平台管理系统';
 
@@ -34,6 +37,8 @@ const serviceState = reactive<{
   fee: false,
   hpc: false,
 });
+
+const quotaInfo = ref<UserQuotaInfo | undefined>(undefined);
 onMounted(async () => {
   const loginUserInfo = getUserInfoFromStorage();
   if (!loginUserInfo) {
@@ -56,6 +61,14 @@ onMounted(async () => {
       type: 'warning',
       offset: 80,
     });
+  }
+  if (userInfo.value) {
+    try {
+      const info = await getHpcUserQuotaInfo(userInfo.value.hpcUserID);
+      quotaInfo.value = info;
+    } catch (error) {
+      console.log(`no quota info for current user`);
+    }
   }
 });
 const refreshServiceState = async () => {
@@ -139,6 +152,27 @@ onUnmounted(() => {
       </el-card>
     </el-col>
   </el-row>
+  <el-row v-if="quotaInfo" justify="center" class="second-row">
+    <el-col :lg="10" :sm="22">
+      <el-card>
+        <template #header>
+          <span>用户存储情况: </span>
+        </template>
+        <p>
+          <strong>已用空间: {{ quotaInfo.used }}</strong>
+        </p>
+        <p>
+          <strong>最大容量: {{ quotaInfo.max }}</strong>
+        </p>
+        <p>
+          <strong>使用期限: </strong>
+          {{ dayjs(quotaInfo.startTimeUnix * 1000).format('YYYY-HH-DD') }}至{{
+            dayjs(quotaInfo?.endTimeUnix * 1000).format('YYYY-HH-DD')
+          }}
+        </p>
+      </el-card>
+    </el-col>
+  </el-row>
 </template>
 <style lang="less">
 .success-state {
@@ -159,5 +193,8 @@ onUnmounted(() => {
   display: inline-block;
   margin-left: 8px;
   margin-right: 8px;
+}
+.second-row {
+  margin-top: 16px;
 }
 </style>

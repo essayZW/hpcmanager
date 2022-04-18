@@ -9,8 +9,8 @@ import {
   UserLevels,
 } from '../service/user';
 import dayjs from 'dayjs';
-import { HpcUser } from '../api/hpc';
-import { getHpcUserInfoByID } from '../service/hpc';
+import { HpcUser, UserQuotaInfo } from '../api/hpc';
+import { getHpcUserInfoByID, getHpcUserQuotaInfo } from '../service/hpc';
 import { zeroWithDefault } from '../utils/obj';
 import { PermissionInfo } from '../api/permission';
 import {
@@ -62,6 +62,7 @@ const tableRowExtraInfo = reactive<{
     group?: GroupInfo;
     hpcUser?: HpcUser;
     permission?: PermissionInfo[];
+    quotaInfo?: UserQuotaInfo;
     loading?: boolean;
   };
 }>({});
@@ -160,6 +161,14 @@ const expandChangeHandler = async (row: UserInfo) => {
         type: 'error',
         message: `${error}`,
       });
+    }
+  }
+  if (!tableRowExtraInfo[row.id].quotaInfo) {
+    try {
+      const quotaInfo = await getHpcUserQuotaInfo(row.hpcUserID);
+      tableRowExtraInfo[row.id].quotaInfo = quotaInfo;
+    } catch (error) {
+      tableRowExtraInfo[row.id].quotaInfo = undefined;
     }
   }
   tableRowExtraInfo[row.id].loading = false;
@@ -290,6 +299,38 @@ const delAdminHandler = async (id: number) => {
                 >
               </p>
               <p v-else class="info">未创建计算节点账户</p>
+              <p><strong>用户存储信息: </strong></p>
+              <p
+                v-if="
+                  props.row.hpcUserID &&
+                  tableRowExtraInfo[props.row.id].quotaInfo
+                "
+                class="info"
+              >
+                <span>
+                  <strong>使用容量: </strong>
+                  {{ tableRowExtraInfo[props.row.id].quotaInfo?.used }}
+                </span>
+                <span
+                  ><strong>最大容量: </strong
+                  >{{ tableRowExtraInfo[props.row.id].quotaInfo?.max }}</span
+                >
+                <span>
+                  <strong>使用期限: </strong>
+                  {{
+                    dayjs(
+                      tableRowExtraInfo[props.row.id].quotaInfo?.startTimeUnix *
+                        1000
+                    ).format('YYYY-HH-DD')
+                  }}至{{
+                    dayjs(
+                      tableRowExtraInfo[props.row.id].quotaInfo?.endTimeUnix *
+                        1000
+                    ).format('YYYY-HH-DD')
+                  }}
+                </span>
+              </p>
+              <p v-else class="info">无存储空间使用信息</p>
               <p><strong>用户权限信息: </strong></p>
               <p class="info">
                 <span

@@ -66,3 +66,29 @@ export async function queryHpcUserInfo(id: number): Promise<HpcUser> {
   }
   return resp.data;
 }
+
+/**
+ * 用户存储信息
+ */
+export type UserQuotaInfo = {
+  used: string;
+  max: string;
+  startTimeUnix: number;
+  endTimeUnix: number;
+};
+
+/**
+ * 通过用户HPC ID查询用户存储使用情况信息
+ */
+export async function queryUserQuotaByUserHpcID(
+  id: number
+): Promise<UserQuotaInfo> {
+  const resp = await ApiRequest.request<UserQuotaInfo>(
+    `/hpc/quota/${id}`,
+    'GET'
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}
