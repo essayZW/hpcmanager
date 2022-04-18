@@ -362,7 +362,14 @@ func (group *UserGroupService) CheckApply(
 		TutorCheck:   req.TutorCheck,
 	}
 	if err := message.Public(group.rabbitmqBroker, req.BaseRequest); err != nil {
-		logger.Warn("Message public error: ", err)
+		logger.Error(
+			"public check apply group message error: ",
+			err,
+			" with message: ",
+			message,
+			" with request: ",
+			req.BaseRequest,
+		)
 	}
 	return nil
 }

@@ -11,10 +11,12 @@ import (
 	"github.com/essayZW/hpcmanager/logger"
 	permissionpb "github.com/essayZW/hpcmanager/permission/proto"
 	publicproto "github.com/essayZW/hpcmanager/proto"
+	userbroker "github.com/essayZW/hpcmanager/user/broker"
 	"github.com/essayZW/hpcmanager/user/db"
 	"github.com/essayZW/hpcmanager/user/logic"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
+	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/client"
 )
 
@@ -24,6 +26,8 @@ type UserService struct {
 	groupLogic        *logic.UserGroup
 	permissionService permissionpb.PermissionService
 	hpcService        hpcpb.HpcService
+
+	rabbitmqBroker broker.Broker
 }
 
 // Ping 测试
@@ -422,6 +426,7 @@ func (s *UserService) JoinGroup(
 				return nil, errors.New("group not exists")
 			}
 
+			// 调用作业调度系统将用户添加到用户组
 			hpcResp, err := s.hpcService.AddUserToGroup(ctx, &hpcpb.AddUserToGroupRequest{
 				UserName:    userInfo.PinyinName,
 				HpcGroupID:  int32(groupInfo.HpcGroupID),
@@ -470,6 +475,23 @@ func (s *UserService) JoinGroup(
 			return nil, nil
 		},
 	)
+	if err == nil && resp.Success {
+		// 发送用户加入组成功的MQ消息
+		joinGroupMessage := &userbroker.UserJoinGroupMessage{
+			UserID:  int(req.UserID),
+			GroupID: int(req.GroupID),
+		}
+		if err := joinGroupMessage.Public(s.rabbitmqBroker, req.BaseRequest); err != nil {
+			logger.Error(
+				"public join group message error: ",
+				err,
+				" with message: ",
+				joinGroupMessage,
+				" with request: ",
+				req.BaseRequest,
+			)
+		}
+	}
 	return err
 }
 
@@ -596,6 +618,7 @@ func NewUser(
 	client client.Client,
 	userLogic *logic.User,
 	groupLogic *logic.UserGroup,
+	mqBroker broker.Broker,
 ) *UserService {
 	permissionService := permissionpb.NewPermissionService("permission", client)
 	hpcService := hpcpb.NewHpcService("hpc", client)
@@ -604,5 +627,6 @@ func NewUser(
 		groupLogic:        groupLogic,
 		permissionService: permissionService,
 		hpcService:        hpcService,
+		rabbitmqBroker:    mqBroker,
 	}
 }

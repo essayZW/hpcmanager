@@ -93,7 +93,7 @@ func main() {
 
 	serviceServer := srv.Server()
 
-	userService := service.NewUser(serviceClient, userLogic, userGroupLogic)
+	userService := service.NewUser(serviceClient, userLogic, userGroupLogic, rabbitmqBroker)
 	user.RegisterUserHandler(serviceServer, userService)
 
 	userGroupService := service.NewGroup(serviceClient, userGroupLogic, userLogic, rabbitmqBroker)
