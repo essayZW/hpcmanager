@@ -101,7 +101,7 @@ CREATE TABLE `hpc_user` (
   `id` int NOT NULL AUTO_INCREMENT,
   `node_username` varchar(64) NOT NULL,
   `node_uid` int NOT NULL,
-  `node_max_quota` tinyint DEFAULT '1',
+  `node_max_quota` int DEFAULT '0',
   `quota_start_time` timestamp NULL DEFAULT NULL,
   `quota_end_time` timestamp NULL DEFAULT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
@@ -464,4 +464,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-04-18 20:31:47
+-- Dump completed on 2022-04-18 20:33:40
