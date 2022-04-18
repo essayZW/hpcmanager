@@ -218,6 +218,36 @@ CREATE TABLE `node_distribute_log` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `node_quota_bill`
+--
+
+DROP TABLE IF EXISTS `node_quota_bill`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `node_quota_bill` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `user_name` varchar(32) NOT NULL,
+  `user_username` varchar(32) NOT NULL,
+  `user_group_id` int NOT NULL DEFAULT '-1',
+  `oper_type` tinyint NOT NULL,
+  `old_size` int NOT NULL,
+  `new_size` int NOT NULL,
+  `old_end_time` timestamp NOT NULL,
+  `new_end_time` timestamp NOT NULL,
+  `fee` decimal(18,2) NOT NULL,
+  `pay_flag` tinyint DEFAULT '0',
+  `pay_fee` decimal(18,2) DEFAULT '0.00',
+  `pay_time` timestamp NULL DEFAULT NULL,
+  `pay_type` tinyint DEFAULT NULL,
+  `pay_message` varchar(300) DEFAULT NULL,
+  `create_time` timestamp NOT NULL,
+  `extraAttributes` varchar(2048) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `paper_apply`
 --
 
@@ -288,38 +318,6 @@ CREATE TABLE `project` (
   `modify_user_id` int NOT NULL,
   `modify_username` varchar(32) DEFAULT NULL,
   `modify_user_name` varchar(45) DEFAULT NULL,
-  `extraAttributes` varchar(2048) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `quota_apply`
---
-
-DROP TABLE IF EXISTS `quota_apply`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `quota_apply` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `user_name` varchar(32) NOT NULL,
-  `user_username` varchar(32) NOT NULL,
-  `oper_type` tinyint NOT NULL,
-  `create_time` timestamp NOT NULL,
-  `check_status` tinyint NOT NULL DEFAULT '-1',
-  `checker_id` int DEFAULT NULL,
-  `checker_name` varchar(32) DEFAULT NULL,
-  `old_size` tinyint DEFAULT NULL,
-  `new_size` tinyint DEFAULT NULL,
-  `new_end_time` timestamp NULL DEFAULT NULL,
-  `delay_year` tinyint DEFAULT NULL,
-  `old_end_time` timestamp NULL DEFAULT NULL,
-  `old_start_time` timestamp NULL DEFAULT NULL,
-  `pay_flag` tinyint DEFAULT '0',
-  `pay_time` timestamp NULL DEFAULT NULL,
-  `pay_type` tinyint DEFAULT NULL,
-  `pay_message` varchar(300) DEFAULT NULL,
   `extraAttributes` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -466,4 +464,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-04-14 21:30:11
+-- Dump completed on 2022-04-18 20:31:47
