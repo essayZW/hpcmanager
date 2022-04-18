@@ -166,8 +166,8 @@ onUnmounted(() => {
         </p>
         <p>
           <strong>使用期限: </strong>
-          {{ dayjs(quotaInfo.startTimeUnix * 1000).format('YYYY-HH-DD') }}至{{
-            dayjs(quotaInfo?.endTimeUnix * 1000).format('YYYY-HH-DD')
+          {{ dayjs(quotaInfo.startTimeUnix * 1000).format('YYYY-MM-DD') }}至{{
+            dayjs(quotaInfo?.endTimeUnix * 1000).format('YYYY-MM-DD')
           }}
         </p>
       </el-card>

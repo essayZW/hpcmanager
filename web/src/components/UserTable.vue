@@ -325,12 +325,12 @@ const delAdminHandler = async (id: number) => {
                     dayjs(
                       tableRowExtraInfo[props.row.id].quotaInfo?.startTimeUnix *
                         1000
-                    ).format('YYYY-HH-DD')
+                    ).format('YYYY-MM-DD')
                   }}至{{
                     dayjs(
                       tableRowExtraInfo[props.row.id].quotaInfo?.endTimeUnix *
                         1000
-                    ).format('YYYY-HH-DD')
+                    ).format('YYYY-MM-DD')
                   }}
                 </span>
               </p>
