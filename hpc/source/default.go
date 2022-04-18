@@ -116,8 +116,6 @@ func (source *defaultSource) timeoutExecInBaseDir(
 	return source.execInBaseDir(ctx, executor, file, args...)
 }
 
-// NOTE: 如果max为0代表容量无限制
-// TODO: 登录计算节点服务器查看执行命令返回的数据的单位,查看hpc_ug数据库的hpcquota数据表
 func (source *defaultSource) QuotaQuery(username string, fs string) (*QuotaUsageInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 	defer cancel()
@@ -132,19 +130,12 @@ func (source *defaultSource) QuotaQuery(username string, fs string) (*QuotaUsage
 		logger.Warn("resStrSlices len must larger 5: ", resStrSlices, " ", string(output))
 		return nil, errors.New("error when parse cmd output")
 	}
-	used, err := strconv.Atoi(resStrSlices[2])
-	if err != nil {
-		logger.Warn("parse output error: ", err)
-		return nil, err
-	}
-	max, err := strconv.Atoi(resStrSlices[4])
-	if err != nil {
-		logger.Warn("parse output error: ", err)
-		return nil, err
-	}
 	res := &QuotaUsageInfo{
-		Used: used,
-		Max:  max,
+		Used: resStrSlices[2],
+		Max:  resStrSlices[4],
+	}
+	if res.Max == "0k" {
+		res.Max = "无限制"
 	}
 	return res, nil
 }

@@ -3,6 +3,7 @@ package source
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -154,11 +155,25 @@ func (dev *hpcDev) getAllUsernames(ctx context.Context) ([]string, error) {
 }
 
 func (dev *hpcDev) QuotaQuery(username string, fs string) (*QuotaUsageInfo, error) {
-	// TODO: 需要实现
-	logger.Fatal("need implement")
-	return nil, nil
+	rander := rand.New(rand.NewSource(time.Now().UnixMicro()))
+	maxQuotaKB := rander.Intn(1073741824)
+	usedKB := rander.Intn(maxQuotaKB)
+	return &QuotaUsageInfo{
+		Used: dev.parseKBToStr(usedKB),
+		Max:  dev.parseKBToStr(maxQuotaKB),
+	}, nil
 }
 
+func (dev *hpcDev) parseKBToStr(kb int) string {
+	kbFloat := float64(kb)
+	if res := kbFloat / 1048576; res >= 1 {
+		return fmt.Sprintf("%vG", res)
+	} else if res := kbFloat / 1024; res >= 1 {
+		return fmt.Sprintf("%vM", res)
+	} else {
+		return fmt.Sprintf("%vK", kbFloat)
+	}
+}
 func newDev(options *Options) HpcSource {
 	if options.redisConn == nil {
 		logger.Fatal("invalid redis conn")

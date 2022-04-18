@@ -44,7 +44,9 @@ type HpcNodeUsage struct {
 }
 
 // QuotaUsageInfo 存储使用信息
+// NOTE: 作业调度系统中返回的存储数据不是纯数字数据，是带单位的容量数据
+// 比如0k, 1k, 1T这种
 type QuotaUsageInfo struct {
-	Used int
-	Max  int
+	Used string
+	Max  string
 }
