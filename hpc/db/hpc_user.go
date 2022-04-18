@@ -104,6 +104,21 @@ func (hpcdb *HpcUserDB) UpdateQuotaStartTime(ctx context.Context, hpcUserID int,
 	return count > 0, nil
 }
 
+// UpdateMaxQuotaByID 更新最大的存储容量
+func (hpcdb *HpcUserDB) UpdateMaxQuotaByID(ctx context.Context, hpcUserID int, maxQuotaTB int) (bool, error) {
+	res, err := hpcdb.conn.Exec(ctx, "UPDATE `hpc_user` SET `node_max_quota`=? WHERE `id`=?", maxQuotaTB, hpcUserID)
+	if err != nil {
+		logger.Warn("UpdateMaxQuotaByID error: ", err)
+		return false, errors.New("UpdateMaxQuotaByID error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateMaxQuotaByID error: ", err)
+		return false, errors.New("UpdateMaxQuotaByID error")
+	}
+	return count > 0, nil
+}
+
 // NewHpcUser 创建新的NewHpcUser结构体并返回指针
 func NewHpcUser(db *db.DB) *HpcUserDB {
 	return &HpcUserDB{

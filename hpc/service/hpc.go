@@ -515,27 +515,33 @@ func (h *HpcService) SetQuotaByHpcUserID(
 	if req.SetDate {
 		status, err = h.hpcLogic.UpdateUserQuotaEndTimeByID(ctx, int(req.HpcUserID), req.NewEndTimeUnix)
 	} else {
-		info, err := h.hpcLogic.GetUserInfoByID(ctx, int(req.HpcUserID))
-		if err != nil {
-			return err
-		}
-		err = h.hpcLogic.UpdateUserQuotaSizeByUsername(ctx, info.NodeUsername, int(req.NewMaxQuotaTB))
-		if err != nil {
-			err = errors.New("set max quota size error")
-		}
-		// 如果用户当前的存储时间为null的话则初始化存储的使用期限时间
-		if !info.QuotaStartTime.Valid {
-			// 设置开始时间为当前时间
-			status, err = h.hpcLogic.UpdateUserQuotaStartTimeByID(ctx, int(req.HpcUserID), time.Now().Unix())
-			// 设置结束时间为当前时间的一年后
-			status, err = h.hpcLogic.UpdateUserQuotaEndTimeByID(ctx, int(req.HpcUserID), time.Now().Add(time.Duration(8760)*time.Hour).Unix())
-		}
+		statusInterface, newErr := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
 
+			info, err := h.hpcLogic.GetUserInfoByID(c, int(req.HpcUserID))
+			if err != nil {
+				return false, err
+			}
+			err = h.hpcLogic.UpdateUserQuotaSizeByUsername(c, info.ID, info.NodeUsername, int(req.NewMaxQuotaTB))
+			if err != nil {
+				return false, errors.New("set max quota size error")
+			}
+			// 如果用户当前的存储时间为null的话则初始化存储的使用期限时间
+			if !info.QuotaStartTime.Valid {
+				// 设置开始时间为当前时间
+				status, err := h.hpcLogic.UpdateUserQuotaStartTimeByID(c, int(req.HpcUserID), time.Now().Unix())
+				// 设置结束时间为当前时间的一年后
+				status, err = h.hpcLogic.UpdateUserQuotaEndTimeByID(c, int(req.HpcUserID), time.Now().Add(time.Duration(8760)*time.Hour).Unix())
+				return status, err
+			}
+			return true, nil
+		})
+		err = newErr
+		status = statusInterface.(bool)
 	}
+	resp.Success = status
 	if err != nil {
 		return err
 	}
-	resp.Success = status
 	// TODO: 创建对应的扩容/延时账单
 	return nil
 }

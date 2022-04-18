@@ -152,7 +152,20 @@ func (hpc *HpcLogic) GetUserQuotaByUsername(ctx context.Context, username string
 }
 
 // UpdateUserQuotaSizeByUsername 通过hpc用户名更新用户存储空间的最大限制
-func (hpc *HpcLogic) UpdateUserQuotaSizeByUsername(ctx context.Context, username string, newMaxLimitTB int) error {
+func (hpc *HpcLogic) UpdateUserQuotaSizeByUsername(
+	ctx context.Context,
+	hpcUserID int,
+	username string,
+	newMaxLimitTB int,
+) error {
+	// 先更改数据库中的数据
+	status, err := hpc.hpcUserDB.UpdateMaxQuotaByID(ctx, hpcUserID, newMaxLimitTB)
+	if err != nil {
+		return err
+	}
+	if !status {
+		return errors.New("update max quota error")
+	}
 	// OPTIMIZE: 硬编码的fs参数应该进行优化
 	return hpc.hpcSource.QuotaModify(username, "/data", newMaxLimitTB)
 }
