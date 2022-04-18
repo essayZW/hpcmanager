@@ -69,6 +69,7 @@ func (hpcdb *HpcUserDB) UpdateQuotaEndTime(ctx context.Context, hpcUserID int, e
 		ctx,
 		"UPDATE `hpc_user` SET `quota_end_time`=? WHERE `id`=? AND `quota_start_time`<?",
 		endTime,
+		hpcUserID,
 		endTime,
 	)
 	if err != nil {
@@ -89,7 +90,7 @@ func (hpcdb *HpcUserDB) UpdateQuotaStartTime(ctx context.Context, hpcUserID int,
 		ctx,
 		"UPDATE `hpc_user` SET `quota_start_time`=? WHERE `id`=?",
 		endTime,
-		endTime,
+		hpcUserID,
 	)
 	if err != nil {
 		logger.Warn("UpdateQuotaStartTime error: ", err)
