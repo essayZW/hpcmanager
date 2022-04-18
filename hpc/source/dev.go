@@ -113,7 +113,7 @@ func (dev *hpcDev) GetNodeUsageWithDate(
 		return nil, errors.New("empty user lists")
 	}
 	for i := range infos {
-		randUserNameIndex := rander.Intn(len(usernames) - 1)
+		randUserNameIndex := rander.Intn(len(usernames))
 		groupName, err := dev.getUserGroup(context.Background(), usernames[randUserNameIndex])
 		if err != nil {
 			logger.Warn(err)
