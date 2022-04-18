@@ -5,6 +5,7 @@ go 1.17
 replace github.com/essayZW/hpcmanager => ../
 
 require (
+	github.com/asim/go-micro/plugins/broker/rabbitmq/v4 v4.0.0-20220311080335-e5a35d38f931
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220407104607-62c2981baf63
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
@@ -52,6 +53,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
+	github.com/streadway/amqp v1.0.0 // indirect
 	github.com/urfave/cli/v2 v2.3.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.0 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.0 // indirect
