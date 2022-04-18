@@ -184,6 +184,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: Common,
 			},
+			// 需要普通管理员及以上权限
+			UpdateUserHpcQuota: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
 		},
 	}
 }

@@ -200,6 +200,32 @@ message GetQuotaByHpcUserIDResponse {
 }
 ```
 
+## SetQuotaByHpcUserID
+
+描述: 修改用户的存储空间
+
+原型定义: `rpc SetQuotaByHpcUserID(SetQuotaByHpcUserIDRequest) returns (SetQuotaByHpcUserIDResponse) {}`
+
+请求参数:
+
+```protobuf
+message SetQuotaByHpcUserIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcUserID = 2;
+    int32 newMaxQuotaTB = 3;
+    int64 newEndTimeUnix = 4;
+    bool setDate = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message SetQuotaByHpcUserIDResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## HpcUser

@@ -491,6 +491,46 @@ func (h *HpcService) GetQuotaByHpcUserID(
 	return nil
 }
 
+// SetQuotaByHpcUserID 通过HPC ID 设置用户的存储信息
+func (h *HpcService) SetQuotaByHpcUserID(
+	ctx context.Context,
+	req *hpcproto.SetQuotaByHpcUserIDRequest,
+	resp *hpcproto.SetQuotaByHpcUserIDResponse,
+) error {
+	logger.Info("SetQuotaByHpcUserID: ", req.BaseRequest)
+	if !verify.Identify(verify.UpdateUserHpcQuota, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"UpdateUserHpcQuota permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("UpdateUserHpcQuota permission forbidden")
+	}
+	var status bool
+	var err error
+	if req.SetDate {
+		status, err = h.hpcLogic.UpdateUserQuotaEndTimeByID(ctx, int(req.HpcUserID), req.NewEndTimeUnix)
+	} else {
+		info, err := h.hpcLogic.GetUserInfoByID(ctx, int(req.HpcUserID))
+		if err != nil {
+			return err
+		}
+		err = h.hpcLogic.UpdateUserQuotaSizeByUsername(ctx, info.NodeUsername, int(req.NewMaxQuotaTB))
+		if err != nil {
+			err = errors.New("set max quota size error")
+		}
+	}
+	if err != nil {
+		return err
+	}
+	resp.Success = status
+	// TODO: 创建对应的扩容/延时账单
+	return nil
+}
+
 var _ hpcproto.HpcHandler = (*HpcService)(nil)
 
 // NewHpc 新建一个Hpc服务
