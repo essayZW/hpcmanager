@@ -70,6 +70,8 @@ const (
 	QueryUserHpcQuota = "__QUERY_USER_HPC_QUOTA__"
 	// UpdateUserHpcQuota 更新用户计算节点存储信息
 	UpdateUserHpcQuota = "__UPDATE_USER_HPC_QUOTA__"
+	// CreateNodeQuotaModifyBill 创建用户拥有的机器节点容量/时间变化的账单
+	CreateNodeQuotaModifyBill = "__CREATE_NODE_QUOTA_MODIFY_BILL__"
 )
 
 // Verify 进行操作的权限验证

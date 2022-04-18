@@ -250,6 +250,34 @@ message GetNodeUsageFeeRateResponse {
 }
 ```
 
+## CreateNodeQuotaModifyBill
+
+描述: 创建机器存储账单
+
+原型定义: `rpc CreateNodeQuotaModifyBill(CreateNodeQuotaModifyBillRequest) returns (CreateNodeQuotaModifyBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message CreateNodeQuotaModifyBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userID = 2;
+    int32 oldSize = 3;
+    int32 newSize = 4;
+    int64 oldEndTimeUnix = 5;
+    int64 newEndTimeUnix = 6;
+    bool quotaSizeModify = 7;
+}
+```
+
+响应参数:
+
+```protobuf
+message CreateNodeQuotaModifyBillResponse {
+    int32 id = 1;
+}
+```
+
 # 附录
 
 ## NodeDistributeBill

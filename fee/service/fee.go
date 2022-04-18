@@ -18,6 +18,7 @@ import (
 type FeeService struct {
 	nodeDistributeBillLogic *logic.NodeDistributeBill
 	nodeWeekUsageBillLogic  *logic.NodeWeekUsageBill
+	nodeQuotaBillLogic      *logic.NodeQuotaBill
 
 	nodeService      nodepb.NodeService
 	userService      userpb.UserService
@@ -500,6 +501,56 @@ func (fs *FeeService) GetNodeUsageFeeRate(
 	return nil
 }
 
+// CreateNodeQuotaModifyBill 创建用户存储扩容/延时的账单
+func (fs *FeeService) CreateNodeQuotaModifyBill(
+	ctx context.Context,
+	req *feepb.CreateNodeQuotaModifyBillRequest,
+	resp *feepb.CreateNodeQuotaModifyBillResponse,
+) error {
+	logger.Info("CreateNodeQuotaModifyBill: ", req.BaseRequest)
+	if !verify.Identify(verify.CreateNodeQuotaModifyBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"CreateNodeQuotaModifyBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("CreateNodeQuotaModifyBill permission forbidden")
+	}
+
+	userInfo, err := fs.userService.GetUserInfo(ctx, &userpb.GetUserInfoRequest{
+		BaseRequest: req.BaseRequest,
+		Userid:      req.UserID,
+	})
+	if err != nil {
+		return err
+	}
+	var operType logic.QuoatOperationType
+	if req.QuotaSizeModify {
+		operType = logic.ChangeQuotaSize
+	} else {
+		operType = logic.ChangeEndTime
+	}
+	id, err := fs.nodeQuotaBillLogic.CreateNewBill(context.Background(), &logic.CreateNewBillParam{
+		UserID:      int(req.UserID),
+		Username:    userInfo.UserInfo.Username,
+		UserName:    userInfo.UserInfo.Name,
+		UserGroupID: int(userInfo.UserInfo.GroupId),
+		OperType:    operType,
+		OldSize:     int(req.OldSize),
+		NewSize:     int(req.NewSize),
+		OldEndTime:  req.OldEndTimeUnix,
+		NewEndTime:  req.NewEndTimeUnix,
+	})
+	if err != nil {
+		return err
+	}
+	resp.Id = int32(id)
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务
@@ -507,6 +558,7 @@ func NewFee(
 	client client.Client,
 	nodeDistributeBillLogic *logic.NodeDistributeBill,
 	nodeWeekUsageBillLogic *logic.NodeWeekUsageBill,
+	nodeQuotaBillLogic *logic.NodeQuotaBill,
 ) *FeeService {
 	nodeService := nodepb.NewNodeService("node", client)
 	userService := userpb.NewUserService("user", client)
@@ -514,6 +566,7 @@ func NewFee(
 	return &FeeService{
 		nodeDistributeBillLogic: nodeDistributeBillLogic,
 		nodeWeekUsageBillLogic:  nodeWeekUsageBillLogic,
+		nodeQuotaBillLogic:      nodeQuotaBillLogic,
 		nodeService:             nodeService,
 		userService:             userService,
 		userGroupService:        userGroupService,

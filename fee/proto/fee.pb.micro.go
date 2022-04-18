@@ -48,6 +48,7 @@ type FeeService interface {
 	PaginationGetUserGroupUsageBillRecords(ctx context.Context, in *PaginationGetUserGroupUsageBillRecordsRequest, opts ...client.CallOption) (*PaginationGetUserGroupUsageBillRecordsResponse, error)
 	PayGroupNodeUsageBill(ctx context.Context, in *PayGroupNodeUsageBillRequest, opts ...client.CallOption) (*PayGroupNodeUsageBillResponse, error)
 	GetNodeUsageFeeRate(ctx context.Context, in *GetNodeUsageFeeRateRequest, opts ...client.CallOption) (*GetNodeUsageFeeRateResponse, error)
+	CreateNodeQuotaModifyBill(ctx context.Context, in *CreateNodeQuotaModifyBillRequest, opts ...client.CallOption) (*CreateNodeQuotaModifyBillResponse, error)
 }
 
 type feeService struct {
@@ -162,6 +163,16 @@ func (c *feeService) GetNodeUsageFeeRate(ctx context.Context, in *GetNodeUsageFe
 	return out, nil
 }
 
+func (c *feeService) CreateNodeQuotaModifyBill(ctx context.Context, in *CreateNodeQuotaModifyBillRequest, opts ...client.CallOption) (*CreateNodeQuotaModifyBillResponse, error) {
+	req := c.c.NewRequest(c.name, "Fee.CreateNodeQuotaModifyBill", in)
+	out := new(CreateNodeQuotaModifyBillResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Fee service
 
 type FeeHandler interface {
@@ -175,6 +186,7 @@ type FeeHandler interface {
 	PaginationGetUserGroupUsageBillRecords(context.Context, *PaginationGetUserGroupUsageBillRecordsRequest, *PaginationGetUserGroupUsageBillRecordsResponse) error
 	PayGroupNodeUsageBill(context.Context, *PayGroupNodeUsageBillRequest, *PayGroupNodeUsageBillResponse) error
 	GetNodeUsageFeeRate(context.Context, *GetNodeUsageFeeRateRequest, *GetNodeUsageFeeRateResponse) error
+	CreateNodeQuotaModifyBill(context.Context, *CreateNodeQuotaModifyBillRequest, *CreateNodeQuotaModifyBillResponse) error
 }
 
 func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.HandlerOption) error {
@@ -189,6 +201,7 @@ func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.Handler
 		PaginationGetUserGroupUsageBillRecords(ctx context.Context, in *PaginationGetUserGroupUsageBillRecordsRequest, out *PaginationGetUserGroupUsageBillRecordsResponse) error
 		PayGroupNodeUsageBill(ctx context.Context, in *PayGroupNodeUsageBillRequest, out *PayGroupNodeUsageBillResponse) error
 		GetNodeUsageFeeRate(ctx context.Context, in *GetNodeUsageFeeRateRequest, out *GetNodeUsageFeeRateResponse) error
+		CreateNodeQuotaModifyBill(ctx context.Context, in *CreateNodeQuotaModifyBillRequest, out *CreateNodeQuotaModifyBillResponse) error
 	}
 	type Fee struct {
 		fee
@@ -239,4 +252,8 @@ func (h *feeHandler) PayGroupNodeUsageBill(ctx context.Context, in *PayGroupNode
 
 func (h *feeHandler) GetNodeUsageFeeRate(ctx context.Context, in *GetNodeUsageFeeRateRequest, out *GetNodeUsageFeeRateResponse) error {
 	return h.FeeHandler.GetNodeUsageFeeRate(ctx, in, out)
+}
+
+func (h *feeHandler) CreateNodeQuotaModifyBill(ctx context.Context, in *CreateNodeQuotaModifyBillRequest, out *CreateNodeQuotaModifyBillResponse) error {
+	return h.FeeHandler.CreateNodeQuotaModifyBill(ctx, in, out)
 }

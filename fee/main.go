@@ -50,8 +50,16 @@ func main() {
 		logger.Fatal("create logic error: ", err)
 	}
 	nodeWeekUsageBillLogic, err := logic.NewNodeWeekUsageBill(feedb.NewNodeWeekUsageBill(sqldb), etcdConfig)
+	if err != nil {
+		logger.Fatal("create logic error: ", err)
+	}
 
-	feeService := service.NewFee(serviceClient, nodeDistributeBillLogic, nodeWeekUsageBillLogic)
+	nodeQuotaBillLogic, err := logic.NewNodeQuotaBill(feedb.NewNodeQuotaBill(sqldb), etcdConfig)
+	if err != nil {
+		logger.Fatal("create logic error: ", err)
+	}
+
+	feeService := service.NewFee(serviceClient, nodeDistributeBillLogic, nodeWeekUsageBillLogic, nodeQuotaBillLogic)
 	feepb.RegisterFeeHandler(srv.Server(), feeService)
 
 	srv.Init()
