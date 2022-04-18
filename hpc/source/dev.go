@@ -167,11 +167,11 @@ func (dev *hpcDev) QuotaQuery(username string, fs string) (*QuotaUsageInfo, erro
 func (dev *hpcDev) parseKBToStr(kb int) string {
 	kbFloat := float64(kb)
 	if res := kbFloat / 1048576; res >= 1 {
-		return fmt.Sprintf("%vG", res)
+		return fmt.Sprintf("%.2fG", res)
 	} else if res := kbFloat / 1024; res >= 1 {
-		return fmt.Sprintf("%vM", res)
+		return fmt.Sprintf("%.2fM", res)
 	} else {
-		return fmt.Sprintf("%vK", kbFloat)
+		return fmt.Sprintf("%.2fK", kbFloat)
 	}
 }
 func newDev(options *Options) HpcSource {

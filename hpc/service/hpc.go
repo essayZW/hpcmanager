@@ -445,12 +445,6 @@ func (h *HpcService) GetQuotaByHpcUserID(
 		)
 		return errors.New("QueryUserHpcQuota permission forbidden")
 	}
-	// TODO: 应该根据不同的权限等级限制查询范围
-	// 先查询对应的HPC用户信息
-	userInfo, err := h.hpcLogic.GetUserInfoByID(ctx, int(req.HpcUserID))
-	if err != nil {
-		return err
-	}
 	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
 	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
 	if !isTutor && !isAdmin {
@@ -477,6 +471,14 @@ func (h *HpcService) GetQuotaByHpcUserID(
 		if userResp.Info.GroupId != req.BaseRequest.UserInfo.GroupId {
 			return errors.New("tutor only can query self group's user info")
 		}
+	}
+	// 先查询对应的HPC用户信息
+	userInfo, err := h.hpcLogic.GetUserInfoByID(ctx, int(req.HpcUserID))
+	if err != nil {
+		return err
+	}
+	if !userInfo.QuotaStartTime.Valid || !userInfo.QuotaEndTime.Valid {
+		return errors.New("no quota info")
 	}
 	res, err := h.hpcLogic.GetUserQuotaByUsername(ctx, userInfo.NodeUsername)
 	if err != nil {
