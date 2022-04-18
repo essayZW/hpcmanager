@@ -163,6 +163,12 @@ func (hpc *HpcLogic) UpdateUserQuotaEndTimeByID(ctx context.Context, hpcUserID i
 	return hpc.hpcUserDB.UpdateQuotaEndTime(ctx, hpcUserID, endTime)
 }
 
+// UpdateUserQuotaStartTimeByID 更新用户存储使用期限的开始时间
+func (hpc *HpcLogic) UpdateUserQuotaStartTimeByID(ctx context.Context, hpcUserID int, endTimeUnix int64) (bool, error) {
+	endTime := time.Unix(endTimeUnix, 0)
+	return hpc.hpcUserDB.UpdateQuotaStartTime(ctx, hpcUserID, endTime)
+}
+
 // NewHpc 创建一个HPC作业调度系统逻辑操作
 func NewHpc(
 	hpcSource source.HpcSource,

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/hpc/logic"
@@ -522,6 +523,14 @@ func (h *HpcService) SetQuotaByHpcUserID(
 		if err != nil {
 			err = errors.New("set max quota size error")
 		}
+		// 如果用户当前的存储时间为null的话则初始化存储的使用期限时间
+		if !info.QuotaStartTime.Valid {
+			// 设置开始时间为当前时间
+			status, err = h.hpcLogic.UpdateUserQuotaStartTimeByID(ctx, int(req.HpcUserID), time.Now().Unix())
+			// 设置结束时间为当前时间的一年后
+			status, err = h.hpcLogic.UpdateUserQuotaEndTimeByID(ctx, int(req.HpcUserID), time.Now().Add(time.Duration(8760)*time.Hour).Unix())
+		}
+
 	}
 	if err != nil {
 		return err

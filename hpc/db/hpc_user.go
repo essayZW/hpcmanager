@@ -83,6 +83,26 @@ func (hpcdb *HpcUserDB) UpdateQuotaEndTime(ctx context.Context, hpcUserID int, e
 	return count > 0, nil
 }
 
+// UpdateQuotaStartTime 更新用户存储的开始使用时间
+func (hpcdb *HpcUserDB) UpdateQuotaStartTime(ctx context.Context, hpcUserID int, endTime time.Time) (bool, error) {
+	res, err := hpcdb.conn.Exec(
+		ctx,
+		"UPDATE `hpc_user` SET `quota_start_time`=? WHERE `id`=?",
+		endTime,
+		endTime,
+	)
+	if err != nil {
+		logger.Warn("UpdateQuotaStartTime error: ", err)
+		return false, errors.New("UpdateQuotaStartTime error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateQuotaStartTime error: ", err)
+		return false, errors.New("UpdateQuotaStartTime error")
+	}
+	return count > 0, nil
+}
+
 // NewHpcUser 创建新的NewHpcUser结构体并返回指针
 func NewHpcUser(db *db.DB) *HpcUserDB {
 	return &HpcUserDB{
