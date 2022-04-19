@@ -923,3 +923,18 @@ map[string]float64{
     "gpu": 0,
 }
 ```
+
+### /fee/quota
+
+Method: GET
+
+描述: 分页查询机存储账单
+
+参数:
+
+```typescript
+pageIndex: number;
+pageSize: number;
+```
+
+响应: 分页查询的结果

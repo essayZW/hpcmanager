@@ -287,6 +287,41 @@ func (f *fee) getNodeUsageFeeRate(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+func (f *fee) paginationGetNodeQuotaBills(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := f.feeService.PaginationGetNodeQuotaBill(c, &feepb.PaginationGetNodeQuotaBillRequest{
+		BaseRequest: baseRequest,
+		PageIndex:   int32(pageIndex),
+		PageSize:    int32(pageSize),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询账单信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	respData := &response.PaginationQueryResponse{
+		Data:  resp.Bills,
+		Count: int(resp.Count),
+	}
+	if resp.Bills == nil {
+		respData.Data = make([]*feepb.NodeQuotaBill, 0)
+	}
+	httpResp := response.New(200, respData, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter := router.Group("/fee")
 
@@ -302,6 +337,8 @@ func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter.GET("/usage/week", f.paginationGetNodeWeekUsageBills)
 	feeRouter.GET("/usage/group/week", f.paginationGetNodeWeekUsageBillsGroupByGroupID)
 	feeRouter.PUT("/usage/group/bill", f.payGroupNodeUsageBill)
+
+	feeRouter.GET("/quota", f.paginationGetNodeQuotaBills)
 	return feeRouter
 }
 
