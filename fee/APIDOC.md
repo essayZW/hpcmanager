@@ -324,6 +324,33 @@ message GetNodeQuotaFeeRateResponse {
     double basic = 1;
     double extra = 2;
 }
+
+```
+
+## PayNodeQuotaBill
+
+描述: 支付机器存储账单
+
+原型定义: `rpc PayNodeQuotaBill(PayNodeQuotaBillRequest) returns (PayNodeQuotaBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message PayNodeQuotaBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 billID = 2;
+    double payMoney = 3;
+    int32 payType = 4;
+    string payMessage = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message PayNodeQuotaBillResponse {
+    bool success = 1;
+}
 ```
 
 # 附录

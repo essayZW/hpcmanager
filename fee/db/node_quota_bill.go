@@ -161,6 +161,39 @@ func (this *NodeQuotaBillDB) QueryAllWithLimitByUserGroupID(
 	return infos, nil
 }
 
+// UpdatePayStatus 更新支付状态
+func (this *NodeQuotaBillDB) UpdatePayStatus(ctx context.Context, newBillInfo *NodeQuotaBill) (bool, error) {
+	res, err := this.conn.Exec(ctx, "UPDATE `node_quota_bill` SET "+
+		" `pay_flag`=1, `pay_fee`=?, `pay_time`=?, `pay_type`=?, `pay_message`=? WHERE `id`=? AND `pay_flag`=0",
+		newBillInfo.PayFee, newBillInfo.PayTime, newBillInfo.PayType, newBillInfo.PayMessage, newBillInfo.ID,
+	)
+	if err != nil {
+		logger.Warn("UpdatePayStatus error: ", err)
+		return false, errors.New("UpdatePayStatus error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdatePayStatus error: ", err)
+		return false, errors.New("UpdatePayStatus error")
+	}
+	return count > 0, nil
+}
+
+// QueryByID 通过ID查询记录
+func (this *NodeQuotaBillDB) QueryByID(ctx context.Context, billID int) (*NodeQuotaBill, error) {
+	row, err := this.conn.QueryRow(ctx, "SELECT * FROM `node_quota_bill` WHERE `id`=?", billID)
+	if err != nil {
+		logger.Warn("QueryByID error: ", err)
+		return nil, errors.New("QueryByID error")
+	}
+	var info NodeQuotaBill
+	if err := row.StructScan(&info); err != nil {
+		logger.Warn("QueryByID struct scan error: ", err)
+		return nil, errors.New("QueryByID struct scan error")
+	}
+	return &info, nil
+}
+
 // NewNodeQuotaBill 创建新的机器存储账单数据库操作
 func NewNodeQuotaBill(conn *db.DB) *NodeQuotaBillDB {
 	return &NodeQuotaBillDB{

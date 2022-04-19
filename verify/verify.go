@@ -74,6 +74,8 @@ const (
 	CreateNodeQuotaModifyBill = "__CREATE_NODE_QUOTA_MODIFY_BILL__"
 	// QueryNodeQuotaBill 查询机器存储账单
 	QueryNodeQuotaBill = "__QUERY_NODE_QUOTA_BILL__"
+	// PayNodeQuotaBill 支付机器存储账单
+	PayNodeQuotaBill = "__PAY_NODE_QUOTA_BILL__"
 )
 
 // Verify 进行操作的权限验证

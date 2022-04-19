@@ -636,6 +636,62 @@ func (fs *FeeService) GetNodeQuotaFeeRate(
 	return nil
 }
 
+// PayNodeQuotaBill 支付机器存储账单
+func (fs *FeeService) PayNodeQuotaBill(
+	ctx context.Context,
+	req *feepb.PayNodeQuotaBillRequest,
+	resp *feepb.PayNodeQuotaBillResponse,
+) error {
+	logger.Info("PayNodeQuotaBill: ", req.BaseRequest)
+	if !verify.Identify(verify.PayNodeQuotaBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"PayNodeQuotaBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("PayNodeQuotaBill permission forbidden")
+	}
+
+	status, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		status, err := fs.nodeQuotaBillLogic.PayBill(
+			c,
+			int(req.BillID),
+			req.PayMoney,
+			logic.PayType(req.PayType),
+			req.PayMessage,
+		)
+		if err != nil {
+			return status, err
+		}
+
+		if req.PayType == int32(logic.OfflinePay) {
+			// 线下缴费
+			return status, nil
+		}
+		// 余额缴费
+		bill, err := fs.nodeQuotaBillLogic.GetInfoByID(c, int(req.BillID))
+		if err != nil {
+			return false, err
+		}
+
+		_, err = fs.userGroupService.AddBalance(c, &userpb.AddBalanceRequest{
+			BaseRequest: req.BaseRequest,
+			GroupID:     int32(bill.UserGroupID),
+			Money:       -req.PayMoney,
+		})
+		if err != nil {
+			return false, err
+		}
+		return status, nil
+	})
+
+	resp.Success = status.(bool)
+	return err
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务

@@ -51,6 +51,7 @@ type FeeService interface {
 	CreateNodeQuotaModifyBill(ctx context.Context, in *CreateNodeQuotaModifyBillRequest, opts ...client.CallOption) (*CreateNodeQuotaModifyBillResponse, error)
 	PaginationGetNodeQuotaBill(ctx context.Context, in *PaginationGetNodeQuotaBillRequest, opts ...client.CallOption) (*PaginationGetNodeQuotaBillResponse, error)
 	GetNodeQuotaFeeRate(ctx context.Context, in *GetNodeQuotaFeeRateRequest, opts ...client.CallOption) (*GetNodeQuotaFeeRateResponse, error)
+	PayNodeQuotaBill(ctx context.Context, in *PayNodeQuotaBillRequest, opts ...client.CallOption) (*PayNodeQuotaBillResponse, error)
 }
 
 type feeService struct {
@@ -195,6 +196,16 @@ func (c *feeService) GetNodeQuotaFeeRate(ctx context.Context, in *GetNodeQuotaFe
 	return out, nil
 }
 
+func (c *feeService) PayNodeQuotaBill(ctx context.Context, in *PayNodeQuotaBillRequest, opts ...client.CallOption) (*PayNodeQuotaBillResponse, error) {
+	req := c.c.NewRequest(c.name, "Fee.PayNodeQuotaBill", in)
+	out := new(PayNodeQuotaBillResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Fee service
 
 type FeeHandler interface {
@@ -211,6 +222,7 @@ type FeeHandler interface {
 	CreateNodeQuotaModifyBill(context.Context, *CreateNodeQuotaModifyBillRequest, *CreateNodeQuotaModifyBillResponse) error
 	PaginationGetNodeQuotaBill(context.Context, *PaginationGetNodeQuotaBillRequest, *PaginationGetNodeQuotaBillResponse) error
 	GetNodeQuotaFeeRate(context.Context, *GetNodeQuotaFeeRateRequest, *GetNodeQuotaFeeRateResponse) error
+	PayNodeQuotaBill(context.Context, *PayNodeQuotaBillRequest, *PayNodeQuotaBillResponse) error
 }
 
 func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.HandlerOption) error {
@@ -228,6 +240,7 @@ func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.Handler
 		CreateNodeQuotaModifyBill(ctx context.Context, in *CreateNodeQuotaModifyBillRequest, out *CreateNodeQuotaModifyBillResponse) error
 		PaginationGetNodeQuotaBill(ctx context.Context, in *PaginationGetNodeQuotaBillRequest, out *PaginationGetNodeQuotaBillResponse) error
 		GetNodeQuotaFeeRate(ctx context.Context, in *GetNodeQuotaFeeRateRequest, out *GetNodeQuotaFeeRateResponse) error
+		PayNodeQuotaBill(ctx context.Context, in *PayNodeQuotaBillRequest, out *PayNodeQuotaBillResponse) error
 	}
 	type Fee struct {
 		fee
@@ -290,4 +303,8 @@ func (h *feeHandler) PaginationGetNodeQuotaBill(ctx context.Context, in *Paginat
 
 func (h *feeHandler) GetNodeQuotaFeeRate(ctx context.Context, in *GetNodeQuotaFeeRateRequest, out *GetNodeQuotaFeeRateResponse) error {
 	return h.FeeHandler.GetNodeQuotaFeeRate(ctx, in, out)
+}
+
+func (h *feeHandler) PayNodeQuotaBill(ctx context.Context, in *PayNodeQuotaBillRequest, out *PayNodeQuotaBillResponse) error {
+	return h.FeeHandler.PayNodeQuotaBill(ctx, in, out)
 }

@@ -24,6 +24,7 @@ service Fee {
     rpc CreateNodeQuotaModifyBill(CreateNodeQuotaModifyBillRequest) returns (CreateNodeQuotaModifyBillResponse) {}
     rpc PaginationGetNodeQuotaBill(PaginationGetNodeQuotaBillRequest) returns (PaginationGetNodeQuotaBillResponse) {}
     rpc GetNodeQuotaFeeRate(GetNodeQuotaFeeRateRequest) returns (GetNodeQuotaFeeRateResponse) {}
+    rpc PayNodeQuotaBill(PayNodeQuotaBillRequest) returns (PayNodeQuotaBillResponse) {}
 }
 
 message CreateNodeDistributeBillRequest {
@@ -160,4 +161,16 @@ message GetNodeQuotaFeeRateRequest {
 message GetNodeQuotaFeeRateResponse {
     double basic = 1;
     double extra = 2;
+}
+
+message PayNodeQuotaBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 billID = 2;
+    double payMoney = 3;
+    int32 payType = 4;
+    string payMessage = 5;
+}
+
+message PayNodeQuotaBillResponse {
+    bool success = 1;
 }

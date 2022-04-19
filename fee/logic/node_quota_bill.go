@@ -9,6 +9,7 @@ import (
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/fee/db"
 	"github.com/essayZW/hpcmanager/fee/utils"
+	"gopkg.in/guregu/null.v4"
 )
 
 // NodeQuotaFeeRate 机器节点存储费率
@@ -213,6 +214,34 @@ func (this *NodeQuotaBill) PaginationGetNodeQuotaBillByGroupID(
 		Count: count,
 		Data:  data,
 	}, nil
+}
+
+// PayBill 支付账单
+func (this *NodeQuotaBill) PayBill(
+	ctx context.Context,
+	billID int,
+	payMoney float64,
+	payType PayType,
+	payMessage string,
+) (bool, error) {
+	if billID <= 0 {
+		return false, errors.New("invalid bill id")
+	}
+	if payType != OfflinePay && payType != BalancePay {
+		return false, errors.New("invalid pay type")
+	}
+	return this.nodeQuotaBillDB.UpdatePayStatus(ctx, &db.NodeQuotaBill{
+		ID:         billID,
+		PayFee:     payMoney,
+		PayType:    null.IntFrom(int64(payType)),
+		PayMessage: null.StringFrom(payMessage),
+		PayTime:    null.TimeFrom(time.Now()),
+	})
+}
+
+// GetInfoByID 通过ID查询
+func (this *NodeQuotaBill) GetInfoByID(ctx context.Context, billID int) (*db.NodeQuotaBill, error) {
+	return this.nodeQuotaBillDB.QueryByID(ctx, billID)
 }
 
 // QuotaOperationType 存储操作类型
