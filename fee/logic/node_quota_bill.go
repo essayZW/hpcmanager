@@ -74,17 +74,27 @@ func (this *NodeQuotaBill) CreateNewBill(ctx context.Context, param *CreateNewBi
 // CalFee 计算费用
 func (this *NodeQuotaBill) CalFee(oldSize, newSize int, oldEndTime, newEndTime time.Time) float64 {
 	yearDuration := utils.CalYearDuration(oldEndTime, newEndTime)
-	if yearDuration == 0 {
-		yearDuration = 1
+
+	// 现有的容量每年需要的费用,用来计算延期的费用
+	var quotaFeePerYear float64
+	if oldSize > 0 {
+		quotaFeePerYear = this.basicPerYearPerTB + float64(oldSize-1)*this.extraPerYearPerTB
+	} else {
+		quotaFeePerYear = 0
 	}
 
-	var quotaFee float64
-	if newSize > 1 {
-		quotaFee = this.basicPerYearPerTB + float64(newSize-1)*this.extraPerYearPerTB
+	expandSize := newSize - oldSize
+	// 扩展的容量每年需要的费用
+	var expandFeePerYear float64
+	if oldSize == 0 {
+		expandFeePerYear = this.basicPerYearPerTB + this.extraPerYearPerTB*float64(expandSize-1)
 	} else {
-		quotaFee = this.basicPerYearPerTB
+		expandFeePerYear = this.extraPerYearPerTB * float64(expandSize)
 	}
-	return quotaFee * yearDuration
+	// 由于扩展的容量在今后才被使用,所以计算现在到结束的时间差
+	expandSizeDuration := utils.CalYearDuration(time.Now(), newEndTime)
+	// 延期带来的费用加上扩容带来的费用
+	return quotaFeePerYear*yearDuration + expandFeePerYear*expandSizeDuration
 }
 
 // NewNodeQuotaBill 创建新的节点存储账单操作逻辑
