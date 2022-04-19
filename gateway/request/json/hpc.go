@@ -21,7 +21,7 @@ type SetUserQuotaParam struct {
 	NewSize             int   `form:"newSize"             json:"newSize"             binding:"required"`
 	OldEndTimeMilliUnix int64 `form:"oldEndTimeMilliUnix" json:"oldEndTimeMilliUnix" binding:"required"`
 	NewEndTimeMilliUnix int64 `form:"newEndTimeMilliUnix" json:"newEndTimeMilliUnix" binding:"required"`
-	ModifyData          bool  `form:"modifyData"          json:"modifyData"`
+	ModifyDate          bool  `form:"modifyDate"          json:"modifyDate"`
 }
 
 func (param *SetUserQuotaParam) Validator() validator.StructLevelFunc {

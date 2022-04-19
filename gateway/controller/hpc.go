@@ -146,7 +146,7 @@ func (hpc *Hpc) setUserQuota(ctx *gin.Context) {
 		HpcUserID:      int32(param.HpcUserID),
 		NewMaxQuotaTB:  int32(param.NewSize),
 		NewEndTimeUnix: newEndTime.Unix(),
-		SetDate:        param.ModifyData,
+		SetDate:        param.ModifyDate,
 	})
 	if err != nil {
 		httpResp := response.New(200, nil, false, fmt.Sprintf("修改用户存储信息失败: %s", err.Error()))
