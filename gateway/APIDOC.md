@@ -938,3 +938,13 @@ pageSize: number;
 ```
 
 响应: 分页查询的结果
+
+### /fee/rate/quota
+
+Method: GET
+
+描述: 查询机器存储费率
+
+参数: 无
+
+响应: 费率信息
