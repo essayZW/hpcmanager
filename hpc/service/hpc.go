@@ -525,12 +525,12 @@ func (h *HpcService) SetQuotaByHpcUserID(
 			if info.NodeMaxQuota == 0 {
 				nowTime := time.Now()
 				// 初始化用户的存储期限为当前时间开始当前时间结束
-				status, err := h.hpcLogic.UpdateUserQuotaStartTimeByID(c, int(req.HpcUserID), nowTime.Unix())
+				_, err := h.hpcLogic.UpdateUserQuotaStartTimeByID(c, int(req.HpcUserID), nowTime.Unix())
 				if err != nil {
 					return false, err
 				}
 				info.QuotaEndTime = null.TimeFrom(nowTime)
-				status, err = h.hpcLogic.UpdateUserQuotaStartTimeByID(c, int(req.HpcUserID), nowTime.Unix())
+				_, err = h.hpcLogic.UpdateUserQuotaStartTimeByID(c, int(req.HpcUserID), nowTime.Unix())
 				if err != nil {
 					return false, err
 				}
@@ -538,7 +538,7 @@ func (h *HpcService) SetQuotaByHpcUserID(
 			// 先延期
 			status, err := h.hpcLogic.UpdateUserQuotaEndTimeByID(c, int(req.HpcUserID), req.NewEndTimeUnix)
 			if err != nil {
-				return false, err
+				return status, err
 			}
 			// 扩容
 			err = h.hpcLogic.UpdateUserQuotaSizeByUsername(c, int(req.HpcUserID), info.NodeUsername, int(req.NewMaxQuotaTB))
