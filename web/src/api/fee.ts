@@ -249,3 +249,56 @@ export async function queryNodeUsageFeeRateInfo(): Promise<nodeUsageFeeRate> {
   }
   return resp.data;
 }
+
+/**
+ * 机器存储账单
+ */
+export type NodeQuotaBill = {
+  id: number;
+  userID: number;
+  name: string;
+  username: string;
+  userGroupID: number;
+  operType: number;
+  oldSize: number;
+  newSize: number;
+  oldEndTimeUnix: number;
+  newEndTimeUnix: number;
+  fee: number;
+  payFlag: number;
+  payFee: number;
+  payTimeUnix: number;
+  payType: number;
+  payMessage: string;
+  createTime: number;
+  extraAttributes: string;
+};
+
+/**
+ * 分页查询机器存储账单
+ */
+export async function paginationQueryNodeQuotaBill(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<NodeQuotaBill>> {
+  const resp = await ApiRequest.request<PaginationQueryResponse<NodeQuotaBill>>(
+    '/fee/quota',
+    'GET',
+    {
+      pageIndex,
+      pageSize,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  for (const info of resp.data.Data) {
+    undefinedWithDefault(info, 'oldSize', 0);
+    undefinedWithDefault(info, 'fee', 0);
+    undefinedWithDefault(info, 'payFee', 0);
+    undefinedWithDefault(info, 'payFlag', 0);
+    undefinedWithDefault(info, 'payType', 0);
+    undefinedWithDefault(info, 'operType', 0);
+  }
+  return resp.data;
+}

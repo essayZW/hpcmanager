@@ -13,6 +13,7 @@ import NodeDistributeBillManager from '../components/common/NodeDistributeBillMa
 import UserNodeUsageBillManager from '../components/common/UserNodeUsageBillManager.vue';
 import GroupNodeUsageBillManager from '../components/tutor/GroupNodeUsageBillManager.vue';
 import AdminNodeUsageBillManager from '../components/admin/AdminNodeUsageBillManager.vue';
+import NodeQuotaBillManager from '../components/common/NodeQuotaBillManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -111,6 +112,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/user_node_usage_bill_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/node_quota_bill_manager',
+          name: 'NodeQuotaBillManager',
+          component: NodeQuotaBillManager,
+        },
+        item: {
+          name: '机器存储账单',
+          to: '/main/node_quota_bill_manager',
+        },
+      },
     ],
   ],
   [
@@ -191,6 +203,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器独占账单',
           to: '/main/node_distribute_bill_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_quota_bill_manager',
+          name: 'NodeQuotaBillManager',
+          component: NodeQuotaBillManager,
+        },
+        item: {
+          name: '机器存储账单',
+          to: '/main/node_quota_bill_manager',
         },
       },
     ],
@@ -297,6 +320,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/node_distribute_bill_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/node_quota_bill_manager',
+          name: 'NodeQuotaBillManager',
+          component: NodeQuotaBillManager,
+        },
+        item: {
+          name: '机器存储账单',
+          to: '/main/node_quota_bill_manager',
+        },
+      },
     ],
   ],
   // 超级管理员和普通管理员都这项操作
@@ -401,6 +435,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器独占账单',
           to: '/main/node_distribute_bill_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/node_quota_bill_manager',
+          name: 'NodeQuotaBillManager',
+          component: NodeQuotaBillManager,
+        },
+        item: {
+          name: '机器存储账单',
+          to: '/main/node_quota_bill_manager',
         },
       },
     ],
