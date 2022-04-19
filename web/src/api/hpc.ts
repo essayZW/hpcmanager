@@ -92,3 +92,33 @@ export async function queryUserQuotaByUserHpcID(
   }
   return resp.data;
 }
+
+/**
+ * 设置用户的存储信息参数
+ */
+export type SetUserQuotaParam = {
+  hpcUserID: number;
+  oldSize: number;
+  newSize: number;
+  oldEndTimeMilliUnix: number;
+  newEndTimeMilliUnix: number;
+  modifyDate: boolean;
+};
+
+/**
+ * 设置用户的存储信息
+ */
+export async function setUserQuota(param: SetUserQuotaParam): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/hpc/quota',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}

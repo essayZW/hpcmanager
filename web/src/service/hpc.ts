@@ -4,6 +4,7 @@ import {
   queryHpcUserInfo,
   UserQuotaInfo,
   queryUserQuotaByUserHpcID,
+  setUserQuota,
 } from '../api/hpc';
 import { HpcUser, ping } from '../api/hpc';
 /**
@@ -43,4 +44,25 @@ export async function servicePing(): Promise<boolean> {
  */
 export async function getHpcUserQuotaInfo(id: number): Promise<UserQuotaInfo> {
   return queryUserQuotaByUserHpcID(id);
+}
+
+/**
+ * 修改用户存储信息
+ */
+export async function modifyUserQuotaInfo(
+  hpcUserID: number,
+  oldSize: number,
+  newSize: number,
+  oldEndTimeMilliUnix: number,
+  newEndTimeMilliUnix: number,
+  modifyDate: boolean
+): Promise<boolean> {
+  return setUserQuota({
+    hpcUserID,
+    oldSize,
+    newSize,
+    oldEndTimeMilliUnix,
+    newEndTimeMilliUnix,
+    modifyDate,
+  });
 }

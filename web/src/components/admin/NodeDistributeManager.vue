@@ -290,7 +290,7 @@ const handlerFinishWorkOrder = async (id: number) => {
     </el-col>
   </el-row>
 </template>
-<style lang="less">
+<style lang="less" scoped>
 .red {
   color: red;
 }

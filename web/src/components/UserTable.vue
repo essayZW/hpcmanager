@@ -1,16 +1,21 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { UserInfo } from '../api/user';
 import { GroupInfo } from '../api/group';
 import { getGroupInfoByID } from '../service/group';
 import {
   paginationGetUserInfo,
   isSuperAdmin,
+  isAdmin,
   UserLevels,
 } from '../service/user';
 import dayjs from 'dayjs';
 import { HpcUser, UserQuotaInfo } from '../api/hpc';
-import { getHpcUserInfoByID, getHpcUserQuotaInfo } from '../service/hpc';
+import {
+  getHpcUserInfoByID,
+  getHpcUserQuotaInfo,
+  modifyUserQuotaInfo,
+} from '../service/hpc';
 import { zeroWithDefault } from '../utils/obj';
 import { PermissionInfo } from '../api/permission';
 import {
@@ -218,6 +223,82 @@ const delAdminHandler = async (id: number) => {
     });
   }
 };
+
+const modifyUserQuotaDialogVisible = ref<boolean>(false);
+
+const dialogUserInfo = ref<UserInfo | undefined>(undefined);
+const dialogUserQuotaInfo = ref<UserQuotaInfo | undefined>(undefined);
+
+const showModifyUserQuotaDialog = async (row: UserInfo) => {
+  dialogUserInfo.value = row;
+
+  try {
+    const data = await getHpcUserQuotaInfo(row.hpcUserID);
+    dialogUserQuotaInfo.value = data;
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+    return;
+  }
+  dialogFormData.endTime = new Date(
+    dialogUserQuotaInfo.value.endTimeUnix * 1000
+  );
+  dialogFormData.maxSize = parseInt(dialogUserQuotaInfo.value.max);
+  modifyUserQuotaDialogVisible.value = true;
+};
+const hideModifyUserQuotaDialog = () => {
+  modifyUserQuotaDialogVisible.value = false;
+};
+
+const dialogFormData = reactive<{
+  operType: number;
+  maxSize: number;
+  endTime: Date;
+}>({
+  operType: 1,
+  maxSize: 0,
+  endTime: new Date(),
+});
+
+const modifyUserQuotaSubmit = async () => {
+  if (!dialogUserInfo.value) {
+    ElMessage({
+      type: 'error',
+      message: `用户信息加载失败,请刷新页面`,
+    });
+    return;
+  }
+  if (!dialogUserQuotaInfo.value) {
+    ElMessage({
+      type: 'error',
+      message: `用户信息存储加载失败,请刷新页面`,
+    });
+    return;
+  }
+  try {
+    await modifyUserQuotaInfo(
+      dialogUserInfo.value.hpcUserID,
+      parseInt(dialogUserQuotaInfo.value.max),
+      dialogFormData.maxSize,
+      dialogUserQuotaInfo.value?.endTimeUnix * 1000,
+      dialogFormData.endTime.getTime(),
+      dialogFormData.operType == 2
+    );
+    ElMessage({
+      type: 'success',
+      message: '修改成功',
+    });
+    hideModifyUserQuotaDialog();
+    refreshTable();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+};
 </script>
 <template>
   <el-row justify="space-between" class="refresh-button-row">
@@ -304,36 +385,49 @@ const delAdminHandler = async (id: number) => {
               </p>
               <p v-else class="info">未创建计算节点账户</p>
               <p><strong>用户存储信息: </strong></p>
-              <p
+              <div
                 v-if="
                   props.row.hpcUserID &&
                   tableRowExtraInfo[props.row.id].quotaInfo
                 "
                 class="info"
               >
-                <span>
-                  <strong>使用容量: </strong>
-                  {{ tableRowExtraInfo[props.row.id].quotaInfo?.used }}
-                </span>
-                <span
-                  ><strong>最大容量: </strong
-                  >{{ tableRowExtraInfo[props.row.id].quotaInfo?.max }}</span
-                >
-                <span>
-                  <strong>使用期限: </strong>
-                  {{
-                    dayjs(
-                      tableRowExtraInfo[props.row.id].quotaInfo?.startTimeUnix *
-                        1000
-                    ).format('YYYY-MM-DD')
-                  }}至{{
-                    dayjs(
-                      tableRowExtraInfo[props.row.id].quotaInfo?.endTimeUnix *
-                        1000
-                    ).format('YYYY-MM-DD')
-                  }}
-                </span>
-              </p>
+                <p>
+                  <span>
+                    <strong>使用容量: </strong>
+                    {{ tableRowExtraInfo[props.row.id].quotaInfo?.used }}
+                  </span>
+                  <span
+                    ><strong>最大容量: </strong
+                    >{{ tableRowExtraInfo[props.row.id].quotaInfo?.max }}</span
+                  >
+                  <span>
+                    <strong>使用期限: </strong>
+                    {{
+                      dayjs(
+                        tableRowExtraInfo[props.row.id].quotaInfo
+                          ?.startTimeUnix * 1000
+                      ).format('YYYY-MM-DD')
+                    }}至{{
+                      dayjs(
+                        tableRowExtraInfo[props.row.id].quotaInfo?.endTimeUnix *
+                          1000
+                      ).format('YYYY-MM-DD')
+                    }}
+                  </span>
+                </p>
+                <p v-if="isAdmin()">
+                  <span
+                    ><strong>操作: </strong
+                    ><el-button
+                      size="small"
+                      type="primary"
+                      @click="showModifyUserQuotaDialog(props.row)"
+                      >修改存储信息</el-button
+                    ></span
+                  >
+                </p>
+              </div>
               <p v-else class="info">无存储空间使用信息</p>
               <p><strong>用户权限信息: </strong></p>
               <p class="info">
@@ -391,6 +485,69 @@ const delAdminHandler = async (id: number) => {
       </el-pagination>
     </el-col>
   </el-row>
+  <el-dialog
+    v-if="isAdmin()"
+    v-model="modifyUserQuotaDialogVisible"
+    title="修改用户存储信息"
+  >
+    <el-form inline>
+      <el-form-item label="用户姓名: ">
+        <span>{{ dialogUserInfo.name }}</span>
+      </el-form-item>
+      <el-form-item label="用户学(工)号: "
+        ><span>{{ dialogUserInfo.username }}</span></el-form-item
+      >
+      <el-form-item label="当前最大容量: "
+        ><span>{{ dialogUserQuotaInfo.max }}</span></el-form-item
+      >
+      <el-form-item label="当前使用期限: "
+        ><span
+          >{{
+            dayjs(dialogUserQuotaInfo?.startTimeUnix * 1000).format(
+              'YYYY-MM-DD'
+            )
+          }}至{{
+            dayjs(dialogUserQuotaInfo?.endTimeUnix * 1000).format('YYYY-MM-DD')
+          }}</span
+        ></el-form-item
+      >
+    </el-form>
+    <el-form>
+      <el-form-item label="操作: ">
+        <el-radio-group v-model="dialogFormData.operType">
+          <el-radio-button :label="1">扩容</el-radio-button>
+          <el-radio-button :label="2">延期</el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item v-if="dialogFormData.operType == 1" label="新的最大容量: ">
+        <el-input
+          v-model.number="dialogFormData.maxSize"
+          type="number"
+          placeholder="新的最大容量限制,不能小于现在的最大容量"
+        >
+          <template #append>TB</template>
+        </el-input>
+      </el-form-item>
+      <el-form-item
+        v-if="dialogFormData.operType == 2"
+        label="新的期限结束日期: "
+      >
+        <el-date-picker
+          v-model="dialogFormData.endTime"
+          type="date"
+          placeholder="选择新的期限结束日期"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="hideModifyUserQuotaDialog">取消</el-button>
+        <el-button type="primary" @click="modifyUserQuotaSubmit"
+          >修改</el-button
+        >
+      </span>
+    </template>
+  </el-dialog>
 </template>
 <style lang="less" scoped>
 .pagination-row {
@@ -400,7 +557,8 @@ const delAdminHandler = async (id: number) => {
     justify-content: center;
   }
 }
-p.info {
+p.info,
+div.info {
   padding-left: 16px;
   span {
     margin-right: 12px;
