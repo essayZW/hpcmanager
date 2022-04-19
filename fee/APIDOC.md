@@ -280,6 +280,8 @@ message CreateNodeQuotaModifyBillResponse {
 
 ## PaginationGetNodeQuotaBill
 
+描述: 分页查询机器存储账单
+
 原型定义: `rpc PaginationGetNodeQuotaBill(PaginationGetNodeQuotaBillRequest) returns (PaginationGetNodeQuotaBillResponse) {}`
 
 请求参数:
@@ -298,6 +300,29 @@ message PaginationGetNodeQuotaBillRequest {
 message PaginationGetNodeQuotaBillResponse {
     int32 count = 1;
     repeated fee.NodeQuotaBill bills = 2;
+}
+```
+
+## GetNodeQuotaFeeRate
+
+描述: 查询机器存储费率
+
+原型定义: `rpc GetNodeQuotaFeeRate(GetNodeQuotaFeeRateRequest) returns (GetNodeQuotaFeeRateResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetNodeQuotaFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetNodeQuotaFeeRateResponse {
+    double basic = 1;
+    double extra = 2;
 }
 ```
 

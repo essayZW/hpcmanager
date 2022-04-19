@@ -624,6 +624,18 @@ func (fs *FeeService) PaginationGetNodeQuotaBill(
 	return nil
 }
 
+// GetNodeQuotaFeeRate 查询机器存储费率
+func (fs *FeeService) GetNodeQuotaFeeRate(
+	ctx context.Context,
+	req *feepb.GetNodeQuotaFeeRateRequest,
+	resp *feepb.GetNodeQuotaFeeRateResponse,
+) error {
+	logger.Info("GetNodeQuotaFeeRate: ", req.BaseRequest)
+	resp.Basic = fs.nodeQuotaBillLogic.GetBasic()
+	resp.Extra = fs.nodeQuotaBillLogic.GetExtra()
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务

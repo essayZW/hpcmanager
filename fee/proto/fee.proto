@@ -23,6 +23,7 @@ service Fee {
     rpc GetNodeUsageFeeRate(GetNodeUsageFeeRateRequest) returns (GetNodeUsageFeeRateResponse) {}
     rpc CreateNodeQuotaModifyBill(CreateNodeQuotaModifyBillRequest) returns (CreateNodeQuotaModifyBillResponse) {}
     rpc PaginationGetNodeQuotaBill(PaginationGetNodeQuotaBillRequest) returns (PaginationGetNodeQuotaBillResponse) {}
+    rpc GetNodeQuotaFeeRate(GetNodeQuotaFeeRateRequest) returns (GetNodeQuotaFeeRateResponse) {}
 }
 
 message CreateNodeDistributeBillRequest {
@@ -150,4 +151,13 @@ message PaginationGetNodeQuotaBillRequest {
 message PaginationGetNodeQuotaBillResponse {
     int32 count = 1;
     repeated fee.NodeQuotaBill bills = 2;
+}
+
+message GetNodeQuotaFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+}
+
+message GetNodeQuotaFeeRateResponse {
+    double basic = 1;
+    double extra = 2;
 }

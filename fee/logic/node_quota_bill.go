@@ -11,12 +11,27 @@ import (
 	"github.com/essayZW/hpcmanager/fee/utils"
 )
 
+// NodeQuotaFeeRate 机器节点存储费率
 type NodeQuotaFeeRate struct {
 	mutex sync.Mutex
 	// basicPerYearPerTB 基本存储1TB/年,指的是最初初始化的1TB 1年的空间的费率
 	basicPerYearPerTB float64
 	// extraPerYearPerTB 额外的存储1TB/年
 	extraPerYearPerTB float64
+}
+
+// GetBasic 获取基本存储费率
+func (this *NodeQuotaFeeRate) GetBasic() float64 {
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	return this.basicPerYearPerTB
+}
+
+// GetExtra 获得额外存储的费率
+func (this *NodeQuotaFeeRate) GetExtra() float64 {
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	return this.extraPerYearPerTB
 }
 
 type NodeQuotaBill struct {
