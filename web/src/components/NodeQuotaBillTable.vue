@@ -145,4 +145,17 @@ const handleSizeChange = (pageSize: number) => {
 .operator-tool-row {
   margin: 16px 0px;
 }
+.pagination-row {
+  margin: 16px 0px;
+  .pagination-control-panel {
+    margin: 0px auto;
+    justify-content: center;
+  }
+}
+.green {
+  color: green;
+}
+.red {
+  color: red;
+}
 </style>
