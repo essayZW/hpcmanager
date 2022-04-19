@@ -536,14 +536,30 @@ func (h *HpcService) SetQuotaByHpcUserID(
 				}
 			}
 			// 先延期
-			status, err := h.hpcLogic.UpdateUserQuotaEndTimeByID(c, int(req.HpcUserID), req.NewEndTimeUnix)
-			if err != nil {
-				return status, err
+			newEndTime := time.Unix(req.NewEndTimeUnix, 0)
+			if info.QuotaEndTime.Time.Year() != newEndTime.Year() || info.QuotaEndTime.Time.Month() != newEndTime.Month() ||
+				info.QuotaEndTime.Time.Day() != newEndTime.Day() {
+				if newEndTime.Before(info.QuotaEndTime.Time) {
+					return false, errors.New("new end time can't before old end time")
+				}
+
+				status, err := h.hpcLogic.UpdateUserQuotaEndTimeByID(c, int(req.HpcUserID), req.NewEndTimeUnix)
+				if err != nil {
+					return status, err
+				}
+				if !status {
+					return status, errors.New("no change")
+				}
 			}
-			// 扩容
-			err = h.hpcLogic.UpdateUserQuotaSizeByUsername(c, int(req.HpcUserID), info.NodeUsername, int(req.NewMaxQuotaTB))
-			if err != nil {
-				return false, err
+			if req.NewMaxQuotaTB != int32(info.NodeMaxQuota) {
+				if req.NewMaxQuotaTB < int32(info.NodeMaxQuota) {
+					return false, errors.New("new size can't less than old size")
+				}
+				// 扩容
+				err = h.hpcLogic.UpdateUserQuotaSizeByUsername(c, int(req.HpcUserID), info.NodeUsername, int(req.NewMaxQuotaTB))
+				if err != nil {
+					return false, err
+				}
 			}
 			// 查询用户信息
 			userResp, err := h.userService.GetUserInfoByHpcID(c, &userpb.GetUserInfoByHpcIDRequest{

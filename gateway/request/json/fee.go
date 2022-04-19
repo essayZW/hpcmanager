@@ -10,9 +10,9 @@ import (
 func init() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		payNodeDistributeBill := PayNodeDistributeBillParam{}
-		v.RegisterStructValidation(payNodeDistributeBill.Validator(), &payNodeDistributeBill)
+		v.RegisterStructValidation(payNodeDistributeBill.Validator(), payNodeDistributeBill)
 		payGroupNodeUsageBill := PayGroupNodeUsageBillParam{}
-		v.RegisterStructValidation(payGroupNodeUsageBill.Validator(), &payGroupNodeUsageBill)
+		v.RegisterStructValidation(payGroupNodeUsageBill.Validator(), payGroupNodeUsageBill)
 	}
 }
 

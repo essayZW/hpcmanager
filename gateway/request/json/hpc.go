@@ -10,7 +10,7 @@ import (
 func init() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		setUserQuotaParam := &SetUserQuotaParam{}
-		v.RegisterStructValidation(setUserQuotaParam.Validator(), &setUserQuotaParam)
+		v.RegisterStructValidation(setUserQuotaParam.Validator(), setUserQuotaParam)
 	}
 }
 
