@@ -3,6 +3,8 @@ import { reactive } from 'vue';
 import { NodeQuotaBill } from '../api/fee';
 import { paginationGetNodeQuotaBill, payTypeToString } from '../service/fee';
 import { zeroWithDefault } from '../utils/obj';
+import { isAdmin } from '../service/user';
+
 import dayjs from 'dayjs';
 
 const tableData = reactive<{
@@ -117,7 +119,17 @@ const handleSizeChange = (pageSize: number) => {
             <span v-if="props.row.payFlag">{{
               payTypeToString(props.row.payType)
             }}</span>
+            <span v-else-if="isAdmin()"
+              ><el-button type="primary">缴费</el-button></span
+            >
             <span v-else>未缴费</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="创建时间" align="center">
+          <template #default="props">
+            {{
+              dayjs(props.row.createTime * 1000).format('YYYY-MM-DD HH:mm:ss')
+            }}
           </template>
         </el-table-column>
       </el-table>
