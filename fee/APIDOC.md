@@ -278,6 +278,29 @@ message CreateNodeQuotaModifyBillResponse {
 }
 ```
 
+## PaginationGetNodeQuotaBill
+
+原型定义: `rpc PaginationGetNodeQuotaBill(PaginationGetNodeQuotaBillRequest) returns (PaginationGetNodeQuotaBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message PaginationGetNodeQuotaBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message PaginationGetNodeQuotaBillResponse {
+    int32 count = 1;
+    repeated fee.NodeQuotaBill bills = 2;
+}
+```
+
 # 附录
 
 ## NodeDistributeBill

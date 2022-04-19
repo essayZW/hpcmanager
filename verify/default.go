@@ -194,6 +194,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			// 需要普通权限以上
+			QueryNodeQuotaBill: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
 		},
 	}
 }

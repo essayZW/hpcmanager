@@ -22,6 +22,7 @@ service Fee {
     rpc PayGroupNodeUsageBill(PayGroupNodeUsageBillRequest) returns (PayGroupNodeUsageBillResponse) {}
     rpc GetNodeUsageFeeRate(GetNodeUsageFeeRateRequest) returns (GetNodeUsageFeeRateResponse) {}
     rpc CreateNodeQuotaModifyBill(CreateNodeQuotaModifyBillRequest) returns (CreateNodeQuotaModifyBillResponse) {}
+    rpc PaginationGetNodeQuotaBill(PaginationGetNodeQuotaBillRequest) returns (PaginationGetNodeQuotaBillResponse) {}
 }
 
 message CreateNodeDistributeBillRequest {
@@ -138,4 +139,15 @@ message CreateNodeQuotaModifyBillRequest {
 
 message CreateNodeQuotaModifyBillResponse {
     int32 id = 1;
+}
+
+message PaginationGetNodeQuotaBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+
+message PaginationGetNodeQuotaBillResponse {
+    int32 count = 1;
+    repeated fee.NodeQuotaBill bills = 2;
 }

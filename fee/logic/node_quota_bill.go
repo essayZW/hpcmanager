@@ -123,6 +123,83 @@ func NewNodeQuotaBill(nodeQuotaBillDB *db.NodeQuotaBillDB, dynamicConfig config.
 	return res, nil
 }
 
+// PaginationGetNodeQuotaBillsResult 分页查询机器存储账单的结果
+type PaginationGetNodeQuotaBillsResult struct {
+	Count int
+	Data  []*db.NodeQuotaBill
+}
+
+// PaginationGetAllNodeQuotaBill 分页查询所有的机器存储账单
+func (this *NodeQuotaBill) PaginationGetAllNodeQuotaBill(
+	ctx context.Context,
+	pageIndex, pageSize int,
+) (*PaginationGetNodeQuotaBillsResult, error) {
+	if pageIndex <= 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize <= 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+	count, err := this.nodeQuotaBillDB.QueryAllCount(ctx)
+	if err != nil {
+		return nil, err
+	}
+	limit := pageSize * (pageIndex - 1)
+	data, err := this.nodeQuotaBillDB.QueryAllWithLimit(ctx, limit, pageSize)
+	return &PaginationGetNodeQuotaBillsResult{
+		Count: count,
+		Data:  data,
+	}, nil
+}
+
+// PaginationGetNodeQuotaBillByUserID 分页查询某个用户的所有的机器存储账单
+func (this *NodeQuotaBill) PaginationGetNodeQuotaBillByUserID(
+	ctx context.Context,
+	userID int,
+	pageIndex, pageSize int,
+) (*PaginationGetNodeQuotaBillsResult, error) {
+	if pageIndex <= 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize <= 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+	count, err := this.nodeQuotaBillDB.QueryAllCountByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	limit := pageSize * (pageIndex - 1)
+	data, err := this.nodeQuotaBillDB.QueryAllWithLimitByUserID(ctx, limit, pageSize, userID)
+	return &PaginationGetNodeQuotaBillsResult{
+		Count: count,
+		Data:  data,
+	}, nil
+}
+
+// PaginationGetNodeQuotaBillByGroupID 分页查询某个组的所有机器节点账单
+func (this *NodeQuotaBill) PaginationGetNodeQuotaBillByGroupID(
+	ctx context.Context,
+	groupID int,
+	pageIndex, pageSize int,
+) (*PaginationGetNodeQuotaBillsResult, error) {
+	if pageIndex <= 0 {
+		return nil, errors.New("invalid pageIndex")
+	}
+	if pageSize <= 0 {
+		return nil, errors.New("invalid pageSize")
+	}
+	count, err := this.nodeQuotaBillDB.QueryAllCountByUserGroupID(ctx, groupID)
+	if err != nil {
+		return nil, err
+	}
+	limit := pageSize * (pageIndex - 1)
+	data, err := this.nodeQuotaBillDB.QueryAllWithLimitByUserGroupID(ctx, limit, pageSize, groupID)
+	return &PaginationGetNodeQuotaBillsResult{
+		Count: count,
+		Data:  data,
+	}, nil
+}
+
 // QuotaOperationType 存储操作类型
 type QuoatOperationType int8
 

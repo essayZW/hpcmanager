@@ -551,6 +551,79 @@ func (fs *FeeService) CreateNodeQuotaModifyBill(
 	return nil
 }
 
+// PaginationGetNodeQuotaBill 分页查询机器节点存储账单
+func (fs *FeeService) PaginationGetNodeQuotaBill(
+	ctx context.Context,
+	req *feepb.PaginationGetNodeQuotaBillRequest,
+	resp *feepb.PaginationGetNodeQuotaBillResponse,
+) error {
+	logger.Info("PaginationGetNodeQuotaBill: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeQuotaBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryNodeQuotaBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryNodeQuotaBill permission forbidden")
+	}
+
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+
+	var infos *logic.PaginationGetNodeQuotaBillsResult
+	var err error
+	if !isAdmin && !isTutor {
+		// 普通学生用户,只能查看自己的存储账单
+		infos, err = fs.nodeQuotaBillLogic.PaginationGetNodeQuotaBillByUserID(
+			ctx,
+			int(req.BaseRequest.UserInfo.UserId),
+			int(req.PageIndex),
+			int(req.PageSize),
+		)
+	} else if !isAdmin && isTutor {
+		// 导师用户,只能查看自己组的存储账单
+		infos, err = fs.nodeQuotaBillLogic.PaginationGetNodeQuotaBillByGroupID(ctx, int(req.BaseRequest.UserInfo.GroupId), int(req.PageIndex), int(req.PageSize))
+	} else {
+		// 管理员用户,可以查看所有人的存储账单
+		infos, err = fs.nodeQuotaBillLogic.PaginationGetAllNodeQuotaBill(ctx, int(req.PageIndex), int(req.PageSize))
+	}
+
+	if err != nil {
+		return err
+	}
+
+	resp.Count = int32(infos.Count)
+	resp.Bills = make([]*feepb.NodeQuotaBill, len(infos.Data))
+	for index := range infos.Data {
+		resp.Bills[index] = &feepb.NodeQuotaBill{
+			Id:             int32(infos.Data[index].ID),
+			UserID:         int32(infos.Data[index].UserID),
+			Name:           infos.Data[index].UserName,
+			Username:       infos.Data[index].Username,
+			UserGroupID:    int32(infos.Data[index].UserGroupID),
+			OperType:       int32(infos.Data[index].OperType),
+			OldSize:        int32(infos.Data[index].OldSize),
+			NewSize:        int32(infos.Data[index].NewSize),
+			OldEndTimeUnix: infos.Data[index].OldEndTime.Unix(),
+			NewEndTimeUnix: infos.Data[index].NewEndTime.Unix(),
+			Fee:            infos.Data[index].Fee,
+			PayFlag:        int32(infos.Data[index].PayFlag),
+			PayFee:         infos.Data[index].PayFee,
+			PayTimeUnix:    infos.Data[index].PayTime.Time.Unix(),
+			PayType:        int32(infos.Data[index].PayType.Int64),
+			PayMessage:     infos.Data[index].PayMessage.String,
+			CreateTime:     infos.Data[index].CreateTime.Unix(),
+		}
+		if infos.Data[index].ExtraAttributes != nil {
+			resp.Bills[index].ExtraAttributes = infos.Data[index].ExtraAttributes.String()
+		}
+	}
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务
