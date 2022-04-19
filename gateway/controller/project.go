@@ -44,7 +44,7 @@ func (p *Project) createProject(ctx *gin.Context) {
 	baseRequest := baseReq.(*gatewaypb.BaseRequest)
 	var param json.CreateProjectParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}
