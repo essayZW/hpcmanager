@@ -56,11 +56,12 @@ func userJoinGroupCustomer(client client.Client) func(broker.Event) error {
 			logger.Warn(err)
 			return err
 		}
-		// 创建存储信息,默认1TB大小
+		// 创建存储信息,默认1TB大小,期限为一年
 		hpcResp, err := hpcService.SetQuotaByHpcUserID(c, &hpcproto.SetQuotaByHpcUserIDRequest{
-			BaseRequest:   baseRequest,
-			HpcUserID:     userInfo.UserInfo.HpcUserID,
-			NewMaxQuotaTB: 1,
+			BaseRequest:    baseRequest,
+			HpcUserID:      userInfo.UserInfo.HpcUserID,
+			NewMaxQuotaTB:  1,
+			NewEndTimeUnix: time.Now().Add(time.Duration(8760) * time.Hour).Unix(),
 		})
 		if err != nil {
 			logger.Warn(err)

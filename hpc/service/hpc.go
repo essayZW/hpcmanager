@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/essayZW/hpcmanager/db"
+	feepb "github.com/essayZW/hpcmanager/fee/proto"
 	"github.com/essayZW/hpcmanager/hpc/logic"
 	hpcproto "github.com/essayZW/hpcmanager/hpc/proto"
 	"github.com/essayZW/hpcmanager/logger"
@@ -13,13 +14,16 @@ import (
 	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
 	"go-micro.dev/v4/client"
+	"gopkg.in/guregu/null.v4"
 )
 
 // HpcService hpc服务
 type HpcService struct {
-	hpcLogic         *logic.HpcLogic
+	hpcLogic *logic.HpcLogic
+
 	userService      userpb.UserService
 	userGroupService userpb.GroupService
+	feeService       feepb.FeeService
 }
 
 // Ping ping测试
@@ -510,40 +514,62 @@ func (h *HpcService) SetQuotaByHpcUserID(
 		)
 		return errors.New("UpdateUserHpcQuota permission forbidden")
 	}
-	var status bool
-	var err error
-	if req.SetDate {
-		status, err = h.hpcLogic.UpdateUserQuotaEndTimeByID(ctx, int(req.HpcUserID), req.NewEndTimeUnix)
-	} else {
-		statusInterface, newErr := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
-
-			info, err := h.hpcLogic.GetUserInfoByID(c, int(req.HpcUserID))
+	statusInterface, err := db.Transaction(
+		context.Background(),
+		func(c context.Context, i ...interface{}) (interface{}, error) {
+			info, err := h.hpcLogic.GetUserInfoByID(ctx, int(req.HpcUserID))
 			if err != nil {
 				return false, err
 			}
-			err = h.hpcLogic.UpdateUserQuotaSizeByUsername(c, info.ID, info.NodeUsername, int(req.NewMaxQuotaTB))
-			if err != nil {
-				return false, errors.New("set max quota size error")
+			// 先判断用户存储信息是否初始化
+			if info.NodeMaxQuota == 0 {
+				nowTime := time.Now()
+				// 初始化用户的存储期限为当前时间开始当前时间结束
+				status, err := h.hpcLogic.UpdateUserQuotaStartTimeByID(c, int(req.HpcUserID), nowTime.Unix())
+				if err != nil {
+					return false, err
+				}
+				info.QuotaEndTime = null.TimeFrom(nowTime)
+				status, err = h.hpcLogic.UpdateUserQuotaStartTimeByID(c, int(req.HpcUserID), nowTime.Unix())
+				if err != nil {
+					return false, err
+				}
 			}
-			// 如果用户当前的存储时间为null的话则初始化存储的使用期限时间
-			if !info.QuotaStartTime.Valid {
-				// 设置开始时间为当前时间
-				status, err := h.hpcLogic.UpdateUserQuotaStartTimeByID(c, int(req.HpcUserID), time.Now().Unix())
-				// 设置结束时间为当前时间的一年后
-				status, err = h.hpcLogic.UpdateUserQuotaEndTimeByID(c, int(req.HpcUserID), time.Now().Add(time.Duration(8760)*time.Hour).Unix())
-				return status, err
+			// 先延期
+			status, err := h.hpcLogic.UpdateUserQuotaEndTimeByID(c, int(req.HpcUserID), req.NewEndTimeUnix)
+			if err != nil {
+				return false, err
+			}
+			// 扩容
+			err = h.hpcLogic.UpdateUserQuotaSizeByUsername(c, int(req.HpcUserID), info.NodeUsername, int(req.NewMaxQuotaTB))
+			if err != nil {
+				return false, err
+			}
+			// 查询用户信息
+			userResp, err := h.userService.GetUserInfoByHpcID(c, &userpb.GetUserInfoByHpcIDRequest{
+				BaseRequest: req.BaseRequest,
+				HpcUserID:   req.HpcUserID,
+			})
+			if err != nil {
+				return false, err
+			}
+			_, err = h.feeService.CreateNodeQuotaModifyBill(c, &feepb.CreateNodeQuotaModifyBillRequest{
+				BaseRequest:     req.BaseRequest,
+				UserID:          userResp.Info.Id,
+				OldSize:         int32(info.NodeMaxQuota),
+				NewSize:         req.NewMaxQuotaTB,
+				OldEndTimeUnix:  info.QuotaEndTime.Time.Unix(),
+				NewEndTimeUnix:  req.NewEndTimeUnix,
+				QuotaSizeModify: !req.SetDate,
+			})
+			if err != nil {
+				return false, err
 			}
 			return true, nil
-		})
-		err = newErr
-		status = statusInterface.(bool)
-	}
-	resp.Success = status
-	if err != nil {
-		return err
-	}
-	// TODO: 创建对应的扩容/延时账单
-	return nil
+		},
+	)
+	resp.Success = statusInterface.(bool)
+	return err
 }
 
 var _ hpcproto.HpcHandler = (*HpcService)(nil)
@@ -554,5 +580,6 @@ func NewHpc(client client.Client, hpcLogic *logic.HpcLogic) *HpcService {
 		hpcLogic:         hpcLogic,
 		userService:      userpb.NewUserService("user", client),
 		userGroupService: userpb.NewGroupService("user", client),
+		feeService:       feepb.NewFeeService("fee", client),
 	}
 }

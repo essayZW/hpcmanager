@@ -3,14 +3,25 @@ package logic
 import (
 	"context"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/fee/db"
-	"github.com/essayZW/hpcmanager/logger"
+	"github.com/essayZW/hpcmanager/fee/utils"
 )
 
+type NodeQuotaFeeRate struct {
+	mutex sync.Mutex
+	// basicPerYearPerTB 基本存储1TB/年,指的是最初初始化的1TB 1年的空间的费率
+	basicPerYearPerTB float64
+	// extraPerYearPerTB 额外的存储1TB/年
+	extraPerYearPerTB float64
+}
+
 type NodeQuotaBill struct {
+	NodeQuotaFeeRate
+
 	nodeQuotaBillDB *db.NodeQuotaBillDB
 }
 
@@ -62,16 +73,44 @@ func (this *NodeQuotaBill) CreateNewBill(ctx context.Context, param *CreateNewBi
 
 // CalFee 计算费用
 func (this *NodeQuotaBill) CalFee(oldSize, newSize int, oldEndTime, newEndTime time.Time) float64 {
-	// TODO: need implement
-	logger.Fatal("need implement")
-	return 0
+	yearDuration := utils.CalYearDuration(oldEndTime, newEndTime)
+	if yearDuration == 0 {
+		yearDuration = 1
+	}
+
+	var quotaFee float64
+	if newSize > 1 {
+		quotaFee = this.basicPerYearPerTB + float64(newSize-1)*this.extraPerYearPerTB
+	} else {
+		quotaFee = this.basicPerYearPerTB
+	}
+	return quotaFee * yearDuration
 }
 
 // NewNodeQuotaBill 创建新的节点存储账单操作逻辑
 func NewNodeQuotaBill(nodeQuotaBillDB *db.NodeQuotaBillDB, dynamicConfig config.DynamicConfig) (*NodeQuotaBill, error) {
-	return &NodeQuotaBill{
+	res := &NodeQuotaBill{
 		nodeQuotaBillDB: nodeQuotaBillDB,
-	}, nil
+	}
+
+	var basicFeeRate float64
+	var extraFeeRate float64
+
+	err := dynamicConfig.Registry("fee_rate_Quota_basic", &basicFeeRate, func(newV interface{}) {
+		res.mutex.Lock()
+		defer res.mutex.Unlock()
+		res.basicPerYearPerTB = basicFeeRate
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	err = dynamicConfig.Registry("fee_rate_Quota_extra", &extraFeeRate, func(newV interface{}) {
+		res.mutex.Lock()
+		defer res.mutex.Unlock()
+		res.extraPerYearPerTB = extraFeeRate
+	})
+	return res, nil
 }
 
 // QuotaOperationType 存储操作类型
