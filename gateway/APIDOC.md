@@ -216,6 +216,28 @@ map[string]interface{}{
 }
 ```
 
+### /hpc/quota
+
+Method: PUT
+
+描述: 修改用户存储信息
+
+参数:
+
+```go
+// SetUserQuotaParam 设置用户存储信息参数
+type SetUserQuotaParam struct {
+    HpcUserID           int   `form:"hpcUserID"           json:"hpcUserID"           binding:"required"`
+    OldSize             int   `form:"oldSize"             json:"oldSize"             binding:"required"`
+    NewSize             int   `form:"newSize"             json:"newSize"             binding:"required"`
+    OldEndTimeMilliUnix int64 `form:"oldEndTimeMilliUnix" json:"oldEndTimeMilliUnix" binding:"required"`
+    NewEndTimeMilliUnix int64 `form:"newEndTimeMilliUnix" json:"newEndTimeMilliUnix" binding:"required"`
+    ModifyData          bool  `form:"modifyData"          json:"modifyData"`
+}
+```
+
+响应: 是否修改成功
+
 ## permission 控制器
 
 ### /permission/ping

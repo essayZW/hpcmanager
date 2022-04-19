@@ -9,6 +9,7 @@ import (
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
 	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
+	"github.com/essayZW/hpcmanager/gateway/request/json"
 	"github.com/essayZW/hpcmanager/gateway/response"
 	hpcpb "github.com/essayZW/hpcmanager/hpc/proto"
 	"github.com/essayZW/hpcmanager/logger"
@@ -126,6 +127,43 @@ func (hpc *Hpc) queryUserQuota(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+func (hpc *Hpc) setUserQuota(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.SetUserQuotaParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	newEndTime := time.UnixMilli(param.NewEndTimeMilliUnix)
+	resp, err := hpc.hpcService.SetQuotaByHpcUserID(c, &hpcpb.SetQuotaByHpcUserIDRequest{
+		BaseRequest:    baseRequest,
+		HpcUserID:      int32(param.HpcUserID),
+		NewMaxQuotaTB:  int32(param.NewSize),
+		NewEndTimeUnix: newEndTime.Unix(),
+		SetDate:        param.ModifyData,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("修改用户存储信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "修改用户存储信息失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
 // Registry 注册相应的处理函数
 func (hpc *Hpc) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller hpc")
@@ -136,6 +174,7 @@ func (hpc *Hpc) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	hpcRouter.GET("/user/:id", hpc.getUserByID)
 	hpcRouter.GET("/group/:id", hpc.getGroupByID)
 	hpcRouter.GET("/quota/:hpcID", hpc.queryUserQuota)
+	hpcRouter.PUT("/quota", hpc.setUserQuota)
 	return hpcRouter
 }
 
