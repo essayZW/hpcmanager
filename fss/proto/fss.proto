@@ -6,8 +6,20 @@ package fss;
 
 import "proto/ping.proto";
 import "proto/common.proto";
+import "gateway/proto/baserequest.proto";
 
 service FssService {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+    rpc StoreFile(StoreFileRequest) returns (StoreFileResponse) {}
+}
+
+message StoreFileRequest {
+    request.BaseRequest baseRequest = 1;
+    string fileName = 2;
+    bytes file = 3;
+}
+
+message StoreFileResponse {
+    string filePath = 1;
 }
 

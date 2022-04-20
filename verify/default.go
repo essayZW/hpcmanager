@@ -204,6 +204,10 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			StoreFile: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
 		},
 	}
 }

@@ -5,6 +5,7 @@ package fss
 
 import (
 	fmt "fmt"
+	_ "github.com/essayZW/hpcmanager/gateway/proto"
 	proto1 "github.com/essayZW/hpcmanager/proto"
 	proto "google.golang.org/protobuf/proto"
 	math "math"
@@ -38,6 +39,7 @@ func NewFssServiceEndpoints() []*api.Endpoint {
 
 type FssService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
+	StoreFile(ctx context.Context, in *StoreFileRequest, opts ...client.CallOption) (*StoreFileResponse, error)
 }
 
 type fssService struct {
@@ -62,15 +64,27 @@ func (c *fssService) Ping(ctx context.Context, in *proto1.Empty, opts ...client.
 	return out, nil
 }
 
+func (c *fssService) StoreFile(ctx context.Context, in *StoreFileRequest, opts ...client.CallOption) (*StoreFileResponse, error) {
+	req := c.c.NewRequest(c.name, "FssService.StoreFile", in)
+	out := new(StoreFileResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for FssService service
 
 type FssServiceHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
+	StoreFile(context.Context, *StoreFileRequest, *StoreFileResponse) error
 }
 
 func RegisterFssServiceHandler(s server.Server, hdlr FssServiceHandler, opts ...server.HandlerOption) error {
 	type fssService interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
+		StoreFile(ctx context.Context, in *StoreFileRequest, out *StoreFileResponse) error
 	}
 	type FssService struct {
 		fssService
@@ -85,4 +99,8 @@ type fssServiceHandler struct {
 
 func (h *fssServiceHandler) Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error {
 	return h.FssServiceHandler.Ping(ctx, in, out)
+}
+
+func (h *fssServiceHandler) StoreFile(ctx context.Context, in *StoreFileRequest, out *StoreFileResponse) error {
+	return h.FssServiceHandler.StoreFile(ctx, in, out)
 }

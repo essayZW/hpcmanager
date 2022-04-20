@@ -11,3 +11,4 @@ redis:
   address: 172.17.0.4:6379
   password:
   db: 0
+fileStorePath: /file
