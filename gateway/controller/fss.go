@@ -48,7 +48,7 @@ func (f *fss) uploadFile(ctx *gin.Context) {
 		httpResp.Send(ctx)
 		return
 	}
-	logger.Debug("upload file: ", fileHeader)
+	logger.Debug("upload file: ", fileHeader.Filename)
 	uploadedFile, err := fileHeader.Open()
 	if err != nil {
 		logger.Warn(err)
