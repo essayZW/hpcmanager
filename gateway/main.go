@@ -96,6 +96,8 @@ func main() {
 	feeController.Registry(api)
 	fssController := controller.NewFss(serviceClient)
 	fssController.Registry(api)
+	awardController := controller.NewAward(serviceClient)
+	awardController.Registry(api)
 
 	// 注册404处理
 	server.NoRoute(func(c *gin.Context) {

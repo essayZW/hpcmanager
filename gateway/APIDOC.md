@@ -980,3 +980,15 @@ Method: GET
 参数：无
 
 响应：请求 ID、PONG
+
+## award 控制器
+
+### /award/ping
+
+Method: GET
+
+描述：进行 group 服务的 ping 测试
+
+参数：无
+
+响应：请求 ID、PONG
