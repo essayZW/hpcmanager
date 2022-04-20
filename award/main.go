@@ -2,9 +2,12 @@ package main
 
 import (
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
+	awarddb "github.com/essayZW/hpcmanager/award/db"
+	"github.com/essayZW/hpcmanager/award/logic"
 	awardpb "github.com/essayZW/hpcmanager/award/proto"
 	"github.com/essayZW/hpcmanager/award/service"
 	"github.com/essayZW/hpcmanager/config"
+	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/registry"
@@ -28,11 +31,18 @@ func main() {
 		micro.Name("award"),
 		micro.Registry(etcdRegistry),
 	)
+	// 创建数据库连接
+	sqldb, err := db.NewDB()
+	if err != nil {
+		logger.Fatal("MySQL conn error: ", err)
+	}
 
 	serviceClient := srv.Client()
 	serviceServer := srv.Server()
 
-	awardService := service.NewAward(serviceClient)
+	paperAwardLogic := logic.NewPaper(awarddb.NewPaperAward(sqldb))
+
+	awardService := service.NewAward(serviceClient, paperAwardLogic)
 	awardpb.RegisterAwardServiceHandler(serviceServer, awardService)
 
 	srv.Init()
