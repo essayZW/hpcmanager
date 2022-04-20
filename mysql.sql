@@ -261,13 +261,13 @@ CREATE TABLE `paper_apply` (
   `creater_name` varchar(32) NOT NULL,
   `create_time` timestamp NOT NULL,
   `user_group_id` int NOT NULL,
-  `tutor_id` timestamp NOT NULL,
+  `tutor_id` int NOT NULL,
   `tutor_username` varchar(32) NOT NULL,
   `tutor_name` varchar(32) NOT NULL,
   `paper_title` varchar(256) NOT NULL,
   `paper_category` varchar(128) NOT NULL,
   `paper_partition` varchar(32) NOT NULL,
-  `papaer_firstpage_img` varchar(512) NOT NULL,
+  `paper_firstpage_img` varchar(512) NOT NULL,
   `paper_thankspage_img` varchar(512) NOT NULL,
   `remark_message` varchar(512) DEFAULT NULL,
   `check_status` tinyint DEFAULT '-1',
@@ -470,4 +470,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-04-20 20:01:08
+-- Dump completed on 2022-04-20 20:19:36
