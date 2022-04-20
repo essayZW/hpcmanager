@@ -78,6 +78,8 @@ const (
 	PayNodeQuotaBill = "__PAY_NODE_QUOTA_BILL__"
 	// StoreFile 存储文件
 	StoreFile = "__STORE_FILE__"
+	// CreatePaperAward 创建论文奖励申请
+	CreatePaperAward = "__CREATE_PAPER_AWARD__"
 )
 
 // Verify 进行操作的权限验证

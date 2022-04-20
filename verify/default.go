@@ -204,7 +204,13 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			// 需要普通权限以上
 			StoreFile: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 需要普通权限以上
+			CreatePaperAward: {
 				maxLevel: MaxLevel,
 				minLevel: Common,
 			},

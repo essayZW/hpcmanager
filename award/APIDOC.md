@@ -25,3 +25,31 @@ message PingResponse {
     string RequestId = 3;
 }
 ```
+
+## CreatePaperAward
+
+描述: 创建论文奖励申请
+
+原型定义: `rpc CreatePaperAward(CreatePaperAwardRequest) returns (CreatePaperAwardResponse) {}`
+
+请求参数:
+
+```protobuf
+message CreatePaperAwardRequest {
+    request.BaseRequest baseRequest = 1;
+    string title = 2;
+    string category = 3;
+    string partition = 4;
+    string firstPageImageName = 5;
+    string thanksPageImageName = 6;
+    string remarkMessage = 7;
+}
+```
+
+响应参数:
+
+```protobuf
+message CreatePaperAwardResponse {
+    int32 id = 1;
+}
+```
