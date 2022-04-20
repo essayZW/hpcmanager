@@ -948,3 +948,23 @@ Method: GET
 参数: 无
 
 响应: 费率信息
+
+### /fee/quota/bill
+
+Method: PUT
+
+描述: 支付机器存储账单
+
+参数:
+
+```protobuf
+// PayNodeQuotaBillParam 支付机器存储账单参数
+type PayNodeQuotaBillParam struct {
+    BillID     int     `form:"billID"     json:"billID"     binding:"required"`
+    PayType    int     `form:"payType"    json:"payType"    binding:"required"`
+    PayMessage string  `form:"payMessage" json:"payMessage"`
+    PayMoney   float64 `form:"payMoney"   json:"payMoney"   binding:"required"`
+}
+```
+
+响应: 是否支付成功

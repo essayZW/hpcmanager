@@ -348,6 +348,44 @@ func (f *fee) getNodeQuotaFeeRate(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// payNodeQuotaBill 支付机器存储账单
+func (f *fee) payNodeQuotaBill(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.PayNodeQuotaBillParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, "参数验证失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := f.feeService.PayNodeQuotaBill(c, &feepb.PayNodeQuotaBillRequest{
+		BaseRequest: baseRequest,
+		BillID:      int32(param.BillID),
+		PayType:     int32(param.PayType),
+		PayMessage:  param.PayMessage,
+		PayMoney:    param.PayMoney,
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("支付账单失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "支付账单失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter := router.Group("/fee")
 
@@ -366,6 +404,7 @@ func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter.PUT("/usage/group/bill", f.payGroupNodeUsageBill)
 
 	feeRouter.GET("/quota", f.paginationGetNodeQuotaBills)
+	feeRouter.PUT("/quota/bill", f.payNodeQuotaBill)
 	return feeRouter
 }
 
