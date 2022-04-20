@@ -273,6 +273,7 @@ CREATE TABLE `paper_apply` (
   `check_status` tinyint DEFAULT '-1',
   `checker_id` int DEFAULT NULL,
   `checker_name` varchar(32) DEFAULT NULL,
+  `checker_username` varchar(32) DEFAULT NULL,
   `check_money` decimal(18,2) DEFAULT '0.00',
   `check_message` varchar(512) DEFAULT NULL,
   `check_time` timestamp NULL DEFAULT NULL,
@@ -469,4 +470,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-04-20 18:19:56
+-- Dump completed on 2022-04-20 20:01:08
