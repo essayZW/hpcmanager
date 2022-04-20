@@ -179,6 +179,31 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			// 需要普通权限以上
+			QueryUserHpcQuota: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 需要普通管理员及以上权限
+			UpdateUserHpcQuota: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			// 需要普通管理员及以上权限
+			CreateNodeQuotaModifyBill: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
+			// 需要普通权限以上
+			QueryNodeQuotaBill: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 需要普通管理员及以上权限
+			PayNodeQuotaBill: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
 		},
 	}
 }

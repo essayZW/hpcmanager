@@ -47,7 +47,7 @@ func (user *User) ping(ctx *gin.Context) {
 func (user *User) login(ctx *gin.Context) {
 	var params jsonparam.Login
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		rep := response.New(500, err.Error(), false, "用户名或者密码格式错误")
+		rep := response.New(500, "参数验证失败", false, "用户名或者密码格式错误")
 		rep.Send(ctx)
 		return
 	}
@@ -207,7 +207,7 @@ func (user *User) updateUserInfo(ctx *gin.Context) {
 
 	var param json.UpdateUserInfoParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}
@@ -240,7 +240,7 @@ func (user *User) createUserByAdmin(ctx *gin.Context) {
 
 	var param json.CreateUserWithGroup
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}

@@ -197,6 +197,47 @@ message HpcGroup {
 }
 ```
 
+### /hpc/quota/:hpcID
+
+Method: GET
+
+描述: 通过用户 hpc ID 查询用户存储信息
+
+参数: hpcID
+
+响应:
+
+```go
+map[string]interface{}{
+        "used":          resp.Used,
+        "max":           resp.Max,
+        "startTimeUnix": resp.StartTimeUnix,
+        "endTimeUnix":   resp.EndTimeUnix,
+}
+```
+
+### /hpc/quota
+
+Method: PUT
+
+描述: 修改用户存储信息
+
+参数:
+
+```go
+// SetUserQuotaParam 设置用户存储信息参数
+type SetUserQuotaParam struct {
+    HpcUserID           int   `form:"hpcUserID"           json:"hpcUserID"           binding:"required"`
+    OldSize             int   `form:"oldSize"             json:"oldSize"             binding:"required"`
+    NewSize             int   `form:"newSize"             json:"newSize"             binding:"required"`
+    OldEndTimeMilliUnix int64 `form:"oldEndTimeMilliUnix" json:"oldEndTimeMilliUnix" binding:"required"`
+    NewEndTimeMilliUnix int64 `form:"newEndTimeMilliUnix" json:"newEndTimeMilliUnix" binding:"required"`
+    ModifyData          bool  `form:"modifyData"          json:"modifyData"`
+}
+```
+
+响应: 是否修改成功
+
 ## permission 控制器
 
 ### /permission/ping
@@ -882,3 +923,48 @@ map[string]float64{
     "gpu": 0,
 }
 ```
+
+### /fee/quota
+
+Method: GET
+
+描述: 分页查询机存储账单
+
+参数:
+
+```typescript
+pageIndex: number;
+pageSize: number;
+```
+
+响应: 分页查询的结果
+
+### /fee/rate/quota
+
+Method: GET
+
+描述: 查询机器存储费率
+
+参数: 无
+
+响应: 费率信息
+
+### /fee/quota/bill
+
+Method: PUT
+
+描述: 支付机器存储账单
+
+参数:
+
+```protobuf
+// PayNodeQuotaBillParam 支付机器存储账单参数
+type PayNodeQuotaBillParam struct {
+    BillID     int     `form:"billID"     json:"billID"     binding:"required"`
+    PayType    int     `form:"payType"    json:"payType"    binding:"required"`
+    PayMessage string  `form:"payMessage" json:"payMessage"`
+    PayMoney   float64 `form:"payMoney"   json:"payMoney"   binding:"required"`
+}
+```
+
+响应: 是否支付成功

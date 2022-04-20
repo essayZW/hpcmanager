@@ -15,7 +15,12 @@ type HpcSource interface {
 	AddUserWithGroup(userName string, groupName string) (map[string]interface{}, error)
 	// AddUserToGroup 添加用户到现有的用户组
 	AddUserToGroup(userName string, groupName string, gid int) (map[string]interface{}, error)
+	// GetNodeUsageWithDate 获取某段时间内的节点使用情况
 	GetNodeUsageWithDate(ctx context.Context, startTime, endTime time.Time) ([]*HpcNodeUsage, error)
+	// QuotaQuery 用户的存储信息查询
+	QuotaQuery(username string, fs string) (*QuotaUsageInfo, error)
+	// QuotaModify 修改用户的存储信息
+	QuotaModify(username string, fs string, mLimitTB int) error
 }
 
 // New 创建默认的作业调度源
@@ -38,4 +43,12 @@ type HpcNodeUsage struct {
 	QueueName string  `db:"Queue"`
 	WallTime  float64 `db:"WallTime"`
 	GWallTime float64 `db:"GpusWallTime"`
+}
+
+// QuotaUsageInfo 存储使用信息
+// NOTE: 作业调度系统中返回的存储数据不是纯数字数据，是带单位的容量数据
+// 比如0k, 1k, 1T这种
+type QuotaUsageInfo struct {
+	Used string
+	Max  string
 }

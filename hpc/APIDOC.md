@@ -174,6 +174,58 @@ message GetGroupInfoByGroupNameResponse {
 }
 ```
 
+## GetQuotaByHpcUserID
+
+描述: 通过计算节点用户的 ID 查询计算节点上的用户存储信息
+
+原型定义: `rpc GetQuotaByHpcUserID(GetQuotaByHpcUserIDRequest) returns (GetQuotaByHpcUserIDResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetQuotaByHpcUserIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcUserID = 2;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetQuotaByHpcUserIDResponse {
+    int32 used = 1;
+    int32 max = 2;
+    int64 startTimeUnix = 3;
+    int64 endTimeUnix = 4;
+}
+```
+
+## SetQuotaByHpcUserID
+
+描述: 修改用户的存储空间
+
+原型定义: `rpc SetQuotaByHpcUserID(SetQuotaByHpcUserIDRequest) returns (SetQuotaByHpcUserIDResponse) {}`
+
+请求参数:
+
+```protobuf
+message SetQuotaByHpcUserIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 hpcUserID = 2;
+    int32 newMaxQuotaTB = 3;
+    int64 newEndTimeUnix = 4;
+    bool setDate = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message SetQuotaByHpcUserIDResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## HpcUser

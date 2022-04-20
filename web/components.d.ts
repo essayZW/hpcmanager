@@ -14,7 +14,7 @@ declare module 'vue' {
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
-    ElCards: typeof import('element-plus/es')['ElCards'];
+    ElCards: typeof import('element-plus/es')['ElCards']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
@@ -38,6 +38,9 @@ declare module 'vue' {
     ElOption: typeof import('element-plus/es')['ElOption']
     ElPagination: typeof import('element-plus/es')['ElPagination']
     ElPopover: typeof import('element-plus/es')['ElPopover'];
+    ElRadio: typeof import('element-plus/es')['ElRadio']
+    ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
+    ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElResult: typeof import('element-plus/es')['ElResult'];
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSelect: typeof import('element-plus/es')['ElSelect']
@@ -53,6 +56,7 @@ declare module 'vue' {
     GroupWeekUsageTable: typeof import('./src/components/GroupWeekUsageTable.vue')['default']
     IEpArrowDown: typeof import('~icons/ep/arrow-down')['default']
     IEpAvatar: typeof import('~icons/ep/avatar')['default']
+    IIcBaselineArrowRightAlt: typeof import('~icons/ic/baseline-arrow-right-alt')['default']
     IIcRoundRefresh: typeof import('~icons/ic/round-refresh')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     MainIndex: typeof import('./src/components/MainIndex.vue')['default']
@@ -61,6 +65,8 @@ declare module 'vue' {
     NodeDistributeBillManager: typeof import('./src/components/common/NodeDistributeBillManager.vue')['default']
     NodeDistributeBillTable: typeof import('./src/components/NodeDistributeBillTable.vue')['default']
     NodeDistributeManager: typeof import('./src/components/admin/NodeDistributeManager.vue')['default']
+    NodeQuotaBillManager: typeof import('./src/components/common/NodeQuotaBillManager.vue')['default']
+    NodeQuotaBillTable: typeof import('./src/components/NodeQuotaBillTable.vue')['default']
     NodeTypeSelect: typeof import('./src/components/form/NodeTypeSelect.vue')['default']
     NodeUsageBillManager: typeof import('./src/components/common/NodeUsageBillManager.vue')['default']
     NodeUsageBillTable: typeof import('./src/components/NodeUsageBillTable.vue')['default']

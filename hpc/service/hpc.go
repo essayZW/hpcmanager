@@ -3,8 +3,10 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/essayZW/hpcmanager/db"
+	feepb "github.com/essayZW/hpcmanager/fee/proto"
 	"github.com/essayZW/hpcmanager/hpc/logic"
 	hpcproto "github.com/essayZW/hpcmanager/hpc/proto"
 	"github.com/essayZW/hpcmanager/logger"
@@ -12,13 +14,16 @@ import (
 	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
 	"go-micro.dev/v4/client"
+	"gopkg.in/guregu/null.v4"
 )
 
 // HpcService hpc服务
 type HpcService struct {
-	hpcLogic         *logic.HpcLogic
+	hpcLogic *logic.HpcLogic
+
 	userService      userpb.UserService
 	userGroupService userpb.GroupService
+	feeService       feepb.FeeService
 }
 
 // Ping ping测试
@@ -427,6 +432,162 @@ func (h *HpcService) GetGroupInfoByGroupName(
 	return nil
 }
 
+// GetQuotaByHpcUserID 通过计算节点用户ID查询用户存储情况信息
+func (h *HpcService) GetQuotaByHpcUserID(
+	ctx context.Context,
+	req *hpcproto.GetQuotaByHpcUserIDRequest,
+	resp *hpcproto.GetQuotaByHpcUserIDResponse,
+) error {
+	logger.Info("GetQuotaByHpcUserID: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryUserHpcQuota, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryUserHpcQuota permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryUserHpcQuota permission forbidden")
+	}
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	if !isTutor && !isAdmin {
+		// 普通用户,需判断自己是不是该hpc_user的记录对应者
+		userResp, err := h.userService.GetUserInfo(ctx, &userpb.GetUserInfoRequest{
+			Userid:      req.BaseRequest.UserInfo.UserId,
+			BaseRequest: req.BaseRequest,
+		})
+		if err != nil {
+			return errors.New("user info get error")
+		}
+		if userResp.UserInfo.HpcUserID != req.HpcUserID {
+			return errors.New("user only can query self hpc user info")
+		}
+	} else if !isAdmin && isTutor {
+		// 导师用户,需判断该hpc_user对应的用户是否属于自己的组
+		userResp, err := h.userService.GetUserInfoByHpcID(ctx, &userpb.GetUserInfoByHpcIDRequest{
+			BaseRequest: req.BaseRequest,
+			HpcUserID:   req.HpcUserID,
+		})
+		if err != nil {
+			return errors.New("user info get error")
+		}
+		if userResp.Info.GroupId != req.BaseRequest.UserInfo.GroupId {
+			return errors.New("tutor only can query self group's user info")
+		}
+	}
+	// 先查询对应的HPC用户信息
+	userInfo, err := h.hpcLogic.GetUserInfoByID(ctx, int(req.HpcUserID))
+	if err != nil {
+		return err
+	}
+	if !userInfo.QuotaStartTime.Valid || !userInfo.QuotaEndTime.Valid {
+		return errors.New("no quota info")
+	}
+	res, err := h.hpcLogic.GetUserQuotaByUsername(ctx, userInfo.NodeUsername)
+	if err != nil {
+		return errors.New("query quota info error")
+	}
+	resp.Used = res.Used
+	resp.Max = res.Max
+	resp.StartTimeUnix = userInfo.QuotaStartTime.Time.Unix()
+	resp.EndTimeUnix = userInfo.QuotaEndTime.Time.Unix()
+	return nil
+}
+
+// SetQuotaByHpcUserID 通过HPC ID 设置用户的存储信息
+func (h *HpcService) SetQuotaByHpcUserID(
+	ctx context.Context,
+	req *hpcproto.SetQuotaByHpcUserIDRequest,
+	resp *hpcproto.SetQuotaByHpcUserIDResponse,
+) error {
+	logger.Info("SetQuotaByHpcUserID: ", req.BaseRequest)
+	if !verify.Identify(verify.UpdateUserHpcQuota, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"UpdateUserHpcQuota permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("UpdateUserHpcQuota permission forbidden")
+	}
+	statusInterface, err := db.Transaction(
+		context.Background(),
+		func(c context.Context, i ...interface{}) (interface{}, error) {
+			info, err := h.hpcLogic.GetUserInfoByID(ctx, int(req.HpcUserID))
+			if err != nil {
+				return false, err
+			}
+			// 先判断用户存储信息是否初始化
+			if info.NodeMaxQuota == 0 {
+				nowTime := time.Now()
+				// 初始化用户的存储期限为当前时间开始当前时间结束
+				_, err := h.hpcLogic.UpdateUserQuotaStartTimeByID(c, int(req.HpcUserID), nowTime.Unix())
+				if err != nil {
+					return false, err
+				}
+				info.QuotaEndTime = null.TimeFrom(nowTime)
+				_, err = h.hpcLogic.UpdateUserQuotaStartTimeByID(c, int(req.HpcUserID), nowTime.Unix())
+				if err != nil {
+					return false, err
+				}
+			}
+			// 先延期
+			newEndTime := time.Unix(req.NewEndTimeUnix, 0)
+			if info.QuotaEndTime.Time.Year() != newEndTime.Year() || info.QuotaEndTime.Time.Month() != newEndTime.Month() ||
+				info.QuotaEndTime.Time.Day() != newEndTime.Day() {
+				if newEndTime.Before(info.QuotaEndTime.Time) {
+					return false, errors.New("new end time can't before old end time")
+				}
+
+				status, err := h.hpcLogic.UpdateUserQuotaEndTimeByID(c, int(req.HpcUserID), req.NewEndTimeUnix)
+				if err != nil {
+					return status, err
+				}
+				if !status {
+					return status, errors.New("no change")
+				}
+			}
+			if req.NewMaxQuotaTB != int32(info.NodeMaxQuota) {
+				if req.NewMaxQuotaTB < int32(info.NodeMaxQuota) {
+					return false, errors.New("new size can't less than old size")
+				}
+				// 扩容
+				err = h.hpcLogic.UpdateUserQuotaSizeByUsername(c, int(req.HpcUserID), info.NodeUsername, int(req.NewMaxQuotaTB))
+				if err != nil {
+					return false, err
+				}
+			}
+			// 查询用户信息
+			userResp, err := h.userService.GetUserInfoByHpcID(c, &userpb.GetUserInfoByHpcIDRequest{
+				BaseRequest: req.BaseRequest,
+				HpcUserID:   req.HpcUserID,
+			})
+			if err != nil {
+				return false, err
+			}
+			_, err = h.feeService.CreateNodeQuotaModifyBill(c, &feepb.CreateNodeQuotaModifyBillRequest{
+				BaseRequest:     req.BaseRequest,
+				UserID:          userResp.Info.Id,
+				OldSize:         int32(info.NodeMaxQuota),
+				NewSize:         req.NewMaxQuotaTB,
+				OldEndTimeUnix:  info.QuotaEndTime.Time.Unix(),
+				NewEndTimeUnix:  req.NewEndTimeUnix,
+				QuotaSizeModify: !req.SetDate,
+			})
+			if err != nil {
+				return false, err
+			}
+			return true, nil
+		},
+	)
+	resp.Success = statusInterface.(bool)
+	return err
+}
+
 var _ hpcproto.HpcHandler = (*HpcService)(nil)
 
 // NewHpc 新建一个Hpc服务
@@ -435,5 +596,6 @@ func NewHpc(client client.Client, hpcLogic *logic.HpcLogic) *HpcService {
 		hpcLogic:         hpcLogic,
 		userService:      userpb.NewUserService("user", client),
 		userGroupService: userpb.NewGroupService("user", client),
+		feeService:       feepb.NewFeeService("fee", client),
 	}
 }

@@ -48,6 +48,10 @@ const refreshTableData = async (pageIndex: number, pageSize: number) => {
       message: data,
     });
   }
+  // 清空扩展行的缓存
+  for (const index in tableRowExtraInfo) {
+    tableRowExtraInfo[index] = {};
+  }
   tableData.data = (data as PaginationQueryResponse<GroupInfo>).Data;
   tableData.count = (data as PaginationQueryResponse<GroupInfo>).Count;
 };

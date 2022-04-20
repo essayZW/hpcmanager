@@ -81,7 +81,7 @@ func (ug *UserGroup) createGroup(ctx *gin.Context) {
 
 	param := json.CreateGroupParam{}
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}
@@ -210,7 +210,7 @@ func (ug *UserGroup) createJoinGroupApply(ctx *gin.Context) {
 
 	var param json.CreateJoinGroupApplyParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}
@@ -240,7 +240,7 @@ func (ug *UserGroup) checkApply(ctx *gin.Context) {
 
 	var param json.CheckJoinGroupApplyParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, "参数验证失败:"+err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}
@@ -305,7 +305,7 @@ func (ug *UserGroup) addBalance(ctx *gin.Context) {
 
 	var param json.AddGroupBalanceParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}

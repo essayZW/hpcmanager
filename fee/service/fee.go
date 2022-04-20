@@ -18,6 +18,7 @@ import (
 type FeeService struct {
 	nodeDistributeBillLogic *logic.NodeDistributeBill
 	nodeWeekUsageBillLogic  *logic.NodeWeekUsageBill
+	nodeQuotaBillLogic      *logic.NodeQuotaBill
 
 	nodeService      nodepb.NodeService
 	userService      userpb.UserService
@@ -500,6 +501,197 @@ func (fs *FeeService) GetNodeUsageFeeRate(
 	return nil
 }
 
+// CreateNodeQuotaModifyBill 创建用户存储扩容/延时的账单
+func (fs *FeeService) CreateNodeQuotaModifyBill(
+	ctx context.Context,
+	req *feepb.CreateNodeQuotaModifyBillRequest,
+	resp *feepb.CreateNodeQuotaModifyBillResponse,
+) error {
+	logger.Info("CreateNodeQuotaModifyBill: ", req.BaseRequest)
+	if !verify.Identify(verify.CreateNodeQuotaModifyBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"CreateNodeQuotaModifyBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("CreateNodeQuotaModifyBill permission forbidden")
+	}
+
+	userInfo, err := fs.userService.GetUserInfo(ctx, &userpb.GetUserInfoRequest{
+		BaseRequest: req.BaseRequest,
+		Userid:      req.UserID,
+	})
+	if err != nil {
+		return err
+	}
+	var operType logic.QuoatOperationType
+	if req.QuotaSizeModify {
+		operType = logic.ChangeQuotaSize
+	} else {
+		operType = logic.ChangeEndTime
+	}
+	id, err := fs.nodeQuotaBillLogic.CreateNewBill(context.Background(), &logic.CreateNewBillParam{
+		UserID:      int(req.UserID),
+		Username:    userInfo.UserInfo.Username,
+		UserName:    userInfo.UserInfo.Name,
+		UserGroupID: int(userInfo.UserInfo.GroupId),
+		OperType:    operType,
+		OldSize:     int(req.OldSize),
+		NewSize:     int(req.NewSize),
+		OldEndTime:  req.OldEndTimeUnix,
+		NewEndTime:  req.NewEndTimeUnix,
+	})
+	if err != nil {
+		return err
+	}
+	resp.Id = int32(id)
+	return nil
+}
+
+// PaginationGetNodeQuotaBill 分页查询机器节点存储账单
+func (fs *FeeService) PaginationGetNodeQuotaBill(
+	ctx context.Context,
+	req *feepb.PaginationGetNodeQuotaBillRequest,
+	resp *feepb.PaginationGetNodeQuotaBillResponse,
+) error {
+	logger.Info("PaginationGetNodeQuotaBill: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryNodeQuotaBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"QueryNodeQuotaBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryNodeQuotaBill permission forbidden")
+	}
+
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+
+	var infos *logic.PaginationGetNodeQuotaBillsResult
+	var err error
+	if !isAdmin && !isTutor {
+		// 普通学生用户,只能查看自己的存储账单
+		infos, err = fs.nodeQuotaBillLogic.PaginationGetNodeQuotaBillByUserID(
+			ctx,
+			int(req.BaseRequest.UserInfo.UserId),
+			int(req.PageIndex),
+			int(req.PageSize),
+		)
+	} else if !isAdmin && isTutor {
+		// 导师用户,只能查看自己组的存储账单
+		infos, err = fs.nodeQuotaBillLogic.PaginationGetNodeQuotaBillByGroupID(ctx, int(req.BaseRequest.UserInfo.GroupId), int(req.PageIndex), int(req.PageSize))
+	} else {
+		// 管理员用户,可以查看所有人的存储账单
+		infos, err = fs.nodeQuotaBillLogic.PaginationGetAllNodeQuotaBill(ctx, int(req.PageIndex), int(req.PageSize))
+	}
+
+	if err != nil {
+		return err
+	}
+
+	resp.Count = int32(infos.Count)
+	resp.Bills = make([]*feepb.NodeQuotaBill, len(infos.Data))
+	for index := range infos.Data {
+		resp.Bills[index] = &feepb.NodeQuotaBill{
+			Id:             int32(infos.Data[index].ID),
+			UserID:         int32(infos.Data[index].UserID),
+			Name:           infos.Data[index].UserName,
+			Username:       infos.Data[index].Username,
+			UserGroupID:    int32(infos.Data[index].UserGroupID),
+			OperType:       int32(infos.Data[index].OperType),
+			OldSize:        int32(infos.Data[index].OldSize),
+			NewSize:        int32(infos.Data[index].NewSize),
+			OldEndTimeUnix: infos.Data[index].OldEndTime.Unix(),
+			NewEndTimeUnix: infos.Data[index].NewEndTime.Unix(),
+			Fee:            infos.Data[index].Fee,
+			PayFlag:        int32(infos.Data[index].PayFlag),
+			PayFee:         infos.Data[index].PayFee,
+			PayTimeUnix:    infos.Data[index].PayTime.Time.Unix(),
+			PayType:        int32(infos.Data[index].PayType.Int64),
+			PayMessage:     infos.Data[index].PayMessage.String,
+			CreateTime:     infos.Data[index].CreateTime.Unix(),
+		}
+		if infos.Data[index].ExtraAttributes != nil {
+			resp.Bills[index].ExtraAttributes = infos.Data[index].ExtraAttributes.String()
+		}
+	}
+	return nil
+}
+
+// GetNodeQuotaFeeRate 查询机器存储费率
+func (fs *FeeService) GetNodeQuotaFeeRate(
+	ctx context.Context,
+	req *feepb.GetNodeQuotaFeeRateRequest,
+	resp *feepb.GetNodeQuotaFeeRateResponse,
+) error {
+	logger.Info("GetNodeQuotaFeeRate: ", req.BaseRequest)
+	resp.Basic = fs.nodeQuotaBillLogic.GetBasic()
+	resp.Extra = fs.nodeQuotaBillLogic.GetExtra()
+	return nil
+}
+
+// PayNodeQuotaBill 支付机器存储账单
+func (fs *FeeService) PayNodeQuotaBill(
+	ctx context.Context,
+	req *feepb.PayNodeQuotaBillRequest,
+	resp *feepb.PayNodeQuotaBillResponse,
+) error {
+	logger.Info("PayNodeQuotaBill: ", req.BaseRequest)
+	if !verify.Identify(verify.PayNodeQuotaBill, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"PayNodeQuotaBill permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("PayNodeQuotaBill permission forbidden")
+	}
+
+	status, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		status, err := fs.nodeQuotaBillLogic.PayBill(
+			c,
+			int(req.BillID),
+			req.PayMoney,
+			logic.PayType(req.PayType),
+			req.PayMessage,
+		)
+		if err != nil {
+			return status, err
+		}
+
+		if req.PayType == int32(logic.OfflinePay) {
+			// 线下缴费
+			return status, nil
+		}
+		// 余额缴费
+		bill, err := fs.nodeQuotaBillLogic.GetInfoByID(c, int(req.BillID))
+		if err != nil {
+			return false, err
+		}
+
+		_, err = fs.userGroupService.AddBalance(c, &userpb.AddBalanceRequest{
+			BaseRequest: req.BaseRequest,
+			GroupID:     int32(bill.UserGroupID),
+			Money:       -req.PayMoney,
+		})
+		if err != nil {
+			return false, err
+		}
+		return status, nil
+	})
+
+	resp.Success = status.(bool)
+	return err
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务
@@ -507,6 +699,7 @@ func NewFee(
 	client client.Client,
 	nodeDistributeBillLogic *logic.NodeDistributeBill,
 	nodeWeekUsageBillLogic *logic.NodeWeekUsageBill,
+	nodeQuotaBillLogic *logic.NodeQuotaBill,
 ) *FeeService {
 	nodeService := nodepb.NewNodeService("node", client)
 	userService := userpb.NewUserService("user", client)
@@ -514,6 +707,7 @@ func NewFee(
 	return &FeeService{
 		nodeDistributeBillLogic: nodeDistributeBillLogic,
 		nodeWeekUsageBillLogic:  nodeWeekUsageBillLogic,
+		nodeQuotaBillLogic:      nodeQuotaBillLogic,
 		nodeService:             nodeService,
 		userService:             userService,
 		userGroupService:        userGroupService,

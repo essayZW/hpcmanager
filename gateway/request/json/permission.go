@@ -10,7 +10,7 @@ import (
 func init() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		createCommonAdminParam := &ChangeUserPermissionParam{}
-		v.RegisterStructValidation(createCommonAdminParam.Validator(), &createCommonAdminParam)
+		v.RegisterStructValidation(createCommonAdminParam.Validator(), createCommonAdminParam)
 	}
 }
 

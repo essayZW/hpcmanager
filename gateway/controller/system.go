@@ -31,7 +31,7 @@ type System struct {
 func (sys *System) install(ctx *gin.Context) {
 	var params json.CreateUserParam
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		rep := response.New(500, err.Error(), false, "invalid user params")
+		rep := response.New(500, "参数验证失败", false, "invalid user params")
 		rep.Send(ctx)
 		return
 	}

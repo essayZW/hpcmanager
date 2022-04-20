@@ -146,6 +146,42 @@ func (hpc *HpcLogic) GetGroupInfoByName(ctx context.Context, name string) (*db.H
 	return hpc.hpcGroupDB.QueryByName(ctx, name)
 }
 
+func (hpc *HpcLogic) GetUserQuotaByUsername(ctx context.Context, username string) (*source.QuotaUsageInfo, error) {
+	// OPTIMIZE: 硬编码的fs参数应该进行优化
+	return hpc.hpcSource.QuotaQuery(username, "/data")
+}
+
+// UpdateUserQuotaSizeByUsername 通过hpc用户名更新用户存储空间的最大限制
+func (hpc *HpcLogic) UpdateUserQuotaSizeByUsername(
+	ctx context.Context,
+	hpcUserID int,
+	username string,
+	newMaxLimitTB int,
+) error {
+	// 先更改数据库中的数据
+	status, err := hpc.hpcUserDB.UpdateMaxQuotaByID(ctx, hpcUserID, newMaxLimitTB)
+	if err != nil {
+		return err
+	}
+	if !status {
+		return errors.New("update max quota error")
+	}
+	// OPTIMIZE: 硬编码的fs参数应该进行优化
+	return hpc.hpcSource.QuotaModify(username, "/data", newMaxLimitTB)
+}
+
+// UpdateUserQuotaEndTimeByID 更新用户存储使用期限的结束时间
+func (hpc *HpcLogic) UpdateUserQuotaEndTimeByID(ctx context.Context, hpcUserID int, endTimeUnix int64) (bool, error) {
+	endTime := time.Unix(endTimeUnix, 0)
+	return hpc.hpcUserDB.UpdateQuotaEndTime(ctx, hpcUserID, endTime)
+}
+
+// UpdateUserQuotaStartTimeByID 更新用户存储使用期限的开始时间
+func (hpc *HpcLogic) UpdateUserQuotaStartTimeByID(ctx context.Context, hpcUserID int, endTimeUnix int64) (bool, error) {
+	endTime := time.Unix(endTimeUnix, 0)
+	return hpc.hpcUserDB.UpdateQuotaStartTime(ctx, hpcUserID, endTime)
+}
+
 // NewHpc 创建一个HPC作业调度系统逻辑操作
 func NewHpc(
 	hpcSource source.HpcSource,

@@ -250,6 +250,109 @@ message GetNodeUsageFeeRateResponse {
 }
 ```
 
+## CreateNodeQuotaModifyBill
+
+描述: 创建机器存储账单
+
+原型定义: `rpc CreateNodeQuotaModifyBill(CreateNodeQuotaModifyBillRequest) returns (CreateNodeQuotaModifyBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message CreateNodeQuotaModifyBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 userID = 2;
+    int32 oldSize = 3;
+    int32 newSize = 4;
+    int64 oldEndTimeUnix = 5;
+    int64 newEndTimeUnix = 6;
+    bool quotaSizeModify = 7;
+}
+```
+
+响应参数:
+
+```protobuf
+message CreateNodeQuotaModifyBillResponse {
+    int32 id = 1;
+}
+```
+
+## PaginationGetNodeQuotaBill
+
+描述: 分页查询机器存储账单
+
+原型定义: `rpc PaginationGetNodeQuotaBill(PaginationGetNodeQuotaBillRequest) returns (PaginationGetNodeQuotaBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message PaginationGetNodeQuotaBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message PaginationGetNodeQuotaBillResponse {
+    int32 count = 1;
+    repeated fee.NodeQuotaBill bills = 2;
+}
+```
+
+## GetNodeQuotaFeeRate
+
+描述: 查询机器存储费率
+
+原型定义: `rpc GetNodeQuotaFeeRate(GetNodeQuotaFeeRateRequest) returns (GetNodeQuotaFeeRateResponse) {}`
+
+请求参数:
+
+```protobuf
+message GetNodeQuotaFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+}
+```
+
+响应参数:
+
+```protobuf
+message GetNodeQuotaFeeRateResponse {
+    double basic = 1;
+    double extra = 2;
+}
+
+```
+
+## PayNodeQuotaBill
+
+描述: 支付机器存储账单
+
+原型定义: `rpc PayNodeQuotaBill(PayNodeQuotaBillRequest) returns (PayNodeQuotaBillResponse) {}`
+
+请求参数:
+
+```protobuf
+message PayNodeQuotaBillRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 billID = 2;
+    double payMoney = 3;
+    int32 payType = 4;
+    string payMessage = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message PayNodeQuotaBillResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## NodeDistributeBill

@@ -1,4 +1,11 @@
-import { HpcGroup, getHpcGroupInfo, queryHpcUserInfo } from '../api/hpc';
+import {
+  HpcGroup,
+  getHpcGroupInfo,
+  queryHpcUserInfo,
+  UserQuotaInfo,
+  queryUserQuotaByUserHpcID,
+  setUserQuota,
+} from '../api/hpc';
 import { HpcUser, ping } from '../api/hpc';
 /**
  * 通过ID查询hpc_group信息
@@ -30,4 +37,32 @@ export async function servicePing(): Promise<boolean> {
   } catch (error) {
     return false;
   }
+}
+
+/**
+ * 查询用户存储使用情况信息
+ */
+export async function getHpcUserQuotaInfo(id: number): Promise<UserQuotaInfo> {
+  return queryUserQuotaByUserHpcID(id);
+}
+
+/**
+ * 修改用户存储信息
+ */
+export async function modifyUserQuotaInfo(
+  hpcUserID: number,
+  oldSize: number,
+  newSize: number,
+  oldEndTimeMilliUnix: number,
+  newEndTimeMilliUnix: number,
+  modifyDate: boolean
+): Promise<boolean> {
+  return setUserQuota({
+    hpcUserID,
+    oldSize,
+    newSize,
+    oldEndTimeMilliUnix,
+    newEndTimeMilliUnix,
+    modifyDate,
+  });
 }

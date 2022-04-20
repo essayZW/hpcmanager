@@ -7,8 +7,10 @@ import (
 
 	"github.com/asim/go-micro/plugins/registry/etcd/v4"
 	"github.com/essayZW/hpcmanager"
+	hpcbroker "github.com/essayZW/hpcmanager/broker"
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/db"
+	hpc_hpcbroker "github.com/essayZW/hpcmanager/hpc/broker"
 	hpcdb "github.com/essayZW/hpcmanager/hpc/db"
 	"github.com/essayZW/hpcmanager/hpc/logic"
 	hpcpb "github.com/essayZW/hpcmanager/hpc/proto"
@@ -87,6 +89,14 @@ func main() {
 	if err != nil {
 		logger.Fatal("hpcSource init error: ", err)
 	}
+
+	rabbitmqBroker, err := hpcbroker.NewRabbitmq()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	// 注册消费者
+	go hpc_hpcbroker.RegistryCustomer(rabbitmqBroker, serviceClient)
 
 	hpcLogic := logic.NewHpc(hpcSource, hpcdb.NewHpcUser(sqlConn), hpcdb.NewHpcGroup(sqlConn))
 

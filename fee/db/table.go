@@ -56,3 +56,25 @@ type NodeWeekUsageBillForUserGroup struct {
 	PayFlag     int8    `db:"pay_flag"`
 	UserGroupID int     `db:"user_group_id"`
 }
+
+// NodeQuotaBill 数据库中node_quota_bill表的映射
+type NodeQuotaBill struct {
+	ID              int         `db:"id"`
+	UserID          int         `db:"user_id"`
+	UserName        string      `db:"user_name"`
+	Username        string      `db:"user_username"`
+	UserGroupID     int         `db:"user_group_id"`
+	OperType        int8        `db:"oper_type"`
+	OldSize         int         `db:"old_size"`
+	NewSize         int         `db:"new_size"`
+	OldEndTime      time.Time   `db:"old_end_time"`
+	NewEndTime      time.Time   `db:"new_end_time"`
+	Fee             float64     `db:"fee"`
+	PayFlag         int8        `db:"pay_flag"`
+	PayFee          float64     `db:"pay_fee"`
+	PayTime         null.Time   `db:"pay_time"`
+	PayType         null.Int    `db:"pay_type"`
+	PayMessage      null.String `db:"pay_message"`
+	CreateTime      time.Time   `db:"create_time"`
+	ExtraAttributes *db.JSON    `db:"extraAttributes"`
+}

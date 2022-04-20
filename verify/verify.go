@@ -66,6 +66,16 @@ const (
 	QueryNodeWeekUsageBill = "__QUERY_NODE_WEEK_USAGE_BILL__"
 	// PayNodeUsageBill 支付机器节点机时账单
 	PayNodeUsageBill = "__PAY_NODE_USAGE_BILL__"
+	// QueryUserHpcQuota 查询用户的计算节点存储空间使用情况
+	QueryUserHpcQuota = "__QUERY_USER_HPC_QUOTA__"
+	// UpdateUserHpcQuota 更新用户计算节点存储信息
+	UpdateUserHpcQuota = "__UPDATE_USER_HPC_QUOTA__"
+	// CreateNodeQuotaModifyBill 创建用户拥有的机器节点容量/时间变化的账单
+	CreateNodeQuotaModifyBill = "__CREATE_NODE_QUOTA_MODIFY_BILL__"
+	// QueryNodeQuotaBill 查询机器存储账单
+	QueryNodeQuotaBill = "__QUERY_NODE_QUOTA_BILL__"
+	// PayNodeQuotaBill 支付机器存储账单
+	PayNodeQuotaBill = "__PAY_NODE_QUOTA_BILL__"
 )
 
 // Verify 进行操作的权限验证

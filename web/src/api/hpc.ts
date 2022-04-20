@@ -49,8 +49,8 @@ export type HpcUser = {
   nodeUsername: string;
   nodeUID: number;
   nodeMaxQuota: number;
-  nodeStartTime: number;
-  nodeEndTime: number;
+  quotaStartTime: number;
+  quotaEndTime: number;
   extraAttributes: string;
 };
 
@@ -65,4 +65,60 @@ export async function queryHpcUserInfo(id: number): Promise<HpcUser> {
     throw new Error(resp.message);
   }
   return resp.data;
+}
+
+/**
+ * 用户存储信息
+ */
+export type UserQuotaInfo = {
+  used: string;
+  max: string;
+  startTimeUnix: number;
+  endTimeUnix: number;
+};
+
+/**
+ * 通过用户HPC ID查询用户存储使用情况信息
+ */
+export async function queryUserQuotaByUserHpcID(
+  id: number
+): Promise<UserQuotaInfo> {
+  const resp = await ApiRequest.request<UserQuotaInfo>(
+    `/hpc/quota/${id}`,
+    'GET'
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}
+
+/**
+ * 设置用户的存储信息参数
+ */
+export type SetUserQuotaParam = {
+  hpcUserID: number;
+  oldSize: number;
+  newSize: number;
+  oldEndTimeMilliUnix: number;
+  newEndTimeMilliUnix: number;
+  modifyDate: boolean;
+};
+
+/**
+ * 设置用户的存储信息
+ */
+export async function setUserQuota(param: SetUserQuotaParam): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/hpc/quota',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
 }

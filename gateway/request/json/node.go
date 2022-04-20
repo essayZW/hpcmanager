@@ -10,9 +10,9 @@ import (
 func init() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		createNodeApplyParam := CreateNodeApplyParam{}
-		v.RegisterStructValidation(createNodeApplyParam.Validator(), &createNodeApplyParam)
+		v.RegisterStructValidation(createNodeApplyParam.Validator(), createNodeApplyParam)
 		checkNodeApplyParam := CheckNodeApplyParam{}
-		v.RegisterStructValidation(checkNodeApplyParam.Validator(), &checkNodeApplyParam)
+		v.RegisterStructValidation(checkNodeApplyParam.Validator(), checkNodeApplyParam)
 	}
 }
 

@@ -10,7 +10,7 @@ import (
 func init() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		createProjectParam := CreateProjectParam{}
-		v.RegisterStructValidation(createProjectParam.Validator(), &createProjectParam)
+		v.RegisterStructValidation(createProjectParam.Validator(), createProjectParam)
 	}
 }
 

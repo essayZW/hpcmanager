@@ -33,18 +33,6 @@ const Router: RouteRecordRaw[] = [
         localStorage.setItem(accessTokenKey, tokenValue);
         window.location.href = '/';
       }
-
-      // 判断是否已经登录,未登录跳转到登录页面
-      const info = await isLogin();
-      if (info == null) {
-        ElMessage({
-          type: 'error',
-          message: '未登录,请先登录',
-        });
-        return '/login';
-      }
-      // 存储用户信息到storage中
-      setUserInfoToStorage(info);
     },
     children: [
       {
@@ -114,8 +102,12 @@ router.beforeEach(async (to) => {
   const userInfo = await isLogin();
   if (userInfo == null) {
     registerFlag = false;
+    if (to.path != '/login') {
+      return '/login';
+    }
     return;
   }
+  setUserInfoToStorage(userInfo);
   if (!registerFlag) {
     const num = registryRouter('Main', router, userInfo.Levels);
     registerFlag = true;

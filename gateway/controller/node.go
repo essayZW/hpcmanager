@@ -45,7 +45,7 @@ func (n *node) createNodeApply(ctx *gin.Context) {
 
 	var param json.CreateNodeApplyParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}
@@ -115,7 +115,7 @@ func (n *node) checkNodeApply(ctx *gin.Context) {
 
 	var param json.CheckNodeApplyParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}
@@ -214,7 +214,7 @@ func (n *node) finishNodeDistributeByID(ctx *gin.Context) {
 
 	var param json.FinishNodeDistributeParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}
@@ -328,7 +328,7 @@ func (n *node) updateNodeApply(ctx *gin.Context) {
 
 	var param json.UpdateNodeApplyParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}

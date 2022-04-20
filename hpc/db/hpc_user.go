@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/essayZW/hpcmanager/db"
 	"go-micro.dev/v4/logger"
@@ -60,6 +61,62 @@ func (hpcdb *HpcUserDB) QueryByUsername(ctx context.Context, username string) (*
 		return nil, errors.New("Query error")
 	}
 	return &info, nil
+}
+
+// UpdateQuotaEndTime 更新用户存储的结束使用时间
+func (hpcdb *HpcUserDB) UpdateQuotaEndTime(ctx context.Context, hpcUserID int, endTime time.Time) (bool, error) {
+	res, err := hpcdb.conn.Exec(
+		ctx,
+		"UPDATE `hpc_user` SET `quota_end_time`=? WHERE `id`=? AND `quota_start_time`<?",
+		endTime,
+		hpcUserID,
+		endTime,
+	)
+	if err != nil {
+		logger.Warn("UpdateQuotaEndTime error: ", err)
+		return false, errors.New("UpdateQuotaEndTime error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateQuotaEndTime error: ", err)
+		return false, errors.New("UpdateQuotaEndTime error")
+	}
+	return count > 0, nil
+}
+
+// UpdateQuotaStartTime 更新用户存储的开始使用时间
+func (hpcdb *HpcUserDB) UpdateQuotaStartTime(ctx context.Context, hpcUserID int, endTime time.Time) (bool, error) {
+	res, err := hpcdb.conn.Exec(
+		ctx,
+		"UPDATE `hpc_user` SET `quota_start_time`=? WHERE `id`=?",
+		endTime,
+		hpcUserID,
+	)
+	if err != nil {
+		logger.Warn("UpdateQuotaStartTime error: ", err)
+		return false, errors.New("UpdateQuotaStartTime error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateQuotaStartTime error: ", err)
+		return false, errors.New("UpdateQuotaStartTime error")
+	}
+	return count > 0, nil
+}
+
+// UpdateMaxQuotaByID 更新最大的存储容量
+func (hpcdb *HpcUserDB) UpdateMaxQuotaByID(ctx context.Context, hpcUserID int, maxQuotaTB int) (bool, error) {
+	res, err := hpcdb.conn.Exec(ctx, "UPDATE `hpc_user` SET `node_max_quota`=? WHERE `id`=?", maxQuotaTB, hpcUserID)
+	if err != nil {
+		logger.Warn("UpdateMaxQuotaByID error: ", err)
+		return false, errors.New("UpdateMaxQuotaByID error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateMaxQuotaByID error: ", err)
+		return false, errors.New("UpdateMaxQuotaByID error")
+	}
+	return count > 0, nil
 }
 
 // NewHpcUser 创建新的NewHpcUser结构体并返回指针

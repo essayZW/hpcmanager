@@ -13,6 +13,11 @@ import {
   updateGroupNodeUsageBills,
   nodeUsageFeeRate,
   queryNodeUsageFeeRateInfo,
+  NodeQuotaBill,
+  paginationQueryNodeQuotaBill,
+  updateNodeQuotaBillPayInfo,
+  NodeQuotaFeeRate,
+  queryNodeQuotaFeeRate,
 } from '../api/fee';
 
 /**
@@ -125,4 +130,52 @@ export async function payGroupNodeUsageBills(
  */
 export async function getNodeUsageFeeRate(): Promise<nodeUsageFeeRate> {
   return queryNodeUsageFeeRateInfo();
+}
+
+/**
+ * 分页查询机器存储账单
+ */
+export async function paginationGetNodeQuotaBill(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<NodeQuotaBill>> {
+  return paginationQueryNodeQuotaBill(pageIndex, pageSize);
+}
+
+/**
+ * 操作类型转化为字符串
+ */
+export function operTypeToStr(operType: number): string {
+  switch (operType) {
+    case 1:
+      return '扩容';
+    case 2:
+      return '延期';
+    default:
+      return '未知';
+  }
+}
+
+/**
+ * payNodeQuotaBill 支付节点存储账单
+ */
+export async function payNodeQuotaBill(
+  billID: number,
+  payType: number,
+  payMoney: number,
+  payMessage: string
+): Promise<boolean> {
+  return updateNodeQuotaBillPayInfo({
+    billID,
+    payMessage,
+    payMoney,
+    payType,
+  });
+}
+
+/**
+ * 查询机器存储费率
+ */
+export async function getNodeQuotaFeeRate(): Promise<NodeQuotaFeeRate> {
+  return queryNodeQuotaFeeRate();
 }

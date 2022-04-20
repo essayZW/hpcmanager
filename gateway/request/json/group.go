@@ -11,17 +11,17 @@ func init() {
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		createUserParam := CreateGroupParam{}
-		v.RegisterStructValidation(createUserParam.Validator(), &createUserParam)
+		v.RegisterStructValidation(createUserParam.Validator(), createUserParam)
 		createJoinGroupApplyParam := CreateJoinGroupApplyParam{}
 		v.RegisterStructValidation(
 			createJoinGroupApplyParam.Validator(),
 			&createJoinGroupApplyParam,
 		)
 		checkJoinGroupApplyParam := CheckJoinGroupApplyParam{}
-		v.RegisterStructValidation(checkJoinGroupApplyParam.Validator(), &checkJoinGroupApplyParam)
+		v.RegisterStructValidation(checkJoinGroupApplyParam.Validator(), checkJoinGroupApplyParam)
 
 		addGroupBalanceParam := AddGroupBalanceParam{}
-		v.RegisterStructValidation(addGroupBalanceParam.Validator(), &addGroupBalanceParam)
+		v.RegisterStructValidation(addGroupBalanceParam.Validator(), addGroupBalanceParam)
 	}
 }
 

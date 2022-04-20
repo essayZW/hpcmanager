@@ -49,3 +49,24 @@ message NodeWeekUsageBillForUserGroup {
     double payFee = 4;
     int32 userGroupID = 6;
 }
+
+message NodeQuotaBill {
+    int32 id = 1;
+    int32 userID = 2;
+    string name = 3;
+    string username = 4;
+    int32 userGroupID = 5;
+    int32 operType = 6;
+    int32 oldSize = 7;
+    int32 newSize = 8;
+    int64 oldEndTimeUnix = 9;
+    int64 newEndTimeUnix = 10;
+    double fee = 11;
+    int32 payFlag = 12;
+    double payFee = 13;
+    int64 payTimeUnix = 14;
+    int32 payType = 15;
+    string payMessage = 16;
+    int64 createTime = 17;
+    string extraAttributes = 18;
+}

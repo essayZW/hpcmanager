@@ -46,7 +46,7 @@ func (permission *Permission) addAdmin(ctx *gin.Context) {
 
 	var param json.ChangeUserPermissionParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}
@@ -115,7 +115,7 @@ func (permission *Permission) removeAdmin(ctx *gin.Context) {
 
 	var param json.ChangeUserPermissionParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}

@@ -249,3 +249,109 @@ export async function queryNodeUsageFeeRateInfo(): Promise<nodeUsageFeeRate> {
   }
   return resp.data;
 }
+
+/**
+ * 机器存储账单
+ */
+export type NodeQuotaBill = {
+  id: number;
+  userID: number;
+  name: string;
+  username: string;
+  userGroupID: number;
+  operType: number;
+  oldSize: number;
+  newSize: number;
+  oldEndTimeUnix: number;
+  newEndTimeUnix: number;
+  fee: number;
+  payFlag: number;
+  payFee: number;
+  payTimeUnix: number;
+  payType: number;
+  payMessage: string;
+  createTime: number;
+  extraAttributes: string;
+};
+
+/**
+ * 分页查询机器存储账单
+ */
+export async function paginationQueryNodeQuotaBill(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<NodeQuotaBill>> {
+  const resp = await ApiRequest.request<PaginationQueryResponse<NodeQuotaBill>>(
+    '/fee/quota',
+    'GET',
+    {
+      pageIndex,
+      pageSize,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  for (const info of resp.data.Data) {
+    undefinedWithDefault(info, 'oldSize', 0);
+    undefinedWithDefault(info, 'fee', 0);
+    undefinedWithDefault(info, 'payFee', 0);
+    undefinedWithDefault(info, 'payFlag', 0);
+    undefinedWithDefault(info, 'payType', 0);
+    undefinedWithDefault(info, 'operType', 0);
+  }
+  return resp.data;
+}
+
+/**
+ * 支付机器节点存储账单参数
+ */
+export type PayNodeQuotaBillParam = {
+  billID: number;
+  payType: number;
+  payMoney: number;
+  payMessage: string;
+};
+
+/**
+ * 更新机器节点账单的支付信息
+ */
+export async function updateNodeQuotaBillPayInfo(
+  param: PayNodeQuotaBillParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/fee/quota/bill',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}
+
+/**
+ * 机器存储费率
+ */
+export type NodeQuotaFeeRate = {
+  basic: number;
+  extra: number;
+};
+
+/**
+ * 查询机器存储费率信息
+ */
+export async function queryNodeQuotaFeeRate(): Promise<NodeQuotaFeeRate> {
+  const resp = await ApiRequest.request<NodeQuotaFeeRate>(
+    '/fee/rate/quota',
+    'GET'
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}

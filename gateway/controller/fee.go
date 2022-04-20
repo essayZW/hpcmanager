@@ -122,6 +122,7 @@ func (f *fee) getNodeDistributeFeeRate(ctx *gin.Context) {
 	if err != nil {
 		httpResp := response.New(200, nil, false, "信息查询失败")
 		httpResp.Send(ctx)
+		return
 	}
 
 	httpResp := response.New(200, map[string]float64{
@@ -236,7 +237,7 @@ func (f *fee) payGroupNodeUsageBill(ctx *gin.Context) {
 
 	var param json.PayGroupNodeUsageBillParam
 	if err := ctx.ShouldBindJSON(&param); err != nil {
-		httpResp := response.New(200, nil, false, err.Error())
+		httpResp := response.New(200, nil, false, "参数验证失败")
 		httpResp.Send(ctx)
 		return
 	}
@@ -287,6 +288,104 @@ func (f *fee) getNodeUsageFeeRate(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// paginationGetNodeQuotaBills /api/fee/quota GET 分页查询机器存储账单
+func (f *fee) paginationGetNodeQuotaBills(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := f.feeService.PaginationGetNodeQuotaBill(c, &feepb.PaginationGetNodeQuotaBillRequest{
+		BaseRequest: baseRequest,
+		PageIndex:   int32(pageIndex),
+		PageSize:    int32(pageSize),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询账单信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	respData := &response.PaginationQueryResponse{
+		Data:  resp.Bills,
+		Count: int(resp.Count),
+	}
+	if resp.Bills == nil {
+		respData.Data = make([]*feepb.NodeQuotaBill, 0)
+	}
+	httpResp := response.New(200, respData, true, "success")
+	httpResp.Send(ctx)
+}
+
+// getNodeQuotaFeeRate /api/fee/rate/quota GET  查询机器存储费率
+func (f *fee) getNodeQuotaFeeRate(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := f.feeService.GetNodeQuotaFeeRate(c, &feepb.GetNodeQuotaFeeRateRequest{
+		BaseRequest: baseRequest,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, "信息查询失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, map[string]interface{}{
+		"basic": resp.Basic,
+		"extra": resp.Extra,
+	}, true, "success")
+	httpResp.Send(ctx)
+}
+
+// payNodeQuotaBill 支付机器存储账单
+func (f *fee) payNodeQuotaBill(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.PayNodeQuotaBillParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, "参数验证失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := f.feeService.PayNodeQuotaBill(c, &feepb.PayNodeQuotaBillRequest{
+		BaseRequest: baseRequest,
+		BillID:      int32(param.BillID),
+		PayType:     int32(param.PayType),
+		PayMessage:  param.PayMessage,
+		PayMoney:    param.PayMoney,
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("支付账单失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "支付账单失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter := router.Group("/fee")
 
@@ -298,10 +397,14 @@ func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	feeRouter.GET("/rate/distribute", f.getNodeDistributeFeeRate)
 	feeRouter.GET("/rate/usage", f.getNodeUsageFeeRate)
+	feeRouter.GET("/rate/quota", f.getNodeQuotaFeeRate)
 
 	feeRouter.GET("/usage/week", f.paginationGetNodeWeekUsageBills)
 	feeRouter.GET("/usage/group/week", f.paginationGetNodeWeekUsageBillsGroupByGroupID)
 	feeRouter.PUT("/usage/group/bill", f.payGroupNodeUsageBill)
+
+	feeRouter.GET("/quota", f.paginationGetNodeQuotaBills)
+	feeRouter.PUT("/quota/bill", f.payNodeQuotaBill)
 	return feeRouter
 }
 

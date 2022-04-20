@@ -8,6 +8,7 @@ import (
 
 	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/fee/db"
+	"github.com/essayZW/hpcmanager/fee/utils"
 	"gopkg.in/guregu/null.v4"
 )
 
@@ -112,12 +113,8 @@ func (ndbl *NodeDistributeBill) CalFee(startTimeUnix, endTimeUnix int64, nodeTyp
 func (ndbl *NodeDistributeBill) calTimeDurationYear(startTimeUnix, endTimeUnix int64) float64 {
 	startTime := time.Unix(startTimeUnix, 0)
 	endTime := time.Unix(endTimeUnix, 0)
-	// TODO: 对于费率的计算存疑惑,目前将时间差换算为年,然后乘对应的费率
-	yearDuration := endTime.Year() - startTime.Year()
-	var year float64
-	year = float64(yearDuration)
-	year += float64((endTime.Month()+12-startTime.Month())%12) / 12
-	return year
+	// 对于费率的计算存疑惑,目前将时间差换算为年,然后乘对应的费率
+	return utils.CalYearDuration(startTime, endTime)
 }
 
 // PaginationGetNodeDistributeBillResult 分页查询的结果
