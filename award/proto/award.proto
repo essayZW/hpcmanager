@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option go_package = "github.com/essayZW/hpcmanager/award/proto;award";
+
+package award;
+
+import "proto/ping.proto";
+import "proto/common.proto";
+
+service AwardService {
+    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+}

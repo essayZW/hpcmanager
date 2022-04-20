@@ -27,7 +27,7 @@ type FeeService struct {
 
 // Ping ping测试
 func (fs *FeeService) Ping(ctx context.Context, req *publicproto.Empty, resp *publicproto.PingResponse) error {
-	logger.Info("NodeService PING ", req)
+	logger.Info("FeeService PING ", req)
 	resp.Msg = "PONG"
 	resp.Ip = req.BaseRequest.RequestInfo.RemoteIP
 	resp.RequestId = req.BaseRequest.RequestInfo.Id
