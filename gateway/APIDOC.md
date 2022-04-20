@@ -981,6 +981,16 @@ Method: GET
 
 响应：请求 ID、PONG
 
+### /fss/file
+
+Method: POST
+
+描述: 单个文件上传接口
+
+参数: file 文件
+
+响应: 新的文件名称
+
 ## award 控制器
 
 ### /award/ping
