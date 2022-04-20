@@ -16,6 +16,8 @@ import {
   NodeQuotaBill,
   paginationQueryNodeQuotaBill,
   updateNodeQuotaBillPayInfo,
+  NodeQuotaFeeRate,
+  queryNodeQuotaFeeRate,
 } from '../api/fee';
 
 /**
@@ -169,4 +171,11 @@ export async function payNodeQuotaBill(
     payMoney,
     payType,
   });
+}
+
+/**
+ * 查询机器存储费率
+ */
+export async function getNodeQuotaFeeRate(): Promise<NodeQuotaFeeRate> {
+  return queryNodeQuotaFeeRate();
 }

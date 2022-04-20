@@ -1,16 +1,18 @@
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
-import { NodeQuotaBill } from '../api/fee';
+import { onMounted, reactive, ref } from 'vue';
+import { NodeQuotaBill, NodeQuotaFeeRate } from '../api/fee';
 import {
   paginationGetNodeQuotaBill,
   payNodeQuotaBill,
   payTypeToString,
+  getNodeQuotaFeeRate,
 } from '../service/fee';
 import { operTypeToStr } from '../service/fee';
 import { zeroWithDefault } from '../utils/obj';
 import { isAdmin } from '../service/user';
-
+import { getGroupInfoByID } from '../service/group';
 import dayjs from 'dayjs';
+import { GroupInfo } from '../api/group';
 
 const tableData = reactive<{
   data: NodeQuotaBill[];
@@ -77,10 +79,21 @@ const payNodeQuotaBillDialogBillForm = reactive<{
   billID: 0,
 });
 
-const showPayNodeQuotaBillDialog = (row: NodeQuotaBill) => {
+const payNodeQuotaBillGroupInfo = ref<GroupInfo | undefined>(undefined);
+
+const showPayNodeQuotaBillDialog = async (row: NodeQuotaBill) => {
   payNodeQuotaBillDialogBillInfo.value = row;
   payNodeQuotaBillDialogBillForm.billID = row.id;
   payNodeQuotaBillDialogBillForm.payMoney = row.fee;
+  try {
+    const data = await getGroupInfoByID(row.userGroupID);
+    payNodeQuotaBillGroupInfo.value = data;
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
   payNodeQuotaBillDialogVisible.value = true;
 };
 
@@ -109,6 +122,19 @@ const payNodeQuotaBillDialogFormSubmitHandler = async (balancePay: boolean) => {
     });
   }
 };
+
+const nodeQuotaFeeRate = ref<NodeQuotaFeeRate | undefined>(undefined);
+onMounted(async () => {
+  try {
+    const data = await getNodeQuotaFeeRate();
+    nodeQuotaFeeRate.value = data;
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+});
 </script>
 <template>
   <el-row justify="end" class="operator-tool-row">
@@ -213,8 +239,14 @@ const payNodeQuotaBillDialogFormSubmitHandler = async (balancePay: boolean) => {
     <div class="pay-bill-dialog-body">
       <div class="rate-area">
         <h3>存储费率</h3>
-        <p><strong>基础存储费率: </strong>元</p>
-        <p><strong>额外存储费率: </strong>元</p>
+        <p>
+          <strong>基础存储费率: {{ nodeQuotaFeeRate.basic }}</strong
+          >元 1TB 一年
+        </p>
+        <p>
+          <strong>额外存储费率: {{ nodeQuotaFeeRate.extra }}</strong
+          >元 1TB 一年
+        </p>
       </div>
       <div>
         <el-form inline>
@@ -254,6 +286,14 @@ const payNodeQuotaBillDialogFormSubmitHandler = async (balancePay: boolean) => {
           </el-form-item>
           <el-form-item label="应缴费用: ">
             <span>{{ payNodeQuotaBillDialogBillInfo.fee }}元</span>
+          </el-form-item>
+          <el-form-item label="用户组余额: ">
+            <span v-if="payNodeQuotaBillGroupInfo"
+              >{{
+                zeroWithDefault(payNodeQuotaBillGroupInfo.balance, 0)
+              }}元</span
+            >
+            <span v-else class="red">数据加载失败</span>
           </el-form-item>
         </el-form>
         <el-form>
@@ -316,7 +356,7 @@ const payNodeQuotaBillDialogFormSubmitHandler = async (balancePay: boolean) => {
   justify-content: center;
   width: 100%;
   .rate-area {
-    min-width: 30%;
+    min-width: 35%;
   }
 }
 </style>

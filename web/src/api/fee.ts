@@ -333,3 +333,25 @@ export async function updateNodeQuotaBillPayInfo(
   }
   return true;
 }
+
+/**
+ * 机器存储费率
+ */
+export type NodeQuotaFeeRate = {
+  basic: number;
+  extra: number;
+};
+
+/**
+ * 查询机器存储费率信息
+ */
+export async function queryNodeQuotaFeeRate(): Promise<NodeQuotaFeeRate> {
+  const resp = await ApiRequest.request<NodeQuotaFeeRate>(
+    '/fee/rate/quota',
+    'GET'
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return resp.data;
+}
