@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option go_package = "github.com/essayZW/hpcmanager/fss/proto;fss";
+
+package fss;
+
+import "proto/ping.proto";
+import "proto/common.proto";
+
+service FssService {
+    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+}
+
