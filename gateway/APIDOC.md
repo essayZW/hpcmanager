@@ -968,3 +968,15 @@ type PayNodeQuotaBillParam struct {
 ```
 
 响应: 是否支付成功
+
+## fss 控制器
+
+### /fss/ping
+
+Method: GET
+
+描述：进行 group 服务的 ping 测试
+
+参数：无
+
+响应：请求 ID、PONG
