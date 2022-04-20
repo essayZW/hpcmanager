@@ -86,3 +86,5 @@ require (
 replace github.com/essayZW/hpcmanager/fee => ./
 
 replace github.com/essayZW/hpcmanager/fss => ../fss
+
+replace github.com/essayZW/hpcmanager/award => ../award

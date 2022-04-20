@@ -86,3 +86,5 @@ replace github.com/essayZW/hpcmanager/project => ./
 replace github.com/essayZW/hpcmanager/fee => ../fee
 
 replace github.com/essayZW/hpcmanager/fss => ../fss
+
+replace github.com/essayZW/hpcmanager/award => ../award

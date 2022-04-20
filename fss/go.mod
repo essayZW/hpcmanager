@@ -21,6 +21,8 @@ replace github.com/essayZW/hpcmanager/fee => ../fee
 require (
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220419144745-367771923c07
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
+	github.com/google/uuid v1.3.0
 	go-micro.dev/v4 v4.6.0
 	google.golang.org/protobuf v1.26.0
 )
@@ -37,7 +39,6 @@ require (
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
@@ -45,7 +46,6 @@ require (
 	github.com/go-git/go-git/v5 v5.4.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351 // indirect
@@ -78,3 +78,7 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
+
+replace github.com/essayZW/hpcmanager/award => ../award
+
+replace github.com/essayZW/hpcmanager/fss => ./

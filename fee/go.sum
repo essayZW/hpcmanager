@@ -81,7 +81,6 @@ github.com/asim/go-micro/plugins/config/source/etcd/v4 v4.0.0-20220118152736-9e0
 github.com/asim/go-micro/plugins/config/source/etcd/v4 v4.0.0-20220118152736-9e0be6c85d75/go.mod h1:VcUosY7r38HFQRERex3eLtKfKWApTOUshoDJqxV5SZk=
 github.com/asim/go-micro/plugins/logger/zap/v4 v4.0.0-20220118152736-9e0be6c85d75 h1:iSAU5W9JfjryoAyUsvteXX2xz77HDGxGDGD3QQtEC9U=
 github.com/asim/go-micro/plugins/logger/zap/v4 v4.0.0-20220118152736-9e0be6c85d75/go.mod h1:scOnhkJJJdjcHVvfEnQC8iM7NK3UbxbQgbI6vCA5cWU=
-github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220407104607-62c2981baf63/go.mod h1:maR33ztnKc7VeMioGfl1vq3Jm7fzztbNoRWTncu96sc=
 github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220419144745-367771923c07 h1:OctrhjQekloCY/h8XcMNATz+LhbDu1MPFHvWGCTao7U=
 github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220419144745-367771923c07/go.mod h1:maR33ztnKc7VeMioGfl1vq3Jm7fzztbNoRWTncu96sc=
 github.com/asim/go-micro/plugins/sync/etcd/v3 v3.7.1-0.20211012115553-1cd7cfaa6cbb/go.mod h1:UN0lQgtC+qUNd1BKCCCoSh1HWyHb4GkngRJwaSHJ+3M=
