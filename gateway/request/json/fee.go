@@ -61,7 +61,7 @@ type PayNodeQuotaBillParam struct {
 	BillID     int     `form:"billID"     json:"billID"     binding:"required"`
 	PayType    int     `form:"payType"    json:"payType"    binding:"required"`
 	PayMessage string  `form:"payMessage" json:"payMessage"`
-	PayMoney   float64 `form:"payMoney"   json:"payMoney"   binding:"required"`
+	PayMoney   float64 `form:"payMoney"   json:"payMoney"`
 }
 
 func (param *PayNodeQuotaBillParam) Validator() validator.StructLevelFunc {
