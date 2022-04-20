@@ -15,6 +15,7 @@ import {
   queryNodeUsageFeeRateInfo,
   NodeQuotaBill,
   paginationQueryNodeQuotaBill,
+  updateNodeQuotaBillPayInfo,
 } from '../api/fee';
 
 /**
@@ -151,4 +152,21 @@ export function operTypeToStr(operType: number): string {
     default:
       return '未知';
   }
+}
+
+/**
+ * payNodeQuotaBill 支付节点存储账单
+ */
+export async function payNodeQuotaBill(
+  billID: number,
+  payType: number,
+  payMoney: number,
+  payMessage: string
+): Promise<boolean> {
+  return updateNodeQuotaBillPayInfo({
+    billID,
+    payMessage,
+    payMoney,
+    payType,
+  });
 }

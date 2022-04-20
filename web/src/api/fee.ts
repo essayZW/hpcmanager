@@ -302,3 +302,34 @@ export async function paginationQueryNodeQuotaBill(
   }
   return resp.data;
 }
+
+/**
+ * 支付机器节点存储账单参数
+ */
+export type PayNodeQuotaBillParam = {
+  billID: number;
+  payType: number;
+  payMoney: number;
+  payMessage: string;
+};
+
+/**
+ * 更新机器节点账单的支付信息
+ */
+export async function updateNodeQuotaBillPayInfo(
+  param: PayNodeQuotaBillParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/fee/quota/bill',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}

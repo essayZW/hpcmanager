@@ -1,7 +1,12 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { NodeQuotaBill } from '../api/fee';
-import { paginationGetNodeQuotaBill, payTypeToString } from '../service/fee';
+import {
+  paginationGetNodeQuotaBill,
+  payNodeQuotaBill,
+  payTypeToString,
+} from '../service/fee';
+import { operTypeToStr } from '../service/fee';
 import { zeroWithDefault } from '../utils/obj';
 import { isAdmin } from '../service/user';
 
@@ -55,6 +60,54 @@ const handleCurrentChange = (pageIndex: number) => {
 const handleSizeChange = (pageSize: number) => {
   paginationInfo.pageSize = pageSize;
   refreshTableData();
+};
+
+const payNodeQuotaBillDialogVisible = ref<boolean>(false);
+const payNodeQuotaBillDialogBillInfo = ref<NodeQuotaBill | undefined>(
+  undefined
+);
+
+const payNodeQuotaBillDialogBillForm = reactive<{
+  payMoney: number;
+  payMessage: string;
+  billID: number;
+}>({
+  payMoney: 0,
+  payMessage: '',
+  billID: 0,
+});
+
+const showPayNodeQuotaBillDialog = (row: NodeQuotaBill) => {
+  payNodeQuotaBillDialogBillInfo.value = row;
+  payNodeQuotaBillDialogBillForm.billID = row.id;
+  payNodeQuotaBillDialogBillForm.payMoney = row.fee;
+  payNodeQuotaBillDialogVisible.value = true;
+};
+
+const hidePayNodeQuotaBillDialog = () => {
+  payNodeQuotaBillDialogVisible.value = false;
+};
+
+const payNodeQuotaBillDialogFormSubmitHandler = async (balancePay: boolean) => {
+  try {
+    await payNodeQuotaBill(
+      payNodeQuotaBillDialogBillForm.billID,
+      balancePay ? 2 : 1,
+      payNodeQuotaBillDialogBillForm.payMoney,
+      payNodeQuotaBillDialogBillForm.payMessage
+    );
+    ElMessage({
+      type: 'success',
+      message: '缴费成功',
+    });
+    hidePayNodeQuotaBillDialog();
+    refreshTableData();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
 };
 </script>
 <template>
@@ -120,7 +173,11 @@ const handleSizeChange = (pageSize: number) => {
               payTypeToString(props.row.payType)
             }}</span>
             <span v-else-if="isAdmin()"
-              ><el-button type="primary">缴费</el-button></span
+              ><el-button
+                type="primary"
+                @click="showPayNodeQuotaBillDialog(props.row)"
+                >缴费</el-button
+              ></span
             >
             <span v-else>未缴费</span>
           </template>
@@ -152,6 +209,89 @@ const handleSizeChange = (pageSize: number) => {
       </el-pagination>
     </el-col>
   </el-row>
+  <el-dialog v-model="payNodeQuotaBillDialogVisible" title="账单缴费">
+    <div class="pay-bill-dialog-body">
+      <div class="rate-area">
+        <h3>存储费率</h3>
+        <p><strong>基础存储费率: </strong>元</p>
+        <p><strong>额外存储费率: </strong>元</p>
+      </div>
+      <div>
+        <el-form inline>
+          <el-form-item label="操作类型: ">
+            <span>{{
+              operTypeToStr(payNodeQuotaBillDialogBillInfo?.operType)
+            }}</span>
+          </el-form-item>
+          <el-form-item label="容量变化: ">
+            <span>
+              {{ payNodeQuotaBillDialogBillInfo.oldSize }}TB
+              <el-icon><i-ic-baseline-arrow-right-alt /></el-icon>
+              {{ payNodeQuotaBillDialogBillInfo.newSize }}TB
+            </span>
+          </el-form-item>
+          <el-form-item label="结束日期变化: ">
+            <span>
+              {{
+                dayjs(
+                  payNodeQuotaBillDialogBillInfo.oldEndTimeUnix * 1000
+                ).format('YYYY-MM-DD')
+              }}
+              <el-icon><i-ic-baseline-arrow-right-alt /></el-icon>
+              {{
+                dayjs(
+                  payNodeQuotaBillDialogBillInfo.newEndTimeUnix * 1000
+                ).format('YYYY-MM-DD')
+              }}
+            </span>
+          </el-form-item>
+          <el-form-item label="创建时间: ">
+            <span>{{
+              dayjs(payNodeQuotaBillDialogBillInfo.createTime * 1000).format(
+                'YYYY-MM-DD HH:mm:ss'
+              )
+            }}</span>
+          </el-form-item>
+          <el-form-item label="应缴费用: ">
+            <span>{{ payNodeQuotaBillDialogBillInfo.fee }}元</span>
+          </el-form-item>
+        </el-form>
+        <el-form>
+          <el-form-item label="缴费金额: ">
+            <el-input
+              v-model.number="payNodeQuotaBillDialogBillForm.payMoney"
+              type="text"
+            >
+              <template #append>元</template>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="缴费备注: ">
+            <el-input
+              v-model="payNodeQuotaBillDialogBillForm.payMessage"
+              type="textarea"
+              placeholder="缴费的备注信息,可以为空"
+              autosize
+            ></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="hidePayNodeQuotaBillDialog">取消</el-button>
+        <el-button
+          type="primary"
+          @click="payNodeQuotaBillDialogFormSubmitHandler(true)"
+          >余额缴费</el-button
+        >
+        <el-button
+          type="primary"
+          @click="payNodeQuotaBillDialogFormSubmitHandler(false)"
+          >线下缴费</el-button
+        >
+      </span>
+    </template>
+  </el-dialog>
 </template>
 <style lang="less" scoped>
 .operator-tool-row {
@@ -169,5 +309,14 @@ const handleSizeChange = (pageSize: number) => {
 }
 .red {
   color: red;
+}
+
+.pay-bill-dialog-body {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  .rate-area {
+    min-width: 30%;
+  }
 }
 </style>
