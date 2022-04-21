@@ -27,4 +27,5 @@ message PaperApply {
     string checkMessage = 20;
     int64 checkTimeUnix = 21;
     string extraAttributes = 22;
+    int64 createTimeUnix = 23;
 }

@@ -149,6 +149,7 @@ func (as *AwardService) PaginationGetPaperApply(
 			CheckMoney:               infos.Data[i].CheckMoney,
 			CheckMessage:             infos.Data[i].CheckMessage.String,
 			CheckTimeUnix:            infos.Data[i].CheckTime.Time.Unix(),
+			CreateTimeUnix:           infos.Data[i].CreateTime.Unix(),
 		}
 		if infos.Data[i].ExtraAttributes != nil {
 			resp.Applies[i].ExtraAttributes = infos.Data[i].ExtraAttributes.String()

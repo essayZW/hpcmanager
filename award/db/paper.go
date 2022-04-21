@@ -115,7 +115,7 @@ func (this *PaperAwardDB) QueryAllWithLimit(ctx context.Context, limit, offset i
 func (this *PaperAwardDB) QueryWithLimitByCreaterID(
 	ctx context.Context,
 	createrID int,
-	offset, limit int,
+	limit, offset int,
 ) ([]*PaperApply, error) {
 	rows, err := this.conn.Query(ctx, "SELECT * FROM `paper_apply` WHERE `creater_id`=? LIMIT ?, ?", createrID, limit, offset)
 	if err != nil {
