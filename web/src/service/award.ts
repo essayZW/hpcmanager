@@ -1,4 +1,11 @@
-import { ping, createPaperAwardApply } from '../api/award';
+import { PaginationQueryResponse } from '../api/api';
+import {
+  ping,
+  createPaperAwardApply,
+  PaperApply,
+  paginationQueryPaperApply,
+} from '../api/award';
+import { uploadFileUrlPathBase } from '../api/fss';
 /**
  * 服务ping
  */
@@ -44,4 +51,21 @@ export async function createPaperApply(
     thanksPageImageName,
     remarkMessage,
   });
+}
+
+/**
+ * 分页查询论文奖励申请信息
+ */
+export async function paginationGetPaperApply(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<PaperApply>> {
+  const data = await paginationQueryPaperApply(pageIndex, pageSize);
+  for (const single of data.Data) {
+    single.paperFirstPageImageName =
+      uploadFileUrlPathBase + '/' + single.paperFirstPageImageName;
+    single.paperThanksPageImageName =
+      uploadFileUrlPathBase + '/' + single.paperThanksPageImageName;
+  }
+  return data;
 }

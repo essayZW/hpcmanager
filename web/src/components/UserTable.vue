@@ -404,10 +404,8 @@ const modifyUserQuotaSubmit = async () => {
                   <span>
                     <strong>使用期限: </strong>
                     {{
-                      dayjs( zeroWithDefault(tableRowExtraInfo[props.row.id].quotaInfo?.startTimeUnix, 0) as number * 1000).format('YYYY-MM-DD')
-                    // eslint-disable-next-line prettier/prettier
+                      dayjs(zeroWithDefault(tableRowExtraInfo[props.row.id].quotaInfo?.startTimeUnix, 0) as number * 1000).format('YYYY-MM-DD')
                     }}至{{
-
                       dayjs(
                         zeroWithDefault(tableRowExtraInfo[props.row.id].quotaInfo?.endTimeUnix, 0) as number *
                           1000
@@ -504,7 +502,6 @@ const modifyUserQuotaSubmit = async () => {
           >{{
             dayjs(zeroWithDefault(dialogUserQuotaInfo?.startTimeUnix, 0) as number * 1000).format(
               'YYYY-MM-DD'
-            // eslint-disable-next-line prettier/prettier
             )
           }}至{{
             dayjs(zeroWithDefault(dialogUserQuotaInfo?.endTimeUnix, 0) as number * 1000).format('YYYY-MM-DD')

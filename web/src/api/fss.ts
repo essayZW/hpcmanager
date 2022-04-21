@@ -15,3 +15,5 @@ export async function ping(): Promise<PingResponse> {
 }
 
 export const fileUploadPath = ApiBaseURL + '/fss/file';
+
+export const uploadFileUrlPathBase = '/upload';

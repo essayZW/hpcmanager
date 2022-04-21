@@ -1,18 +1,13 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { NodeApplyInfo } from '../api/node';
-import { paginationGetNodeApplyInfo, nodeTypeToName } from '../service/node';
 import dayjs from 'dayjs';
-import { ProjectInfo } from '../api/project';
-import { UserInfo } from '../api/user';
-import { getUserInfoFromStorage, isAdmin, isTutor } from '../service/user';
-import { getProjectInfoByID } from '../service/project';
-import { zeroWithDefault, timeOrBlank } from '../utils/obj';
+import { paginationGetPaperApply } from '../service/award';
+import { PaperApply } from '../api/award';
 
 // 表格数据
 const tableData = reactive<{
   count: number;
-  data: NodeApplyInfo[];
+  data: PaperApply[];
   loading: boolean;
 }>({
   count: 0,
@@ -20,16 +15,11 @@ const tableData = reactive<{
   loading: false,
 });
 
-const userInfo = getUserInfoFromStorage();
-
 // 加载表格数据
 const loadTableData = async (pageIndex: number, pageSize: number) => {
   tableData.loading = true;
   try {
-    const paginationData = await paginationGetNodeApplyInfo(
-      pageIndex,
-      pageSize
-    );
+    const paginationData = await paginationGetPaperApply(pageIndex, pageSize);
     tableData.data = paginationData.Data;
     tableData.count = paginationData.Count;
   } catch (error) {
@@ -69,6 +59,26 @@ const handleCurrentChange = (pageIndex: number) => {
 const handleSizeChange = (pageSize: number) => {
   paginationInfo.pageSize = pageSize;
   refreshTableData();
+};
+
+const showPaperApplyDetail = (row: PaperApply) => {
+  dialogInfo.value = row;
+  imagePreviewList.value[0] = row.paperFirstPageImageName;
+  imagePreviewList.value[1] = row.paperThanksPageImageName;
+  showDialog();
+};
+
+const dialogInfo = ref<PaperApply>();
+const imagePreviewList = ref<string[]>([]);
+
+const dialogVisible = ref<boolean>(false);
+
+const showDialog = () => {
+  dialogVisible.value = true;
+};
+
+const hideDialog = () => {
+  dialogVisible.value = false;
 };
 </script>
 <template>
@@ -120,7 +130,9 @@ const handleSizeChange = (pageSize: number) => {
         <el-table-column label="申请时间" align="center">
           <template #default="props">
             {{
-              dayjs(props.row.createTime * 1000).format('YYYY-MM-DD HH:mm:ss')
+              dayjs(props.row.createTimeUnix * 1000).format(
+                'YYYY-MM-DD HH:mm:ss'
+              )
             }}
           </template>
         </el-table-column>
@@ -131,6 +143,16 @@ const handleSizeChange = (pageSize: number) => {
               >审核通过</span
             >
             <span v-else class="red">审核未通过</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="详情" align="center">
+          <template #default="props">
+            <el-button
+              type="primary"
+              size="small"
+              @click="showPaperApplyDetail(props.row)"
+              >显示详情</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -153,6 +175,47 @@ const handleSizeChange = (pageSize: number) => {
       </el-pagination>
     </el-col>
   </el-row>
+  <el-dialog v-model="dialogVisible" title="申请详情">
+    <el-form>
+      <el-form-item label="论文题目:">
+        <span>{{ dialogInfo?.paperTitle }}</span>
+      </el-form-item>
+      <el-form-item label="论文分类:">
+        <span>{{ dialogInfo?.paperCategory }}</span>
+      </el-form-item>
+      <el-form-item label="论文分区:">
+        <span>{{ dialogInfo?.paperPartition }}</span>
+      </el-form-item>
+      <el-form-item label="论文首页图: ">
+        <el-image
+          :src="dialogInfo?.paperFirstPageImageName"
+          :preview-src-list="imagePreviewList"
+          :initial-index="0"
+          fit="cover"
+        />
+      </el-form-item>
+      <el-form-item label="论文致谢页图:">
+        <el-image
+          :src="dialogInfo?.paperThanksPageImageName"
+          fit="cover"
+          :preview-src-list="imagePreviewList"
+          :initial-index="1"
+        />
+      </el-form-item>
+    </el-form>
+    <el-form>
+      <el-form-item label="审核状态: ">
+        <span v-if="dialogInfo?.checkStatus" class="red">未审核</span>
+        <span v-else class="green">已审核</span>
+      </el-form-item>
+    </el-form>
+    <el-form v-if="dialogInfo?.checkStatus"></el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="hideDialog">关闭</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 <style lang="less" scoped>
 .button-row {
