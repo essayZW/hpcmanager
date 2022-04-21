@@ -14,6 +14,7 @@ import UserNodeUsageBillManager from '../components/common/UserNodeUsageBillMana
 import GroupNodeUsageBillManager from '../components/tutor/GroupNodeUsageBillManager.vue';
 import AdminNodeUsageBillManager from '../components/admin/AdminNodeUsageBillManager.vue';
 import NodeQuotaBillManager from '../components/common/NodeQuotaBillManager.vue';
+import PaperAwardApplyManager from '../components/common/PaperAwardApplyManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -123,6 +124,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/node_quota_bill_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/paper_award_apply_manager',
+          name: 'PaperAwardApplyManager',
+          component: PaperAwardApplyManager,
+        },
+        item: {
+          name: '论文奖励申请',
+          to: '/main/paper_award_apply_manager',
+        },
+      },
     ],
   ],
   [
@@ -214,6 +226,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器存储账单',
           to: '/main/node_quota_bill_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/paper_award_apply_manager',
+          name: 'PaperAwardApplyManager',
+          component: PaperAwardApplyManager,
+        },
+        item: {
+          name: '论文奖励申请',
+          to: '/main/paper_award_apply_manager',
         },
       },
     ],
@@ -331,6 +354,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/node_quota_bill_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/paper_award_apply_manager',
+          name: 'PaperAwardApplyManager',
+          component: PaperAwardApplyManager,
+        },
+        item: {
+          name: '论文奖励申请',
+          to: '/main/paper_award_apply_manager',
+        },
+      },
     ],
   ],
   // 超级管理员和普通管理员都这项操作
@@ -446,6 +480,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '机器存储账单',
           to: '/main/node_quota_bill_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/paper_award_apply_manager',
+          name: 'PaperAwardApplyManager',
+          component: PaperAwardApplyManager,
+        },
+        item: {
+          name: '论文奖励申请',
+          to: '/main/paper_award_apply_manager',
         },
       },
     ],

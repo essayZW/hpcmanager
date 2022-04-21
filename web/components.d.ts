@@ -14,7 +14,7 @@ declare module 'vue' {
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
-    ElCards: typeof import('element-plus/es')['ElCards']
+    ElCards: typeof import('element-plus/es')['ElCards'];
     ElCol: typeof import('element-plus/es')['ElCol']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
@@ -38,7 +38,7 @@ declare module 'vue' {
     ElOption: typeof import('element-plus/es')['ElOption']
     ElPagination: typeof import('element-plus/es')['ElPagination']
     ElPopover: typeof import('element-plus/es')['ElPopover'];
-    ElRadio: typeof import('element-plus/es')['ElRadio']
+    ElRadio: typeof import('element-plus/es')['ElRadio'];
     ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElResult: typeof import('element-plus/es')['ElResult'];
@@ -49,14 +49,17 @@ declare module 'vue' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
+    ElText: typeof import('element-plus/es')['ElText'];
     ElTimeline: typeof import('element-plus/es')['ElTimeline']
     ElTimelineItem: typeof import('element-plus/es')['ElTimelineItem']
+    ElUpload: typeof import('element-plus/es')['ElUpload']
     GroupManager: typeof import('./src/components/admin/GroupManager.vue')['default']
     GroupNodeUsageBillManager: typeof import('./src/components/tutor/GroupNodeUsageBillManager.vue')['default']
     GroupWeekUsageTable: typeof import('./src/components/GroupWeekUsageTable.vue')['default']
     IEpArrowDown: typeof import('~icons/ep/arrow-down')['default']
     IEpAvatar: typeof import('~icons/ep/avatar')['default']
     IIcBaselineArrowRightAlt: typeof import('~icons/ic/baseline-arrow-right-alt')['default']
+    IIcRoundPlus: typeof import('~icons/ic/round-plus')['default']
     IIcRoundRefresh: typeof import('~icons/ic/round-refresh')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     MainIndex: typeof import('./src/components/MainIndex.vue')['default']
@@ -73,8 +76,11 @@ declare module 'vue' {
     NodeUsageManager: typeof import('./src/components/common/NodeUsageManager.vue')['default']
     NodeUsageTable: typeof import('./src/components/NodeUsageTable.vue')['default']
     PageTitle: typeof import('./src/components/PageTitle.vue')['default']
+    PaperAwardApplyManager: typeof import('./src/components/common/PaperAwardApplyManager.vue')['default']
+    PaperAwardApplyTable: typeof import('./src/components/PaperAwardApplyTable.vue')['default']
     ProjectManager: typeof import('./src/components/ProjectManager.vue')['default']
     UpdateUserInfo: typeof import('./src/components/UpdateUserInfo.vue')['default']
+    UploadImageFile: typeof import('./src/components/UploadImageFile.vue')['default']
     UserManager: typeof import('./src/components/admin/UserManager.vue')['default']
     UserNodeUsageBillManager: typeof import('./src/components/common/UserNodeUsageBillManager.vue')['default']
     UserTable: typeof import('./src/components/UserTable.vue')['default']

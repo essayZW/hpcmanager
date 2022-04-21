@@ -1,4 +1,4 @@
-import { ApiRequest, PingResponse } from './api';
+import { ApiBaseURL, ApiRequest, PingResponse } from './api';
 
 // 静态资源服务服务ping测试
 export async function ping(): Promise<PingResponse> {
@@ -13,3 +13,5 @@ export async function ping(): Promise<PingResponse> {
   }
   return data;
 }
+
+export const fileUploadPath = ApiBaseURL + '/fss/file';
