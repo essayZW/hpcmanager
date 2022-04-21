@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option go_package = "github.com/essayZW/hpcmanager/award/proto;award";
+
+package award;
+
+message PaperApply {
+    int32 id = 1;
+    int32 createrID = 2;
+    string createrUsername = 3;
+    string createrName = 4;
+    int32 userGroupID = 5;
+    int32 tutorID = 6;
+    string tutorUsername =  7;
+    string tutorName = 8;
+    string paperTitle = 9;
+    string paperCategory = 10;
+    string paperPartition = 11;
+    string paperFirstPageImageName = 12;
+    string paperThanksPageImageName = 13;
+    string remarkMessage = 14;
+    int32 checkStatus = 15;
+    int32 checkerID = 16;
+    string checkerUsername = 17;
+    string checkerName = 18;
+    double checkMoney = 19;
+    string checkMessage = 20;
+    int64 checkTimeUnix = 21;
+    string extraAttributes = 22;
+}

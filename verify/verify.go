@@ -80,6 +80,8 @@ const (
 	StoreFile = "__STORE_FILE__"
 	// CreatePaperAward 创建论文奖励申请
 	CreatePaperAward = "__CREATE_PAPER_AWARD__"
+	// QueryPaperAwardApply 查询论文奖励申请记录
+	QueryPaperAwardApply = "__QUERY_PAPER_AWARD_APPLY__"
 )
 
 // Verify 进行操作的权限验证

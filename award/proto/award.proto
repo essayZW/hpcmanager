@@ -7,10 +7,12 @@ package award;
 import "proto/ping.proto";
 import "proto/common.proto";
 import "gateway/proto/baserequest.proto";
+import "proto/award_public.proto";
 
 service AwardService {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc CreatePaperAward(CreatePaperAwardRequest) returns (CreatePaperAwardResponse) {}
+    rpc PaginationGetPaperApply(PaginationGetPaperApplyRequest) returns (PaginationGetPaperApplyResponse) {}
 }
 
 message CreatePaperAwardRequest {
@@ -25,4 +27,15 @@ message CreatePaperAwardRequest {
 
 message CreatePaperAwardResponse {
     int32 id = 1;
+}
+
+message PaginationGetPaperApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+
+message PaginationGetPaperApplyResponse {
+    int32 count = 1;
+    repeated award.PaperApply applies = 2;
 }

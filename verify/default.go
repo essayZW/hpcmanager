@@ -214,6 +214,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: Common,
 			},
+			// 需要普通权限以上
+			QueryPaperAwardApply: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
 		},
 	}
 }

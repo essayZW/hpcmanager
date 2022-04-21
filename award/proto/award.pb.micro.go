@@ -40,6 +40,7 @@ func NewAwardServiceEndpoints() []*api.Endpoint {
 type AwardService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
 	CreatePaperAward(ctx context.Context, in *CreatePaperAwardRequest, opts ...client.CallOption) (*CreatePaperAwardResponse, error)
+	PaginationGetPaperApply(ctx context.Context, in *PaginationGetPaperApplyRequest, opts ...client.CallOption) (*PaginationGetPaperApplyResponse, error)
 }
 
 type awardService struct {
@@ -74,17 +75,29 @@ func (c *awardService) CreatePaperAward(ctx context.Context, in *CreatePaperAwar
 	return out, nil
 }
 
+func (c *awardService) PaginationGetPaperApply(ctx context.Context, in *PaginationGetPaperApplyRequest, opts ...client.CallOption) (*PaginationGetPaperApplyResponse, error) {
+	req := c.c.NewRequest(c.name, "AwardService.PaginationGetPaperApply", in)
+	out := new(PaginationGetPaperApplyResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for AwardService service
 
 type AwardServiceHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
 	CreatePaperAward(context.Context, *CreatePaperAwardRequest, *CreatePaperAwardResponse) error
+	PaginationGetPaperApply(context.Context, *PaginationGetPaperApplyRequest, *PaginationGetPaperApplyResponse) error
 }
 
 func RegisterAwardServiceHandler(s server.Server, hdlr AwardServiceHandler, opts ...server.HandlerOption) error {
 	type awardService interface {
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
 		CreatePaperAward(ctx context.Context, in *CreatePaperAwardRequest, out *CreatePaperAwardResponse) error
+		PaginationGetPaperApply(ctx context.Context, in *PaginationGetPaperApplyRequest, out *PaginationGetPaperApplyResponse) error
 	}
 	type AwardService struct {
 		awardService
@@ -103,4 +116,8 @@ func (h *awardServiceHandler) Ping(ctx context.Context, in *proto1.Empty, out *p
 
 func (h *awardServiceHandler) CreatePaperAward(ctx context.Context, in *CreatePaperAwardRequest, out *CreatePaperAwardResponse) error {
 	return h.AwardServiceHandler.CreatePaperAward(ctx, in, out)
+}
+
+func (h *awardServiceHandler) PaginationGetPaperApply(ctx context.Context, in *PaginationGetPaperApplyRequest, out *PaginationGetPaperApplyResponse) error {
+	return h.AwardServiceHandler.PaginationGetPaperApply(ctx, in, out)
 }

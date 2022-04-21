@@ -53,3 +53,28 @@ message CreatePaperAwardResponse {
     int32 id = 1;
 }
 ```
+
+## PaginationGetPaperApply
+
+描述: 分页查询论文奖励申请信息
+
+原型定义: `rpc PaginationGetPaperApply(PaginationGetPaperApplyRequest) returns (PaginationGetPaperApplyResponse) {}`
+
+请求参数:
+
+```protobuf
+message PaginationGetPaperApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message PaginationGetPaperApplyResponse {
+    int32 count = 1;
+    repeated award.PaperApply applies = 2;
+}
+```
