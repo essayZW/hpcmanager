@@ -3,7 +3,7 @@ import { ApiRequest, PingResponse } from './api';
 // 静态资源服务服务ping测试
 export async function ping(): Promise<PingResponse> {
   const { data, status } = await ApiRequest.request<PingResponse>(
-    '/fss/ping',
+    '/award/ping',
     'GET',
     {},
     {}
