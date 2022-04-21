@@ -145,7 +145,7 @@ export async function paginationGetNodeQuotaBill(
 /**
  * 操作类型转化为字符串
  */
-export function operTypeToStr(operType: number): string {
+export function operTypeToStr(operType: number | undefined): string {
   switch (operType) {
     case 1:
       return '扩容';

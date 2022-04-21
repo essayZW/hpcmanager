@@ -47,7 +47,7 @@ export async function createNodeApply(
 /**
  * 节点类型转换为对应的名称
  */
-export function nodeTypeToName(nodeType: string): string {
+export function nodeTypeToName(nodeType: string | undefined): string {
   switch (nodeType) {
     case 'cpuc36':
       return '36核心节点';

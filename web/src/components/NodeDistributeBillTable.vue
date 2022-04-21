@@ -303,18 +303,20 @@ const handlerPayBillSubmit = async (isBalance: boolean) => {
           <el-form-item label="独占时间段: ">
             <span>
               {{
-                dayjs(payBillDialogInfo.applyInfo?.startTime * 1000).format(
-                  'YYYY-MM-DD'
-                )
+                dayjs(
+                  zeroWithDefault(payBillDialogInfo.applyInfo?.startTime, 0) as number *
+                    1000
+                ).format('YYYY-MM-DD')
               }}至{{
-                dayjs(payBillDialogInfo.applyInfo?.endTime * 1000).format(
-                  'YYYY-MM-DD'
-                )
+                dayjs(
+                  zeroWithDefault(payBillDialogInfo.applyInfo?.endTime, 0) as number *
+                    1000
+                ).format('YYYY-MM-DD')
               }}</span
             >
           </el-form-item>
           <el-form-item label="应缴费金额: ">
-            <span>{{ payBillRow.fee }}元</span>
+            <span>{{ payBillRow?.fee }}元</span>
           </el-form-item>
           <el-form-item label="实缴费金额: ">
             <el-input

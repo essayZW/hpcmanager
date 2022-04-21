@@ -56,7 +56,7 @@ const formRules = {
 
 const formElem = ref<FormInstance | undefined>(undefined);
 
-const createPaperAwardApplySubmit = (elem: FormInstance) => {
+const createPaperAwardApplySubmit = (elem: FormInstance | undefined) => {
   if (!elem) {
     return;
   }
