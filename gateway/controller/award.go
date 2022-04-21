@@ -10,6 +10,7 @@ import (
 	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
 	"github.com/essayZW/hpcmanager/gateway/request/json"
 	"github.com/essayZW/hpcmanager/gateway/response"
+	"github.com/essayZW/hpcmanager/gateway/utils"
 	"github.com/essayZW/hpcmanager/proto"
 	"github.com/gin-gonic/gin"
 	"go-micro.dev/v4/client"
@@ -71,12 +72,50 @@ func (a *award) createPaperAwardApply(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// paginationGetPaperApply /api/award/paper GET 分页查询论文奖励申请信息
+func (a *award) paginationGetPaperApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := a.awardService.PaginationGetPaperApply(c, &awardpb.PaginationGetPaperApplyRequest{
+		BaseRequest: baseRequest,
+		PageIndex:   int32(pageIndex),
+		PageSize:    int32(pageSize),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询论文奖励申请信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	respData := &response.PaginationQueryResponse{
+		Data:  resp.Applies,
+		Count: int(resp.Count),
+	}
+	if resp.Applies == nil {
+		respData.Data = make([]*awardpb.PaperApply, 0)
+	}
+	httpResp := response.New(200, respData, true, "success")
+	httpResp.Send(ctx)
+
+}
+
 func (a *award) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	awardRouter := router.Group("/award")
 	awardRouter.GET("/ping", a.ping)
 	middleware.RegistryExcludeAPIPath("GET:/api/award/ping")
 
 	awardRouter.POST("/paper", a.createPaperAwardApply)
+	awardRouter.GET("/paper", a.paginationGetPaperApply)
 
 	return awardRouter
 }

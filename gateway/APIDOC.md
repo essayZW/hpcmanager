@@ -1024,3 +1024,13 @@ type CreatePaperAwardApplyParam struct {
 ```
 
 响应: 创建的申请记录的 ID
+
+### /award/paper
+
+Method: GET
+
+描述: 分页查询论文奖励申请记录
+
+请求参数: 标准的分页参数
+
+响应参数: 查询的信息
