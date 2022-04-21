@@ -1002,3 +1002,25 @@ Method: GET
 参数：无
 
 响应：请求 ID、PONG
+
+### /award/paper
+
+Method: POST
+
+描述: 创建论文奖励申请
+
+参数:
+
+```go
+// CreatePaperAwardApplyParam 创建论文奖励申请参数
+type CreatePaperAwardApplyParam struct {
+    Title               string `form:"title"               json:"title"               binding:"required"`
+    Category            string `form:"category"            json:"category"            binding:"required"`
+    Partition           string `form:"partition"           json:"partition"           binding:"required"`
+    FirstPageImageName  string `form:"firstPageImageName"  json:"firstPageImageName"  binding:"required"`
+    ThanksPageImageName string `form:"thanksPageImageName" json:"thanksPageImageName" binding:"required"`
+    RemarkMessage       string `form:"remarkMessage"       json:"remarkMessage"`
+}
+```
+
+响应: 创建的申请记录的 ID
