@@ -1,6 +1,8 @@
 package json
 
 import (
+	"reflect"
+
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 )
@@ -9,6 +11,8 @@ func init() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		createPaperAwardApplyParam := CreatePaperAwardApplyParam{}
 		v.RegisterStructValidation(createPaperAwardApplyParam.Validator(), createPaperAwardApplyParam)
+		checkPaperApplyParam := CheckPaperApplyParam{}
+		v.RegisterStructValidation(checkPaperApplyParam.Validator(), checkPaperApplyParam)
 	}
 }
 
@@ -24,5 +28,24 @@ type CreatePaperAwardApplyParam struct {
 
 func (param *CreatePaperAwardApplyParam) Validator() validator.StructLevelFunc {
 	return func(sl validator.StructLevel) {
+	}
+}
+
+// CheckPaperApplyParam 审核论文奖励申请参数
+type CheckPaperApplyParam struct {
+	ID           int     `form:"id"           json:"id"           binding:"required"`
+	CheckMoney   float64 `form:"checkMoney"   json:"checkMoney"`
+	CheckMessage string  `form:"checkMessage" json:"checkMessage"`
+}
+
+func (param *CheckPaperApplyParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(PayNodeDistributeBillParam)
+		if data.ID <= 0 {
+			sl.ReportError(reflect.ValueOf(data.ID), "ID", "ID", "binding", "invalid apply id")
+		}
+		if data.PayMoney < 0 {
+			sl.ReportError(reflect.ValueOf(data.PayMoney), "payMoney", "payMoney", "binding", "payMoney can't less than 0")
+		}
 	}
 }
