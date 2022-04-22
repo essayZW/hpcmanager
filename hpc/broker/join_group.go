@@ -35,7 +35,8 @@ func userJoinGroupCustomer(client client.Client) func(broker.Event) error {
 			logger.Warn("Message customer: decode error: ", err)
 			return err
 		}
-		// TODO: 调用hpc服务初始化用户的存储信息
+		// 调用hpc服务初始化用户的存储信息
+
 		c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
 		defer cancel()
 		baseRequest := &proto.BaseRequest{

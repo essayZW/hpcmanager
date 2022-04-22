@@ -113,32 +113,6 @@ func (this *NodeQuotaBill) CalFee(oldSize, newSize int, oldEndTime, newEndTime t
 	return quotaFeePerYear*yearDuration + expandFeePerYear*expandSizeDuration
 }
 
-// NewNodeQuotaBill 创建新的节点存储账单操作逻辑
-func NewNodeQuotaBill(nodeQuotaBillDB *db.NodeQuotaBillDB, dynamicConfig config.DynamicConfig) (*NodeQuotaBill, error) {
-	res := &NodeQuotaBill{
-		nodeQuotaBillDB: nodeQuotaBillDB,
-	}
-
-	var basicFeeRate float64
-	var extraFeeRate float64
-
-	err := dynamicConfig.Registry("fee_rate_Quota_basic", &basicFeeRate, func(newV interface{}) {
-		res.mutex.Lock()
-		defer res.mutex.Unlock()
-		res.basicPerYearPerTB = basicFeeRate
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	err = dynamicConfig.Registry("fee_rate_Quota_extra", &extraFeeRate, func(newV interface{}) {
-		res.mutex.Lock()
-		defer res.mutex.Unlock()
-		res.extraPerYearPerTB = extraFeeRate
-	})
-	return res, nil
-}
-
 // PaginationGetNodeQuotaBillsResult 分页查询机器存储账单的结果
 type PaginationGetNodeQuotaBillsResult struct {
 	Count int
@@ -253,3 +227,29 @@ const (
 	// ChangeEndTime 修改期限的最后的时间
 	ChangeEndTime QuoatOperationType = 2
 )
+
+// NewNodeQuotaBill 创建新的节点存储账单操作逻辑
+func NewNodeQuotaBill(nodeQuotaBillDB *db.NodeQuotaBillDB, dynamicConfig config.DynamicConfig) (*NodeQuotaBill, error) {
+	res := &NodeQuotaBill{
+		nodeQuotaBillDB: nodeQuotaBillDB,
+	}
+
+	var basicFeeRate float64
+	var extraFeeRate float64
+
+	err := dynamicConfig.Registry("fee_rate_Quota_basic", &basicFeeRate, func(newV interface{}) {
+		res.mutex.Lock()
+		defer res.mutex.Unlock()
+		res.basicPerYearPerTB = basicFeeRate
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	err = dynamicConfig.Registry("fee_rate_Quota_extra", &extraFeeRate, func(newV interface{}) {
+		res.mutex.Lock()
+		defer res.mutex.Unlock()
+		res.extraPerYearPerTB = extraFeeRate
+	})
+	return res, nil
+}

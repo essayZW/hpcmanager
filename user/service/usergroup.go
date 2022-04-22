@@ -200,7 +200,6 @@ func (group *UserGroupService) CreateJoinGroupApply(
 	resp.ApplyID = int32(id.(int64))
 	logger.Info("Create new user join group apply: ", id)
 	resp.Success = true
-	// TODO: 发送异步消息，表明申请已经创建
 	return nil
 }
 
