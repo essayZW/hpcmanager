@@ -129,6 +129,7 @@ func (a *award) checkPaperApply(ctx *gin.Context) {
 		ApplyID:      int32(param.ID),
 		Money:        param.CheckMoney,
 		CheckMessage: param.CheckMessage,
+		Accept:       param.Accept,
 	})
 
 	if err != nil {

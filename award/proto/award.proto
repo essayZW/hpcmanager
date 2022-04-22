@@ -46,6 +46,7 @@ message CheckPaperApplyByIDRequest {
     int32 applyID = 2;
     double money = 3;
     string checkMessage = 4;
+    bool accept = 5;
 }
 
 message CheckPaperApplyByIDResponse {

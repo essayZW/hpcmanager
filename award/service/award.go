@@ -184,19 +184,23 @@ func (as *AwardService) CheckPaperApplyByID(
 		if err != nil {
 			return false, err
 		}
-		if info.CheckStatus.Int64 == 1 {
+		if info.CheckStatus != -1 {
 			return false, errors.New("this apply had checked")
 		}
 		status, err := as.paperAwardLogic.CheckPaperApply(c, int(req.ApplyID), &logic.UserInfoParam{
 			ID:       int(req.BaseRequest.UserInfo.UserId),
 			Username: req.BaseRequest.UserInfo.Username,
 			Name:     req.BaseRequest.UserInfo.Name,
-		}, req.Money, req.CheckMessage)
+		}, req.Money, req.CheckMessage, req.Accept)
 		if err != nil {
 			return status, err
 		}
 		if !status {
 			return status, err
+		}
+		if !req.Accept {
+			// 审核未通过
+			return true, nil
 		}
 		// 进行余额的充值
 		_, err = as.userGroupService.AddBalance(ctx, &userpb.AddBalanceRequest{

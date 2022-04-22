@@ -36,6 +36,7 @@ type CheckPaperApplyParam struct {
 	ID           int     `form:"id"           json:"id"           binding:"required"`
 	CheckMoney   float64 `form:"checkMoney"   json:"checkMoney"`
 	CheckMessage string  `form:"checkMessage" json:"checkMessage"`
+	Accept       bool    `form:"accept"       json:"accept"`
 }
 
 func (param *CheckPaperApplyParam) Validator() validator.StructLevelFunc {

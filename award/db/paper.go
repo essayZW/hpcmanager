@@ -157,7 +157,8 @@ func (this *PaperAwardDB) QueryWithLimitByGroupID(ctx context.Context, groupID i
 func (this *PaperAwardDB) UpdateCheckStatus(ctx context.Context, checkInfos *PaperApply) (bool, error) {
 	res, err := this.conn.Exec(
 		ctx,
-		"UPDATE `paper_apply` SET `check_status`=1, `checker_id`=?, `checker_name`=?, `checker_username`=?, `check_money`=?, `check_message`=?, `check_time`=? WHERE `id`=? AND `check_status`=0",
+		"UPDATE `paper_apply` SET `check_status`=?, `checker_id`=?, `checker_name`=?, `checker_username`=?, `check_money`=?, `check_message`=?, `check_time`=? WHERE `id`=? AND `check_status`=-1",
+		checkInfos.CheckStatus,
 		checkInfos.CheckerID,
 		checkInfos.CheckerName,
 		checkInfos.CheckerUsername,

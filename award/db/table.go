@@ -24,7 +24,7 @@ type PaperApply struct {
 	PaperFirstPageImageName  string      `db:"paper_firstpage_img"`
 	PaperThanksPageImageName string      `db:"paper_thankspage_img"`
 	RemarkMessage            string      `db:"remark_message"`
-	CheckStatus              null.Int    `db:"check_status"`
+	CheckStatus              int8        `db:"check_status"`
 	CheckerID                null.Int    `db:"checker_id"`
 	CheckerName              null.String `db:"checker_name"`
 	CheckerUsername          null.String `db:"checker_username"`

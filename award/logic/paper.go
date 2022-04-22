@@ -131,12 +131,18 @@ func (this *Paper) CheckPaperApply(
 	checkerInfo *UserInfoParam,
 	money float64,
 	message string,
+	accept bool,
 ) (bool, error) {
 	if checkerInfo == nil {
 		return false, errors.New("checker info can't be nil")
 	}
+	checkStatus := 0
+	if accept {
+		checkStatus = 1
+	}
 	return this.paperAwardDB.UpdateCheckStatus(ctx, &db.PaperApply{
 		ID:              id,
+		CheckStatus:     checkStatus,
 		CheckerID:       null.IntFrom(int64(checkerInfo.ID)),
 		CheckerUsername: null.StringFrom(checkerInfo.Username),
 		CheckerName:     null.StringFrom(checkerInfo.Name),
@@ -155,4 +161,4 @@ func NewPaper(paperAwardDB *db.PaperAwardDB) *Paper {
 	return &Paper{
 		paperAwardDB: paperAwardDB,
 	}
-}
+
