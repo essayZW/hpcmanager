@@ -6,6 +6,7 @@ import (
 
 	"github.com/essayZW/hpcmanager/award/logic"
 	awardpb "github.com/essayZW/hpcmanager/award/proto"
+	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
 	publicproto "github.com/essayZW/hpcmanager/proto"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
@@ -155,6 +156,64 @@ func (as *AwardService) PaginationGetPaperApply(
 			resp.Applies[i].ExtraAttributes = infos.Data[i].ExtraAttributes.String()
 		}
 	}
+	return nil
+}
+
+// CheckPaperApplyByID 通过ID审核论文奖励申请
+func (as *AwardService) CheckPaperApplyByID(
+	ctx context.Context,
+	req *awardpb.CheckPaperApplyByIDRequest,
+	resp *awardpb.CheckPaperApplyByIDResponse,
+) error {
+	logger.Info("CheckPaperApplyByID error: ", req.BaseRequest)
+	if !verify.Identify(verify.CheckPaperAwardApply, req.GetBaseRequest().GetUserInfo().GetLevels()) {
+		logger.Info(
+			"CheckPaperAwardApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("CheckPaperAwardApply permission forbidden")
+	}
+
+	status, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		// 查询申请的信息
+		info, err := as.paperAwardLogic.GetInfoByID(c, int(req.ApplyID))
+		if err != nil {
+			return false, err
+		}
+		if info.CheckStatus.Int64 == 1 {
+			return false, errors.New("this apply had checked")
+		}
+		status, err := as.paperAwardLogic.CheckPaperApply(c, int(req.ApplyID), &logic.UserInfoParam{
+			ID:       int(req.BaseRequest.UserInfo.UserId),
+			Username: req.BaseRequest.UserInfo.Username,
+			Name:     req.BaseRequest.UserInfo.Name,
+		}, req.Money, req.CheckMessage)
+		if err != nil {
+			return status, err
+		}
+		if !status {
+			return status, err
+		}
+		// 进行余额的充值
+		_, err = as.userGroupService.AddBalance(ctx, &userpb.AddBalanceRequest{
+			BaseRequest: req.BaseRequest,
+			GroupID:     int32(info.UserGroupID),
+			Money:       req.Money,
+		})
+		if err != nil {
+			logger.Warn(err)
+			return false, errors.New("add balance error")
+		}
+		return true, nil
+	})
+	if err != nil {
+		return err
+	}
+	resp.Success = status.(bool)
 	return nil
 }
 

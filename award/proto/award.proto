@@ -13,6 +13,7 @@ service AwardService {
     rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
     rpc CreatePaperAward(CreatePaperAwardRequest) returns (CreatePaperAwardResponse) {}
     rpc PaginationGetPaperApply(PaginationGetPaperApplyRequest) returns (PaginationGetPaperApplyResponse) {}
+    rpc CheckPaperApplyByID(CheckPaperApplyByIDRequest) returns (CheckPaperApplyByIDResponse) {}
 }
 
 message CreatePaperAwardRequest {
@@ -38,4 +39,15 @@ message PaginationGetPaperApplyRequest {
 message PaginationGetPaperApplyResponse {
     int32 count = 1;
     repeated award.PaperApply applies = 2;
+}
+
+message CheckPaperApplyByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    double money = 3;
+    string checkMessage = 4;
+}
+
+message CheckPaperApplyByIDResponse {
+    bool success = 1;
 }

@@ -78,3 +78,28 @@ message PaginationGetPaperApplyResponse {
     repeated award.PaperApply applies = 2;
 }
 ```
+
+## CheckPaperApplyByID
+
+描述: 审核论文奖励申请信息
+
+原型定义: `rpc CheckPaperApplyByID(CheckPaperApplyByIDRequest) returns (CheckPaperApplyByIDResponse) {}`
+
+请求参数:
+
+```protobuf
+message CheckPaperApplyByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    double money = 3;
+    string checkMessage = 4;
+}
+```
+
+响应参数:
+
+```protobuf
+message CheckPaperApplyByIDResponse {
+    bool success = 1;
+}
+```

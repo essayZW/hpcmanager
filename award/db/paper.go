@@ -153,6 +153,46 @@ func (this *PaperAwardDB) QueryWithLimitByGroupID(ctx context.Context, groupID i
 	return res, nil
 }
 
+// UpdateCheckStatus 更新记录的审核信息
+func (this *PaperAwardDB) UpdateCheckStatus(ctx context.Context, checkInfos *PaperApply) (bool, error) {
+	res, err := this.conn.Exec(
+		ctx,
+		"UPDATE `paper_apply` SET `check_status`=1, `checker_id`=?, `checker_name`=?, `checker_username`=?, `check_money`=?, `check_message`=?, `check_time`=? WHERE `id`=? AND `check_status`=0",
+		checkInfos.CheckerID,
+		checkInfos.CheckerName,
+		checkInfos.CheckerUsername,
+		checkInfos.CheckMoney,
+		checkInfos.CheckMessage,
+		checkInfos.CheckTime,
+		checkInfos.ID,
+	)
+	if err != nil {
+		logger.Warn("UpdateCheckStatus error: ", err)
+		return false, errors.New("UpdateCheckStatus error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateCheckStatus error: ", err)
+		return false, errors.New("UpdateCheckStatus error")
+	}
+	return count > 0, nil
+}
+
+// QueryByID 通过ID查询记录信息
+func (this *PaperAwardDB) QueryByID(ctx context.Context, id int) (*PaperApply, error) {
+	row, err := this.conn.QueryRow(ctx, "SELECT * FROM `paper_apply` WHERE `id`=?", id)
+	if err != nil {
+		logger.Warn("QueryByID error: ", err)
+		return nil, errors.New("QueryByID error")
+	}
+	var info PaperApply
+	if err := row.StructScan(&info); err != nil {
+		logger.Warn("QueryByID struct scan error: ", err)
+		return nil, errors.New("QueryByID struct scan error")
+	}
+	return &info, nil
+}
+
 func NewPaperAward(conn *db.DB) *PaperAwardDB {
 	return &PaperAwardDB{
 		conn: conn,

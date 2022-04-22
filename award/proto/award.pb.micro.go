@@ -41,6 +41,7 @@ type AwardService interface {
 	Ping(ctx context.Context, in *proto1.Empty, opts ...client.CallOption) (*proto1.PingResponse, error)
 	CreatePaperAward(ctx context.Context, in *CreatePaperAwardRequest, opts ...client.CallOption) (*CreatePaperAwardResponse, error)
 	PaginationGetPaperApply(ctx context.Context, in *PaginationGetPaperApplyRequest, opts ...client.CallOption) (*PaginationGetPaperApplyResponse, error)
+	CheckPaperApplyByID(ctx context.Context, in *CheckPaperApplyByIDRequest, opts ...client.CallOption) (*CheckPaperApplyByIDResponse, error)
 }
 
 type awardService struct {
@@ -85,12 +86,23 @@ func (c *awardService) PaginationGetPaperApply(ctx context.Context, in *Paginati
 	return out, nil
 }
 
+func (c *awardService) CheckPaperApplyByID(ctx context.Context, in *CheckPaperApplyByIDRequest, opts ...client.CallOption) (*CheckPaperApplyByIDResponse, error) {
+	req := c.c.NewRequest(c.name, "AwardService.CheckPaperApplyByID", in)
+	out := new(CheckPaperApplyByIDResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for AwardService service
 
 type AwardServiceHandler interface {
 	Ping(context.Context, *proto1.Empty, *proto1.PingResponse) error
 	CreatePaperAward(context.Context, *CreatePaperAwardRequest, *CreatePaperAwardResponse) error
 	PaginationGetPaperApply(context.Context, *PaginationGetPaperApplyRequest, *PaginationGetPaperApplyResponse) error
+	CheckPaperApplyByID(context.Context, *CheckPaperApplyByIDRequest, *CheckPaperApplyByIDResponse) error
 }
 
 func RegisterAwardServiceHandler(s server.Server, hdlr AwardServiceHandler, opts ...server.HandlerOption) error {
@@ -98,6 +110,7 @@ func RegisterAwardServiceHandler(s server.Server, hdlr AwardServiceHandler, opts
 		Ping(ctx context.Context, in *proto1.Empty, out *proto1.PingResponse) error
 		CreatePaperAward(ctx context.Context, in *CreatePaperAwardRequest, out *CreatePaperAwardResponse) error
 		PaginationGetPaperApply(ctx context.Context, in *PaginationGetPaperApplyRequest, out *PaginationGetPaperApplyResponse) error
+		CheckPaperApplyByID(ctx context.Context, in *CheckPaperApplyByIDRequest, out *CheckPaperApplyByIDResponse) error
 	}
 	type AwardService struct {
 		awardService
@@ -120,4 +133,8 @@ func (h *awardServiceHandler) CreatePaperAward(ctx context.Context, in *CreatePa
 
 func (h *awardServiceHandler) PaginationGetPaperApply(ctx context.Context, in *PaginationGetPaperApplyRequest, out *PaginationGetPaperApplyResponse) error {
 	return h.AwardServiceHandler.PaginationGetPaperApply(ctx, in, out)
+}
+
+func (h *awardServiceHandler) CheckPaperApplyByID(ctx context.Context, in *CheckPaperApplyByIDRequest, out *CheckPaperApplyByIDResponse) error {
+	return h.AwardServiceHandler.CheckPaperApplyByID(ctx, in, out)
 }

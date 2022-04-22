@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/essayZW/hpcmanager/award/db"
+	"gopkg.in/guregu/null.v4"
 )
 
 type Paper struct {
@@ -121,6 +122,33 @@ func (this *Paper) PaginationGetByGroupID(
 		Count: count,
 		Data:  data,
 	}, nil
+}
+
+// CheckPaperApply 审核论文奖励申请
+func (this *Paper) CheckPaperApply(
+	ctx context.Context,
+	id int,
+	checkerInfo *UserInfoParam,
+	money float64,
+	message string,
+) (bool, error) {
+	if checkerInfo == nil {
+		return false, errors.New("checker info can't be nil")
+	}
+	return this.paperAwardDB.UpdateCheckStatus(ctx, &db.PaperApply{
+		ID:              id,
+		CheckerID:       null.IntFrom(int64(checkerInfo.ID)),
+		CheckerUsername: null.StringFrom(checkerInfo.Username),
+		CheckerName:     null.StringFrom(checkerInfo.Name),
+		CheckMoney:      money,
+		CheckMessage:    null.StringFrom(message),
+		CheckTime:       null.TimeFrom(time.Now()),
+	})
+}
+
+// GetInfoByID 通过ID查询信息
+func (this *Paper) GetInfoByID(ctx context.Context, id int) (*db.PaperApply, error) {
+	return this.paperAwardDB.QueryByID(ctx, id)
 }
 
 func NewPaper(paperAwardDB *db.PaperAwardDB) *Paper {
