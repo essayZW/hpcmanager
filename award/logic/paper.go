@@ -142,7 +142,7 @@ func (this *Paper) CheckPaperApply(
 	}
 	return this.paperAwardDB.UpdateCheckStatus(ctx, &db.PaperApply{
 		ID:              id,
-		CheckStatus:     checkStatus,
+		CheckStatus:     int8(checkStatus),
 		CheckerID:       null.IntFrom(int64(checkerInfo.ID)),
 		CheckerUsername: null.StringFrom(checkerInfo.Username),
 		CheckerName:     null.StringFrom(checkerInfo.Name),
@@ -161,4 +161,4 @@ func NewPaper(paperAwardDB *db.PaperAwardDB) *Paper {
 	return &Paper{
 		paperAwardDB: paperAwardDB,
 	}
-
+}
