@@ -267,8 +267,11 @@ const checkPaperApplyFormSubmit = async (accept: boolean) => {
     </el-form>
     <el-form>
       <el-form-item label="审核状态: ">
-        <span v-if="dialogInfo?.checkStatus" class="red">未审核</span>
-        <span v-else class="green">已审核</span>
+        <span v-if="dialogInfo?.checkStatus == -1">未审核</span>
+        <span v-else-if="dialogInfo?.checkStatus == 1" class="green"
+          >已经通过</span
+        >
+        <span v-else class="red">未通过</span>
       </el-form-item>
     </el-form>
     <el-form v-if="dialogInfo?.checkStatus"></el-form>
