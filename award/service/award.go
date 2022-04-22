@@ -143,7 +143,7 @@ func (as *AwardService) PaginationGetPaperApply(
 			PaperFirstPageImageName:  infos.Data[i].PaperFirstPageImageName,
 			PaperThanksPageImageName: infos.Data[i].PaperThanksPageImageName,
 			RemarkMessage:            infos.Data[i].RemarkMessage,
-			CheckStatus:              int32(infos.Data[i].CheckStatus.Int64),
+			CheckStatus:              int32(infos.Data[i].CheckStatus),
 			CheckerID:                int32(infos.Data[i].CheckerID.Int64),
 			CheckerUsername:          infos.Data[i].CheckerUsername.String,
 			CheckerName:              infos.Data[i].CheckerName.String,
