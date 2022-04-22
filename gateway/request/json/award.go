@@ -41,12 +41,18 @@ type CheckPaperApplyParam struct {
 
 func (param *CheckPaperApplyParam) Validator() validator.StructLevelFunc {
 	return func(sl validator.StructLevel) {
-		data := sl.Current().Interface().(PayNodeDistributeBillParam)
+		data := sl.Current().Interface().(CheckPaperApplyParam)
 		if data.ID <= 0 {
 			sl.ReportError(reflect.ValueOf(data.ID), "ID", "ID", "binding", "invalid apply id")
 		}
-		if data.PayMoney < 0 {
-			sl.ReportError(reflect.ValueOf(data.PayMoney), "payMoney", "payMoney", "binding", "payMoney can't less than 0")
+		if data.CheckMoney < 0 {
+			sl.ReportError(
+				reflect.ValueOf(data.CheckMoney),
+				"checkMoney",
+				"checkMoney",
+				"binding",
+				"checkMoney can't less than 0",
+			)
 		}
 	}
 }

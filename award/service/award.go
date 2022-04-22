@@ -198,10 +198,12 @@ func (as *AwardService) CheckPaperApplyByID(
 		if !status {
 			return status, err
 		}
+		logger.Debug(req.Accept)
 		if !req.Accept {
 			// 审核未通过
 			return true, nil
 		}
+		logger.Debug(req.Money)
 		// 进行余额的充值
 		_, err = as.userGroupService.AddBalance(ctx, &userpb.AddBalanceRequest{
 			BaseRequest: req.BaseRequest,
