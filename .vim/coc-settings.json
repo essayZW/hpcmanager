@@ -4,5 +4,7 @@
     "awarddb",
     "etcdsync",
     "fsspb"
-  ]
+  ],
+  "volar.takeOverMode.enabled": true,
+  "tsserver.enable": false
 }

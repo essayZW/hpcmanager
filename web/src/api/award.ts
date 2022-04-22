@@ -102,3 +102,33 @@ export async function paginationQueryPaperApply(
   }
   return resp.data;
 }
+
+/**
+ * 审核论文奖励申请
+ */
+export type CheckPaperApplyParam = {
+  id: number;
+  checkMoney: number;
+  checkMessage: string;
+  accept: boolean;
+};
+
+/**
+ * 审核论文申请奖励
+ */
+export async function checkPaperApplyByID(
+  param: CheckPaperApplyParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/award/paper',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}

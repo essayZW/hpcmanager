@@ -4,6 +4,7 @@ import {
   createPaperAwardApply,
   PaperApply,
   paginationQueryPaperApply,
+  checkPaperApplyByID,
 } from '../api/award';
 import { uploadFileUrlPathBase } from '../api/fss';
 /**
@@ -68,4 +69,21 @@ export async function paginationGetPaperApply(
       uploadFileUrlPathBase + '/' + single.paperThanksPageImageName;
   }
   return data;
+}
+
+/**
+ * 审核论文奖励申请
+ */
+export async function checkPaperAwardApply(
+  id: number,
+  accept: boolean,
+  money: number,
+  message: string
+): Promise<boolean> {
+  return checkPaperApplyByID({
+    id,
+    accept,
+    checkMoney: money,
+    checkMessage: message,
+  });
 }

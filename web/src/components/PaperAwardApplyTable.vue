@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import dayjs from 'dayjs';
-import { paginationGetPaperApply } from '../service/award';
+import {
+  paginationGetPaperApply,
+  checkPaperAwardApply,
+} from '../service/award';
 import { PaperApply } from '../api/award';
+import { isAdmin } from '../service/user';
 
 // 表格数据
 const tableData = reactive<{
@@ -80,6 +84,57 @@ const showDialog = () => {
 const hideDialog = () => {
   dialogVisible.value = false;
 };
+
+const checkDialogVisible = ref<boolean>(false);
+
+const checkDialogInfo = reactive<{
+  paper?: PaperApply;
+}>({});
+const showCheckDialog = (row: PaperApply) => {
+  checkDialogInfo.paper = row;
+  checkDialogVisible.value = true;
+};
+
+const hideCheckDialog = () => {
+  checkDialogVisible.value = false;
+};
+
+const checkDialogForm = reactive<{
+  money: number;
+  message: string;
+}>({
+  money: 0,
+  message: '',
+});
+
+const checkPaperApplyFormSubmit = async (accept: boolean) => {
+  if (!checkDialogInfo.paper) {
+    ElMessage({
+      type: 'error',
+      message: '申请信息加载失败,请刷新重试',
+    });
+    return;
+  }
+  try {
+    await checkPaperAwardApply(
+      checkDialogInfo.paper.id,
+      accept,
+      checkDialogForm.money,
+      checkDialogForm.message
+    );
+    ElMessage({
+      type: 'success',
+      message: '审核成功',
+    });
+    hideCheckDialog();
+    refreshTableData();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+};
 </script>
 <template>
   <el-row justify="space-between" class="button-row">
@@ -138,11 +193,18 @@ const hideDialog = () => {
         </el-table-column>
         <el-table-column label="审核状态" align="center">
           <template #default="props">
-            <span v-if="props.row.checkStatus == -1">未审核</span>
-            <span v-else-if="props.row.checkStatus == 1" class="green"
-              >审核通过</span
-            >
-            <span v-else class="red">审核未通过</span>
+            <div v-if="props.row.checkStatus == -1 && isAdmin()">
+              <el-button type="primary" @click="showCheckDialog(props.row)"
+                >审核</el-button
+              >
+            </div>
+            <div v-else>
+              <span v-if="props.row.checkStatus == -1">未审核</span>
+              <span v-else-if="props.row.checkStatus == 1" class="green"
+                >审核通过</span
+              >
+              <span v-else class="red">审核未通过</span>
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="详情" align="center">
@@ -213,6 +275,36 @@ const hideDialog = () => {
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="hideDialog">关闭</el-button>
+      </span>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="checkDialogVisible" title="审核论文奖励申请">
+    <el-form>
+      <el-form-item label="奖励金额: ">
+        <el-input
+          v-model.number="checkDialogForm.money"
+          type="number"
+          placeholder="审核成功后发放的奖励的金额数量"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="审核备注: ">
+        <el-input
+          v-model="checkDialogForm.message"
+          type="textarea"
+          placeholder="审核的备注消息"
+          autosize
+        ></el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="checkPaperApplyFormSubmit(true)"
+          >通过</el-button
+        >
+        <el-button type="danger" @click="checkPaperApplyFormSubmit(false)"
+          >不通过</el-button
+        >
+        <el-button @click="hideCheckDialog">关闭</el-button>
       </span>
     </template>
   </el-dialog>
