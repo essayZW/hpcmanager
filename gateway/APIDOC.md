@@ -1056,3 +1056,21 @@ type CreatePaperAwardApplyParam struct {
 ```
 
 响应参数: 是否成功
+
+### /award/technology
+
+描述: 创建科技奖励申请
+
+参数:
+
+```go
+// CreateTechnologyAwardApplyParam 创建科技奖励申请参数
+type CreateTechnologyAwardApplyParam struct {
+    ProjectID      int    `form:"projectID"      json:"projectID"      binding:"required"`
+    PrizeLevel     string `form:"prizeLevel"     json:"prizeLevel"     binding:"required"`
+    PrizeImageName string `form:"prizeImageName" json:"prizeImageName" binding:"required"`
+    RemarkMessage  string `form:"remarkMessage"  json:"remarkMessage"`
+}
+```
+
+响应: 创建的记录的 ID
