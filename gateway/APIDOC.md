@@ -1074,3 +1074,13 @@ type CreateTechnologyAwardApplyParam struct {
 ```
 
 响应: 创建的记录的 ID
+
+### /award/technology
+
+Method: GET
+
+描述: 分页查询科技奖励申请记录
+
+请求参数: 标准的分页参数
+
+响应参数: 查询的信息

@@ -181,6 +181,42 @@ func (a *award) createTechnologyAwardApply(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// paginationGetTechnologyApply /api/award/technology GET 分页查询科技奖励申请信息
+func (a *award) paginationGetTechnologyApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := a.awardService.PaginationGetTechnologyApply(c, &awardpb.PaginationGetTechnologyApplyRequest{
+		BaseRequest: baseRequest,
+		PageIndex:   int32(pageIndex),
+		PageSize:    int32(pageSize),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询科技奖励申请信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	respData := &response.PaginationQueryResponse{
+		Data:  resp.Applies,
+		Count: int(resp.Count),
+	}
+	if resp.Applies == nil {
+		respData.Data = make([]*awardpb.TechnologyApply, 0)
+	}
+	httpResp := response.New(200, respData, true, "success")
+	httpResp.Send(ctx)
+}
+
 func (a *award) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	awardRouter := router.Group("/award")
 	awardRouter.GET("/ping", a.ping)
@@ -191,6 +227,7 @@ func (a *award) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	awardRouter.PUT("/paper", a.checkPaperApply)
 
 	awardRouter.POST("/technology", a.createTechnologyAwardApply)
+	awardRouter.GET("/technology", a.paginationGetTechnologyApply)
 	return awardRouter
 }
 func NewAward(client client.Client) Controller {
