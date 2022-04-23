@@ -44,6 +44,7 @@ type AwardService interface {
 	CheckPaperApplyByID(ctx context.Context, in *CheckPaperApplyByIDRequest, opts ...client.CallOption) (*CheckPaperApplyByIDResponse, error)
 	CreateTechnologyAwardApply(ctx context.Context, in *CreateTechnologyAwardApplyRequest, opts ...client.CallOption) (*CreateTechnologyAwardApplyResponse, error)
 	PaginationGetTechnologyApply(ctx context.Context, in *PaginationGetTechnologyApplyRequest, opts ...client.CallOption) (*PaginationGetTechnologyApplyResponse, error)
+	CheckTechnologyApplyByID(ctx context.Context, in *CheckTechnologyApplyByIDRequest, opts ...client.CallOption) (*CheckTechnologyApplyByIDResponse, error)
 }
 
 type awardService struct {
@@ -118,6 +119,16 @@ func (c *awardService) PaginationGetTechnologyApply(ctx context.Context, in *Pag
 	return out, nil
 }
 
+func (c *awardService) CheckTechnologyApplyByID(ctx context.Context, in *CheckTechnologyApplyByIDRequest, opts ...client.CallOption) (*CheckTechnologyApplyByIDResponse, error) {
+	req := c.c.NewRequest(c.name, "AwardService.CheckTechnologyApplyByID", in)
+	out := new(CheckTechnologyApplyByIDResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for AwardService service
 
 type AwardServiceHandler interface {
@@ -127,6 +138,7 @@ type AwardServiceHandler interface {
 	CheckPaperApplyByID(context.Context, *CheckPaperApplyByIDRequest, *CheckPaperApplyByIDResponse) error
 	CreateTechnologyAwardApply(context.Context, *CreateTechnologyAwardApplyRequest, *CreateTechnologyAwardApplyResponse) error
 	PaginationGetTechnologyApply(context.Context, *PaginationGetTechnologyApplyRequest, *PaginationGetTechnologyApplyResponse) error
+	CheckTechnologyApplyByID(context.Context, *CheckTechnologyApplyByIDRequest, *CheckTechnologyApplyByIDResponse) error
 }
 
 func RegisterAwardServiceHandler(s server.Server, hdlr AwardServiceHandler, opts ...server.HandlerOption) error {
@@ -137,6 +149,7 @@ func RegisterAwardServiceHandler(s server.Server, hdlr AwardServiceHandler, opts
 		CheckPaperApplyByID(ctx context.Context, in *CheckPaperApplyByIDRequest, out *CheckPaperApplyByIDResponse) error
 		CreateTechnologyAwardApply(ctx context.Context, in *CreateTechnologyAwardApplyRequest, out *CreateTechnologyAwardApplyResponse) error
 		PaginationGetTechnologyApply(ctx context.Context, in *PaginationGetTechnologyApplyRequest, out *PaginationGetTechnologyApplyResponse) error
+		CheckTechnologyApplyByID(ctx context.Context, in *CheckTechnologyApplyByIDRequest, out *CheckTechnologyApplyByIDResponse) error
 	}
 	type AwardService struct {
 		awardService
@@ -171,4 +184,8 @@ func (h *awardServiceHandler) CreateTechnologyAwardApply(ctx context.Context, in
 
 func (h *awardServiceHandler) PaginationGetTechnologyApply(ctx context.Context, in *PaginationGetTechnologyApplyRequest, out *PaginationGetTechnologyApplyResponse) error {
 	return h.AwardServiceHandler.PaginationGetTechnologyApply(ctx, in, out)
+}
+
+func (h *awardServiceHandler) CheckTechnologyApplyByID(ctx context.Context, in *CheckTechnologyApplyByIDRequest, out *CheckTechnologyApplyByIDResponse) error {
+	return h.AwardServiceHandler.CheckTechnologyApplyByID(ctx, in, out)
 }

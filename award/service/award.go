@@ -365,6 +365,70 @@ func (as *AwardService) PaginationGetTechnologyApply(
 	return nil
 }
 
+// CheckTechnologyApply 审核科技奖励申请
+func (as *AwardService) CheckTechnologyApplyByID(
+	ctx context.Context,
+	req *awardpb.CheckTechnologyApplyByIDRequest,
+	resp *awardpb.CheckTechnologyApplyByIDResponse,
+) error {
+	logger.Info("CheckTechnologyApply: ", req.BaseRequest)
+	if !verify.Identify(verify.CheckTechnologyApply, req.GetBaseRequest().GetUserInfo().GetLevels()) {
+		logger.Info(
+			"CheckTechnologyApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("CheckTechnologyApply permission forbidden")
+	}
+
+	status, err := db.Transaction(context.Background(), func(c context.Context, i ...interface{}) (interface{}, error) {
+		// 查询申请的信息
+		info, err := as.technologyAwardLogic.GetInfoByID(c, int(req.ApplyID))
+		if err != nil {
+			return false, err
+		}
+		if info.CheckStatus != -1 {
+			return false, errors.New("this apply had checked")
+		}
+		status, err := as.technologyAwardLogic.CheckTechnologyApply(c, int(req.ApplyID), &logic.UserInfoParam{
+			ID:       int(req.BaseRequest.UserInfo.UserId),
+			Username: req.BaseRequest.UserInfo.Username,
+			Name:     req.BaseRequest.UserInfo.Name,
+		}, req.Money, req.CheckMessage, req.Accept)
+		if err != nil {
+			return status, err
+		}
+		if !status {
+			return status, err
+		}
+		logger.Debug(req.Accept)
+		if !req.Accept {
+			// 审核未通过
+			return true, nil
+		}
+		logger.Debug(req.Money)
+		// 进行余额的充值
+		_, err = as.userGroupService.AddBalance(ctx, &userpb.AddBalanceRequest{
+			BaseRequest: req.BaseRequest,
+			GroupID:     int32(info.UserGroupID),
+			Money:       req.Money,
+		})
+		if err != nil {
+			logger.Warn(err)
+			return false, errors.New("add balance error")
+		}
+		return true, nil
+	})
+	if err != nil {
+		return err
+	}
+	resp.Success = status.(bool)
+	return nil
+}
+
 var _ awardpb.AwardServiceHandler = (*AwardService)(nil)
 
 func NewAward(client client.Client, paperAwardLogic *logic.Paper, technologyAwardLogic *logic.Technology) *AwardService {

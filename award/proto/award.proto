@@ -16,6 +16,7 @@ service AwardService {
     rpc CheckPaperApplyByID(CheckPaperApplyByIDRequest) returns (CheckPaperApplyByIDResponse) {}
     rpc CreateTechnologyAwardApply(CreateTechnologyAwardApplyRequest) returns (CreateTechnologyAwardApplyResponse) {}
     rpc PaginationGetTechnologyApply(PaginationGetTechnologyApplyRequest) returns (PaginationGetTechnologyApplyResponse) {}
+    rpc CheckTechnologyApplyByID(CheckTechnologyApplyByIDRequest) returns (CheckTechnologyApplyByIDResponse) {}
 }
 
 message CreatePaperAwardRequest {
@@ -76,4 +77,17 @@ message PaginationGetTechnologyApplyRequest {
 message PaginationGetTechnologyApplyResponse {
     int32 count = 1;
     repeated award.TechnologyApply applies = 2;
+}
+
+
+message CheckTechnologyApplyByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    double money = 3;
+    string checkMessage = 4;
+    bool accept = 5;
+}
+
+message CheckTechnologyApplyByIDResponse {
+    bool success = 1;
 }

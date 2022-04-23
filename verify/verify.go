@@ -88,6 +88,8 @@ const (
 	CreateTechnologyAwardApply = "__CREATE_TECHNOLOGY_AWARD_APPLY__"
 	// QueryTechnologyAwardApply 查询科技奖励申请
 	QueryTechnologyAwardApply = "__QUERY_TECHNOLOGY_AWARD_APPLY__"
+	// CheckTechnologyApply 审核科技奖励申请
+	CheckTechnologyApply = "__CHECK_TECHNOLOGY_APPLY__"
 )
 
 // Verify 进行操作的权限验证

@@ -118,6 +118,39 @@ func (this *Technology) PaginationGetByGroupID(
 	}, nil
 }
 
+// CheckTechnologyApply 审核科技奖励申请
+func (this *Technology) CheckTechnologyApply(
+	ctx context.Context,
+	id int,
+	checkerInfo *UserInfoParam,
+	money float64,
+	message string,
+	accept bool,
+) (bool, error) {
+	if checkerInfo == nil {
+		return false, errors.New("checker info can't be nil")
+	}
+	checkStatus := 0
+	if accept {
+		checkStatus = 1
+	}
+	return this.technologyAwardApplyDB.UpdateCheckStatus(ctx, &db.TechnologyApply{
+		ID:              id,
+		CheckStatus:     int8(checkStatus),
+		CheckerID:       null.IntFrom(int64(checkerInfo.ID)),
+		CheckerUsername: null.StringFrom(checkerInfo.Username),
+		CheckerName:     null.StringFrom(checkerInfo.Name),
+		CheckMoney:      money,
+		CheckMessage:    null.StringFrom(message),
+		CheckTime:       null.TimeFrom(time.Now()),
+	})
+}
+
+// GetInfoByID 通过ID查询信息
+func (this *Technology) GetInfoByID(ctx context.Context, id int) (*db.TechnologyApply, error) {
+	return this.technologyAwardApplyDB.QueryByID(ctx, id)
+}
+
 // NewTechnology 创建Technology
 func NewTechnology(technologyAwardApplyDB *db.TechnologyAwardApplyDB) *Technology {
 	return &Technology{

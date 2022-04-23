@@ -169,6 +169,47 @@ func (this *TechnologyAwardApplyDB) QueryWithLimitByGroupID(
 	return res, nil
 }
 
+// UpdateCheckStatus 更新记录的审核信息
+func (this *TechnologyAwardApplyDB) UpdateCheckStatus(ctx context.Context, checkInfos *TechnologyApply) (bool, error) {
+	res, err := this.conn.Exec(
+		ctx,
+		"UPDATE `technology_apply` SET `check_status`=?, `checker_id`=?, `checker_name`=?, `checker_username`=?, `check_money`=?, `check_message`=?, `check_time`=? WHERE `id`=? AND `check_status`=-1",
+		checkInfos.CheckStatus,
+		checkInfos.CheckerID,
+		checkInfos.CheckerName,
+		checkInfos.CheckerUsername,
+		checkInfos.CheckMoney,
+		checkInfos.CheckMessage,
+		checkInfos.CheckTime,
+		checkInfos.ID,
+	)
+	if err != nil {
+		logger.Warn("UpdateCheckStatus error: ", err)
+		return false, errors.New("UpdateCheckStatus error")
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		logger.Warn("UpdateCheckStatus error: ", err)
+		return false, errors.New("UpdateCheckStatus error")
+	}
+	return count > 0, nil
+}
+
+// QueryByID 通过ID查询记录信息
+func (this *TechnologyAwardApplyDB) QueryByID(ctx context.Context, id int) (*TechnologyApply, error) {
+	row, err := this.conn.QueryRow(ctx, "SELECT * FROM `technology_apply` WHERE `id`=?", id)
+	if err != nil {
+		logger.Warn("QueryByID error: ", err)
+		return nil, errors.New("QueryByID error")
+	}
+	var info TechnologyApply
+	if err := row.StructScan(&info); err != nil {
+		logger.Warn("QueryByID struct scan error: ", err)
+		return nil, errors.New("QueryByID struct scan error")
+	}
+	return &info, nil
+}
+
 // NewTechnologyAwardApply 创建TechnologyAwardApplyDB
 func NewTechnologyAwardApply(conn *db.DB) *TechnologyAwardApplyDB {
 	return &TechnologyAwardApplyDB{

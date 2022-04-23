@@ -155,6 +155,32 @@ message PaginationGetTechnologyApplyResponse {
 }
 ```
 
+## CheckTechnologyApplyByID
+
+描述: 审核科技奖励申请
+
+原型定义: `rpc CheckTechnologyApplyByID(CheckTechnologyApplyByIDRequest) returns (CheckTechnologyApplyByIDResponse) {}`
+
+请求参数:
+
+```protobuf
+message CheckTechnologyApplyByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    double money = 3;
+    string checkMessage = 4;
+    bool accept = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message CheckTechnologyApplyByIDResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## PaperApply
