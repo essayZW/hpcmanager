@@ -73,6 +73,7 @@ func main() {
 	api := server.Group("/api")
 	middleware.Registry(api, serviceClient, redisConn)
 
+	// 创建动态配置源
 	etcdConfig, err := config.NewEtcd()
 	if err != nil {
 		logger.Error("Etcd config create error: ", err)
@@ -86,7 +87,10 @@ func main() {
 	permissionController.Registry(api)
 	userGroupController := controller.NewUserGroup(serviceClient)
 	userGroupController.Registry(api)
-	systemController := controller.NewSystem(serviceClient, redisConn)
+	systemController, err := controller.NewSystem(serviceClient, redisConn, etcdConfig)
+	if err != nil {
+		logger.Fatal(err)
+	}
 	systemController.Registry(api)
 	projectController := controller.NewProject(serviceClient)
 	projectController.Registry(api)
@@ -94,6 +98,10 @@ func main() {
 	nodeController.Registry(api)
 	feeController := controller.NewFee(serviceClient)
 	feeController.Registry(api)
+	fssController := controller.NewFss(serviceClient)
+	fssController.Registry(api)
+	awardController := controller.NewAward(serviceClient)
+	awardController.Registry(api)
 
 	// 注册404处理
 	server.NoRoute(func(c *gin.Context) {

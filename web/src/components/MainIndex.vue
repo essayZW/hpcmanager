@@ -13,6 +13,8 @@ import { servicePing as nodePing } from '../service/node';
 import { servicePing as projectPing } from '../service/project';
 import { servicePing as feePing } from '../service/fee';
 import { servicePing as hpcPing, getHpcUserQuotaInfo } from '../service/hpc';
+import { servicePing as fssPing } from '../service/fss';
+import { servicePing as awardPing } from '../service/award';
 
 import { zeroWithDefault } from '../utils/obj';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
@@ -29,6 +31,8 @@ const serviceState = reactive<{
   project: boolean;
   fee: boolean;
   hpc: boolean;
+  fss: boolean;
+  award: boolean;
 }>({
   user: false,
   permission: false,
@@ -36,6 +40,8 @@ const serviceState = reactive<{
   project: false,
   fee: false,
   hpc: false,
+  fss: false,
+  award: false,
 });
 
 const quotaInfo = ref<UserQuotaInfo | undefined>(undefined);
@@ -82,6 +88,8 @@ const refreshServiceState = async () => {
   serviceState.project = await projectPing();
   serviceState.fee = await feePing();
   serviceState.hpc = await hpcPing();
+  serviceState.fss = await fssPing();
+  serviceState.award = await awardPing();
 };
 const interval = setInterval(refreshServiceState, 5000);
 refreshServiceState();
@@ -148,6 +156,16 @@ onUnmounted(() => {
           <div v-if="serviceState.hpc" class="success-state"></div>
           <div v-else class="error-state"></div>
           <strong>作业调度服务</strong>
+        </div>
+        <div>
+          <div v-if="serviceState.fss" class="success-state"></div>
+          <div v-else class="error-state"></div>
+          <strong>文件存储服务</strong>
+        </div>
+        <div>
+          <div v-if="serviceState.award" class="success-state"></div>
+          <div v-else class="error-state"></div>
+          <strong>奖励服务</strong>
         </div>
       </el-card>
     </el-col>

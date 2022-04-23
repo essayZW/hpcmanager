@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+option go_package = "github.com/essayZW/hpcmanager/award/proto;award";
+
+package award;
+
+import "proto/ping.proto";
+import "proto/common.proto";
+import "gateway/proto/baserequest.proto";
+import "proto/award_public.proto";
+
+service AwardService {
+    rpc Ping(publicproto.Empty) returns (publicproto.PingResponse) {}
+    rpc CreatePaperAward(CreatePaperAwardRequest) returns (CreatePaperAwardResponse) {}
+    rpc PaginationGetPaperApply(PaginationGetPaperApplyRequest) returns (PaginationGetPaperApplyResponse) {}
+    rpc CheckPaperApplyByID(CheckPaperApplyByIDRequest) returns (CheckPaperApplyByIDResponse) {}
+}
+
+message CreatePaperAwardRequest {
+    request.BaseRequest baseRequest = 1;
+    string title = 2;
+    string category = 3;
+    string partition = 4;
+    string firstPageImageName = 5;
+    string thanksPageImageName = 6;
+    string remarkMessage = 7;
+}
+
+message CreatePaperAwardResponse {
+    int32 id = 1;
+}
+
+message PaginationGetPaperApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+
+message PaginationGetPaperApplyResponse {
+    int32 count = 1;
+    repeated award.PaperApply applies = 2;
+}
+
+message CheckPaperApplyByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    double money = 3;
+    string checkMessage = 4;
+    bool accept = 5;
+}
+
+message CheckPaperApplyByIDResponse {
+    bool success = 1;
+}

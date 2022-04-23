@@ -5,9 +5,11 @@ go 1.17
 require github.com/gin-gonic/gin v1.7.7
 
 require (
-	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220407104607-62c2981baf63
+	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220419144745-367771923c07
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/award v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/fee v0.0.0-00010101000000-000000000000
+	github.com/essayZW/hpcmanager/fss v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/hpc v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/node v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/permission v0.0.0-00010101000000-000000000000
@@ -98,3 +100,7 @@ replace github.com/essayZW/hpcmanager/project => ../project
 replace github.com/essayZW/hpcmanager/node => ../node
 
 replace github.com/essayZW/hpcmanager/fee => ../fee
+
+replace github.com/essayZW/hpcmanager/fss => ../fss
+
+replace github.com/essayZW/hpcmanager/award => ../award

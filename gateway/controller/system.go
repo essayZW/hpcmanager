@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/essayZW/hpcmanager/config"
 	"github.com/essayZW/hpcmanager/gateway/middleware"
 	gatewaypb "github.com/essayZW/hpcmanager/gateway/proto"
 	"github.com/essayZW/hpcmanager/gateway/request/json"
@@ -134,7 +135,6 @@ func (sys *System) isInstall(ctx *gin.Context) {
 	resp.Send(ctx)
 }
 
-// TODO: 目前cas配置暂时定死,后面迁移到动态配置平台
 // casConfig 系统的cas配置
 type casConfig struct {
 	Enable      bool
@@ -249,10 +249,10 @@ func (sys *System) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 }
 
 // NewSystem 创建新的系统功能控制器
-func NewSystem(client client.Client, redisConn *redis.Client) Controller {
+func NewSystem(client client.Client, redisConn *redis.Client, dynamicConfig config.DynamicConfig) (Controller, error) {
 	userService := userpb.NewUserService("user", client)
 	permissionService := permissionpb.NewPermissionService("permission", client)
-	return &System{
+	res := &System{
 		userService:       userService,
 		permissionService: permissionService,
 		redisConn:         redisConn,
@@ -261,4 +261,23 @@ func NewSystem(client client.Client, redisConn *redis.Client) Controller {
 		},
 	}
 
+	var casEnable bool
+	var casAuthServer string
+	err := dynamicConfig.Registry("gateway_casEnable", &casEnable, func(newV interface{}) {
+		casConfigMutex.Lock()
+		defer casConfigMutex.Unlock()
+		defaultCasConfig.Enable = casEnable
+	})
+	if err != nil {
+		return nil, err
+	}
+	err = dynamicConfig.Registry("gateway_casAuthServer", &casAuthServer, func(newV interface{}) {
+		casConfigMutex.Lock()
+		defer casConfigMutex.Unlock()
+		defaultCasConfig.AuthServer = casAuthServer
+	})
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }

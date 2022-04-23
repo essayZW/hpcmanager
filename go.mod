@@ -80,3 +80,9 @@ replace github.com/essayZW/hpcmanager/permission => ./permission
 replace github.com/essayZW/hpcmanager/node => ./node
 
 replace github.com/essayZW/hpcmanager/project => ./project
+
+replace github.com/essayZW/hpcmanager/fee => ./fee
+
+replace github.com/essayZW/hpcmanager/fss => ./fss
+
+replace github.com/essayZW/hpcmanager/award => ./award

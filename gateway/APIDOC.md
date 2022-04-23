@@ -968,3 +968,91 @@ type PayNodeQuotaBillParam struct {
 ```
 
 响应: 是否支付成功
+
+## fss 控制器
+
+### /fss/ping
+
+Method: GET
+
+描述：进行 group 服务的 ping 测试
+
+参数：无
+
+响应：请求 ID、PONG
+
+### /fss/file
+
+Method: POST
+
+描述: 单个文件上传接口
+
+参数: file 文件
+
+响应: 新的文件名称
+
+## award 控制器
+
+### /award/ping
+
+Method: GET
+
+描述：进行 group 服务的 ping 测试
+
+参数：无
+
+响应：请求 ID、PONG
+
+### /award/paper
+
+Method: POST
+
+描述: 创建论文奖励申请
+
+参数:
+
+```go
+// CreatePaperAwardApplyParam 创建论文奖励申请参数
+type CreatePaperAwardApplyParam struct {
+    Title               string `form:"title"               json:"title"               binding:"required"`
+    Category            string `form:"category"            json:"category"            binding:"required"`
+    Partition           string `form:"partition"           json:"partition"           binding:"required"`
+    FirstPageImageName  string `form:"firstPageImageName"  json:"firstPageImageName"  binding:"required"`
+    ThanksPageImageName string `form:"thanksPageImageName" json:"thanksPageImageName" binding:"required"`
+    RemarkMessage       string `form:"remarkMessage"       json:"remarkMessage"`
+}
+```
+
+响应: 创建的申请记录的 ID
+
+### /award/paper
+
+Method: GET
+
+描述: 分页查询论文奖励申请记录
+
+请求参数: 标准的分页参数
+
+响应参数: 查询的信息
+
+### /award/paper
+
+Method: PUT
+
+描述: 审核论文奖励申请
+
+参数:
+
+```go
+// CreatePaperAwardApplyParam 创建论文奖励申请参数
+type CreatePaperAwardApplyParam struct {
+    Title               string `form:"title"               json:"title"               binding:"required"`
+    Category            string `form:"category"            json:"category"            binding:"required"`
+    Partition           string `form:"partition"           json:"partition"           binding:"required"`
+    FirstPageImageName  string `form:"firstPageImageName"  json:"firstPageImageName"  binding:"required"`
+    ThanksPageImageName string `form:"thanksPageImageName" json:"thanksPageImageName" binding:"required"`
+    RemarkMessage       string `form:"remarkMessage"       json:"remarkMessage"`
+}
+```
+
+响应参数: 是否成功

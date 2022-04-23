@@ -76,6 +76,14 @@ const (
 	QueryNodeQuotaBill = "__QUERY_NODE_QUOTA_BILL__"
 	// PayNodeQuotaBill 支付机器存储账单
 	PayNodeQuotaBill = "__PAY_NODE_QUOTA_BILL__"
+	// StoreFile 存储文件
+	StoreFile = "__STORE_FILE__"
+	// CreatePaperAward 创建论文奖励申请
+	CreatePaperAward = "__CREATE_PAPER_AWARD__"
+	// QueryPaperAwardApply 查询论文奖励申请记录
+	QueryPaperAwardApply = "__QUERY_PAPER_AWARD_APPLY__"
+	// CheckPaperAwardApply 审核论文奖励申请
+	CheckPaperAwardApply = "__CHECK_PAPER_AWARD_APPLY__"
 )
 
 // Verify 进行操作的权限验证

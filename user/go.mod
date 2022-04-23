@@ -6,7 +6,7 @@ replace github.com/essayZW/hpcmanager => ../
 
 require (
 	github.com/asim/go-micro/plugins/broker/rabbitmq/v4 v4.0.0-20220311080335-e5a35d38f931
-	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220407104607-62c2981baf63
+	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20220419144745-367771923c07
 	github.com/asim/go-micro/plugins/sync/etcd/v3 v3.7.1-0.20211012115553-1cd7cfaa6cbb
 	github.com/essayZW/hpcmanager v0.0.0-00010101000000-000000000000
 	github.com/essayZW/hpcmanager/gateway v0.0.0-00010101000000-000000000000
@@ -90,3 +90,7 @@ replace github.com/essayZW/hpcmanager/project => ../project
 replace github.com/essayZW/hpcmanager/node => ../node
 
 replace github.com/essayZW/hpcmanager/fee => ../fee
+
+replace github.com/essayZW/hpcmanager/fss => ../fss
+
+replace github.com/essayZW/hpcmanager/award => ../award

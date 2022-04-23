@@ -243,14 +243,19 @@ const handlerFinishWorkOrder = async (id: number) => {
                   <strong>申请独占时间段: </strong>
                   {{
                     dayjs(
-                      tableRowExpandData[props.row.id].applyInfo?.startTime *
-                        1000
+                      zeroWithDefault(
+                        tableRowExpandData[props.row.id].applyInfo?.startTime,
+                        0
+                      ) as number * 1000
                     ).format('YYYY-MM-DD')
                   }}
                   &nbsp;至&nbsp;
                   {{
                     dayjs(
-                      tableRowExpandData[props.row.id].applyInfo?.endTime * 1000
+                      zeroWithDefault(
+                        tableRowExpandData[props.row.id].applyInfo?.endTime,
+                        0
+                      ) as number * 1000
                     ).format('YYYY-MM-DD')
                   }}
                 </span>

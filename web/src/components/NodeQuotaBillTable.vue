@@ -240,11 +240,15 @@ onMounted(async () => {
       <div class="rate-area">
         <h3>存储费率</h3>
         <p>
-          <strong>基础存储费率: {{ nodeQuotaFeeRate.basic }}</strong
+          <strong
+            >基础存储费率:
+            {{ zeroWithDefault(nodeQuotaFeeRate?.basic, '加载失败') }}</strong
           >元 1TB 一年
         </p>
         <p>
-          <strong>额外存储费率: {{ nodeQuotaFeeRate.extra }}</strong
+          <strong
+            >额外存储费率:
+            {{ zeroWithDefault(nodeQuotaFeeRate?.extra, '加载失败') }}</strong
           >元 1TB 一年
         </p>
       </div>
@@ -257,40 +261,47 @@ onMounted(async () => {
           </el-form-item>
           <el-form-item label="容量变化: ">
             <span>
-              {{ payNodeQuotaBillDialogBillInfo.oldSize }}TB
+              {{ payNodeQuotaBillDialogBillInfo?.oldSize }}TB
               <el-icon><i-ic-baseline-arrow-right-alt /></el-icon>
-              {{ payNodeQuotaBillDialogBillInfo.newSize }}TB
+              {{ payNodeQuotaBillDialogBillInfo?.newSize }}TB
             </span>
           </el-form-item>
           <el-form-item label="结束日期变化: ">
             <span>
               {{
                 dayjs(
-                  payNodeQuotaBillDialogBillInfo.oldEndTimeUnix * 1000
+                  zeroWithDefault(
+                    payNodeQuotaBillDialogBillInfo?.oldEndTimeUnix,
+                    0
+                  ) as number * 1000
                 ).format('YYYY-MM-DD')
               }}
               <el-icon><i-ic-baseline-arrow-right-alt /></el-icon>
               {{
                 dayjs(
-                  payNodeQuotaBillDialogBillInfo.newEndTimeUnix * 1000
+                  zeroWithDefault(
+                    payNodeQuotaBillDialogBillInfo?.newEndTimeUnix,
+                    0
+                  ) as number * 1000
                 ).format('YYYY-MM-DD')
               }}
             </span>
           </el-form-item>
           <el-form-item label="创建时间: ">
             <span>{{
-              dayjs(payNodeQuotaBillDialogBillInfo.createTime * 1000).format(
-                'YYYY-MM-DD HH:mm:ss'
-              )
+              dayjs(
+                zeroWithDefault(payNodeQuotaBillDialogBillInfo?.createTime, 0) as number *
+                  1000
+              ).format('YYYY-MM-DD HH:mm:ss')
             }}</span>
           </el-form-item>
           <el-form-item label="应缴费用: ">
-            <span>{{ payNodeQuotaBillDialogBillInfo.fee }}元</span>
+            <span>{{ payNodeQuotaBillDialogBillInfo?.fee }}元</span>
           </el-form-item>
           <el-form-item label="用户组余额: ">
             <span v-if="payNodeQuotaBillGroupInfo"
               >{{
-                zeroWithDefault(payNodeQuotaBillGroupInfo.balance, 0)
+                zeroWithDefault(payNodeQuotaBillGroupInfo?.balance, 0)
               }}元</span
             >
             <span v-else class="red">数据加载失败</span>

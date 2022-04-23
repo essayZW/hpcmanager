@@ -257,17 +257,23 @@ DROP TABLE IF EXISTS `paper_apply`;
 CREATE TABLE `paper_apply` (
   `id` int NOT NULL AUTO_INCREMENT,
   `creater_id` int NOT NULL,
+  `creater_username` varchar(32) NOT NULL,
+  `creater_name` varchar(32) NOT NULL,
   `create_time` timestamp NOT NULL,
-  `tutor_id` timestamp NOT NULL,
+  `user_group_id` int NOT NULL,
+  `tutor_id` int NOT NULL,
+  `tutor_username` varchar(32) NOT NULL,
+  `tutor_name` varchar(32) NOT NULL,
   `paper_title` varchar(256) NOT NULL,
   `paper_category` varchar(128) NOT NULL,
   `paper_partition` varchar(32) NOT NULL,
-  `papaer_firstpage_img` varchar(512) NOT NULL,
+  `paper_firstpage_img` varchar(512) NOT NULL,
   `paper_thankspage_img` varchar(512) NOT NULL,
   `remark_message` varchar(512) DEFAULT NULL,
   `check_status` tinyint DEFAULT '-1',
   `checker_id` int DEFAULT NULL,
   `checker_name` varchar(32) DEFAULT NULL,
+  `checker_username` varchar(32) DEFAULT NULL,
   `check_money` decimal(18,2) DEFAULT '0.00',
   `check_message` varchar(512) DEFAULT NULL,
   `check_time` timestamp NULL DEFAULT NULL,
@@ -464,4 +470,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-04-18 20:33:40
+-- Dump completed on 2022-04-20 20:19:36

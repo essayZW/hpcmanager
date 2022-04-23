@@ -404,13 +404,10 @@ const modifyUserQuotaSubmit = async () => {
                   <span>
                     <strong>使用期限: </strong>
                     {{
-                      dayjs(
-                        tableRowExtraInfo[props.row.id].quotaInfo
-                          ?.startTimeUnix * 1000
-                      ).format('YYYY-MM-DD')
+                      dayjs(zeroWithDefault(tableRowExtraInfo[props.row.id].quotaInfo?.startTimeUnix, 0) as number * 1000).format('YYYY-MM-DD')
                     }}至{{
                       dayjs(
-                        tableRowExtraInfo[props.row.id].quotaInfo?.endTimeUnix *
+                        zeroWithDefault(tableRowExtraInfo[props.row.id].quotaInfo?.endTimeUnix, 0) as number *
                           1000
                       ).format('YYYY-MM-DD')
                     }}
@@ -492,22 +489,22 @@ const modifyUserQuotaSubmit = async () => {
   >
     <el-form inline>
       <el-form-item label="用户姓名: ">
-        <span>{{ dialogUserInfo.name }}</span>
+        <span>{{ dialogUserInfo?.name }}</span>
       </el-form-item>
       <el-form-item label="用户学(工)号: "
-        ><span>{{ dialogUserInfo.username }}</span></el-form-item
+        ><span>{{ dialogUserInfo?.username }}</span></el-form-item
       >
       <el-form-item label="当前最大容量: "
-        ><span>{{ dialogUserQuotaInfo.max }}</span></el-form-item
+        ><span>{{ dialogUserQuotaInfo?.max }}</span></el-form-item
       >
       <el-form-item label="当前使用期限: "
         ><span
           >{{
-            dayjs(dialogUserQuotaInfo?.startTimeUnix * 1000).format(
+            dayjs(zeroWithDefault(dialogUserQuotaInfo?.startTimeUnix, 0) as number * 1000).format(
               'YYYY-MM-DD'
             )
           }}至{{
-            dayjs(dialogUserQuotaInfo?.endTimeUnix * 1000).format('YYYY-MM-DD')
+            dayjs(zeroWithDefault(dialogUserQuotaInfo?.endTimeUnix, 0) as number * 1000).format('YYYY-MM-DD')
           }}</span
         ></el-form-item
       >

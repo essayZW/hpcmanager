@@ -1,8 +1,10 @@
 {
-  "volar.takeOverMode.enabled": true,
-  "tsserver.enable": false,
   "cSpell.words": [
     "Oper",
-    "etcdsync"
-  ]
+    "awarddb",
+    "etcdsync",
+    "fsspb"
+  ],
+  "volar.takeOverMode.enabled": true,
+  "tsserver.enable": false
 }

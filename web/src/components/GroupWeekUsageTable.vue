@@ -268,10 +268,18 @@ onBeforeMount(async () => {
       <div class="rate-area">
         <h3>包机费率</h3>
         <p>
-          <strong>CPU费率:{{ feeRateInfo.cpu }}元</strong>
+          <strong
+            >CPU费率:{{
+              zeroWithDefault(feeRateInfo?.cpu, '加载失败')
+            }}元</strong
+          >
         </p>
         <p>
-          <strong>GPU费率:{{ feeRateInfo.gpu }}元</strong>
+          <strong
+            >GPU费率:{{
+              zeroWithDefault(feeRateInfo?.gpu, '加载失败')
+            }}元</strong
+          >
         </p>
       </div>
       <div>
