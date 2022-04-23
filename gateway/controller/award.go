@@ -217,6 +217,44 @@ func (a *award) paginationGetTechnologyApply(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// checkTechnologyApply /api/award/technology PUT 审核科技奖励申请
+func (a *award) checkTechnologyApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.CheckTechnologyApplyParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, "参数验证失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := a.awardService.CheckTechnologyApplyByID(c, &awardpb.CheckTechnologyApplyByIDRequest{
+		BaseRequest:  baseRequest,
+		ApplyID:      int32(param.ID),
+		Money:        param.CheckMoney,
+		CheckMessage: param.CheckMessage,
+		Accept:       param.Accept,
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("审核科技奖励申请失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "审核科技奖励申请失败")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+	return
+}
+
 func (a *award) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	awardRouter := router.Group("/award")
 	awardRouter.GET("/ping", a.ping)
@@ -228,6 +266,7 @@ func (a *award) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	awardRouter.POST("/technology", a.createTechnologyAwardApply)
 	awardRouter.GET("/technology", a.paginationGetTechnologyApply)
+	awardRouter.PUT("/technology", a.checkTechnologyApply)
 	return awardRouter
 }
 func NewAward(client client.Client) Controller {

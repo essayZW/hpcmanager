@@ -15,6 +15,8 @@ func init() {
 		v.RegisterStructValidation(checkPaperApplyParam.Validator(), checkPaperApplyParam)
 		createTechnologyAwardApply := CreateTechnologyAwardApplyParam{}
 		v.RegisterStructValidation(createTechnologyAwardApply.Validator(), createTechnologyAwardApply)
+		checkTechnologyApplyParam := CheckTechnologyApplyParam{}
+		v.RegisterStructValidation(checkTechnologyApplyParam.Validator(), checkTechnologyApplyParam)
 	}
 }
 
@@ -72,6 +74,32 @@ func (param *CreateTechnologyAwardApplyParam) Validator() validator.StructLevelF
 		data := sl.Current().Interface().(CreateTechnologyAwardApplyParam)
 		if data.ProjectID <= 0 {
 			sl.ReportError(reflect.ValueOf(data.ProjectID), "ProjectID", "ProjectID", "binding", "invalid ProjectID")
+		}
+	}
+}
+
+// CheckTechnologyApplyParam 审核科技奖励申请参数
+type CheckTechnologyApplyParam struct {
+	ID           int     `form:"id"           json:"id"           binding:"required"`
+	CheckMoney   float64 `form:"checkMoney"   json:"checkMoney"`
+	CheckMessage string  `form:"checkMessage" json:"checkMessage"`
+	Accept       bool    `form:"accept"       json:"accept"`
+}
+
+func (param *CheckTechnologyApplyParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(CheckTechnologyApplyParam)
+		if data.ID <= 0 {
+			sl.ReportError(reflect.ValueOf(data.ID), "ID", "ID", "binding", "invalid apply id")
+		}
+		if data.CheckMoney < 0 {
+			sl.ReportError(
+				reflect.ValueOf(data.CheckMoney),
+				"checkMoney",
+				"checkMoney",
+				"binding",
+				"checkMoney can't less than 0",
+			)
 		}
 	}
 }

@@ -1044,14 +1044,12 @@ Method: PUT
 参数:
 
 ```go
-// CreatePaperAwardApplyParam 创建论文奖励申请参数
-type CreatePaperAwardApplyParam struct {
-    Title               string `form:"title"               json:"title"               binding:"required"`
-    Category            string `form:"category"            json:"category"            binding:"required"`
-    Partition           string `form:"partition"           json:"partition"           binding:"required"`
-    FirstPageImageName  string `form:"firstPageImageName"  json:"firstPageImageName"  binding:"required"`
-    ThanksPageImageName string `form:"thanksPageImageName" json:"thanksPageImageName" binding:"required"`
-    RemarkMessage       string `form:"remarkMessage"       json:"remarkMessage"`
+// CheckPaperApplyParam 审核论文奖励申请参数
+type CheckPaperApplyParam struct {
+    ID           int     `form:"id"           json:"id"           binding:"required"`
+    CheckMoney   float64 `form:"checkMoney"   json:"checkMoney"`
+    CheckMessage string  `form:"checkMessage" json:"checkMessage"`
+    Accept       bool    `form:"accept"       json:"accept"`
 }
 ```
 
@@ -1084,3 +1082,23 @@ Method: GET
 请求参数: 标准的分页参数
 
 响应参数: 查询的信息
+
+### /award/technology
+
+Method: PUT
+
+描述: 审核科技奖励申请
+
+参数:
+
+```go
+// CheckTechnologyApplyParam 审核科技奖励申请参数
+type CheckTechnologyApplyParam struct {
+    ID           int     `form:"id"           json:"id"           binding:"required"`
+    CheckMoney   float64 `form:"checkMoney"   json:"checkMoney"`
+    CheckMessage string  `form:"checkMessage" json:"checkMessage"`
+    Accept       bool    `form:"accept"       json:"accept"`
+}
+```
+
+响应参数: 是否成功
