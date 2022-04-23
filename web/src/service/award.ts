@@ -5,6 +5,10 @@ import {
   PaperApply,
   paginationQueryPaperApply,
   checkPaperApplyByID,
+  createTechnologyApply,
+  paginationQueryTechnologyApply,
+  TechnologyApply,
+  checkTechnologyApply,
 } from '../api/award';
 import { uploadFileUrlPathBase } from '../api/fss';
 /**
@@ -85,5 +89,49 @@ export async function checkPaperAwardApply(
     accept,
     checkMoney: money,
     checkMessage: message,
+  });
+}
+
+/**
+ * 创建科技奖励申请
+ */
+export async function createTechnologyAwardApply(
+  projectID: number,
+  prizeLevel: string,
+  prizeImageName: string,
+  remarkMessage: string
+): Promise<number> {
+  return createTechnologyApply({
+    projectID,
+    prizeLevel,
+    prizeImageName,
+    remarkMessage,
+  });
+}
+
+/**
+ * 分页查询科技奖励申请
+ */
+export async function paginationGetTechnologyApply(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<TechnologyApply>> {
+  return paginationQueryTechnologyApply(pageIndex, pageSize);
+}
+
+/**
+ * 审核科技奖励申请
+ */
+export async function checkTechnologyApplyByID(
+  id: number,
+  money: number,
+  message: string,
+  accept: boolean
+): Promise<boolean> {
+  return checkTechnologyApply({
+    id,
+    checkMoney: money,
+    checkMessage: message,
+    accept,
   });
 }
