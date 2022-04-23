@@ -116,7 +116,11 @@ export async function paginationGetTechnologyApply(
   pageIndex: number,
   pageSize: number
 ): Promise<PaginationQueryResponse<TechnologyApply>> {
-  return paginationQueryTechnologyApply(pageIndex, pageSize);
+  const data = await paginationQueryTechnologyApply(pageIndex, pageSize);
+  for (const single of data.Data) {
+    single.prizeImageName = uploadFileUrlPathBase + '/' + single.prizeImageName;
+  }
+  return data;
 }
 
 /**
@@ -135,3 +139,15 @@ export async function checkTechnologyApplyByID(
     accept,
   });
 }
+
+/**
+ * 预设的奖项等级
+ */
+export const prizeLevels = [
+  '国家级一等奖',
+  '国家级二等奖',
+  '国家级三等奖',
+  '北京市一等奖',
+  '北京市二等奖',
+  '北京市三等奖',
+];

@@ -49,7 +49,7 @@ const onUploadSuccess = (
     <el-icon v-if="!imageUrl" class="plus-icon">
       <i-ic-round-plus />
     </el-icon>
-    <h4 v-if="!imageUrl">论文首页图片</h4>
+    <h4 v-if="!imageUrl">点击选择图片并进行上传</h4>
     <template #tip>
       <div class="el-upload__tip">只允许上传30MB以内的jpg/png/jpeg格式文件</div>
     </template>

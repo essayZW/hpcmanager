@@ -15,6 +15,7 @@ import GroupNodeUsageBillManager from '../components/tutor/GroupNodeUsageBillMan
 import AdminNodeUsageBillManager from '../components/admin/AdminNodeUsageBillManager.vue';
 import NodeQuotaBillManager from '../components/common/NodeQuotaBillManager.vue';
 import PaperAwardApplyManager from '../components/common/PaperAwardApplyManager.vue';
+import TechnologyAwardApplyManager from '../components/common/TechnologyAwardApplyManager.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -135,6 +136,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/paper_award_apply_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/technology_award_apply_manager',
+          name: 'TechnologyAwardApplyManager',
+          component: TechnologyAwardApplyManager,
+        },
+        item: {
+          name: '科技成果奖励申请',
+          to: '/main/technology_award_apply_manager',
+        },
+      },
     ],
   ],
   [
@@ -237,6 +249,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '论文奖励申请',
           to: '/main/paper_award_apply_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/technology_award_apply_manager',
+          name: 'TechnologyAwardApplyManager',
+          component: TechnologyAwardApplyManager,
+        },
+        item: {
+          name: '科技成果奖励申请',
+          to: '/main/technology_award_apply_manager',
         },
       },
     ],
@@ -365,6 +388,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
           to: '/main/paper_award_apply_manager',
         },
       },
+      {
+        routerRaw: {
+          path: '/main/technology_award_apply_manager',
+          name: 'TechnologyAwardApplyManager',
+          component: TechnologyAwardApplyManager,
+        },
+        item: {
+          name: '科技成果奖励申请',
+          to: '/main/technology_award_apply_manager',
+        },
+      },
     ],
   ],
   // 超级管理员和普通管理员都这项操作
@@ -491,6 +525,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '论文奖励申请',
           to: '/main/paper_award_apply_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/technology_award_apply_manager',
+          name: 'TechnologyAwardApplyManager',
+          component: TechnologyAwardApplyManager,
+        },
+        item: {
+          name: '科技成果奖励申请',
+          to: '/main/technology_award_apply_manager',
         },
       },
     ],

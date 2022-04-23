@@ -91,6 +91,7 @@ const createPaperAwardApplySubmit = (elem: FormInstance | undefined) => {
         type: 'success',
         message: '创建成功',
       });
+      refreshTableData();
       // 由于文件上传的组件不太好用,所以这里直接跳转页面对文件上传组件进行重置
       // eslint-disable-next-line no-self-assign
       window.location.href = window.location.href;
