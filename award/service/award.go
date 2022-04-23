@@ -291,6 +291,80 @@ func (as *AwardService) CreateTechnologyAwardApply(
 	return nil
 }
 
+// PaginationGetTechnologyApply 分页查询科技奖励申请记录
+func (as *AwardService) PaginationGetTechnologyApply(
+	ctx context.Context,
+	req *awardpb.PaginationGetTechnologyApplyRequest,
+	resp *awardpb.PaginationGetTechnologyApplyResponse,
+) error {
+	logger.Info("PaginationGetTechnologyApply: ", req.BaseRequest)
+	if !verify.Identify(verify.QueryTechnologyAwardApply, req.GetBaseRequest().GetUserInfo().GetLevels()) {
+		logger.Info(
+			"QueryTechnologyAwardApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("QueryTechnologyAwardApply permission forbidden")
+	}
+	var infos *logic.PaginationGetTechnologyApplyResult
+	var err error
+	isAdmin := verify.IsAdmin(req.BaseRequest.UserInfo.Levels)
+	isTutor := verify.IsTutor(req.BaseRequest.UserInfo.Levels)
+	if !isAdmin && !isTutor {
+		// 普通学生用户
+		infos, err = as.technologyAwardLogic.PaginationGetByCreaterID(
+			ctx,
+			int(req.BaseRequest.UserInfo.UserId),
+			int(req.PageIndex),
+			int(req.PageSize),
+		)
+	} else if !isAdmin && isTutor {
+		// 导师用户
+		infos, err = as.technologyAwardLogic.PaginationGetByGroupID(ctx, int(req.BaseRequest.UserInfo.GroupId), int(req.PageIndex), int(req.PageSize))
+	} else {
+		// 管理员用户
+		infos, err = as.technologyAwardLogic.PaginationGetAll(ctx, int(req.PageIndex), int(req.PageSize))
+	}
+	if err != nil {
+		return err
+	}
+	resp.Applies = make([]*awardpb.TechnologyApply, len(infos.Data))
+	resp.Count = int32(infos.Count)
+	for i := range infos.Data {
+		resp.Applies[i] = &awardpb.TechnologyApply{
+			Id:                 int32(infos.Data[i].ID),
+			CreaterID:          int32(infos.Data[i].CreaterID),
+			CreaterUsername:    infos.Data[i].CreaterUsername,
+			CreaterName:        infos.Data[i].CreaterName,
+			UserGroupID:        int32(infos.Data[i].UserGroupID),
+			TutorID:            int32(infos.Data[i].TutorID),
+			TutorUsername:      infos.Data[i].TutorUsername,
+			TutorName:          infos.Data[i].TutorName,
+			ProjectID:          int32(infos.Data[i].ProjectID),
+			ProjectName:        infos.Data[i].ProjectName,
+			ProjectDescription: infos.Data[i].ProjectDescription.String,
+			PrizeLevel:         infos.Data[i].PrizeLevel,
+			PrizeImageName:     infos.Data[i].PrizeImageName,
+			RemarkMessage:      infos.Data[i].RemarkMessage,
+			CheckStatus:        int32(infos.Data[i].CheckStatus),
+			CheckerID:          int32(infos.Data[i].CheckerID.Int64),
+			CheckerUsername:    infos.Data[i].CheckerUsername.String,
+			CheckerName:        infos.Data[i].CheckerName.String,
+			CheckMoney:         infos.Data[i].CheckMoney,
+			CheckMessage:       infos.Data[i].CheckMessage.String,
+			CheckTimeUnix:      infos.Data[i].CheckTime.Time.Unix(),
+			CreateTimeUnix:     infos.Data[i].CreateTime.Unix(),
+		}
+		if infos.Data[i].ExtraAttributes != nil {
+			resp.Applies[i].ExtraAttributes = infos.Data[i].ExtraAttributes.String()
+		}
+	}
+	return nil
+}
+
 var _ awardpb.AwardServiceHandler = (*AwardService)(nil)
 
 func NewAward(client client.Client, paperAwardLogic *logic.Paper, technologyAwardLogic *logic.Technology) *AwardService {

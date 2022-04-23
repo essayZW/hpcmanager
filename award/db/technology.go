@@ -47,6 +47,128 @@ func (this *TechnologyAwardApplyDB) Insert(ctx context.Context, newInfo *Technol
 	return id, nil
 }
 
+// QueryAllCount 查询所有记录的数量
+func (this *TechnologyAwardApplyDB) QueryAllCount(ctx context.Context) (int, error) {
+	row, err := this.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `technology_apply`")
+	if err != nil {
+		logger.Warn("QueryAllCount error: ", err)
+		return 0, errors.New("QueryAllCount error")
+	}
+	var count int
+	if err := row.Scan(&count); err != nil {
+		logger.Warn("QueryAllCount scan error")
+		return 0, errors.New("QueryAllCount scan error")
+	}
+	return count, nil
+}
+
+// QueryCountByCreaterID 查询某个用户创建的所有记录的数量
+func (this *TechnologyAwardApplyDB) QueryCountByCreaterID(ctx context.Context, createrID int) (int, error) {
+	row, err := this.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `technology_apply` WHERE `creater_id`=?", createrID)
+	if err != nil {
+		logger.Warn("QueryCountByCreaterID error: ", err)
+		return 0, errors.New("QueryCountByCreaterID error")
+	}
+	var count int
+	if err := row.Scan(&count); err != nil {
+		logger.Warn("QueryCountByCreaterID scan error")
+		return 0, errors.New("QueryCountByCreaterID scan error")
+	}
+	return count, nil
+}
+
+// QueryCountByGroupID 查询某个用户组创建的所有记录的数量
+func (this *TechnologyAwardApplyDB) QueryCountByGroupID(ctx context.Context, groupID int) (int, error) {
+	row, err := this.conn.QueryRow(ctx, "SELECT COUNT(*) FROM `technology_apply` WHERE `user_group_id`=?", groupID)
+	if err != nil {
+		logger.Warn("QueryCountByGroupID error: ", err)
+		return 0, errors.New("QueryCountByGroupID error")
+	}
+	var count int
+	if err := row.Scan(&count); err != nil {
+		logger.Warn("QueryCountByGroupID scan error")
+		return 0, errors.New("QueryCountByGroupID scan error")
+	}
+	return count, nil
+}
+
+// QueryAllWithLimit 分页查询所有范围内的记录
+func (this *TechnologyAwardApplyDB) QueryAllWithLimit(ctx context.Context, limit, offset int) ([]*TechnologyApply, error) {
+	rows, err := this.conn.Query(ctx, "SELECT * FROM `technology_apply` LIMIT ?, ?", limit, offset)
+	if err != nil {
+		logger.Warn("QueryAllWithLimit error: ", err)
+		return nil, errors.New("QueryAllWithLimit error")
+	}
+	res := make([]*TechnologyApply, 0)
+	for rows.Next() {
+		var info TechnologyApply
+		if err := rows.StructScan(&info); err != nil {
+			logger.Warn("QueryAllWithLimit struct scan error: ", err)
+			return nil, errors.New("QueryAllWithLimit struct scan error")
+		}
+		res = append(res, &info)
+	}
+	return res, nil
+}
+
+// QueryWithLimitByCreaterID 分页查询某个用户创建的记录
+func (this *TechnologyAwardApplyDB) QueryWithLimitByCreaterID(
+	ctx context.Context,
+	createrID int,
+	limit, offset int,
+) ([]*TechnologyApply, error) {
+	rows, err := this.conn.Query(
+		ctx,
+		"SELECT * FROM `technology_apply` WHERE `creater_id`=? LIMIT ?, ?",
+		createrID,
+		limit,
+		offset,
+	)
+	if err != nil {
+		logger.Warn("QueryWithLimitByCreaterID error: ", err)
+		return nil, errors.New("QueryWithLimitByCreaterID error")
+	}
+	res := make([]*TechnologyApply, 0)
+	for rows.Next() {
+		var info TechnologyApply
+		if err := rows.StructScan(&info); err != nil {
+			logger.Warn("QueryWithLimitByCreaterID struct scan error: ", err)
+			return nil, errors.New("QueryWithLimitByCreaterID struct scan error")
+		}
+		res = append(res, &info)
+	}
+	return res, nil
+}
+
+// QueryWithLimitByGroupID 分页查询某个用户组的记录
+func (this *TechnologyAwardApplyDB) QueryWithLimitByGroupID(
+	ctx context.Context,
+	groupID int,
+	limit, offset int,
+) ([]*TechnologyApply, error) {
+	rows, err := this.conn.Query(
+		ctx,
+		"SELECT * FROM `technology_apply` WHERE `user_group_id`=? LIMIT ?, ?",
+		groupID,
+		limit,
+		offset,
+	)
+	if err != nil {
+		logger.Warn("QueryWithLimitByGroupID error: ", err)
+		return nil, errors.New("QueryWithLimitByGroupID error")
+	}
+	res := make([]*TechnologyApply, 0)
+	for rows.Next() {
+		var info TechnologyApply
+		if err := rows.StructScan(&info); err != nil {
+			logger.Warn("QueryWithLimitByGroupID struct scan error: ", err)
+			return nil, errors.New("QueryWithLimitByGroupID struct scan error")
+		}
+		res = append(res, &info)
+	}
+	return res, nil
+}
+
 // NewTechnologyAwardApply 创建TechnologyAwardApplyDB
 func NewTechnologyAwardApply(conn *db.DB) *TechnologyAwardApplyDB {
 	return &TechnologyAwardApplyDB{
