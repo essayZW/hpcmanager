@@ -408,6 +408,132 @@ func (x *CheckPaperApplyByIDResponse) GetSuccess() bool {
 	return false
 }
 
+type CreateTechnologyAwardApplyRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BaseRequest    *proto.BaseRequest `protobuf:"bytes,1,opt,name=baseRequest,proto3" json:"baseRequest,omitempty"`
+	ProjectID      int32              `protobuf:"varint,2,opt,name=projectID,proto3" json:"projectID,omitempty"`
+	PrizeLevel     string             `protobuf:"bytes,3,opt,name=prizeLevel,proto3" json:"prizeLevel,omitempty"`
+	PrizeImageName string             `protobuf:"bytes,4,opt,name=prizeImageName,proto3" json:"prizeImageName,omitempty"`
+	RemarkMessage  string             `protobuf:"bytes,5,opt,name=remarkMessage,proto3" json:"remarkMessage,omitempty"`
+}
+
+func (x *CreateTechnologyAwardApplyRequest) Reset() {
+	*x = CreateTechnologyAwardApplyRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_award_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateTechnologyAwardApplyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateTechnologyAwardApplyRequest) ProtoMessage() {}
+
+func (x *CreateTechnologyAwardApplyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_award_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateTechnologyAwardApplyRequest.ProtoReflect.Descriptor instead.
+func (*CreateTechnologyAwardApplyRequest) Descriptor() ([]byte, []int) {
+	return file_proto_award_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *CreateTechnologyAwardApplyRequest) GetBaseRequest() *proto.BaseRequest {
+	if x != nil {
+		return x.BaseRequest
+	}
+	return nil
+}
+
+func (x *CreateTechnologyAwardApplyRequest) GetProjectID() int32 {
+	if x != nil {
+		return x.ProjectID
+	}
+	return 0
+}
+
+func (x *CreateTechnologyAwardApplyRequest) GetPrizeLevel() string {
+	if x != nil {
+		return x.PrizeLevel
+	}
+	return ""
+}
+
+func (x *CreateTechnologyAwardApplyRequest) GetPrizeImageName() string {
+	if x != nil {
+		return x.PrizeImageName
+	}
+	return ""
+}
+
+func (x *CreateTechnologyAwardApplyRequest) GetRemarkMessage() string {
+	if x != nil {
+		return x.RemarkMessage
+	}
+	return ""
+}
+
+type CreateTechnologyAwardApplyResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *CreateTechnologyAwardApplyResponse) Reset() {
+	*x = CreateTechnologyAwardApplyResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_award_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateTechnologyAwardApplyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateTechnologyAwardApplyResponse) ProtoMessage() {}
+
+func (x *CreateTechnologyAwardApplyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_award_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateTechnologyAwardApplyResponse.ProtoReflect.Descriptor instead.
+func (*CreateTechnologyAwardApplyResponse) Descriptor() ([]byte, []int) {
+	return file_proto_award_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *CreateTechnologyAwardApplyResponse) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 var File_proto_award_proto protoreflect.FileDescriptor
 
 var file_proto_award_proto_rawDesc = []byte{
@@ -471,7 +597,25 @@ var file_proto_award_proto_rawDesc = []byte{
 	0x74, 0x22, 0x37, 0x0a, 0x1b, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x50, 0x61, 0x70, 0x65, 0x72, 0x41,
 	0x70, 0x70, 0x6c, 0x79, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
 	0x12, 0x18, 0x0a, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x08, 0x52, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x32, 0xea, 0x02, 0x0a, 0x0c, 0x41,
+	0x08, 0x52, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x22, 0xe7, 0x01, 0x0a, 0x21, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x54, 0x65, 0x63, 0x68, 0x6e, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x41,
+	0x77, 0x61, 0x72, 0x64, 0x41, 0x70, 0x70, 0x6c, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x36, 0x0a, 0x0b, 0x62, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e,
+	0x42, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x0b, 0x62, 0x61, 0x73,
+	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1c, 0x0a, 0x09, 0x70, 0x72, 0x6f, 0x6a,
+	0x65, 0x63, 0x74, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x09, 0x70, 0x72, 0x6f,
+	0x6a, 0x65, 0x63, 0x74, 0x49, 0x44, 0x12, 0x1e, 0x0a, 0x0a, 0x70, 0x72, 0x69, 0x7a, 0x65, 0x4c,
+	0x65, 0x76, 0x65, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x72, 0x69, 0x7a,
+	0x65, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x12, 0x26, 0x0a, 0x0e, 0x70, 0x72, 0x69, 0x7a, 0x65, 0x49,
+	0x6d, 0x61, 0x67, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e,
+	0x70, 0x72, 0x69, 0x7a, 0x65, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x24,
+	0x0a, 0x0d, 0x72, 0x65, 0x6d, 0x61, 0x72, 0x6b, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x72, 0x65, 0x6d, 0x61, 0x72, 0x6b, 0x4d, 0x65, 0x73,
+	0x73, 0x61, 0x67, 0x65, 0x22, 0x34, 0x0a, 0x22, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x54, 0x65,
+	0x63, 0x68, 0x6e, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x41, 0x77, 0x61, 0x72, 0x64, 0x41, 0x70, 0x70,
+	0x6c, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x32, 0xdf, 0x03, 0x0a, 0x0c, 0x41,
 	0x77, 0x61, 0x72, 0x64, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x37, 0x0a, 0x04, 0x50,
 	0x69, 0x6e, 0x67, 0x12, 0x12, 0x2e, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x19, 0x2e, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63,
@@ -494,11 +638,18 @@ var file_proto_award_proto_rawDesc = []byte{
 	0x72, 0x41, 0x70, 0x70, 0x6c, 0x79, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
 	0x74, 0x1a, 0x22, 0x2e, 0x61, 0x77, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x50,
 	0x61, 0x70, 0x65, 0x72, 0x41, 0x70, 0x70, 0x6c, 0x79, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x31, 0x5a, 0x2f, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x73, 0x73, 0x61, 0x79, 0x5a, 0x57, 0x2f, 0x68, 0x70,
-	0x63, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x2f, 0x61, 0x77, 0x61, 0x72, 0x64, 0x2f, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x3b, 0x61, 0x77, 0x61, 0x72, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x73, 0x0a, 0x1a, 0x43, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x54, 0x65, 0x63, 0x68, 0x6e, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x41, 0x77, 0x61, 0x72, 0x64,
+	0x41, 0x70, 0x70, 0x6c, 0x79, 0x12, 0x28, 0x2e, 0x61, 0x77, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x54, 0x65, 0x63, 0x68, 0x6e, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x41, 0x77,
+	0x61, 0x72, 0x64, 0x41, 0x70, 0x70, 0x6c, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x29, 0x2e, 0x61, 0x77, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x54, 0x65,
+	0x63, 0x68, 0x6e, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x41, 0x77, 0x61, 0x72, 0x64, 0x41, 0x70, 0x70,
+	0x6c, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x31, 0x5a, 0x2f,
+	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x73, 0x73, 0x61, 0x79,
+	0x5a, 0x57, 0x2f, 0x68, 0x70, 0x63, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x2f, 0x61, 0x77,
+	0x61, 0x72, 0x64, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x3b, 0x61, 0x77, 0x61, 0x72, 0x64, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -513,37 +664,42 @@ func file_proto_award_proto_rawDescGZIP() []byte {
 	return file_proto_award_proto_rawDescData
 }
 
-var file_proto_award_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_proto_award_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_proto_award_proto_goTypes = []interface{}{
-	(*CreatePaperAwardRequest)(nil),         // 0: award.CreatePaperAwardRequest
-	(*CreatePaperAwardResponse)(nil),        // 1: award.CreatePaperAwardResponse
-	(*PaginationGetPaperApplyRequest)(nil),  // 2: award.PaginationGetPaperApplyRequest
-	(*PaginationGetPaperApplyResponse)(nil), // 3: award.PaginationGetPaperApplyResponse
-	(*CheckPaperApplyByIDRequest)(nil),      // 4: award.CheckPaperApplyByIDRequest
-	(*CheckPaperApplyByIDResponse)(nil),     // 5: award.CheckPaperApplyByIDResponse
-	(*proto.BaseRequest)(nil),               // 6: request.BaseRequest
-	(*PaperApply)(nil),                      // 7: award.PaperApply
-	(*proto1.Empty)(nil),                    // 8: publicproto.Empty
-	(*proto1.PingResponse)(nil),             // 9: publicproto.PingResponse
+	(*CreatePaperAwardRequest)(nil),            // 0: award.CreatePaperAwardRequest
+	(*CreatePaperAwardResponse)(nil),           // 1: award.CreatePaperAwardResponse
+	(*PaginationGetPaperApplyRequest)(nil),     // 2: award.PaginationGetPaperApplyRequest
+	(*PaginationGetPaperApplyResponse)(nil),    // 3: award.PaginationGetPaperApplyResponse
+	(*CheckPaperApplyByIDRequest)(nil),         // 4: award.CheckPaperApplyByIDRequest
+	(*CheckPaperApplyByIDResponse)(nil),        // 5: award.CheckPaperApplyByIDResponse
+	(*CreateTechnologyAwardApplyRequest)(nil),  // 6: award.CreateTechnologyAwardApplyRequest
+	(*CreateTechnologyAwardApplyResponse)(nil), // 7: award.CreateTechnologyAwardApplyResponse
+	(*proto.BaseRequest)(nil),                  // 8: request.BaseRequest
+	(*PaperApply)(nil),                         // 9: award.PaperApply
+	(*proto1.Empty)(nil),                       // 10: publicproto.Empty
+	(*proto1.PingResponse)(nil),                // 11: publicproto.PingResponse
 }
 var file_proto_award_proto_depIdxs = []int32{
-	6, // 0: award.CreatePaperAwardRequest.baseRequest:type_name -> request.BaseRequest
-	6, // 1: award.PaginationGetPaperApplyRequest.baseRequest:type_name -> request.BaseRequest
-	7, // 2: award.PaginationGetPaperApplyResponse.applies:type_name -> award.PaperApply
-	6, // 3: award.CheckPaperApplyByIDRequest.baseRequest:type_name -> request.BaseRequest
-	8, // 4: award.AwardService.Ping:input_type -> publicproto.Empty
-	0, // 5: award.AwardService.CreatePaperAward:input_type -> award.CreatePaperAwardRequest
-	2, // 6: award.AwardService.PaginationGetPaperApply:input_type -> award.PaginationGetPaperApplyRequest
-	4, // 7: award.AwardService.CheckPaperApplyByID:input_type -> award.CheckPaperApplyByIDRequest
-	9, // 8: award.AwardService.Ping:output_type -> publicproto.PingResponse
-	1, // 9: award.AwardService.CreatePaperAward:output_type -> award.CreatePaperAwardResponse
-	3, // 10: award.AwardService.PaginationGetPaperApply:output_type -> award.PaginationGetPaperApplyResponse
-	5, // 11: award.AwardService.CheckPaperApplyByID:output_type -> award.CheckPaperApplyByIDResponse
-	8, // [8:12] is the sub-list for method output_type
-	4, // [4:8] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	8,  // 0: award.CreatePaperAwardRequest.baseRequest:type_name -> request.BaseRequest
+	8,  // 1: award.PaginationGetPaperApplyRequest.baseRequest:type_name -> request.BaseRequest
+	9,  // 2: award.PaginationGetPaperApplyResponse.applies:type_name -> award.PaperApply
+	8,  // 3: award.CheckPaperApplyByIDRequest.baseRequest:type_name -> request.BaseRequest
+	8,  // 4: award.CreateTechnologyAwardApplyRequest.baseRequest:type_name -> request.BaseRequest
+	10, // 5: award.AwardService.Ping:input_type -> publicproto.Empty
+	0,  // 6: award.AwardService.CreatePaperAward:input_type -> award.CreatePaperAwardRequest
+	2,  // 7: award.AwardService.PaginationGetPaperApply:input_type -> award.PaginationGetPaperApplyRequest
+	4,  // 8: award.AwardService.CheckPaperApplyByID:input_type -> award.CheckPaperApplyByIDRequest
+	6,  // 9: award.AwardService.CreateTechnologyAwardApply:input_type -> award.CreateTechnologyAwardApplyRequest
+	11, // 10: award.AwardService.Ping:output_type -> publicproto.PingResponse
+	1,  // 11: award.AwardService.CreatePaperAward:output_type -> award.CreatePaperAwardResponse
+	3,  // 12: award.AwardService.PaginationGetPaperApply:output_type -> award.PaginationGetPaperApplyResponse
+	5,  // 13: award.AwardService.CheckPaperApplyByID:output_type -> award.CheckPaperApplyByIDResponse
+	7,  // 14: award.AwardService.CreateTechnologyAwardApply:output_type -> award.CreateTechnologyAwardApplyResponse
+	10, // [10:15] is the sub-list for method output_type
+	5,  // [5:10] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_proto_award_proto_init() }
@@ -625,6 +781,30 @@ func file_proto_award_proto_init() {
 				return nil
 			}
 		}
+		file_proto_award_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateTechnologyAwardApplyRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_award_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateTechnologyAwardApplyResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -632,7 +812,7 @@ func file_proto_award_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_award_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

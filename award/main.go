@@ -41,8 +41,9 @@ func main() {
 	serviceServer := srv.Server()
 
 	paperAwardLogic := logic.NewPaper(awarddb.NewPaperAward(sqldb))
+	technologyAwardLogic := logic.NewTechnology(awarddb.NewTechnologyAwardApply(sqldb))
 
-	awardService := service.NewAward(serviceClient, paperAwardLogic)
+	awardService := service.NewAward(serviceClient, paperAwardLogic, technologyAwardLogic)
 	awardpb.RegisterAwardServiceHandler(serviceServer, awardService)
 
 	srv.Init()

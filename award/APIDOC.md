@@ -103,3 +103,29 @@ message CheckPaperApplyByIDResponse {
     bool success = 1;
 }
 ```
+
+## CreateTechnologyAwardApply
+
+描述: 创建科技奖励申请
+
+原型定义: `rpc CreateTechnologyAwardApply(CreateTechnologyAwardApplyRequest) returns (CreateTechnologyAwardApplyResponse) {}`
+
+请求参数:
+
+```protobuf
+message CreateTechnologyAwardApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 projectID = 2;
+    string prizeLevel = 3;
+    string prizeImageName = 4;
+    string remarkMessage = 5;
+}
+```
+
+响应参数:
+
+```protobuf
+message CreateTechnologyAwardApplyResponse {
+    int32 id = 1;
+}
+```

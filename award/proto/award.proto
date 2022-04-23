@@ -14,6 +14,7 @@ service AwardService {
     rpc CreatePaperAward(CreatePaperAwardRequest) returns (CreatePaperAwardResponse) {}
     rpc PaginationGetPaperApply(PaginationGetPaperApplyRequest) returns (PaginationGetPaperApplyResponse) {}
     rpc CheckPaperApplyByID(CheckPaperApplyByIDRequest) returns (CheckPaperApplyByIDResponse) {}
+    rpc CreateTechnologyAwardApply(CreateTechnologyAwardApplyRequest) returns (CreateTechnologyAwardApplyResponse) {}
 }
 
 message CreatePaperAwardRequest {
@@ -51,4 +52,16 @@ message CheckPaperApplyByIDRequest {
 
 message CheckPaperApplyByIDResponse {
     bool success = 1;
+}
+
+message CreateTechnologyAwardApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 projectID = 2;
+    string prizeLevel = 3;
+    string prizeImageName = 4;
+    string remarkMessage = 5;
+}
+
+message CreateTechnologyAwardApplyResponse {
+    int32 id = 1;
 }

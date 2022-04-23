@@ -8,6 +8,7 @@ import (
 	awardpb "github.com/essayZW/hpcmanager/award/proto"
 	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/logger"
+	projectpb "github.com/essayZW/hpcmanager/project/proto"
 	publicproto "github.com/essayZW/hpcmanager/proto"
 	userpb "github.com/essayZW/hpcmanager/user/proto"
 	"github.com/essayZW/hpcmanager/verify"
@@ -15,10 +16,12 @@ import (
 )
 
 type AwardService struct {
-	paperAwardLogic *logic.Paper
+	paperAwardLogic      *logic.Paper
+	technologyAwardLogic *logic.Technology
 
 	userService      userpb.UserService
 	userGroupService userpb.GroupService
+	projectService   projectpb.ProjectService
 }
 
 // Ping ping测试
@@ -223,14 +226,82 @@ func (as *AwardService) CheckPaperApplyByID(
 	return nil
 }
 
+// CreateTechnologyAwardApply 创建科技奖励申请记录
+func (as *AwardService) CreateTechnologyAwardApply(
+	ctx context.Context,
+	req *awardpb.CreateTechnologyAwardApplyRequest,
+	resp *awardpb.CreateTechnologyAwardApplyResponse,
+) error {
+	logger.Info("CreateTechnologyAwardApply: ", req.BaseRequest)
+	if !verify.Identify(verify.CreateTechnologyAwardApply, req.GetBaseRequest().GetUserInfo().GetLevels()) {
+		logger.Info(
+			"CreateTechnologyAwardApply permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("CreateTechnologyAwardApply permission forbidden")
+	}
+	// 查询用户所在组的信息
+	req.BaseRequest.UserInfo.Levels = append(
+		req.BaseRequest.UserInfo.Levels,
+		int32(verify.SuperAdmin),
+	)
+	groupResp, err := as.userGroupService.GetGroupInfoByID(ctx, &userpb.GetGroupInfoByIDRequest{
+		BaseRequest: req.BaseRequest,
+		GroupID:     req.BaseRequest.UserInfo.GroupId,
+	})
+	// 取消其临时赋予的管理员权限
+	req.BaseRequest.UserInfo.Levels = req.BaseRequest.UserInfo.Levels[:len(req.BaseRequest.UserInfo.Levels)-1]
+	if err != nil {
+		return errors.New("query group info error")
+	}
+	// 查询项目信息
+	projectResp, err := as.projectService.GetProjectInfoByID(ctx, &projectpb.GetProjectInfoByIDRequest{
+		BaseRequest: req.BaseRequest,
+		Id:          req.ProjectID,
+	})
+	if err != nil {
+		return errors.New("query project info error")
+	}
+
+	id, err := as.technologyAwardLogic.Create(ctx, &logic.UserInfoParam{
+		ID:       int(req.BaseRequest.UserInfo.UserId),
+		Username: req.BaseRequest.UserInfo.Username,
+		Name:     req.BaseRequest.UserInfo.Name,
+	}, &logic.UserInfoParam{
+		ID:       int(groupResp.GroupInfo.TutorID),
+		Username: groupResp.GroupInfo.TutorUsername,
+		Name:     groupResp.GroupInfo.TutorName,
+	}, int(groupResp.GroupInfo.Id), &logic.TechnologyParam{
+		Level:         req.PrizeLevel,
+		ImageName:     req.PrizeImageName,
+		RemarkMessage: req.RemarkMessage,
+	}, &logic.ProjectInfoParam{
+		ID:          int(req.ProjectID),
+		Name:        projectResp.Data.Name,
+		Description: projectResp.Data.Description,
+	})
+	if err != nil {
+		return err
+	}
+	resp.Id = int32(id)
+	return nil
+}
+
 var _ awardpb.AwardServiceHandler = (*AwardService)(nil)
 
-func NewAward(client client.Client, paperAwardLogic *logic.Paper) *AwardService {
+func NewAward(client client.Client, paperAwardLogic *logic.Paper, technologyAwardLogic *logic.Technology) *AwardService {
 	userService := userpb.NewUserService("user", client)
 	userGroupService := userpb.NewGroupService("user", client)
+	projectService := projectpb.NewProjectService("project", client)
 	return &AwardService{
-		paperAwardLogic:  paperAwardLogic,
-		userService:      userService,
-		userGroupService: userGroupService,
+		paperAwardLogic:      paperAwardLogic,
+		technologyAwardLogic: technologyAwardLogic,
+		userService:          userService,
+		userGroupService:     userGroupService,
+		projectService:       projectService,
 	}
 }
