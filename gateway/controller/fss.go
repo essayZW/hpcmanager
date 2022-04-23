@@ -1,10 +1,9 @@
 package controller
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"time"
 
 	fsspb "github.com/essayZW/hpcmanager/fss/proto"
@@ -57,20 +56,12 @@ func (f *fss) uploadFile(ctx *gin.Context) {
 		return
 	}
 
-	bytesBuffer := make([]byte, 1024)
-	fileDataBuffer := bytes.NewBuffer(make([]byte, 0))
-	for {
-		_, err := uploadedFile.Read(bytesBuffer)
-		if err == io.EOF {
-			break
-		}
-		_, err = fileDataBuffer.Write(bytesBuffer)
-		if err != nil {
-			logger.Warn(err)
-			httpResp := response.New(200, nil, false, "文件上传失败")
-			httpResp.Send(ctx)
-			return
-		}
+	fileDataBuffer, err := ioutil.ReadAll(uploadedFile)
+	if err != nil {
+		logger.Warn(err)
+		httpResp := response.New(200, nil, false, "文件上传失败")
+		httpResp.Send(ctx)
+		return
 	}
 
 	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
@@ -79,7 +70,7 @@ func (f *fss) uploadFile(ctx *gin.Context) {
 	resp, err := f.fssService.StoreFile(c, &fsspb.StoreFileRequest{
 		BaseRequest: baseRequest,
 		FileName:    fileHeader.Filename,
-		File:        fileDataBuffer.Bytes(),
+		File:        fileDataBuffer,
 	})
 	if err != nil {
 		httpResp := response.New(200, nil, false, fmt.Sprintf("文件上传失败: %s", err.Error()))

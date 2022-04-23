@@ -5,6 +5,10 @@ import {
   PaperApply,
   paginationQueryPaperApply,
   checkPaperApplyByID,
+  createTechnologyApply,
+  paginationQueryTechnologyApply,
+  TechnologyApply,
+  checkTechnologyApply,
 } from '../api/award';
 import { uploadFileUrlPathBase } from '../api/fss';
 /**
@@ -87,3 +91,63 @@ export async function checkPaperAwardApply(
     checkMessage: message,
   });
 }
+
+/**
+ * 创建科技奖励申请
+ */
+export async function createTechnologyAwardApply(
+  projectID: number,
+  prizeLevel: string,
+  prizeImageName: string,
+  remarkMessage: string
+): Promise<number> {
+  return createTechnologyApply({
+    projectID,
+    prizeLevel,
+    prizeImageName,
+    remarkMessage,
+  });
+}
+
+/**
+ * 分页查询科技奖励申请
+ */
+export async function paginationGetTechnologyApply(
+  pageIndex: number,
+  pageSize: number
+): Promise<PaginationQueryResponse<TechnologyApply>> {
+  const data = await paginationQueryTechnologyApply(pageIndex, pageSize);
+  for (const single of data.Data) {
+    single.prizeImageName = uploadFileUrlPathBase + '/' + single.prizeImageName;
+  }
+  return data;
+}
+
+/**
+ * 审核科技奖励申请
+ */
+export async function checkTechnologyApplyByID(
+  id: number,
+  money: number,
+  message: string,
+  accept: boolean
+): Promise<boolean> {
+  return checkTechnologyApply({
+    id,
+    checkMoney: money,
+    checkMessage: message,
+    accept,
+  });
+}
+
+/**
+ * 预设的奖项等级
+ */
+export const prizeLevels = [
+  '国家级一等奖',
+  '国家级二等奖',
+  '国家级三等奖',
+  '北京市一等奖',
+  '北京市二等奖',
+  '北京市三等奖',
+];

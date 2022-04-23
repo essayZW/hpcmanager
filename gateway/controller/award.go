@@ -147,6 +147,114 @@ func (a *award) checkPaperApply(ctx *gin.Context) {
 	return
 }
 
+// createTechnologyAwardApply /api/award/technology POST 创建新的科技奖励申请记录
+func (a *award) createTechnologyAwardApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.CreateTechnologyAwardApplyParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, "参数验证失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := a.awardService.CreateTechnologyAwardApply(c, &awardpb.CreateTechnologyAwardApplyRequest{
+		BaseRequest:    baseRequest,
+		ProjectID:      int32(param.ProjectID),
+		PrizeLevel:     param.PrizeLevel,
+		PrizeImageName: param.PrizeImageName,
+		RemarkMessage:  param.RemarkMessage,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("创建科技奖励申请失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+
+	httpResp := response.New(200, map[string]interface{}{
+		"id": resp.Id,
+	}, true, "success")
+	httpResp.Send(ctx)
+}
+
+// paginationGetTechnologyApply /api/award/technology GET 分页查询科技奖励申请信息
+func (a *award) paginationGetTechnologyApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	pageIndex, pageSize, err := utils.ParsePagination(ctx)
+	if err != nil {
+		httpResp := response.New(200, nil, false, err.Error())
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := a.awardService.PaginationGetTechnologyApply(c, &awardpb.PaginationGetTechnologyApplyRequest{
+		BaseRequest: baseRequest,
+		PageIndex:   int32(pageIndex),
+		PageSize:    int32(pageSize),
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("查询科技奖励申请信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	respData := &response.PaginationQueryResponse{
+		Data:  resp.Applies,
+		Count: int(resp.Count),
+	}
+	if resp.Applies == nil {
+		respData.Data = make([]*awardpb.TechnologyApply, 0)
+	}
+	httpResp := response.New(200, respData, true, "success")
+	httpResp.Send(ctx)
+}
+
+// checkTechnologyApply /api/award/technology PUT 审核科技奖励申请
+func (a *award) checkTechnologyApply(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.CheckTechnologyApplyParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, "参数验证失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	resp, err := a.awardService.CheckTechnologyApplyByID(c, &awardpb.CheckTechnologyApplyByIDRequest{
+		BaseRequest:  baseRequest,
+		ApplyID:      int32(param.ID),
+		Money:        param.CheckMoney,
+		CheckMessage: param.CheckMessage,
+		Accept:       param.Accept,
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("审核科技奖励申请失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	if !resp.Success {
+		httpResp := response.New(200, nil, false, "审核科技奖励申请失败")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+	return
+}
+
 func (a *award) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	awardRouter := router.Group("/award")
 	awardRouter.GET("/ping", a.ping)
@@ -156,6 +264,9 @@ func (a *award) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	awardRouter.GET("/paper", a.paginationGetPaperApply)
 	awardRouter.PUT("/paper", a.checkPaperApply)
 
+	awardRouter.POST("/technology", a.createTechnologyAwardApply)
+	awardRouter.GET("/technology", a.paginationGetTechnologyApply)
+	awardRouter.PUT("/technology", a.checkTechnologyApply)
 	return awardRouter
 }
 func NewAward(client client.Client) Controller {

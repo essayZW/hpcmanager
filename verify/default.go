@@ -224,6 +224,21 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			// 需要普通权限以上
+			CreateTechnologyAwardApply: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 需要普通权限以上
+			QueryTechnologyAwardApply: {
+				maxLevel: MaxLevel,
+				minLevel: Common,
+			},
+			// 需要普通管理员及以上权限
+			CheckTechnologyApply: {
+				maxLevel: MaxLevel,
+				minLevel: CommonAdmin,
+			},
 		},
 	}
 }

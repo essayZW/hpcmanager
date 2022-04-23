@@ -73,6 +73,8 @@ declare module 'vue' {
     PaperAwardApplyManager: typeof import('./src/components/common/PaperAwardApplyManager.vue')['default']
     PaperAwardApplyTable: typeof import('./src/components/PaperAwardApplyTable.vue')['default']
     ProjectManager: typeof import('./src/components/ProjectManager.vue')['default']
+    TechnologyAwardApplyManager: typeof import('./src/components/common/TechnologyAwardApplyManager.vue')['default']
+    TechnologyAwardApplyTable: typeof import('./src/components/TechnologyAwardApplyTable.vue')['default']
     UpdateUserInfo: typeof import('./src/components/UpdateUserInfo.vue')['default']
     UploadImageFile: typeof import('./src/components/UploadImageFile.vue')['default']
     UserManager: typeof import('./src/components/admin/UserManager.vue')['default']

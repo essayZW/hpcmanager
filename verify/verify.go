@@ -84,6 +84,12 @@ const (
 	QueryPaperAwardApply = "__QUERY_PAPER_AWARD_APPLY__"
 	// CheckPaperAwardApply 审核论文奖励申请
 	CheckPaperAwardApply = "__CHECK_PAPER_AWARD_APPLY__"
+	// CreateTechnologyAwardApply 创建科技奖励申请
+	CreateTechnologyAwardApply = "__CREATE_TECHNOLOGY_AWARD_APPLY__"
+	// QueryTechnologyAwardApply 查询科技奖励申请
+	QueryTechnologyAwardApply = "__QUERY_TECHNOLOGY_AWARD_APPLY__"
+	// CheckTechnologyApply 审核科技奖励申请
+	CheckTechnologyApply = "__CHECK_TECHNOLOGY_APPLY__"
 )
 
 // Verify 进行操作的权限验证

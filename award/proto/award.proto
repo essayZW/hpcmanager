@@ -14,6 +14,9 @@ service AwardService {
     rpc CreatePaperAward(CreatePaperAwardRequest) returns (CreatePaperAwardResponse) {}
     rpc PaginationGetPaperApply(PaginationGetPaperApplyRequest) returns (PaginationGetPaperApplyResponse) {}
     rpc CheckPaperApplyByID(CheckPaperApplyByIDRequest) returns (CheckPaperApplyByIDResponse) {}
+    rpc CreateTechnologyAwardApply(CreateTechnologyAwardApplyRequest) returns (CreateTechnologyAwardApplyResponse) {}
+    rpc PaginationGetTechnologyApply(PaginationGetTechnologyApplyRequest) returns (PaginationGetTechnologyApplyResponse) {}
+    rpc CheckTechnologyApplyByID(CheckTechnologyApplyByIDRequest) returns (CheckTechnologyApplyByIDResponse) {}
 }
 
 message CreatePaperAwardRequest {
@@ -50,5 +53,41 @@ message CheckPaperApplyByIDRequest {
 }
 
 message CheckPaperApplyByIDResponse {
+    bool success = 1;
+}
+
+message CreateTechnologyAwardApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 projectID = 2;
+    string prizeLevel = 3;
+    string prizeImageName = 4;
+    string remarkMessage = 5;
+}
+
+message CreateTechnologyAwardApplyResponse {
+    int32 id = 1;
+}
+
+message PaginationGetTechnologyApplyRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 pageIndex = 2;
+    int32 pageSize = 3;
+}
+
+message PaginationGetTechnologyApplyResponse {
+    int32 count = 1;
+    repeated award.TechnologyApply applies = 2;
+}
+
+
+message CheckTechnologyApplyByIDRequest {
+    request.BaseRequest baseRequest = 1;
+    int32 applyID = 2;
+    double money = 3;
+    string checkMessage = 4;
+    bool accept = 5;
+}
+
+message CheckTechnologyApplyByIDResponse {
     bool success = 1;
 }

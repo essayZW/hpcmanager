@@ -16,3 +16,17 @@ type PaperInfoParam struct {
 	ThanksPageImageName string
 	RemarkMessage       string
 }
+
+// TechnologyParam 科技奖励信息参数
+type TechnologyParam struct {
+	Level         string
+	ImageName     string
+	RemarkMessage string
+}
+
+// ProjectInfoParam 项目信息参数
+type ProjectInfoParam struct {
+	ID          int
+	Name        string
+	Description string
+}
