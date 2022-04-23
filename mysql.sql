@@ -339,8 +339,13 @@ DROP TABLE IF EXISTS `technology_apply`;
 CREATE TABLE `technology_apply` (
   `id` int NOT NULL AUTO_INCREMENT,
   `creater_id` int NOT NULL,
+  `creater_username` varchar(32) NOT NULL,
+  `creater_name` varchar(32) NOT NULL,
+  `user_group_id` int NOT NULL,
   `create_time` timestamp NOT NULL,
   `tutor_id` int NOT NULL,
+  `tutor_username` varchar(32) NOT NULL,
+  `tutor_name` varchar(32) NOT NULL,
   `project_id` int NOT NULL,
   `project_name` varchar(128) NOT NULL,
   `project_description` varchar(1024) DEFAULT NULL,
@@ -352,6 +357,7 @@ CREATE TABLE `technology_apply` (
   `checker_name` varchar(32) DEFAULT NULL,
   `check_message` varchar(512) DEFAULT NULL,
   `check_time` timestamp NULL DEFAULT NULL,
+  `check_money` decimal(18,2) NOT NULL DEFAULT '0.00',
   `extraAttributes` varchar(2048) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -470,4 +476,4 @@ CREATE TABLE `week_usage_bill` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-04-20 20:19:36
+-- Dump completed on 2022-04-23 15:07:56
