@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"strconv"
 	"sync"
 	"testing"
@@ -86,4 +87,16 @@ func TestEtcdDynamicConfig(t *testing.T) {
 
 	}
 	wt.Wait()
+}
+
+func TestPut(t *testing.T) {
+	etcdConfig, err := NewEtcd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	etcdConfig.Put(context.Background(), "testing", 123)
+	etcdConfig.Put(context.Background(), "testing1", true)
+	etcdConfig.Put(context.Background(), "testing2", 12.34)
+	etcdConfig.Put(context.Background(), "testing3", "xss")
 }

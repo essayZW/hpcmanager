@@ -1,20 +1,25 @@
 package config
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
 	"sync"
+	"time"
 
 	"github.com/asim/go-micro/plugins/config/source/etcd/v4"
 	"github.com/essayZW/hpcmanager/logger"
 	"go-micro.dev/v4/config"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 // etcdDynamicConfig etcd为数据源的动态配置监听
 type etcdDynamicConfig struct {
-	conf  config.Config
-	mutex sync.Mutex
+	conf       config.Config
+	etcdClient *clientv3.Client
+	mutex      sync.Mutex
 }
 
 // Registry 注册
@@ -118,26 +123,54 @@ func (e *etcdDynamicConfig) setValue(
 	}
 }
 
+func (e *etcdDynamicConfig) Put(ctx context.Context, key string, val interface{}) error {
+	putValue := map[string]interface{}{
+		"value": val,
+	}
+	valueStr, err := json.Marshal(putValue)
+	if err != nil {
+		logger.Warn(err)
+		return fmt.Errorf("invalid val: %v", val)
+	}
+	_, err = e.etcdClient.KV.Put(ctx, fmt.Sprintf("%s/%s/v", EtcdDynamicConfigPrefix, key), string(valueStr))
+	if err != nil {
+		logger.Warn(err)
+		return fmt.Errorf("put error")
+	}
+	return nil
+}
+
 // EtcdDynamicConfigPrefix etcd动态配置存储的前缀
 const EtcdDynamicConfigPrefix = "/hpcmanager/micro/config"
 
 // NewEtcd 创建一个基于etcd的动态配置工具
 func NewEtcd() (DynamicConfig, error) {
-	conf, err := NewEtcdConfig()
-	if err != nil {
-		return nil, err
-	}
-	return &etcdDynamicConfig{
-		conf: conf,
-	}, nil
-}
-
-// NewEtcdConfig 创建新的etcd的配置源
-func NewEtcdConfig() (config.Config, error) {
 	registryConf, err := LoadRegistry()
 	if err != nil {
 		return nil, err
 	}
+	conf, err := NewEtcdConfig(registryConf)
+	if err != nil {
+		return nil, err
+	}
+	etcdCli, err := clientv3.New(clientv3.Config{
+		Endpoints: []string{
+			registryConf.Etcd.Address + ":2379",
+		},
+		DialTimeout: time.Duration(5) * time.Second,
+	})
+	if err != nil {
+		logger.Error("init etcd clientv3 error: ", err)
+		return nil, err
+	}
+	return &etcdDynamicConfig{
+		conf:       conf,
+		etcdClient: etcdCli,
+	}, nil
+}
+
+// NewEtcdConfig 创建新的etcd的配置源
+func NewEtcdConfig(registryConf *Registry) (config.Config, error) {
 	etcdSource := etcd.NewSource(
 		etcd.WithAddress(registryConf.Etcd.Address),
 		etcd.WithPrefix(EtcdDynamicConfigPrefix),
@@ -151,5 +184,4 @@ func NewEtcdConfig() (config.Config, error) {
 		return nil, err
 	}
 	return conf, nil
-
 }
