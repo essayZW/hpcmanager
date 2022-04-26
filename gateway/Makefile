@@ -10,3 +10,6 @@ proto:
 .PHONY: dev
 dev:
 	env HPCMANAGER_ENV=dev go run main.go -port 8080
+.PHONY: docker
+docker:
+	sudo docker build . -t hpcmanager/gateway:1.0
