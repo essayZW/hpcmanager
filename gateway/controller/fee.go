@@ -386,6 +386,37 @@ func (f *fee) payNodeQuotaBill(ctx *gin.Context) {
 	httpResp.Send(ctx)
 }
 
+// setNodeDistributeFeeRate /api/fee/rate/distribute PUT 修改机器节点分配费率
+func (f *fee) setNodeDistributeFeeRate(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.SetNodeDistributeFeeRateParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, "参数验证失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	_, err := f.feeService.SetNodeDistributeFeeRate(c, &feepb.SetNodeDistributeFeeRateRequest{
+		BaseRequest: baseRequest,
+		Rate36CPU:   param.Rate36CPU,
+		Rate4GPU:    param.Rate4GPU,
+		Rate8GPU:    param.Rate8GPU,
+	})
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("修改节点分配费率失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+	return
+}
+
 func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter := router.Group("/fee")
 

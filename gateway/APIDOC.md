@@ -969,6 +969,25 @@ type PayNodeQuotaBillParam struct {
 
 响应: 是否支付成功
 
+### /fee/rate/distribute
+
+Method: PUT
+
+描述: 修改机器分配费率
+
+参数:
+
+```go
+// SetNodeDistributeFeeRateParam 设置机器分配费率参数
+type SetNodeDistributeFeeRateParam struct {
+    Rate36CPU float64 `form:"rate36CPU" json:"rate36CPU"`
+    Rate4GPU  float64 `form:"rate4GPU"  json:"rate4GPU"`
+    Rate8GPU  float64 `form:"rate8GPU"  json:"rate8GPU"`
+}
+```
+
+响应: 是否操作成功
+
 ## fss 控制器
 
 ### /fss/ping
