@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/fee/logic"
@@ -690,6 +691,36 @@ func (fs *FeeService) PayNodeQuotaBill(
 
 	resp.Success = status.(bool)
 	return err
+}
+
+// SetNodeDistributeFeeRate 设置机器节点分配费率
+func (fs *FeeService) SetNodeDistributeFeeRate(
+	ctx context.Context,
+	req *feepb.SetNodeDistributeFeeRateRequest,
+	resp *feepb.SetNodeDistributeFeeRateResponse,
+) error {
+	logger.Info("SetNodeDistributeFeeRate: ", req.BaseRequest)
+	if !verify.Identify(verify.SetNodeDistributeFeeRate, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"SetNodeDistributeFeeRate permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("SetNodeDistributeFeeRate permission forbidden")
+	}
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	err := fs.nodeDistributeBillLogic.Set36CPURate(c, req.Rate36CPU)
+	err = fs.nodeDistributeBillLogic.Set8GPURate(c, req.Rate8GPU)
+	err = fs.nodeDistributeBillLogic.Set4GPURate(c, req.Rate4GPU)
+	if err != nil {
+		return errors.New("update rate error")
+	}
+	resp.Success = true
+	return nil
 }
 
 var _ feepb.FeeHandler = (*FeeService)(nil)

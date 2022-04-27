@@ -12,9 +12,16 @@ import (
 	"gopkg.in/guregu/null.v4"
 )
 
+const (
+	rate36CPUKey = "fee_rate36CPU"
+	rate8GPUKey  = "fee_rate8GPU"
+	rate4GPUKey  = "fee_rate4GPU"
+)
+
 // NodeDistributeRate 机器节点独占费率
 type NodeDistributeRate struct {
-	mutex sync.Mutex
+	mutex         sync.Mutex
+	dynamicConfig config.DynamicConfig
 	// rate36CPU 36 核心节点费率/年
 	rate36CPU float64
 	// rate4GPU 4 gpu核心节点费率/年
@@ -30,6 +37,13 @@ func (ndr *NodeDistributeRate) Get36CPURate() float64 {
 	return ndr.rate36CPU
 }
 
+// Set36CPURate 设置36 CPU节点的费率
+func (ndr *NodeDistributeRate) Set36CPURate(ctx context.Context, newValue float64) error {
+	ndr.mutex.Lock()
+	defer ndr.mutex.Unlock()
+	return ndr.dynamicConfig.Put(ctx, rate36CPUKey, newValue)
+}
+
 // Get4GPU 查询4 GPU节点的费率
 func (ndr *NodeDistributeRate) Get4GPU() float64 {
 	ndr.mutex.Lock()
@@ -37,11 +51,56 @@ func (ndr *NodeDistributeRate) Get4GPU() float64 {
 	return ndr.rate4GPU
 }
 
+// Set4GPURate 设置4GPU的费率
+func (ndr *NodeDistributeRate) Set4GPURate(ctx context.Context, value float64) error {
+	ndr.mutex.Lock()
+	defer ndr.mutex.Unlock()
+	return ndr.dynamicConfig.Put(ctx, rate4GPUKey, value)
+}
+
 // Get8GPU 查询8 GPU节点的费率
 func (ndr *NodeDistributeRate) Get8GPU() float64 {
 	ndr.mutex.Lock()
 	defer ndr.mutex.Unlock()
 	return ndr.rate8GPU
+}
+
+func (ndr *NodeDistributeRate) Set8GPURate(ctx context.Context, value float64) error {
+	ndr.mutex.Lock()
+	defer ndr.mutex.Unlock()
+	return ndr.dynamicConfig.Put(ctx, rate8GPUKey, value)
+}
+
+// RegistryDynamicConfig
+func (ndr *NodeDistributeRate) RegistryDynamicConfig() error {
+	// rate36CPU 36 核心节点费率/年
+	var rate36CPU float64
+	// rate4GPU 4 gpu核心节点费率/年
+	var rate4GPU float64
+	// rate8GPU 8 gpu核心节点费率/年
+	var rate8GPU float64
+	if err := ndr.dynamicConfig.Registry(rate36CPUKey, &rate36CPU, func(newV interface{}) {
+		ndr.mutex.Lock()
+		defer ndr.mutex.Unlock()
+		ndr.rate36CPU = rate36CPU
+	}); err != nil {
+		return err
+	}
+	if err := ndr.dynamicConfig.Registry(rate8GPUKey, &rate8GPU, func(newV interface{}) {
+		ndr.mutex.Lock()
+		defer ndr.mutex.Unlock()
+		ndr.rate8GPU = rate8GPU
+	}); err != nil {
+		return err
+	}
+	if err := ndr.dynamicConfig.Registry(rate4GPUKey, &rate4GPU, func(newV interface{}) {
+		ndr.mutex.Lock()
+		defer ndr.mutex.Unlock()
+		ndr.rate4GPU = rate4GPU
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 // NodeDistributeBill 机器独占账单操作逻辑
@@ -244,33 +303,12 @@ func (ndbl *NodeDistributeBill) GetRate(ctx context.Context) *NodeDistributeRate
 func NewNodeDistributeBill(ndb *db.NodeDistributeBillDB, dynamicConfig config.DynamicConfig) (*NodeDistributeBill, error) {
 	res := &NodeDistributeBill{
 		ndb: ndb,
+		NodeDistributeRate: NodeDistributeRate{
+			dynamicConfig: dynamicConfig,
+		},
 	}
-
-	// rate36CPU 36 核心节点费率/年
-	var rate36CPU float64
-	// rate4GPU 4 gpu核心节点费率/年
-	var rate4GPU float64
-	// rate8GPU 8 gpu核心节点费率/年
-	var rate8GPU float64
-	if err := dynamicConfig.Registry("fee_rate36CPU", &rate36CPU, func(newV interface{}) {
-		res.mutex.Lock()
-		defer res.mutex.Unlock()
-		res.rate36CPU = rate36CPU
-	}); err != nil {
-		return nil, err
-	}
-	if err := dynamicConfig.Registry("fee_rate8GPU", &rate8GPU, func(newV interface{}) {
-		res.mutex.Lock()
-		defer res.mutex.Unlock()
-		res.rate8GPU = rate8GPU
-	}); err != nil {
-		return nil, err
-	}
-	if err := dynamicConfig.Registry("fee_rate4GPU", &rate4GPU, func(newV interface{}) {
-		res.mutex.Lock()
-		defer res.mutex.Unlock()
-		res.rate4GPU = rate4GPU
-	}); err != nil {
+	err := res.RegistryDynamicConfig()
+	if err != nil {
 		return nil, err
 	}
 	return res, nil

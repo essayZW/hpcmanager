@@ -239,6 +239,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: CommonAdmin,
 			},
+			// 需要超级管理员及以上权限
+			SetNodeDistributeFeeRate: {
+				maxLevel: MaxLevel,
+				minLevel: SuperAdmin,
+			},
 		},
 	}
 }

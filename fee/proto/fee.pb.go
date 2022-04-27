@@ -1596,6 +1596,124 @@ func (x *PayNodeQuotaBillResponse) GetSuccess() bool {
 	return false
 }
 
+type SetNodeDistributeFeeRateRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BaseRequest *proto.BaseRequest `protobuf:"bytes,1,opt,name=baseRequest,proto3" json:"baseRequest,omitempty"`
+	Rate36CPU   float64            `protobuf:"fixed64,2,opt,name=rate36CPU,proto3" json:"rate36CPU,omitempty"`
+	Rate4GPU    float64            `protobuf:"fixed64,3,opt,name=rate4GPU,proto3" json:"rate4GPU,omitempty"`
+	Rate8GPU    float64            `protobuf:"fixed64,4,opt,name=rate8GPU,proto3" json:"rate8GPU,omitempty"`
+}
+
+func (x *SetNodeDistributeFeeRateRequest) Reset() {
+	*x = SetNodeDistributeFeeRateRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_fee_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SetNodeDistributeFeeRateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetNodeDistributeFeeRateRequest) ProtoMessage() {}
+
+func (x *SetNodeDistributeFeeRateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_fee_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetNodeDistributeFeeRateRequest.ProtoReflect.Descriptor instead.
+func (*SetNodeDistributeFeeRateRequest) Descriptor() ([]byte, []int) {
+	return file_proto_fee_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *SetNodeDistributeFeeRateRequest) GetBaseRequest() *proto.BaseRequest {
+	if x != nil {
+		return x.BaseRequest
+	}
+	return nil
+}
+
+func (x *SetNodeDistributeFeeRateRequest) GetRate36CPU() float64 {
+	if x != nil {
+		return x.Rate36CPU
+	}
+	return 0
+}
+
+func (x *SetNodeDistributeFeeRateRequest) GetRate4GPU() float64 {
+	if x != nil {
+		return x.Rate4GPU
+	}
+	return 0
+}
+
+func (x *SetNodeDistributeFeeRateRequest) GetRate8GPU() float64 {
+	if x != nil {
+		return x.Rate8GPU
+	}
+	return 0
+}
+
+type SetNodeDistributeFeeRateResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Success bool `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+}
+
+func (x *SetNodeDistributeFeeRateResponse) Reset() {
+	*x = SetNodeDistributeFeeRateResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_fee_proto_msgTypes[27]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SetNodeDistributeFeeRateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetNodeDistributeFeeRateResponse) ProtoMessage() {}
+
+func (x *SetNodeDistributeFeeRateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_fee_proto_msgTypes[27]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetNodeDistributeFeeRateResponse.ProtoReflect.Descriptor instead.
+func (*SetNodeDistributeFeeRateResponse) Descriptor() ([]byte, []int) {
+	return file_proto_fee_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *SetNodeDistributeFeeRateResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_proto_fee_proto protoreflect.FileDescriptor
 
 var file_proto_fee_proto_rawDesc = []byte{
@@ -1814,7 +1932,22 @@ var file_proto_fee_proto_rawDesc = []byte{
 	0x34, 0x0a, 0x18, 0x50, 0x61, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x51, 0x75, 0x6f, 0x74, 0x61, 0x42,
 	0x69, 0x6c, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x73,
 	0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x73, 0x75,
-	0x63, 0x63, 0x65, 0x73, 0x73, 0x32, 0xd4, 0x0b, 0x0a, 0x03, 0x46, 0x65, 0x65, 0x12, 0x37, 0x0a,
+	0x63, 0x63, 0x65, 0x73, 0x73, 0x22, 0xaf, 0x01, 0x0a, 0x1f, 0x53, 0x65, 0x74, 0x4e, 0x6f, 0x64,
+	0x65, 0x44, 0x69, 0x73, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x46, 0x65, 0x65, 0x52, 0x61,
+	0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x36, 0x0a, 0x0b, 0x62, 0x61, 0x73,
+	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14,
+	0x2e, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x42, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x52, 0x0b, 0x62, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x1c, 0x0a, 0x09, 0x72, 0x61, 0x74, 0x65, 0x33, 0x36, 0x43, 0x50, 0x55, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x01, 0x52, 0x09, 0x72, 0x61, 0x74, 0x65, 0x33, 0x36, 0x43, 0x50, 0x55, 0x12,
+	0x1a, 0x0a, 0x08, 0x72, 0x61, 0x74, 0x65, 0x34, 0x47, 0x50, 0x55, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x01, 0x52, 0x08, 0x72, 0x61, 0x74, 0x65, 0x34, 0x47, 0x50, 0x55, 0x12, 0x1a, 0x0a, 0x08, 0x72,
+	0x61, 0x74, 0x65, 0x38, 0x47, 0x50, 0x55, 0x18, 0x04, 0x20, 0x01, 0x28, 0x01, 0x52, 0x08, 0x72,
+	0x61, 0x74, 0x65, 0x38, 0x47, 0x50, 0x55, 0x22, 0x3c, 0x0a, 0x20, 0x53, 0x65, 0x74, 0x4e, 0x6f,
+	0x64, 0x65, 0x44, 0x69, 0x73, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x46, 0x65, 0x65, 0x52,
+	0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x73,
+	0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x73, 0x75,
+	0x63, 0x63, 0x65, 0x73, 0x73, 0x32, 0xbf, 0x0c, 0x0a, 0x03, 0x46, 0x65, 0x65, 0x12, 0x37, 0x0a,
 	0x04, 0x50, 0x69, 0x6e, 0x67, 0x12, 0x12, 0x2e, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x70, 0x72,
 	0x6f, 0x74, 0x6f, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x19, 0x2e, 0x70, 0x75, 0x62, 0x6c,
 	0x69, 0x63, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70,
@@ -1907,11 +2040,17 @@ var file_proto_fee_proto_rawDesc = []byte{
 	0x66, 0x65, 0x65, 0x2e, 0x50, 0x61, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x51, 0x75, 0x6f, 0x74, 0x61,
 	0x42, 0x69, 0x6c, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x66, 0x65,
 	0x65, 0x2e, 0x50, 0x61, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x51, 0x75, 0x6f, 0x74, 0x61, 0x42, 0x69,
-	0x6c, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x2d, 0x5a, 0x2b,
-	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x73, 0x73, 0x61, 0x79,
-	0x5a, 0x57, 0x2f, 0x68, 0x70, 0x63, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x2f, 0x66, 0x65,
-	0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x3b, 0x66, 0x65, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x6c, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x69, 0x0a, 0x18,
+	0x53, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x44, 0x69, 0x73, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74,
+	0x65, 0x46, 0x65, 0x65, 0x52, 0x61, 0x74, 0x65, 0x12, 0x24, 0x2e, 0x66, 0x65, 0x65, 0x2e, 0x53,
+	0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x44, 0x69, 0x73, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65,
+	0x46, 0x65, 0x65, 0x52, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x25,
+	0x2e, 0x66, 0x65, 0x65, 0x2e, 0x53, 0x65, 0x74, 0x4e, 0x6f, 0x64, 0x65, 0x44, 0x69, 0x73, 0x74,
+	0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x46, 0x65, 0x65, 0x52, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x2d, 0x5a, 0x2b, 0x67, 0x69, 0x74, 0x68, 0x75,
+	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x73, 0x73, 0x61, 0x79, 0x5a, 0x57, 0x2f, 0x68, 0x70,
+	0x63, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x2f, 0x66, 0x65, 0x65, 0x2f, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x3b, 0x66, 0x65, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1926,7 +2065,7 @@ func file_proto_fee_proto_rawDescGZIP() []byte {
 	return file_proto_fee_proto_rawDescData
 }
 
-var file_proto_fee_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_proto_fee_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_proto_fee_proto_goTypes = []interface{}{
 	(*CreateNodeDistributeBillRequest)(nil),                // 0: fee.CreateNodeDistributeBillRequest
 	(*CreateNodeDistributeBillResponse)(nil),               // 1: fee.CreateNodeDistributeBillResponse
@@ -1954,65 +2093,70 @@ var file_proto_fee_proto_goTypes = []interface{}{
 	(*GetNodeQuotaFeeRateResponse)(nil),                    // 23: fee.GetNodeQuotaFeeRateResponse
 	(*PayNodeQuotaBillRequest)(nil),                        // 24: fee.PayNodeQuotaBillRequest
 	(*PayNodeQuotaBillResponse)(nil),                       // 25: fee.PayNodeQuotaBillResponse
-	(*proto.BaseRequest)(nil),                              // 26: request.BaseRequest
-	(*NodeDistributeBill)(nil),                             // 27: fee.NodeDistributeBill
-	(*NodeWeekUsageBill)(nil),                              // 28: fee.NodeWeekUsageBill
-	(*NodeWeekUsageBillForUserGroup)(nil),                  // 29: fee.NodeWeekUsageBillForUserGroup
-	(*NodeQuotaBill)(nil),                                  // 30: fee.NodeQuotaBill
-	(*proto1.Empty)(nil),                                   // 31: publicproto.Empty
-	(*proto1.PingResponse)(nil),                            // 32: publicproto.PingResponse
+	(*SetNodeDistributeFeeRateRequest)(nil),                // 26: fee.SetNodeDistributeFeeRateRequest
+	(*SetNodeDistributeFeeRateResponse)(nil),               // 27: fee.SetNodeDistributeFeeRateResponse
+	(*proto.BaseRequest)(nil),                              // 28: request.BaseRequest
+	(*NodeDistributeBill)(nil),                             // 29: fee.NodeDistributeBill
+	(*NodeWeekUsageBill)(nil),                              // 30: fee.NodeWeekUsageBill
+	(*NodeWeekUsageBillForUserGroup)(nil),                  // 31: fee.NodeWeekUsageBillForUserGroup
+	(*NodeQuotaBill)(nil),                                  // 32: fee.NodeQuotaBill
+	(*proto1.Empty)(nil),                                   // 33: publicproto.Empty
+	(*proto1.PingResponse)(nil),                            // 34: publicproto.PingResponse
 }
 var file_proto_fee_proto_depIdxs = []int32{
-	26, // 0: fee.CreateNodeDistributeBillRequest.baseRequest:type_name -> request.BaseRequest
-	26, // 1: fee.PaginationGetNodeDistributeBillRequest.baseRequest:type_name -> request.BaseRequest
-	27, // 2: fee.PaginationGetNodeDistributeBillResponse.bills:type_name -> fee.NodeDistributeBill
-	26, // 3: fee.PayNodeDistributeBillRequest.baseRequest:type_name -> request.BaseRequest
-	26, // 4: fee.GetNodeDistributeFeeRateRequest.baseRequest:type_name -> request.BaseRequest
-	26, // 5: fee.CreateNodeWeekUsageBillRequest.baseRequest:type_name -> request.BaseRequest
-	26, // 6: fee.PaginationGetNodeWeekUsageBillRecordsResquest.baseRequest:type_name -> request.BaseRequest
-	28, // 7: fee.PaginationGetNodeWeekUsageBillRecordsResponse.bills:type_name -> fee.NodeWeekUsageBill
-	26, // 8: fee.PaginationGetUserGroupUsageBillRecordsRequest.baseRequest:type_name -> request.BaseRequest
-	29, // 9: fee.PaginationGetUserGroupUsageBillRecordsResponse.bills:type_name -> fee.NodeWeekUsageBillForUserGroup
-	26, // 10: fee.PayGroupNodeUsageBillRequest.baseRequest:type_name -> request.BaseRequest
-	26, // 11: fee.GetNodeUsageFeeRateRequest.baseRequest:type_name -> request.BaseRequest
-	26, // 12: fee.CreateNodeQuotaModifyBillRequest.baseRequest:type_name -> request.BaseRequest
-	26, // 13: fee.PaginationGetNodeQuotaBillRequest.baseRequest:type_name -> request.BaseRequest
-	30, // 14: fee.PaginationGetNodeQuotaBillResponse.bills:type_name -> fee.NodeQuotaBill
-	26, // 15: fee.GetNodeQuotaFeeRateRequest.baseRequest:type_name -> request.BaseRequest
-	26, // 16: fee.PayNodeQuotaBillRequest.baseRequest:type_name -> request.BaseRequest
-	31, // 17: fee.Fee.Ping:input_type -> publicproto.Empty
-	0,  // 18: fee.Fee.CreateNodeDistributeBill:input_type -> fee.CreateNodeDistributeBillRequest
-	2,  // 19: fee.Fee.PaginationGetNodeDistributeBill:input_type -> fee.PaginationGetNodeDistributeBillRequest
-	4,  // 20: fee.Fee.PayNodeDistributeBill:input_type -> fee.PayNodeDistributeBillRequest
-	6,  // 21: fee.Fee.GetNodeDistributeFeeRate:input_type -> fee.GetNodeDistributeFeeRateRequest
-	8,  // 22: fee.Fee.CreateNodeWeekUsageBill:input_type -> fee.CreateNodeWeekUsageBillRequest
-	10, // 23: fee.Fee.PaginationGetNodeWeekUsageBillRecords:input_type -> fee.PaginationGetNodeWeekUsageBillRecordsResquest
-	12, // 24: fee.Fee.PaginationGetUserGroupUsageBillRecords:input_type -> fee.PaginationGetUserGroupUsageBillRecordsRequest
-	14, // 25: fee.Fee.PayGroupNodeUsageBill:input_type -> fee.PayGroupNodeUsageBillRequest
-	16, // 26: fee.Fee.GetNodeUsageFeeRate:input_type -> fee.GetNodeUsageFeeRateRequest
-	18, // 27: fee.Fee.CreateNodeQuotaModifyBill:input_type -> fee.CreateNodeQuotaModifyBillRequest
-	20, // 28: fee.Fee.PaginationGetNodeQuotaBill:input_type -> fee.PaginationGetNodeQuotaBillRequest
-	22, // 29: fee.Fee.GetNodeQuotaFeeRate:input_type -> fee.GetNodeQuotaFeeRateRequest
-	24, // 30: fee.Fee.PayNodeQuotaBill:input_type -> fee.PayNodeQuotaBillRequest
-	32, // 31: fee.Fee.Ping:output_type -> publicproto.PingResponse
-	1,  // 32: fee.Fee.CreateNodeDistributeBill:output_type -> fee.CreateNodeDistributeBillResponse
-	3,  // 33: fee.Fee.PaginationGetNodeDistributeBill:output_type -> fee.PaginationGetNodeDistributeBillResponse
-	5,  // 34: fee.Fee.PayNodeDistributeBill:output_type -> fee.PayNodeDistributeBillResponse
-	7,  // 35: fee.Fee.GetNodeDistributeFeeRate:output_type -> fee.GetNodeDistributeFeeRateResponse
-	9,  // 36: fee.Fee.CreateNodeWeekUsageBill:output_type -> fee.CreateNodeWeekUsageBillResponse
-	11, // 37: fee.Fee.PaginationGetNodeWeekUsageBillRecords:output_type -> fee.PaginationGetNodeWeekUsageBillRecordsResponse
-	13, // 38: fee.Fee.PaginationGetUserGroupUsageBillRecords:output_type -> fee.PaginationGetUserGroupUsageBillRecordsResponse
-	15, // 39: fee.Fee.PayGroupNodeUsageBill:output_type -> fee.PayGroupNodeUsageBillResponse
-	17, // 40: fee.Fee.GetNodeUsageFeeRate:output_type -> fee.GetNodeUsageFeeRateResponse
-	19, // 41: fee.Fee.CreateNodeQuotaModifyBill:output_type -> fee.CreateNodeQuotaModifyBillResponse
-	21, // 42: fee.Fee.PaginationGetNodeQuotaBill:output_type -> fee.PaginationGetNodeQuotaBillResponse
-	23, // 43: fee.Fee.GetNodeQuotaFeeRate:output_type -> fee.GetNodeQuotaFeeRateResponse
-	25, // 44: fee.Fee.PayNodeQuotaBill:output_type -> fee.PayNodeQuotaBillResponse
-	31, // [31:45] is the sub-list for method output_type
-	17, // [17:31] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	28, // 0: fee.CreateNodeDistributeBillRequest.baseRequest:type_name -> request.BaseRequest
+	28, // 1: fee.PaginationGetNodeDistributeBillRequest.baseRequest:type_name -> request.BaseRequest
+	29, // 2: fee.PaginationGetNodeDistributeBillResponse.bills:type_name -> fee.NodeDistributeBill
+	28, // 3: fee.PayNodeDistributeBillRequest.baseRequest:type_name -> request.BaseRequest
+	28, // 4: fee.GetNodeDistributeFeeRateRequest.baseRequest:type_name -> request.BaseRequest
+	28, // 5: fee.CreateNodeWeekUsageBillRequest.baseRequest:type_name -> request.BaseRequest
+	28, // 6: fee.PaginationGetNodeWeekUsageBillRecordsResquest.baseRequest:type_name -> request.BaseRequest
+	30, // 7: fee.PaginationGetNodeWeekUsageBillRecordsResponse.bills:type_name -> fee.NodeWeekUsageBill
+	28, // 8: fee.PaginationGetUserGroupUsageBillRecordsRequest.baseRequest:type_name -> request.BaseRequest
+	31, // 9: fee.PaginationGetUserGroupUsageBillRecordsResponse.bills:type_name -> fee.NodeWeekUsageBillForUserGroup
+	28, // 10: fee.PayGroupNodeUsageBillRequest.baseRequest:type_name -> request.BaseRequest
+	28, // 11: fee.GetNodeUsageFeeRateRequest.baseRequest:type_name -> request.BaseRequest
+	28, // 12: fee.CreateNodeQuotaModifyBillRequest.baseRequest:type_name -> request.BaseRequest
+	28, // 13: fee.PaginationGetNodeQuotaBillRequest.baseRequest:type_name -> request.BaseRequest
+	32, // 14: fee.PaginationGetNodeQuotaBillResponse.bills:type_name -> fee.NodeQuotaBill
+	28, // 15: fee.GetNodeQuotaFeeRateRequest.baseRequest:type_name -> request.BaseRequest
+	28, // 16: fee.PayNodeQuotaBillRequest.baseRequest:type_name -> request.BaseRequest
+	28, // 17: fee.SetNodeDistributeFeeRateRequest.baseRequest:type_name -> request.BaseRequest
+	33, // 18: fee.Fee.Ping:input_type -> publicproto.Empty
+	0,  // 19: fee.Fee.CreateNodeDistributeBill:input_type -> fee.CreateNodeDistributeBillRequest
+	2,  // 20: fee.Fee.PaginationGetNodeDistributeBill:input_type -> fee.PaginationGetNodeDistributeBillRequest
+	4,  // 21: fee.Fee.PayNodeDistributeBill:input_type -> fee.PayNodeDistributeBillRequest
+	6,  // 22: fee.Fee.GetNodeDistributeFeeRate:input_type -> fee.GetNodeDistributeFeeRateRequest
+	8,  // 23: fee.Fee.CreateNodeWeekUsageBill:input_type -> fee.CreateNodeWeekUsageBillRequest
+	10, // 24: fee.Fee.PaginationGetNodeWeekUsageBillRecords:input_type -> fee.PaginationGetNodeWeekUsageBillRecordsResquest
+	12, // 25: fee.Fee.PaginationGetUserGroupUsageBillRecords:input_type -> fee.PaginationGetUserGroupUsageBillRecordsRequest
+	14, // 26: fee.Fee.PayGroupNodeUsageBill:input_type -> fee.PayGroupNodeUsageBillRequest
+	16, // 27: fee.Fee.GetNodeUsageFeeRate:input_type -> fee.GetNodeUsageFeeRateRequest
+	18, // 28: fee.Fee.CreateNodeQuotaModifyBill:input_type -> fee.CreateNodeQuotaModifyBillRequest
+	20, // 29: fee.Fee.PaginationGetNodeQuotaBill:input_type -> fee.PaginationGetNodeQuotaBillRequest
+	22, // 30: fee.Fee.GetNodeQuotaFeeRate:input_type -> fee.GetNodeQuotaFeeRateRequest
+	24, // 31: fee.Fee.PayNodeQuotaBill:input_type -> fee.PayNodeQuotaBillRequest
+	26, // 32: fee.Fee.SetNodeDistributeFeeRate:input_type -> fee.SetNodeDistributeFeeRateRequest
+	34, // 33: fee.Fee.Ping:output_type -> publicproto.PingResponse
+	1,  // 34: fee.Fee.CreateNodeDistributeBill:output_type -> fee.CreateNodeDistributeBillResponse
+	3,  // 35: fee.Fee.PaginationGetNodeDistributeBill:output_type -> fee.PaginationGetNodeDistributeBillResponse
+	5,  // 36: fee.Fee.PayNodeDistributeBill:output_type -> fee.PayNodeDistributeBillResponse
+	7,  // 37: fee.Fee.GetNodeDistributeFeeRate:output_type -> fee.GetNodeDistributeFeeRateResponse
+	9,  // 38: fee.Fee.CreateNodeWeekUsageBill:output_type -> fee.CreateNodeWeekUsageBillResponse
+	11, // 39: fee.Fee.PaginationGetNodeWeekUsageBillRecords:output_type -> fee.PaginationGetNodeWeekUsageBillRecordsResponse
+	13, // 40: fee.Fee.PaginationGetUserGroupUsageBillRecords:output_type -> fee.PaginationGetUserGroupUsageBillRecordsResponse
+	15, // 41: fee.Fee.PayGroupNodeUsageBill:output_type -> fee.PayGroupNodeUsageBillResponse
+	17, // 42: fee.Fee.GetNodeUsageFeeRate:output_type -> fee.GetNodeUsageFeeRateResponse
+	19, // 43: fee.Fee.CreateNodeQuotaModifyBill:output_type -> fee.CreateNodeQuotaModifyBillResponse
+	21, // 44: fee.Fee.PaginationGetNodeQuotaBill:output_type -> fee.PaginationGetNodeQuotaBillResponse
+	23, // 45: fee.Fee.GetNodeQuotaFeeRate:output_type -> fee.GetNodeQuotaFeeRateResponse
+	25, // 46: fee.Fee.PayNodeQuotaBill:output_type -> fee.PayNodeQuotaBillResponse
+	27, // 47: fee.Fee.SetNodeDistributeFeeRate:output_type -> fee.SetNodeDistributeFeeRateResponse
+	33, // [33:48] is the sub-list for method output_type
+	18, // [18:33] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_proto_fee_proto_init() }
@@ -2334,6 +2478,30 @@ func file_proto_fee_proto_init() {
 				return nil
 			}
 		}
+		file_proto_fee_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SetNodeDistributeFeeRateRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_fee_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SetNodeDistributeFeeRateResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2341,7 +2509,7 @@ func file_proto_fee_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_fee_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   26,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

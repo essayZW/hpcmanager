@@ -25,6 +25,7 @@ service Fee {
     rpc PaginationGetNodeQuotaBill(PaginationGetNodeQuotaBillRequest) returns (PaginationGetNodeQuotaBillResponse) {}
     rpc GetNodeQuotaFeeRate(GetNodeQuotaFeeRateRequest) returns (GetNodeQuotaFeeRateResponse) {}
     rpc PayNodeQuotaBill(PayNodeQuotaBillRequest) returns (PayNodeQuotaBillResponse) {}
+    rpc SetNodeDistributeFeeRate(SetNodeDistributeFeeRateRequest) returns (SetNodeDistributeFeeRateResponse) {}
 }
 
 message CreateNodeDistributeBillRequest {
@@ -172,5 +173,16 @@ message PayNodeQuotaBillRequest {
 }
 
 message PayNodeQuotaBillResponse {
+    bool success = 1;
+}
+
+message SetNodeDistributeFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+    double rate36CPU = 2;
+    double rate4GPU = 3;
+    double rate8GPU = 4;
+}
+
+message SetNodeDistributeFeeRateResponse {
     bool success = 1;
 }

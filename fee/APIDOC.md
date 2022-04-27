@@ -353,6 +353,31 @@ message PayNodeQuotaBillResponse {
 }
 ```
 
+## SetNodeDistributeFeeRate
+
+描述: 设置节点分配账单费率
+
+原型定义: `rpc SetNodeDistributeFeeRate(SetNodeDistributeFeeRateRequest) returns (SetNodeDistributeFeeRateResponse) {}`
+
+请求参数:
+
+```protobuf
+message SetNodeDistributeFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+    double rate36CPU = 2;
+    double rate4GPU = 3;
+    double rate8GPU = 4;
+}
+```
+
+响应参数:
+
+```protobuf
+message SetNodeDistributeFeeRateResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## NodeDistributeBill

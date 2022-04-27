@@ -90,6 +90,8 @@ const (
 	QueryTechnologyAwardApply = "__QUERY_TECHNOLOGY_AWARD_APPLY__"
 	// CheckTechnologyApply 审核科技奖励申请
 	CheckTechnologyApply = "__CHECK_TECHNOLOGY_APPLY__"
+	// SetNodeDistributeFeeRate 设置机器节点分配费率
+	SetNodeDistributeFeeRate = "__SET_NODE_DISTRIBUTE_FEE_RATE__"
 )
 
 // Verify 进行操作的权限验证
