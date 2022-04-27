@@ -427,6 +427,7 @@ func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter.PUT("/distribute", f.payNodeDistributeBill)
 
 	feeRouter.GET("/rate/distribute", f.getNodeDistributeFeeRate)
+	feeRouter.PUT("/rate/distribute", f.setNodeDistributeFeeRate)
 	feeRouter.GET("/rate/usage", f.getNodeUsageFeeRate)
 	feeRouter.GET("/rate/quota", f.getNodeQuotaFeeRate)
 

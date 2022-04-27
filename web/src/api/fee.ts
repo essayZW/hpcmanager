@@ -355,3 +355,32 @@ export async function queryNodeQuotaFeeRate(): Promise<NodeQuotaFeeRate> {
   }
   return resp.data;
 }
+
+/**
+ * 设置机器节点费率参数
+ */
+export type SetNodeDistributeFeeRateParam = {
+  rate36CPU: number;
+  rate4GPU: number;
+  rate8GPU: number;
+};
+
+/**
+ * 设置机器节点费率
+ */
+export async function setNodeDistributeFeeRate(
+  param: SetNodeDistributeFeeRateParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/fee/rate/distribute',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}

@@ -18,6 +18,7 @@ import {
   updateNodeQuotaBillPayInfo,
   NodeQuotaFeeRate,
   queryNodeQuotaFeeRate,
+  setNodeDistributeFeeRate as setNodeDistributeFeeRateAPI,
 } from '../api/fee';
 
 /**
@@ -178,4 +179,19 @@ export async function payNodeQuotaBill(
  */
 export async function getNodeQuotaFeeRate(): Promise<NodeQuotaFeeRate> {
   return queryNodeQuotaFeeRate();
+}
+
+/**
+ * 设置机器节点费率
+ */
+export async function setNodeDistributeFeeRate(
+  rate36CPU: number,
+  rate4GPU: number,
+  rate8GPU: number
+): Promise<boolean> {
+  return setNodeDistributeFeeRateAPI({
+    rate8GPU,
+    rate4GPU,
+    rate36CPU,
+  });
 }
