@@ -753,6 +753,36 @@ func (fs *FeeService) SetNodeUsageFeeRate(
 	return nil
 }
 
+// SetNodeQuotaFeeRate 设置机器存储费率
+func (fs *FeeService) SetNodeQuotaFeeRate(
+	ctx context.Context,
+	req *feepb.SetNodeQuotaFeeRateRequest,
+	resp *feepb.SetNodeQuotaFeeRateResponse,
+) error {
+	logger.Info("SetNodeQuotaFeeRate: ", req.BaseRequest)
+	if !verify.Identify(verify.SetNodeQuotaFeeRate, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"SetNodeQuotaFeeRate permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("SetNodeQuotaFeeRate permission forbidden")
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	err := fs.nodeQuotaBillLogic.SetBasic(c, req.Basic)
+	err = fs.nodeQuotaBillLogic.SetExtra(c, req.Extra)
+	if err != nil {
+		return errors.New("set fee rate error")
+	}
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务

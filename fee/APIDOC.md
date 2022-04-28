@@ -402,6 +402,30 @@ message SetNodeUsageFeeRateResponse {
 }
 ```
 
+## SetNodeQuotaFeeRate
+
+描述: 设置机器存储费率
+
+原型定义: `rpc SetNodeQuotaFeeRate(SetNodeQuotaFeeRateRequest) returns (SetNodeQuotaFeeRateResponse) {}`
+
+请求参数:
+
+```protobuf
+message SetNodeQuotaFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+    double basic = 2;
+    double extra = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message SetNodeQuotaFeeRateResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## NodeDistributeBill

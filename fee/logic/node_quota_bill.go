@@ -12,9 +12,15 @@ import (
 	"gopkg.in/guregu/null.v4"
 )
 
+const (
+	basicKey = "fee_rate_Quota_basic"
+	extraKey = "fee_rate_Quota_extra"
+)
+
 // NodeQuotaFeeRate 机器节点存储费率
 type NodeQuotaFeeRate struct {
-	mutex sync.Mutex
+	dynamicConfig config.DynamicConfig
+	mutex         sync.Mutex
 	// basicPerYearPerTB 基本存储1TB/年,指的是最初初始化的1TB 1年的空间的费率
 	basicPerYearPerTB float64
 	// extraPerYearPerTB 额外的存储1TB/年
@@ -28,11 +34,50 @@ func (this *NodeQuotaFeeRate) GetBasic() float64 {
 	return this.basicPerYearPerTB
 }
 
+// SetBasic 设置基本存储费率
+func (this *NodeQuotaFeeRate) SetBasic(ctx context.Context, value float64) error {
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	return this.dynamicConfig.Put(ctx, basicKey, value)
+}
+
 // GetExtra 获得额外存储的费率
 func (this *NodeQuotaFeeRate) GetExtra() float64 {
 	this.mutex.Lock()
 	defer this.mutex.Unlock()
 	return this.extraPerYearPerTB
+}
+
+// SetExtra 设置额外存储的费率
+func (this *NodeQuotaFeeRate) SetExtra(ctx context.Context, value float64) error {
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	return this.dynamicConfig.Put(ctx, extraKey, value)
+}
+
+func (this *NodeQuotaFeeRate) Registry() error {
+	var basicFeeRate float64
+	var extraFeeRate float64
+
+	err := this.dynamicConfig.Registry(basicKey, &basicFeeRate, func(newV interface{}) {
+		this.mutex.Lock()
+		defer this.mutex.Unlock()
+		this.basicPerYearPerTB = basicFeeRate
+	})
+	if err != nil {
+		return err
+	}
+
+	err = this.dynamicConfig.Registry(extraKey, &extraFeeRate, func(newV interface{}) {
+		this.mutex.Lock()
+		defer this.mutex.Unlock()
+		this.extraPerYearPerTB = extraFeeRate
+	})
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type NodeQuotaBill struct {
@@ -232,24 +277,12 @@ const (
 func NewNodeQuotaBill(nodeQuotaBillDB *db.NodeQuotaBillDB, dynamicConfig config.DynamicConfig) (*NodeQuotaBill, error) {
 	res := &NodeQuotaBill{
 		nodeQuotaBillDB: nodeQuotaBillDB,
+		NodeQuotaFeeRate: NodeQuotaFeeRate{
+			dynamicConfig: dynamicConfig,
+		},
 	}
-
-	var basicFeeRate float64
-	var extraFeeRate float64
-
-	err := dynamicConfig.Registry("fee_rate_Quota_basic", &basicFeeRate, func(newV interface{}) {
-		res.mutex.Lock()
-		defer res.mutex.Unlock()
-		res.basicPerYearPerTB = basicFeeRate
-	})
-	if err != nil {
+	if err := res.Registry(); err != nil {
 		return nil, err
 	}
-
-	err = dynamicConfig.Registry("fee_rate_Quota_extra", &extraFeeRate, func(newV interface{}) {
-		res.mutex.Lock()
-		defer res.mutex.Unlock()
-		res.extraPerYearPerTB = extraFeeRate
-	})
 	return res, nil
 }

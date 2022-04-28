@@ -27,6 +27,7 @@ service Fee {
     rpc PayNodeQuotaBill(PayNodeQuotaBillRequest) returns (PayNodeQuotaBillResponse) {}
     rpc SetNodeDistributeFeeRate(SetNodeDistributeFeeRateRequest) returns (SetNodeDistributeFeeRateResponse) {}
     rpc SetNodeUsageFeeRate(SetNodeUsageFeeRateRequest) returns (SetNodeUsageFeeRateResponse) {}
+    rpc SetNodeQuotaFeeRate(SetNodeQuotaFeeRateRequest) returns (SetNodeQuotaFeeRateResponse) {}
 }
 
 message CreateNodeDistributeBillRequest {
@@ -195,5 +196,15 @@ message SetNodeUsageFeeRateRequest {
 }
 
 message SetNodeUsageFeeRateResponse {
+    bool success = 1;
+}
+
+message SetNodeQuotaFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+    double basic = 2;
+    double extra = 3;
+}
+
+message SetNodeQuotaFeeRateResponse {
     bool success = 1;
 }
