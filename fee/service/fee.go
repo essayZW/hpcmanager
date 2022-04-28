@@ -723,6 +723,36 @@ func (fs *FeeService) SetNodeDistributeFeeRate(
 	return nil
 }
 
+// SetNodeUsageFeeRate 修改机器节点时长费率
+func (fs *FeeService) SetNodeUsageFeeRate(
+	ctx context.Context,
+	req *feepb.SetNodeUsageFeeRateRequest,
+	resp *feepb.SetNodeUsageFeeRateResponse,
+) error {
+	logger.Info("SetNodeUsageFeeRate: ", req.BaseRequest)
+	if !verify.Identify(verify.SetNodeUsageFeeRate, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"SetNodeUsageFeeRate permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("SetNodeUsageFeeRate permission forbidden")
+	}
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	err := fs.nodeWeekUsageBillLogic.SetCPURate(c, req.Cpu)
+	err = fs.nodeWeekUsageBillLogic.SetGPURate(c, req.Gpu)
+	if err != nil {
+		return errors.New("ser fee rate error")
+	}
+	resp.Success = true
+	return nil
+}
+
 var _ feepb.FeeHandler = (*FeeService)(nil)
 
 // NewFee 创建新的fee服务

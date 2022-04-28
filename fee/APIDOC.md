@@ -378,6 +378,30 @@ message SetNodeDistributeFeeRateResponse {
 }
 ```
 
+## SetNodeUsageFeeRate
+
+描述: 设置机时费率
+
+原型定义: `rpc SetNodeUsageFeeRate(SetNodeUsageFeeRateRequest) returns (SetNodeUsageFeeRateResponse) {}`
+
+请求参数:
+
+```protobuf
+message SetNodeUsageFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+    double cpu = 2;
+    double gpu = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message SetNodeUsageFeeRateResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## NodeDistributeBill

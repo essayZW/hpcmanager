@@ -92,6 +92,8 @@ const (
 	CheckTechnologyApply = "__CHECK_TECHNOLOGY_APPLY__"
 	// SetNodeDistributeFeeRate 设置机器节点分配费率
 	SetNodeDistributeFeeRate = "__SET_NODE_DISTRIBUTE_FEE_RATE__"
+	// SetNodeUsageFeeRate 设置机器节点机时费率
+	SetNodeUsageFeeRate = "_SET_NODE_USAGE_FEE_RATE__"
 )
 
 // Verify 进行操作的权限验证

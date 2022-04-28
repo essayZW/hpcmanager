@@ -244,6 +244,11 @@ func newDefault() *hardcodeVerify {
 				maxLevel: MaxLevel,
 				minLevel: SuperAdmin,
 			},
+			// 需要超级管理员及以上权限
+			SetNodeUsageFeeRate: {
+				maxLevel: MaxLevel,
+				minLevel: SuperAdmin,
+			},
 		},
 	}
 }
