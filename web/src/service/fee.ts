@@ -19,6 +19,7 @@ import {
   NodeQuotaFeeRate,
   queryNodeQuotaFeeRate,
   setNodeDistributeFeeRate as setNodeDistributeFeeRateAPI,
+  setNodeUsageFeeRate as setNodeUsageFeeRateAPI,
 } from '../api/fee';
 
 /**
@@ -193,5 +194,18 @@ export async function setNodeDistributeFeeRate(
     rate8GPU,
     rate4GPU,
     rate36CPU,
+  });
+}
+
+/**
+ * 设置机器节点机时费率
+ */
+export async function setNodeUsageFeeRate(
+  cpu: number,
+  gpu: number
+): Promise<boolean> {
+  return setNodeUsageFeeRateAPI({
+    cpu,
+    gpu,
   });
 }

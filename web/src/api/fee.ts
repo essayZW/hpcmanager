@@ -384,3 +384,31 @@ export async function setNodeDistributeFeeRate(
   }
   return true;
 }
+
+/**
+ * 设置机时费率参数
+ */
+export type SetNodeUsageFeeRateParam = {
+  cpu: number;
+  gpu: number;
+};
+
+/**
+ * 修改机器机时费率
+ */
+export async function setNodeUsageFeeRate(
+  param: SetNodeUsageFeeRateParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/fee/rate/usage',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}

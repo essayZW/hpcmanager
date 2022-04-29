@@ -66,7 +66,11 @@ const setNodeDistributeHandler = async () => {
       >
     </template>
   </node-distribute-bill-table>
-  <el-dialog v-model="feeRateDialogVisible" title="修改机器节点独占费率">
+  <el-dialog
+    v-if="isSuperAdmin()"
+    v-model="feeRateDialogVisible"
+    title="修改机器节点独占费率"
+  >
     <el-form>
       <el-form-item label="36核心节点">
         <el-input v-model.number="feeRateInfoForm.rate36CPU" type="number">
