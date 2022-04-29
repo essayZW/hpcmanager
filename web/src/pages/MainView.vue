@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import LogoImageSrc from '../assets/logo.png';
 import { getUserInfoFromStorage, logout as userLogout } from '../service/user';
 import { LoginUserInfo } from '../api/user';
 import { useRouter } from 'vue-router';

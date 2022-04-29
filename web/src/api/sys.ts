@@ -1,5 +1,5 @@
 import { CreateUserRequest } from './user';
-import { ApiBaseURL, ApiRequest } from './api';
+import { ApiRequest } from './api';
 
 // installRequest 安装系统的请求
 export type InstallRequest = CreateUserRequest;
