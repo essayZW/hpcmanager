@@ -1,5 +1,10 @@
 import { undefinedWithDefault } from '../utils/obj';
-import { ApiRequest, PaginationQueryResponse, PingResponse } from './api';
+import {
+  ApiBaseURL,
+  ApiRequest,
+  PaginationQueryResponse,
+  PingResponse,
+} from './api';
 
 // 费用服务ping测试
 export async function ping(): Promise<PingResponse> {
@@ -407,6 +412,35 @@ export async function setNodeUsageFeeRate(
       ...param,
     }
   );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}
+
+/**
+ * 设置机器存储费率参数
+ */
+export type SetNodeQuotaFeeRateParam = {
+  basic: number;
+  extra: number;
+};
+
+/**
+ * 设置机器存储费率
+ */
+export async function setNodeQuotaFeeRate(
+  param: SetNodeQuotaFeeRateParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/fee/rate/quota',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+
   if (!resp.status) {
     throw new Error(resp.message);
   }

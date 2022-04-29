@@ -20,6 +20,7 @@ import {
   queryNodeQuotaFeeRate,
   setNodeDistributeFeeRate as setNodeDistributeFeeRateAPI,
   setNodeUsageFeeRate as setNodeUsageFeeRateAPI,
+  setNodeQuotaFeeRate as setNodeQuotaFeeRateAPI,
 } from '../api/fee';
 
 /**
@@ -207,5 +208,18 @@ export async function setNodeUsageFeeRate(
   return setNodeUsageFeeRateAPI({
     cpu,
     gpu,
+  });
+}
+
+/**
+ * 设置机器存储费率
+ */
+export async function setNodeQuotaFeeRate(
+  basic: number,
+  extra: number
+): Promise<boolean> {
+  return setNodeQuotaFeeRateAPI({
+    basic,
+    extra,
   });
 }
