@@ -228,16 +228,14 @@ const handlerChangeFeeRate = async () => {
   <el-dialog v-model="changeFeeRateDialogVisible" title="修改机时费率">
     <el-form>
       <el-form-item label="CPU费率">
-        <el-input
-          v-model.number="feeRateDialogFormData.cpu"
-          type="number"
-        ></el-input>
+        <el-input v-model.number="feeRateDialogFormData.cpu" type="number">
+          <template #append>元/小时</template>
+        </el-input>
       </el-form-item>
       <el-form-item label="GPU费率">
-        <el-input
-          v-model.number="feeRateDialogFormData.gpu"
-          type="number"
-        ></el-input>
+        <el-input v-model.number="feeRateDialogFormData.gpu" type="number">
+          <template #append>元/小时</template>
+        </el-input>
       </el-form-item>
     </el-form>
     <template #footer>
