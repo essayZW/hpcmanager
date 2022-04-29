@@ -100,3 +100,22 @@ func (param *SetNodeDistributeFeeRateParam) Validator() validator.StructLevelFun
 		}
 	}
 }
+
+// SetNodeUsageFeeRateParam 设置机器节点使用机时费率参数
+type SetNodeUsageFeeRateParam struct {
+	Cpu float64 `form:"cpu" json:"cpu"`
+	Gpu float64 `form:"gpu" json:"gpu"`
+}
+
+func (param *SetNodeUsageFeeRateParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(SetNodeUsageFeeRateParam)
+		if data.Cpu < 0 {
+			sl.ReportError(reflect.ValueOf(data.Cpu), "cpu", "cpu", "binding", "invalid cpu fee rate")
+		}
+
+		if data.Gpu < 0 {
+			sl.ReportError(reflect.ValueOf(data.Gpu), "gpu", "gpu", "binding", "invalid gpu fee rate")
+		}
+	}
+}

@@ -988,6 +988,24 @@ type SetNodeDistributeFeeRateParam struct {
 
 响应: 是否操作成功
 
+### /fee/rate/usage
+
+Method: PUT
+
+描述: 修改机器时长费率
+
+参数:
+
+```go
+// SetNodeUsageFeeRateParam 设置机器节点使用机时费率参数
+type SetNodeUsageFeeRateParam struct {
+    Cpu float64 `form:"cpu" json:"cpu"`
+    Gpu float64 `form:"gpu" json:"gpu"`
+}
+```
+
+响应: 是否操作成功
+
 ## fss 控制器
 
 ### /fss/ping
