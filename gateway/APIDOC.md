@@ -1006,6 +1006,24 @@ type SetNodeUsageFeeRateParam struct {
 
 响应: 是否操作成功
 
+### /fee/rate/quota
+
+Method: PUT
+
+描述: 修改机器存储费率
+
+参数:
+
+```go
+// SetNodeQuotaFeeRateParam 修改机器存储费率参数
+type SetNodeQuotaFeeRateParam struct {
+    Basic float64 `form:"basic" json:"basic"`
+    Extra float64 `form:"extra" json:"extra"`
+}
+```
+
+响应: 是否操作成功
+
 ## fss 控制器
 
 ### /fss/ping

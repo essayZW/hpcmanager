@@ -119,3 +119,23 @@ func (param *SetNodeUsageFeeRateParam) Validator() validator.StructLevelFunc {
 		}
 	}
 }
+
+// SetNodeQuotaFeeRateParam 修改机器存储费率参数
+type SetNodeQuotaFeeRateParam struct {
+	Basic float64 `form:"basic" json:"basic"`
+	Extra float64 `form:"extra" json:"extra"`
+}
+
+func (param *SetNodeQuotaFeeRateParam) Validator() validator.StructLevelFunc {
+	return func(sl validator.StructLevel) {
+		data := sl.Current().Interface().(SetNodeQuotaFeeRateParam)
+
+		if data.Basic < 0 {
+			sl.ReportError(reflect.ValueOf(data.Basic), "Basic", "Basic", "binding", "invalid basic fee rate")
+		}
+
+		if data.Extra < 0 {
+			sl.ReportError(reflect.ValueOf(data.Extra), "Extra", "Extra", "binding", "invalid extra fee rate")
+		}
+	}
+}

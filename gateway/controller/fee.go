@@ -448,6 +448,36 @@ func (f *fee) setNodeUsageFeeRate(ctx *gin.Context) {
 
 }
 
+// setNodeQuotaFeeRate /api/fee/rate/quota PUT 修改机器存储费率
+func (f *fee) setNodeQuotaFeeRate(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	var param json.SetNodeQuotaFeeRateParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, "参数验证失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	_, err := f.feeService.SetNodeQuotaFeeRate(c, &feepb.SetNodeQuotaFeeRateRequest{
+		BaseRequest: baseRequest,
+		Basic:       param.Basic,
+		Extra:       param.Extra,
+	})
+
+	if err != nil {
+		httpResp := response.New(200, nil, false, fmt.Sprintf("修改费率信息失败: %s", err.Error()))
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+	return
+}
+
 func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter := router.Group("/fee")
 
@@ -462,6 +492,7 @@ func (f *fee) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	feeRouter.GET("/rate/usage", f.getNodeUsageFeeRate)
 	feeRouter.PUT("/rate/usage", f.setNodeUsageFeeRate)
 	feeRouter.GET("/rate/quota", f.getNodeQuotaFeeRate)
+	feeRouter.PUT("/rate/quota", f.setNodeQuotaFeeRate)
 
 	feeRouter.GET("/usage/week", f.paginationGetNodeWeekUsageBills)
 	feeRouter.GET("/usage/group/week", f.paginationGetNodeWeekUsageBillsGroupByGroupID)
