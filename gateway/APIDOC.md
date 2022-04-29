@@ -552,6 +552,23 @@ ticket=
 
 若验证成功跳转到主页,否则返回错误信息
 
+### /sys/cas/config
+
+Method: PUT
+
+描述: 修改系统 CAS 配置
+
+参数:
+
+```go
+type SetCasConfigParam struct {
+    Enable     bool   `form:"enable"     json:"enable"`
+    AuthServer string `form:"authServer" json:"authServer"`
+}
+```
+
+响应: 是否操作成功
+
 ## project 控制器
 
 ### /project/ping

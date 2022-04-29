@@ -151,6 +151,8 @@ var defaultCasConfig = casConfig{
 	ValidPath:  "/api/sys/cas/valid",
 }
 
+var dynamicConfigTool config.DynamicConfig
+
 // casAuthConfig /api/sys/cas/config GET 获取CAS认证的配置
 func (sys *System) casAuthConfig(ctx *gin.Context) {
 	casConfigMutex.Lock()
@@ -230,6 +232,51 @@ func (sys *System) casAuthValid(ctx *gin.Context) {
 	ctx.Redirect(302, "/?setToken="+tokenResp.Token)
 }
 
+const (
+	casEnableKey     = "gateway_casEnable"
+	casAuthServerKey = "gateway_casAuthServer"
+)
+
+// setCasConfig /api/sys/cas/config PUT 设置系统的CAS配置
+func (sys *System) setCasConfig(ctx *gin.Context) {
+	baseReq, _ := ctx.Get(middleware.BaseRequestKey)
+	baseRequest := baseReq.(*gatewaypb.BaseRequest)
+
+	if !verify.IsAdmin(baseRequest.UserInfo.Levels) {
+		httpResp := response.New(200, nil, false, "权限限制")
+		httpResp.Send(ctx)
+		return
+	}
+
+	var param json.SetCasConfigParam
+	if err := ctx.ShouldBindJSON(&param); err != nil {
+		httpResp := response.New(200, nil, false, "参数验证失败")
+		httpResp.Send(ctx)
+		return
+	}
+
+	casConfigMutex.Lock()
+	defer casConfigMutex.Unlock()
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	err := dynamicConfigTool.Put(c, casEnableKey, param.Enable)
+	err1 := dynamicConfigTool.Put(c, casAuthServerKey, param.AuthServer)
+	if err != nil {
+		httpResp := response.New(200, nil, false, "修改CAS启用状态失败")
+		httpResp.Send(ctx)
+		return
+	}
+	if err1 != nil {
+		httpResp := response.New(200, nil, false, "修改CAS验证服务器失败")
+		httpResp.Send(ctx)
+		return
+	}
+	httpResp := response.New(200, nil, true, "success")
+	httpResp.Send(ctx)
+}
+
 // Registry 注册system控制器的相关函数
 func (sys *System) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 	logger.Info("registry gateway controller System")
@@ -245,6 +292,8 @@ func (sys *System) Registry(router *gin.RouterGroup) *gin.RouterGroup {
 
 	sysRouter.GET("/cas/valid", sys.casAuthValid)
 	middleware.RegistryExcludeAPIPath("GET:" + defaultCasConfig.ValidPath)
+
+	sysRouter.PUT("/cas/config", sys.setCasConfig)
 	return sysRouter
 }
 
@@ -260,10 +309,11 @@ func NewSystem(client client.Client, redisConn *redis.Client, dynamicConfig conf
 			AuthServer: defaultCasConfig.AuthServer,
 		},
 	}
+	dynamicConfigTool = dynamicConfig
 
 	var casEnable bool
 	var casAuthServer string
-	err := dynamicConfig.Registry("gateway_casEnable", &casEnable, func(newV interface{}) {
+	err := dynamicConfig.Registry(casEnableKey, &casEnable, func(newV interface{}) {
 		casConfigMutex.Lock()
 		defer casConfigMutex.Unlock()
 		defaultCasConfig.Enable = casEnable
@@ -271,7 +321,7 @@ func NewSystem(client client.Client, redisConn *redis.Client, dynamicConfig conf
 	if err != nil {
 		return nil, err
 	}
-	err = dynamicConfig.Registry("gateway_casAuthServer", &casAuthServer, func(newV interface{}) {
+	err = dynamicConfig.Registry(casAuthServerKey, &casAuthServer, func(newV interface{}) {
 		casConfigMutex.Lock()
 		defer casConfigMutex.Unlock()
 		defaultCasConfig.AuthServer = casAuthServer
