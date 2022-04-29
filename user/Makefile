@@ -11,3 +11,6 @@ clean:
 .PHONY: dev
 dev:
 	env HPCMANAGER_ENV=dev go run main.go
+.PHONY: docker
+docker:
+	sudo docker build . -t hpcmanager/user:1.0

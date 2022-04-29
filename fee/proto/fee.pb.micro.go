@@ -52,6 +52,9 @@ type FeeService interface {
 	PaginationGetNodeQuotaBill(ctx context.Context, in *PaginationGetNodeQuotaBillRequest, opts ...client.CallOption) (*PaginationGetNodeQuotaBillResponse, error)
 	GetNodeQuotaFeeRate(ctx context.Context, in *GetNodeQuotaFeeRateRequest, opts ...client.CallOption) (*GetNodeQuotaFeeRateResponse, error)
 	PayNodeQuotaBill(ctx context.Context, in *PayNodeQuotaBillRequest, opts ...client.CallOption) (*PayNodeQuotaBillResponse, error)
+	SetNodeDistributeFeeRate(ctx context.Context, in *SetNodeDistributeFeeRateRequest, opts ...client.CallOption) (*SetNodeDistributeFeeRateResponse, error)
+	SetNodeUsageFeeRate(ctx context.Context, in *SetNodeUsageFeeRateRequest, opts ...client.CallOption) (*SetNodeUsageFeeRateResponse, error)
+	SetNodeQuotaFeeRate(ctx context.Context, in *SetNodeQuotaFeeRateRequest, opts ...client.CallOption) (*SetNodeQuotaFeeRateResponse, error)
 }
 
 type feeService struct {
@@ -206,6 +209,36 @@ func (c *feeService) PayNodeQuotaBill(ctx context.Context, in *PayNodeQuotaBillR
 	return out, nil
 }
 
+func (c *feeService) SetNodeDistributeFeeRate(ctx context.Context, in *SetNodeDistributeFeeRateRequest, opts ...client.CallOption) (*SetNodeDistributeFeeRateResponse, error) {
+	req := c.c.NewRequest(c.name, "Fee.SetNodeDistributeFeeRate", in)
+	out := new(SetNodeDistributeFeeRateResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *feeService) SetNodeUsageFeeRate(ctx context.Context, in *SetNodeUsageFeeRateRequest, opts ...client.CallOption) (*SetNodeUsageFeeRateResponse, error) {
+	req := c.c.NewRequest(c.name, "Fee.SetNodeUsageFeeRate", in)
+	out := new(SetNodeUsageFeeRateResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *feeService) SetNodeQuotaFeeRate(ctx context.Context, in *SetNodeQuotaFeeRateRequest, opts ...client.CallOption) (*SetNodeQuotaFeeRateResponse, error) {
+	req := c.c.NewRequest(c.name, "Fee.SetNodeQuotaFeeRate", in)
+	out := new(SetNodeQuotaFeeRateResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Fee service
 
 type FeeHandler interface {
@@ -223,6 +256,9 @@ type FeeHandler interface {
 	PaginationGetNodeQuotaBill(context.Context, *PaginationGetNodeQuotaBillRequest, *PaginationGetNodeQuotaBillResponse) error
 	GetNodeQuotaFeeRate(context.Context, *GetNodeQuotaFeeRateRequest, *GetNodeQuotaFeeRateResponse) error
 	PayNodeQuotaBill(context.Context, *PayNodeQuotaBillRequest, *PayNodeQuotaBillResponse) error
+	SetNodeDistributeFeeRate(context.Context, *SetNodeDistributeFeeRateRequest, *SetNodeDistributeFeeRateResponse) error
+	SetNodeUsageFeeRate(context.Context, *SetNodeUsageFeeRateRequest, *SetNodeUsageFeeRateResponse) error
+	SetNodeQuotaFeeRate(context.Context, *SetNodeQuotaFeeRateRequest, *SetNodeQuotaFeeRateResponse) error
 }
 
 func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.HandlerOption) error {
@@ -241,6 +277,9 @@ func RegisterFeeHandler(s server.Server, hdlr FeeHandler, opts ...server.Handler
 		PaginationGetNodeQuotaBill(ctx context.Context, in *PaginationGetNodeQuotaBillRequest, out *PaginationGetNodeQuotaBillResponse) error
 		GetNodeQuotaFeeRate(ctx context.Context, in *GetNodeQuotaFeeRateRequest, out *GetNodeQuotaFeeRateResponse) error
 		PayNodeQuotaBill(ctx context.Context, in *PayNodeQuotaBillRequest, out *PayNodeQuotaBillResponse) error
+		SetNodeDistributeFeeRate(ctx context.Context, in *SetNodeDistributeFeeRateRequest, out *SetNodeDistributeFeeRateResponse) error
+		SetNodeUsageFeeRate(ctx context.Context, in *SetNodeUsageFeeRateRequest, out *SetNodeUsageFeeRateResponse) error
+		SetNodeQuotaFeeRate(ctx context.Context, in *SetNodeQuotaFeeRateRequest, out *SetNodeQuotaFeeRateResponse) error
 	}
 	type Fee struct {
 		fee
@@ -307,4 +346,16 @@ func (h *feeHandler) GetNodeQuotaFeeRate(ctx context.Context, in *GetNodeQuotaFe
 
 func (h *feeHandler) PayNodeQuotaBill(ctx context.Context, in *PayNodeQuotaBillRequest, out *PayNodeQuotaBillResponse) error {
 	return h.FeeHandler.PayNodeQuotaBill(ctx, in, out)
+}
+
+func (h *feeHandler) SetNodeDistributeFeeRate(ctx context.Context, in *SetNodeDistributeFeeRateRequest, out *SetNodeDistributeFeeRateResponse) error {
+	return h.FeeHandler.SetNodeDistributeFeeRate(ctx, in, out)
+}
+
+func (h *feeHandler) SetNodeUsageFeeRate(ctx context.Context, in *SetNodeUsageFeeRateRequest, out *SetNodeUsageFeeRateResponse) error {
+	return h.FeeHandler.SetNodeUsageFeeRate(ctx, in, out)
+}
+
+func (h *feeHandler) SetNodeQuotaFeeRate(ctx context.Context, in *SetNodeQuotaFeeRateRequest, out *SetNodeQuotaFeeRateResponse) error {
+	return h.FeeHandler.SetNodeQuotaFeeRate(ctx, in, out)
 }

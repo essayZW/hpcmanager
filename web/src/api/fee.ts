@@ -1,5 +1,10 @@
 import { undefinedWithDefault } from '../utils/obj';
-import { ApiRequest, PaginationQueryResponse, PingResponse } from './api';
+import {
+  ApiBaseURL,
+  ApiRequest,
+  PaginationQueryResponse,
+  PingResponse,
+} from './api';
 
 // 费用服务ping测试
 export async function ping(): Promise<PingResponse> {
@@ -354,4 +359,90 @@ export async function queryNodeQuotaFeeRate(): Promise<NodeQuotaFeeRate> {
     throw new Error(resp.message);
   }
   return resp.data;
+}
+
+/**
+ * 设置机器节点费率参数
+ */
+export type SetNodeDistributeFeeRateParam = {
+  rate36CPU: number;
+  rate4GPU: number;
+  rate8GPU: number;
+};
+
+/**
+ * 设置机器节点费率
+ */
+export async function setNodeDistributeFeeRate(
+  param: SetNodeDistributeFeeRateParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/fee/rate/distribute',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}
+
+/**
+ * 设置机时费率参数
+ */
+export type SetNodeUsageFeeRateParam = {
+  cpu: number;
+  gpu: number;
+};
+
+/**
+ * 修改机器机时费率
+ */
+export async function setNodeUsageFeeRate(
+  param: SetNodeUsageFeeRateParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/fee/rate/usage',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}
+
+/**
+ * 设置机器存储费率参数
+ */
+export type SetNodeQuotaFeeRateParam = {
+  basic: number;
+  extra: number;
+};
+
+/**
+ * 设置机器存储费率
+ */
+export async function setNodeQuotaFeeRate(
+  param: SetNodeQuotaFeeRateParam
+): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/fee/rate/quota',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
 }

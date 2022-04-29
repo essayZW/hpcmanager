@@ -11,8 +11,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+const (
+	cpuKey = "fee_rate_CPU"
+	gpuKey = "fee_rate_GPU"
+)
+
 type NodeUsageFeeRate struct {
-	mutex sync.Mutex
+	dynamicConfig config.DynamicConfig
+	mutex         sync.Mutex
 	// cpu cpu节点费率/小时×核心
 	cpu float64
 	// gpu gpu节点费率/小时×核心
@@ -26,11 +32,50 @@ func (this *NodeUsageFeeRate) GetCPURate() float64 {
 	return this.cpu
 }
 
+// SetCPURate 设置CPU机时费率
+func (this *NodeUsageFeeRate) SetCPURate(ctx context.Context, value float64) error {
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	return this.dynamicConfig.Put(ctx, cpuKey, value)
+}
+
 // GetGPURate 查询GPU节点速率
 func (this *NodeUsageFeeRate) GetGPURate() float64 {
 	this.mutex.Lock()
 	defer this.mutex.Unlock()
 	return this.gpu
+}
+
+// SetGPURate 设置GPU节点机时费率
+func (this *NodeUsageFeeRate) SetGPURate(ctx context.Context, value float64) error {
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	return this.dynamicConfig.Put(ctx, gpuKey, value)
+}
+
+// Registry 注册动态配置
+func (this *NodeUsageFeeRate) Registry() error {
+	var cpu float64
+	var gpu float64
+
+	err := this.dynamicConfig.Registry(cpuKey, &cpu, func(newV interface{}) {
+		this.mutex.Lock()
+		defer this.mutex.Unlock()
+		this.cpu = cpu
+	})
+	if err != nil {
+		return err
+	}
+
+	err = this.dynamicConfig.Registry(gpuKey, &gpu, func(newV interface{}) {
+		this.mutex.Lock()
+		defer this.mutex.Unlock()
+		this.gpu = gpu
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // NodeWeekUsageBill 机器机时周账单
@@ -280,28 +325,12 @@ func NewNodeWeekUsageBill(
 ) (*NodeWeekUsageBill, error) {
 	res := &NodeWeekUsageBill{
 		nodeWeekUsageBillDB: nodeWeekUsageBillDB,
+		NodeUsageFeeRate: NodeUsageFeeRate{
+			dynamicConfig: dynamicConfig,
+		},
 	}
-
-	var cpu float64
-	var gpu float64
-
-	err := dynamicConfig.Registry("fee_rate_CPU", &cpu, func(newV interface{}) {
-		res.mutex.Lock()
-		defer res.mutex.Unlock()
-		res.cpu = cpu
-	})
-	if err != nil {
+	if err := res.Registry(); err != nil {
 		return nil, err
 	}
-
-	err = dynamicConfig.Registry("fee_rate_GPU", &gpu, func(newV interface{}) {
-		res.mutex.Lock()
-		defer res.mutex.Unlock()
-		res.gpu = gpu
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	return res, nil
 }

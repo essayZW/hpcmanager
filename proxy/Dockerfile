@@ -4,6 +4,7 @@ COPY build/go/main /main
 COPY build/web /www
 COPY docker/config-template.yaml /config-template.yaml
 COPY docker/entrypoint.sh /entrypoint.sh
+COPY nginx.conf /etc/nginx/nginx.conf
 
 
 ENV MYSQL_HOST=127.0.0.1
@@ -15,5 +16,6 @@ ENV ETCD_ADDRESS=172.17.0.1
 
 
 ENV HPCMANAGER_ENV=production
+ENV GATEWAY_ADDRESS=172.17.0.1:80
 
 CMD ["bash", "/entrypoint.sh"]

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/essayZW/hpcmanager/db"
 	"github.com/essayZW/hpcmanager/fee/logic"
@@ -690,6 +691,96 @@ func (fs *FeeService) PayNodeQuotaBill(
 
 	resp.Success = status.(bool)
 	return err
+}
+
+// SetNodeDistributeFeeRate 设置机器节点分配费率
+func (fs *FeeService) SetNodeDistributeFeeRate(
+	ctx context.Context,
+	req *feepb.SetNodeDistributeFeeRateRequest,
+	resp *feepb.SetNodeDistributeFeeRateResponse,
+) error {
+	logger.Info("SetNodeDistributeFeeRate: ", req.BaseRequest)
+	if !verify.Identify(verify.SetNodeDistributeFeeRate, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"SetNodeDistributeFeeRate permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("SetNodeDistributeFeeRate permission forbidden")
+	}
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+	err := fs.nodeDistributeBillLogic.Set36CPURate(c, req.Rate36CPU)
+	err = fs.nodeDistributeBillLogic.Set8GPURate(c, req.Rate8GPU)
+	err = fs.nodeDistributeBillLogic.Set4GPURate(c, req.Rate4GPU)
+	if err != nil {
+		return errors.New("update rate error")
+	}
+	resp.Success = true
+	return nil
+}
+
+// SetNodeUsageFeeRate 修改机器节点时长费率
+func (fs *FeeService) SetNodeUsageFeeRate(
+	ctx context.Context,
+	req *feepb.SetNodeUsageFeeRateRequest,
+	resp *feepb.SetNodeUsageFeeRateResponse,
+) error {
+	logger.Info("SetNodeUsageFeeRate: ", req.BaseRequest)
+	if !verify.Identify(verify.SetNodeUsageFeeRate, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"SetNodeUsageFeeRate permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("SetNodeUsageFeeRate permission forbidden")
+	}
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	err := fs.nodeWeekUsageBillLogic.SetCPURate(c, req.Cpu)
+	err = fs.nodeWeekUsageBillLogic.SetGPURate(c, req.Gpu)
+	if err != nil {
+		return errors.New("ser fee rate error")
+	}
+	resp.Success = true
+	return nil
+}
+
+// SetNodeQuotaFeeRate 设置机器存储费率
+func (fs *FeeService) SetNodeQuotaFeeRate(
+	ctx context.Context,
+	req *feepb.SetNodeQuotaFeeRateRequest,
+	resp *feepb.SetNodeQuotaFeeRateResponse,
+) error {
+	logger.Info("SetNodeQuotaFeeRate: ", req.BaseRequest)
+	if !verify.Identify(verify.SetNodeQuotaFeeRate, req.BaseRequest.UserInfo.Levels) {
+		logger.Info(
+			"SetNodeQuotaFeeRate permission forbidden: ",
+			req.BaseRequest.RequestInfo.Id,
+			", fromUserId: ",
+			req.BaseRequest.UserInfo.UserId,
+			", withLevels: ",
+			req.BaseRequest.UserInfo.Levels,
+		)
+		return errors.New("SetNodeQuotaFeeRate permission forbidden")
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	err := fs.nodeQuotaBillLogic.SetBasic(c, req.Basic)
+	err = fs.nodeQuotaBillLogic.SetExtra(c, req.Extra)
+	if err != nil {
+		return errors.New("set fee rate error")
+	}
+	return nil
 }
 
 var _ feepb.FeeHandler = (*FeeService)(nil)

@@ -474,6 +474,24 @@ func (group *UserGroupService) CreateGroup(
 	}
 	resp.GroupID = int32(id)
 	resp.Success = true
+
+	if err == nil {
+		// 发送用户加入组成功的MQ消息
+		joinGroupMessage := &userbroker.UserJoinGroupMessage{
+			UserID:  int(req.TutorID),
+			GroupID: int(resp.GroupID),
+		}
+		if err := joinGroupMessage.Public(group.rabbitmqBroker, req.BaseRequest); err != nil {
+			logger.Error(
+				"public join group message error: ",
+				err,
+				" with message: ",
+				joinGroupMessage,
+				" with request: ",
+				req.BaseRequest,
+			)
+		}
+	}
 	return nil
 }
 

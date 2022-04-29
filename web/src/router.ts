@@ -102,7 +102,7 @@ router.beforeEach(async (to) => {
   const userInfo = await isLogin();
   if (userInfo == null) {
     registerFlag = false;
-    if (to.path != '/login') {
+    if (to.path != '/login' && to.path != '/install') {
       return '/login';
     }
     return;

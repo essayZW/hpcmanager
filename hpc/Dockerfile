@@ -13,8 +13,11 @@ ENV MYSQL_DATABASE=hpcmanager
 ENV MYSQL_USERNAME=root
 ENV MYSQL_PASSWORD=password
 ENV ETCD_ADDRESS=172.17.0.1
+ENV REDIS_ADDRESS=172.17.0.1
+ENV RABBITMQ_ADDRESS=172.17.0.6:5672
 
 
-ENV HPCMANAGER_ENV=production
+# 由于hpc服务部署在docker中只是为了测试,所以设置为dev环境
+ENV HPCMANAGER_ENV=dev
 
 CMD ["sh", "/entrypoint.sh"]

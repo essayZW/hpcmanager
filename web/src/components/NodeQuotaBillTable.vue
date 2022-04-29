@@ -6,10 +6,11 @@ import {
   payNodeQuotaBill,
   payTypeToString,
   getNodeQuotaFeeRate,
+  setNodeQuotaFeeRate,
 } from '../service/fee';
 import { operTypeToStr } from '../service/fee';
 import { zeroWithDefault } from '../utils/obj';
-import { isAdmin } from '../service/user';
+import { isAdmin, isSuperAdmin } from '../service/user';
 import { getGroupInfoByID } from '../service/group';
 import dayjs from 'dayjs';
 import { GroupInfo } from '../api/group';
@@ -135,9 +136,58 @@ onMounted(async () => {
     });
   }
 });
+const feeRateDialogVisible = ref<boolean>(false);
+
+const feeRateDialogFormData = reactive<NodeQuotaFeeRate>({
+  basic: 0,
+  extra: 0,
+});
+
+const showFeeRateDialog = async () => {
+  try {
+    const data = await getNodeQuotaFeeRate();
+    feeRateDialogFormData.basic = data.basic;
+    feeRateDialogFormData.extra = data.extra;
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+    return;
+  }
+  feeRateDialogVisible.value = true;
+};
+
+const handlerFeeRateDialogForm = async () => {
+  try {
+    await setNodeQuotaFeeRate(
+      feeRateDialogFormData.basic,
+      feeRateDialogFormData.extra
+    );
+    ElMessage({
+      type: 'success',
+      message: '修改存储费率成功',
+    });
+    hideFeeRateDialog();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+};
+
+const hideFeeRateDialog = () => {
+  feeRateDialogVisible.value = false;
+};
 </script>
 <template>
-  <el-row justify="end" class="operator-tool-row">
+  <el-row justify="space-between" class="operator-tool-row">
+    <div>
+      <el-button v-if="isSuperAdmin()" type="primary" @click="showFeeRateDialog"
+        >修改存储费率</el-button
+      >
+    </div>
     <el-button type="primary" @click="refreshTableData">
       <el-icon class="el-icon--left">
         <i-ic-round-refresh />
@@ -341,6 +391,26 @@ onMounted(async () => {
           >线下缴费</el-button
         >
       </span>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="feeRateDialogVisible" title="修改存储费率">
+    <el-form>
+      <el-form-item label="基础费率">
+        <el-input v-model.number="feeRateDialogFormData.basic" type="number">
+          <template #append> 元/1TB一年 </template>
+        </el-input>
+      </el-form-item>
+      <el-form-item label="额外费率">
+        <el-input v-model.number="feeRateDialogFormData.extra" type="number">
+          <template #append> 元/1TB一年 </template>
+        </el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="hideFeeRateDialog">取消</el-button>
+      <el-button type="primary" @click="handlerFeeRateDialogForm"
+        >确认修改</el-button
+      >
     </template>
   </el-dialog>
 </template>

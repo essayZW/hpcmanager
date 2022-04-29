@@ -6,11 +6,15 @@ sed -i s/database:\ hpcmanager/database:\ $MYSQL_DATABASE/g /config-template.yam
 sed -i s/username:\ mysqlroot/username:\ $MYSQL_USERNAME/g /config-template.yaml
 sed -i s/password:\ mysqlpass/password:\ $MYSQL_PASSWORD/g /config-template.yaml
 sed -i s/address:\ etcdaddress/address:\ $ETCD_ADDRESS/g /config-template.yaml
+sed -i s/address:\ 172.17.0.4:6379/address:\ $REDIS_ADDRESS/g /config-template.yaml
 
 
 
 mkdir -p /root/.config/hpcmanager
 cp /config-template.yaml /root/.config/hpcmanager/config-$HPCMANAGER_ENV.yaml
+
+# wait database start
+while ! nc -z $MYSQL_HOST $MYSQL_HOST; do echo waiting database...; sleep 2; done
 
 # run app
 /main

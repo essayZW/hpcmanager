@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-import { NodeWeekUsageBill } from '../api/fee';
+import { reactive, ref } from 'vue';
+import { nodeUsageFeeRate, NodeWeekUsageBill } from '../api/fee';
 import dayjs from 'dayjs';
 import {
+  getNodeUsageFeeRate,
   paginationGetNodeWeekUsageBill,
   payTypeToString,
+  setNodeUsageFeeRate,
 } from '../service/fee';
 import { timeSecondFormat, zeroWithDefault } from '../utils/obj';
+import { isSuperAdmin } from '../service/user';
 
 const tableData = reactive<{
   data: NodeWeekUsageBill[];
@@ -74,6 +77,49 @@ const handleSizeChange = (pageSize: number) => {
   paginationInfo.pageSize = pageSize;
   refreshTableData();
 };
+
+const changeFeeRateDialogVisible = ref<boolean>(false);
+
+const hideDialog = () => {
+  changeFeeRateDialogVisible.value = false;
+};
+const feeRateDialogFormData = reactive<nodeUsageFeeRate>({
+  cpu: 0,
+  gpu: 0,
+});
+const showDialog = async () => {
+  try {
+    const data = await getNodeUsageFeeRate();
+    feeRateDialogFormData.cpu = data.cpu;
+    feeRateDialogFormData.gpu = data.gpu;
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+    return;
+  }
+  changeFeeRateDialogVisible.value = true;
+};
+
+const handlerChangeFeeRate = async () => {
+  try {
+    await setNodeUsageFeeRate(
+      feeRateDialogFormData.cpu,
+      feeRateDialogFormData.gpu
+    );
+    ElMessage({
+      type: 'success',
+      message: '修改费率成功',
+    });
+    hideDialog();
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: `${error}`,
+    });
+  }
+};
 </script>
 <template>
   <el-row justify="space-between" class="operator-tool-row">
@@ -88,12 +134,17 @@ const handleSizeChange = (pageSize: number) => {
         end-placeholder="End date"
       />
     </div>
-    <el-button type="primary" @click="refreshTableData">
-      <el-icon class="el-icon--left">
-        <i-ic-round-refresh />
-      </el-icon>
-      刷新
-    </el-button>
+    <div>
+      <el-button v-if="isSuperAdmin()" type="primary" @click="showDialog"
+        >修改机时费率</el-button
+      >
+      <el-button type="primary" @click="refreshTableData">
+        <el-icon class="el-icon--left">
+          <i-ic-round-refresh />
+        </el-icon>
+        刷新
+      </el-button>
+    </div>
   </el-row>
   <el-row justify="center">
     <el-col :span="24">
@@ -174,6 +225,26 @@ const handleSizeChange = (pageSize: number) => {
       </el-pagination>
     </el-col>
   </el-row>
+  <el-dialog v-model="changeFeeRateDialogVisible" title="修改机时费率">
+    <el-form>
+      <el-form-item label="CPU费率">
+        <el-input v-model.number="feeRateDialogFormData.cpu" type="number">
+          <template #append>元/小时</template>
+        </el-input>
+      </el-form-item>
+      <el-form-item label="GPU费率">
+        <el-input v-model.number="feeRateDialogFormData.gpu" type="number">
+          <template #append>元/小时</template>
+        </el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="hideDialog">取消</el-button>
+      <el-button type="primary" @click="handlerChangeFeeRate"
+        >确认修改</el-button
+      >
+    </template>
+  </el-dialog>
 </template>
 <style lang="less" scoped>
 .operator-tool-row {

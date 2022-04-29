@@ -2,8 +2,11 @@
   "cSpell.words": [
     "Oper",
     "awarddb",
+    "clientv",
+    "entrypoint",
     "etcdsync",
-    "fsspb"
+    "fsspb",
+    "initdb"
   ],
   "volar.takeOverMode.enabled": true,
   "tsserver.enable": false

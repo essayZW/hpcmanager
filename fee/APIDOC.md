@@ -353,6 +353,79 @@ message PayNodeQuotaBillResponse {
 }
 ```
 
+## SetNodeDistributeFeeRate
+
+描述: 设置节点分配账单费率
+
+原型定义: `rpc SetNodeDistributeFeeRate(SetNodeDistributeFeeRateRequest) returns (SetNodeDistributeFeeRateResponse) {}`
+
+请求参数:
+
+```protobuf
+message SetNodeDistributeFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+    double rate36CPU = 2;
+    double rate4GPU = 3;
+    double rate8GPU = 4;
+}
+```
+
+响应参数:
+
+```protobuf
+message SetNodeDistributeFeeRateResponse {
+    bool success = 1;
+}
+```
+
+## SetNodeUsageFeeRate
+
+描述: 设置机时费率
+
+原型定义: `rpc SetNodeUsageFeeRate(SetNodeUsageFeeRateRequest) returns (SetNodeUsageFeeRateResponse) {}`
+
+请求参数:
+
+```protobuf
+message SetNodeUsageFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+    double cpu = 2;
+    double gpu = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message SetNodeUsageFeeRateResponse {
+    bool success = 1;
+}
+```
+
+## SetNodeQuotaFeeRate
+
+描述: 设置机器存储费率
+
+原型定义: `rpc SetNodeQuotaFeeRate(SetNodeQuotaFeeRateRequest) returns (SetNodeQuotaFeeRateResponse) {}`
+
+请求参数:
+
+```protobuf
+message SetNodeQuotaFeeRateRequest {
+    request.BaseRequest baseRequest = 1;
+    double basic = 2;
+    double extra = 3;
+}
+```
+
+响应参数:
+
+```protobuf
+message SetNodeQuotaFeeRateResponse {
+    bool success = 1;
+}
+```
+
 # 附录
 
 ## NodeDistributeBill

@@ -127,7 +127,7 @@ if (userInfo) {
 }
 </script>
 <template>
-  <page-title title="科技成果奖励申请" des="论文奖励申请管理"></page-title>
+  <page-title title="科技成果奖励申请" des="科技成果奖励申请管理"></page-title>
   <technology-award-apply-table ref="tableElem">
     <template #tool>
       <el-button
