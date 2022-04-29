@@ -1,5 +1,5 @@
 import { CreateUserRequest } from './user';
-import { ApiRequest } from './api';
+import { ApiBaseURL, ApiRequest } from './api';
 
 // installRequest 安装系统的请求
 export type InstallRequest = CreateUserRequest;
@@ -57,4 +57,31 @@ export async function loadCasConfig(
   } catch (error) {
     return null;
   }
+}
+
+/**
+ * 更新CAS设置参数
+ */
+export type setCasConfigParam = {
+  enable: boolean;
+  authServer: string;
+};
+
+/**
+ * 修改CAS登录设置
+ */
+export async function setCasConfig(param: setCasConfigParam): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/sys/cas/config',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
 }
