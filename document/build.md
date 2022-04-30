@@ -289,3 +289,40 @@ docker run -itd --name hpc_hpc -e MYSQL_HOST=172.17.0.3 \
 
 ## 1. 生产环境下的作业调度服务部署
 
+ 首先初始化配置文件，将`hpc`服务的配置文件模板`hpc/docker/config-template.yaml`文件复制到计算节点用户的`.config/hpcmanager`目录下
+
+> 如果计算节点使用root用户运行hpc服务则配置文件目录为:
+>
+> `/root/.config/hpcmanager`
+>
+> 如果是其他用户则为：
+>
+> `/home/用户名/.config/hpcmanager`
+
+将文件名命名为`config-production.yaml`
+
+其中配置文件中的`jobDatabase`项为作业调度系统数据库配置，用来同步机器时长数据信息
+
+然后执行以下命令运行hpc服务：
+
+`env HPCMANAGER_ENV=production ./hpcmain --cmdBaseDir=/path/to/cmd`
+
+其中的参数`cmdBaseDir`为作业调度系统PHP脚本的地址，即原来系统的`hpc_server`目录
+
+其中的`hpcmain`为`hpc`服务编译后的可执行文件
+
+## 2. 机时数据自动同步脚本部署
+
+机时数据自动同步脚本使用`crontab`命令进行定时执行，并自动抓取执行时候的日期前7天至当日的时间段的机时原始数据。
+
+首先修改`hpc/crontab/weekGetUsage.sh`文件中的内容
+
+![image-20220430170015569](mdimages/image-20220430170015569.png)
+
+主要是修改环境变量以及可执行文件的路径
+
+然后执行`crontab -e`添加计划任务
+
+![image-20220430170142545](mdimages/image-20220430170142545.png)
+
+同时要修改`weekGetUsage.sh`文件的路径确保能够正确执行。
