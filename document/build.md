@@ -116,7 +116,7 @@ docker run -itd --name hpc_proxy -e MYSQL_HOST=172.17.0.3 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
                                 -e GATEWAY_ADDRESS=172.17.0.7 \
-                                hpcmanager/proxy:test
+                                hpcmanager/proxy:1.0
 ```
 
 > 在正式环境部署时候需要将容器的80端口映射出来供外界访问
@@ -138,7 +138,7 @@ docker run -itd --name hpc_user -e MYSQL_HOST=172.17.0.3 \
                                -e ETCD_ADDRESS=172.17.0.5 \
                                -e REDIS_ADDRESS=172.17.0.4:6379 \
                                -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                               hpcmanager/user:test
+                               hpcmanager/user:1.0
 
 
 ```
@@ -160,7 +160,7 @@ docker run -itd --name hpc_permission -e MYSQL_HOST=172.17.0.3 \
                                -e ETCD_ADDRESS=172.17.0.5 \
                                -e REDIS_ADDRESS=172.17.0.4:6379 \
                                -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                               hpcmanager/permission:test
+                               hpcmanager/permission:1.0
 
 
 ```
@@ -176,7 +176,7 @@ docker run -itd --name hpc_node -e MYSQL_HOST=172.17.0.3 \
                                 -e ETCD_ADDRESS=172.17.0.5 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                                hpcmanager/node:test    
+                                hpcmanager/node:1.0    
 ```
 
 ## 10. 费用服务
@@ -190,7 +190,7 @@ docker run -itd --name hpc_fee -e MYSQL_HOST=172.17.0.3 \
                                 -e ETCD_ADDRESS=172.17.0.5 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                                hpcmanager/fee:test       
+                                hpcmanager/fee:1.0       
 ```
 
 ## 11. 项目服务
@@ -204,7 +204,7 @@ docker run -itd --name hpc_project -e MYSQL_HOST=172.17.0.3 \
                                 -e ETCD_ADDRESS=172.17.0.5 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                                hpcmanager/project:test
+                                hpcmanager/project:1.0
 ```
 
 ## 12. 奖励服务
@@ -218,7 +218,7 @@ docker run -itd --name hpc_award -e MYSQL_HOST=172.17.0.3 \
                                 -e ETCD_ADDRESS=172.17.0.5 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                                hpcmanager/award:test
+                                hpcmanager/award:1.0
 ```
 
 ## 13. 作业调度测试服务
@@ -234,7 +234,7 @@ docker run -itd --name hpc_hpc -e MYSQL_HOST=172.17.0.3 \
                                 -e ETCD_ADDRESS=172.17.0.5 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                                hpcmanager/hpc:test
+                                hpcmanager/hpc:1.0
 ```
 
 待服务启动之后查看其日志：
@@ -265,7 +265,27 @@ docker run -itd --name hpc_hpc -e MYSQL_HOST=172.17.0.3 \
 
 其中绿色代表服务状态正常，红色代表服务下线。
 
+# 系统部分配置
+
+## 1. 机器节点独占费率配置
+
+超级管理员用户在机器独占账单管理界面可以进行配置
+
+![image-20220430154658151](mdimages/image-20220430154658151.png)
+
+## 2. 机器包机时长费率配置
+
+超级管理员用户可以在机器时长账单管理界面进行配置
+
+![image-20220430155223167](mdimages/image-20220430155223167.png)
+
+## 3. 机器存储费率配置
+
+超级管理员可以在机器存储账单页面进行配置
+
+![image-20220430155330213](mdimages/image-20220430155330213.png)
+
 # 附录
 
-## 生产环境下的作业调度服务部署
+## 1. 生产环境下的作业调度服务部署
 
