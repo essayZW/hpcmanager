@@ -4,6 +4,7 @@ import {
   installSys,
   CasConfig,
   loadCasConfig,
+  setCasConfig as setCasConfigAPI,
 } from '../api/sys';
 
 // install 初始化系统,添加系统默认管理员
@@ -34,4 +35,17 @@ export async function isInstall(): Promise<boolean> {
 export async function getCasConfig(): Promise<CasConfig | null> {
   const serviceAddr = window.location.protocol + '//' + window.location.host;
   return await loadCasConfig(serviceAddr);
+}
+
+/**
+ * 设置系统CAS设置
+ */
+export async function setCasConfig(
+  enable: boolean,
+  authServer: string
+): Promise<boolean> {
+  return setCasConfigAPI({
+    enable,
+    authServer,
+  });
 }

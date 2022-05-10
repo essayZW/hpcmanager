@@ -16,6 +16,7 @@ import AdminNodeUsageBillManager from '../components/admin/AdminNodeUsageBillMan
 import NodeQuotaBillManager from '../components/common/NodeQuotaBillManager.vue';
 import PaperAwardApplyManager from '../components/common/PaperAwardApplyManager.vue';
 import TechnologyAwardApplyManager from '../components/common/TechnologyAwardApplyManager.vue';
+import SystemSettings from '../components/admin/SystemSettings.vue';
 
 /**
  * 用户导航以及路由定义item
@@ -536,6 +537,17 @@ export const UserNavigation = new Map<UserLevels, UserNavigationItem[]>([
         item: {
           name: '科技成果奖励申请',
           to: '/main/technology_award_apply_manager',
+        },
+      },
+      {
+        routerRaw: {
+          path: '/main/system_settings',
+          name: 'SystemSettings',
+          component: SystemSettings,
+        },
+        item: {
+          name: '系统设置',
+          to: '/main/system_settings',
         },
       },
     ],

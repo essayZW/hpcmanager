@@ -58,3 +58,30 @@ export async function loadCasConfig(
     return null;
   }
 }
+
+/**
+ * 更新CAS设置参数
+ */
+export type setCasConfigParam = {
+  enable: boolean;
+  authServer: string;
+};
+
+/**
+ * 修改CAS登录设置
+ */
+export async function setCasConfig(param: setCasConfigParam): Promise<boolean> {
+  const resp = await ApiRequest.request(
+    '/sys/cas/config',
+    'PUT',
+    {},
+    {
+      ...param,
+    }
+  );
+
+  if (!resp.status) {
+    throw new Error(resp.message);
+  }
+  return true;
+}

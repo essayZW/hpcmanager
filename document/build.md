@@ -116,7 +116,7 @@ docker run -itd --name hpc_proxy -e MYSQL_HOST=172.17.0.3 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
                                 -e GATEWAY_ADDRESS=172.17.0.7 \
-                                hpcmanager/proxy:test
+                                hpcmanager/proxy:1.0
 ```
 
 > 在正式环境部署时候需要将容器的80端口映射出来供外界访问
@@ -138,7 +138,7 @@ docker run -itd --name hpc_user -e MYSQL_HOST=172.17.0.3 \
                                -e ETCD_ADDRESS=172.17.0.5 \
                                -e REDIS_ADDRESS=172.17.0.4:6379 \
                                -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                               hpcmanager/user:test
+                               hpcmanager/user:1.0
 
 
 ```
@@ -160,7 +160,7 @@ docker run -itd --name hpc_permission -e MYSQL_HOST=172.17.0.3 \
                                -e ETCD_ADDRESS=172.17.0.5 \
                                -e REDIS_ADDRESS=172.17.0.4:6379 \
                                -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                               hpcmanager/permission:test
+                               hpcmanager/permission:1.0
 
 
 ```
@@ -176,7 +176,7 @@ docker run -itd --name hpc_node -e MYSQL_HOST=172.17.0.3 \
                                 -e ETCD_ADDRESS=172.17.0.5 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                                hpcmanager/node:test    
+                                hpcmanager/node:1.0    
 ```
 
 ## 10. 费用服务
@@ -190,7 +190,7 @@ docker run -itd --name hpc_fee -e MYSQL_HOST=172.17.0.3 \
                                 -e ETCD_ADDRESS=172.17.0.5 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                                hpcmanager/fee:test       
+                                hpcmanager/fee:1.0       
 ```
 
 ## 11. 项目服务
@@ -204,7 +204,7 @@ docker run -itd --name hpc_project -e MYSQL_HOST=172.17.0.3 \
                                 -e ETCD_ADDRESS=172.17.0.5 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                                hpcmanager/project:test
+                                hpcmanager/project:1.0
 ```
 
 ## 12. 奖励服务
@@ -218,7 +218,7 @@ docker run -itd --name hpc_award -e MYSQL_HOST=172.17.0.3 \
                                 -e ETCD_ADDRESS=172.17.0.5 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                                hpcmanager/award:test
+                                hpcmanager/award:1.0
 ```
 
 ## 13. 作业调度测试服务
@@ -234,7 +234,7 @@ docker run -itd --name hpc_hpc -e MYSQL_HOST=172.17.0.3 \
                                 -e ETCD_ADDRESS=172.17.0.5 \
                                 -e REDIS_ADDRESS=172.17.0.4:6379 \
                                 -e RABBITMQ_ADDRESS=172.17.0.6:5672 \
-                                hpcmanager/hpc:test
+                                hpcmanager/hpc:1.0
 ```
 
 待服务启动之后查看其日志：
@@ -265,7 +265,64 @@ docker run -itd --name hpc_hpc -e MYSQL_HOST=172.17.0.3 \
 
 其中绿色代表服务状态正常，红色代表服务下线。
 
+# 系统部分配置
+
+## 1. 机器节点独占费率配置
+
+超级管理员用户在机器独占账单管理界面可以进行配置
+
+![image-20220430154658151](mdimages/image-20220430154658151.png)
+
+## 2. 机器包机时长费率配置
+
+超级管理员用户可以在机器时长账单管理界面进行配置
+
+![image-20220430155223167](mdimages/image-20220430155223167.png)
+
+## 3. 机器存储费率配置
+
+超级管理员可以在机器存储账单页面进行配置
+
+![image-20220430155330213](mdimages/image-20220430155330213.png)
+
 # 附录
 
-## 生产环境下的作业调度服务部署
+## 1. 生产环境下的作业调度服务部署
 
+ 首先初始化配置文件，将`hpc`服务的配置文件模板`hpc/docker/config-template.yaml`文件复制到计算节点用户的`.config/hpcmanager`目录下
+
+> 如果计算节点使用root用户运行hpc服务则配置文件目录为:
+>
+> `/root/.config/hpcmanager`
+>
+> 如果是其他用户则为：
+>
+> `/home/用户名/.config/hpcmanager`
+
+将文件名命名为`config-production.yaml`
+
+其中配置文件中的`jobDatabase`项为作业调度系统数据库配置，用来同步机器时长数据信息
+
+然后执行以下命令运行hpc服务：
+
+`env HPCMANAGER_ENV=production ./hpcmain --cmdBaseDir=/path/to/cmd`
+
+其中的参数`cmdBaseDir`为作业调度系统PHP脚本的地址，即原来系统的`hpc_server`目录
+
+其中的`hpcmain`为`hpc`服务编译后的可执行文件
+
+## 2. 机时数据自动同步脚本部署
+
+机时数据自动同步脚本使用`crontab`命令进行定时执行，并自动抓取执行时候的日期前7天至当日的时间段的机时原始数据。
+
+首先修改`hpc/crontab/weekGetUsage.sh`文件中的内容
+
+![image-20220430170015569](mdimages/image-20220430170015569.png)
+
+主要是修改环境变量以及可执行文件的路径
+
+然后执行`crontab -e`添加计划任务
+
+![image-20220430170142545](mdimages/image-20220430170142545.png)
+
+同时要修改`weekGetUsage.sh`文件的路径确保能够正确执行。

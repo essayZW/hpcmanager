@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import LogoImageSrc from '../assets/logo.png';
 import { getUserInfoFromStorage, logout as userLogout } from '../service/user';
 import { LoginUserInfo } from '../api/user';
 import { useRouter } from 'vue-router';
@@ -53,7 +52,6 @@ const jumpToIndex = () => {
   <el-container>
     <el-header class="header">
       <div class="logo-title" @click="jumpToIndex">
-        <el-image :src="LogoImageSrc" class="logo"></el-image>
         <h1>计算平台管理系统</h1>
       </div>
       <div class="login-user">
