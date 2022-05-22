@@ -15,7 +15,7 @@ import (
 	"go-micro.dev/v4/client"
 )
 
-// CheckApplyMessage 审核加入组申请消息
+// CheckApplyMessage 审核计算节点机器独占申请消息
 type CheckApplyMessage struct {
 	CheckStatus  bool
 	CheckMessage string

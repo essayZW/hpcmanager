@@ -26,14 +26,6 @@ const Router: RouteRecordRaw[] = [
     name: 'Main',
     component: MainView,
     redirect: '/main/index',
-    beforeEnter: async () => {
-      // 检查setToken参数
-      const tokenValue = getQuery('setToken');
-      if (tokenValue != null) {
-        localStorage.setItem(accessTokenKey, tokenValue);
-        window.location.href = '/';
-      }
-    },
     children: [
       {
         path: '/main/update_user_info',
@@ -98,6 +90,12 @@ const router = createRouter({
   routes: Router,
 });
 router.beforeEach(async (to) => {
+  // 检查setToken参数
+  const tokenValue = getQuery('setToken');
+  if (tokenValue != null) {
+    localStorage.setItem(accessTokenKey, tokenValue);
+    window.location.href = '/';
+  }
   // 尝试加载动态路由
   const userInfo = await isLogin();
   if (userInfo == null) {

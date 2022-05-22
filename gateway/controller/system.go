@@ -325,6 +325,7 @@ func NewSystem(client client.Client, redisConn *redis.Client, dynamicConfig conf
 		casConfigMutex.Lock()
 		defer casConfigMutex.Unlock()
 		defaultCasConfig.AuthServer = casAuthServer
+		res.casServer.AuthServer = casAuthServer
 	})
 	if err != nil {
 		return nil, err
